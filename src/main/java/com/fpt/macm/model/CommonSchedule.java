@@ -1,34 +1,34 @@
 package com.fpt.macm.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.time.LocalTime;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "event")
-public class Event {
+@Table(name = "common_schedule")
+public class CommonSchedule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
 	@Column
-	private String name;
+	private String title;
 	
 	@Column
-	private String description;
+	private LocalDate date;
 	
 	@Column
-	private int maxQuantityComitee;
+	private LocalTime startTime;
+	
+	@Column
+	private LocalTime finishTime;
 	
 	@Column
 	private String createdBy;
@@ -41,9 +41,6 @@ public class Event {
 
 	@Column
 	private LocalDateTime updatedOn;
-	
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<MemberEvent> membersEvent = new HashSet<MemberEvent>();
 
 	public int getId() {
 		return id;
@@ -53,28 +50,36 @@ public class Event {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTitle(String title) {
+		this.title = title;
 	}
 
-	public String getDescription() {
-		return description;
+	public LocalDate getDate() {
+		return date;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setDate(LocalDate date) {
+		this.date = date;
 	}
 
-	public int getMaxQuantityComitee() {
-		return maxQuantityComitee;
+	public LocalTime getStartTime() {
+		return startTime;
 	}
 
-	public void setMaxQuantityComitee(int maxQuantityComitee) {
-		this.maxQuantityComitee = maxQuantityComitee;
+	public void setStartTime(LocalTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public LocalTime getFinishTime() {
+		return finishTime;
+	}
+
+	public void setFinishTime(LocalTime finishTime) {
+		this.finishTime = finishTime;
 	}
 
 	public String getCreatedBy() {
@@ -107,14 +112,6 @@ public class Event {
 
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
-	}
-
-	public Set<MemberEvent> getMembersEvent() {
-		return membersEvent;
-	}
-
-	public void setMembersEvent(Set<MemberEvent> membersEvent) {
-		this.membersEvent = membersEvent;
 	}
 	
 	
