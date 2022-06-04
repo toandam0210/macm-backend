@@ -1,16 +1,10 @@
 package com.fpt.macm.model;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -23,9 +17,6 @@ public class Role {
 	@Column
 	private String name;
 	
-	@OneToMany(mappedBy = "role", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<User> users = new HashSet<User>();
-
 	public int getId() {
 		return id;
 	}
@@ -41,16 +32,6 @@ public class Role {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-	public Set<User> getUsers() {
-		return users;
-	}
-
-	public void setUsers(Set<User> users) {
-		this.users = users;
-	}
-	
-	
-	
+		
 
 }
