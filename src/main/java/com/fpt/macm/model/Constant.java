@@ -6,4 +6,5 @@ public class Constant {
 	public static final String MSG_003 = "CTV không thể thành BCN";
 	public static final String MSG_004 = "Gỡ quyền quản trị thành công";
 	public static final String MSG_005 = "Cập nhật thông tin thành công";
+	public static final String MSG_006 = "Thêm danh sách thành công";
 }
