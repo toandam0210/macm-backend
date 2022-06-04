@@ -17,6 +17,16 @@ public class Role {
 	@Column
 	private String name;
 	
+	
+	
+	public Role(int id) {
+		super();
+		this.id = id;
+	}
+	public Role() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public int getId() {
 		return id;
 	}
