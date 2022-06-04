@@ -46,11 +46,7 @@ public class UserServiceImpl implements UserService {
 			user.setGender(Boolean.parseBoolean(record.getString("gender")));
 			user.setImage(record.getString("image"));
 			user.setGender(Boolean.parseBoolean(record.getString("is_active")));
-			String[] arrRole = { "Chủ nhiệm", "Phó chủ nhiệm", "Thủ quỹ", "Trưởng ban văn hóa", "Phó ban văn hóa",
-					"Trưởng ban truyền thông", "Phó ban truyền thông", "Trưởng ban chuyên môn", "Phó ban chuyên môn",
-					"Thành viên ban truyền thông", "Thành viên ban văn hóa", "Thành viên ban chuyên môn",
-					"Cộng tác viên ban truyền thông", "Cộng tác viên ban văn hóa", "Cộng tác viên ban chuyên môn" };
-			List<String> roles = Arrays.asList(arrRole);
+			List<String> roles = Arrays.asList(Constant.ROLES);
 			for (int i = 0; i < roles.size(); i++) {
 				Role role = new Role();
 				if (record.getString("role").equals(roles.get(i))) {
