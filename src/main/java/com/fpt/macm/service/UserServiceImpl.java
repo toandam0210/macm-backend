@@ -8,6 +8,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -45,7 +49,7 @@ public class UserServiceImpl implements UserService {
 			user.setEmail(record.getString("email"));
 			user.setGender(Boolean.parseBoolean(record.getString("gender")));
 			user.setImage(record.getString("image"));
-			user.setGender(Boolean.parseBoolean(record.getString("is_active")));
+			user.setActive(Boolean.parseBoolean(record.getString("is_active")));
 			List<String> roles = Arrays.asList(Constant.ROLES);
 			for (int i = 0; i < roles.size(); i++) {
 				Role role = new Role();
@@ -65,5 +69,27 @@ public class UserServiceImpl implements UserService {
 		responseMessage.setMessage(Constant.MSG_006);
 		return responseMessage;
 
+	}
+
+	@Override
+	public ResponseMessage getAllMemberAndCollaborator(int pageNo, int pageSize, String sortBy) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<User> pageResponse = userRepository.findMemberAndCollaboratorByRoleId(paging);
+			List<User> users = new ArrayList<User>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				users = pageResponse.getContent();
+			}
+			responseMessage.setMessage(Constant.MSG_001);
+			responseMessage.setData(users);
+			responseMessage.setPageNo(pageNo);
+			responseMessage.setPageSize(pageSize);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+
+		return responseMessage;
 	}
 }

@@ -15,5 +15,8 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	Optional<User> findByStudentId(String studentId);
 	
 	@Query(value = "select * from [user] where role_id < 10", nativeQuery = true)
-	Page<User> findByRoleId(Pageable pageable);
+	Page<User> findAdminByRoleId(Pageable pageable);
+	
+	@Query(value = "select * from [user] where role_id > 9", nativeQuery = true)
+	Page<User> findMemberAndCollaboratorByRoleId(Pageable pageable);
 }

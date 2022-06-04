@@ -70,7 +70,7 @@ public class AdminServiceImpl implements AdminService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<User> pageResponse = userRepository.findByRoleId(paging);
+			Page<User> pageResponse = userRepository.findAdminByRoleId(paging);
 			List<User> admins = new ArrayList<User>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				admins = pageResponse.getContent();

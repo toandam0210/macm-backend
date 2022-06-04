@@ -6,4 +6,5 @@ import com.fpt.macm.model.ResponseMessage;
 
 public interface UserService {
 	ResponseMessage addListMemberAndCollaboratorFromFileCsv(MultipartFile file) throws Exception;
+	ResponseMessage getAllMemberAndCollaborator(int pageNo, int pageSize, String sortBy);
 }

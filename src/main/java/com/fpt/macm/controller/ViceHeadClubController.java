@@ -59,4 +59,9 @@ public class ViceHeadClubController {
 		return new ResponseEntity<ResponseMessage>(userSerivce.addListMemberAndCollaboratorFromFileCsv(file),HttpStatus.OK);
 	}
 	
+	@GetMapping("/getallmemberandcollaborator")
+	ResponseEntity<ResponseMessage> getAllMemberAndCollaborator(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
+			return new ResponseEntity<ResponseMessage>(userSerivce.getAllMemberAndCollaborator(pageNo,pageSize,sortBy), HttpStatus.OK);
+	}
+	
 }
