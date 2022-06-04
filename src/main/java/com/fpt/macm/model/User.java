@@ -45,12 +45,9 @@ public class User {
 	private String phone;
 
 	@Column
-	private boolean isMember;
-
-	@Column
 	private boolean isActive;
 	
-	@OneToMany(mappedBy = "`user`", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<AttendanceStatus> attendanceStatus = new HashSet<AttendanceStatus>();
 	
 	@ManyToOne(optional = false)
@@ -77,6 +74,9 @@ public class User {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
+	@Column
+	private boolean isAdmin;
 
 	public int getId() {
 		return id;
@@ -132,14 +132,6 @@ public class User {
 
 	public void setPhone(String phone) {
 		this.phone = phone;
-	}
-
-	public boolean isMember() {
-		return isMember;
-	}
-
-	public void setMember(boolean isMember) {
-		this.isMember = isMember;
 	}
 
 	public boolean isActive() {
@@ -228,6 +220,14 @@ public class User {
 
 	public void setMembershipStatus(Set<MembershipStatus> membershipStatus) {
 		this.membershipStatus = membershipStatus;
+	}
+
+	public boolean isAdmin() {
+		return isAdmin;
+	}
+
+	public void setAdmin(boolean isAdmin) {
+		this.isAdmin = isAdmin;
 	}
 	
 	
