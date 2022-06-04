@@ -51,7 +51,6 @@ public class AdminServiceImpl implements AdminService {
 			User user = userOp.get();
 			if (user.getRole().getName().equals(ERole.ROLE_Member.name())) {
 				user.setRole(role);
-				user.setAdmin(true);
 				user.setUpdatedBy("toandv");
 				user.setUpdatedOn(LocalDateTime.now());
 				userRepository.save(user);
@@ -71,7 +70,7 @@ public class AdminServiceImpl implements AdminService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<User> pageResponse = userRepository.findByIsAdmin(true, paging);
+			Page<User> pageResponse = userRepository.findByRoleId(paging);
 			List<User> admins = new ArrayList<User>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				admins = pageResponse.getContent();
@@ -96,7 +95,6 @@ public class AdminServiceImpl implements AdminService {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
 			User user = userOp.get();
 			user.setRole(role);
-			user.setAdmin(false);
 			user.setUpdatedBy("toandv");
 			user.setUpdatedOn(LocalDateTime.now());
 			userRepository.save(user);
