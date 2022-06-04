@@ -27,7 +27,7 @@ public class MembershipInfo {
 	@Column
 	private double amount;
 	
-	@OneToMany(mappedBy = "membershipInfor", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "membershipInfo", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<MembershipStatus>  membershipStatus  = new HashSet<MembershipStatus>();
 	
 	@Column

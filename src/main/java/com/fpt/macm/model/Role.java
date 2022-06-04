@@ -23,7 +23,7 @@ public class Role {
 	@Column
 	private String name;
 	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "role", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<User> users = new HashSet<User>();
 
 	public int getId() {

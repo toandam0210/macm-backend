@@ -30,7 +30,7 @@ public class TrainingSchedule {
 	@Column
 	private LocalDateTime finishTime;
 	
-	@OneToMany(mappedBy = "training_schedule", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "trainingSchedule", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<AttendanceStatus> attendanceStatus = new HashSet<AttendanceStatus>();
 	
 	@Column

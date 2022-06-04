@@ -25,7 +25,7 @@ public class FacilityCategory {
 	@Column
 	private String name;
 	
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "facilityCategory", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<Facility> facilities = new HashSet<Facility>();
 	
 	@Column

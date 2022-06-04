@@ -17,7 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "user")
+@Table(name = "`user`")
 public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,7 +50,7 @@ public class User {
 	@Column
 	private boolean isActive;
 	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "`user`", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<AttendanceStatus> attendanceStatus = new HashSet<AttendanceStatus>();
 	
 	@ManyToOne(optional = false)
