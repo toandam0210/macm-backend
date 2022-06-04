@@ -47,6 +47,9 @@ public class User {
 	@Column
 	private boolean isActive;
 	
+	@Column
+	private String currentAddress;
+	
 	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<AttendanceStatus> attendanceStatus = new HashSet<AttendanceStatus>();
 	
@@ -228,6 +231,14 @@ public class User {
 
 	public void setAdmin(boolean isAdmin) {
 		this.isAdmin = isAdmin;
+	}
+
+	public String getCurrentAddress() {
+		return currentAddress;
+	}
+
+	public void setCurrentAddress(String currentAddress) {
+		this.currentAddress = currentAddress;
 	}
 	
 	
