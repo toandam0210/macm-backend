@@ -77,9 +77,6 @@ public class User {
 
 	@Column
 	private LocalDateTime updatedOn;
-	
-	@Column
-	private boolean isAdmin;
 
 	public int getId() {
 		return id;
@@ -223,14 +220,6 @@ public class User {
 
 	public void setMembershipStatus(Set<MembershipStatus> membershipStatus) {
 		this.membershipStatus = membershipStatus;
-	}
-
-	public boolean isAdmin() {
-		return isAdmin;
-	}
-
-	public void setAdmin(boolean isAdmin) {
-		this.isAdmin = isAdmin;
 	}
 
 	public String getCurrentAddress() {
