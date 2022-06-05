@@ -1,5 +1,7 @@
 package com.fpt.macm.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -65,6 +67,11 @@ public class UserController {
 	@PostMapping("/adduser")
 	ResponseEntity<ResponseMessage> addNewMember(@RequestBody User user){
 		return new ResponseEntity<ResponseMessage>(userSerivce.addAnMemberOrCollaborator(user),HttpStatus.OK);
+	}
+	
+	@PutMapping("/updatestatus")
+	ResponseEntity<ResponseMessage> updateListStatusForUser(@RequestBody List<User> users){
+		return new ResponseEntity<ResponseMessage>(userSerivce.updateListStatusForUser(users),HttpStatus.OK);
 	}
 	
 }
