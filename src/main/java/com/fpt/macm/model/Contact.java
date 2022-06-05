@@ -17,7 +17,13 @@ public class Contact {
 	private int id;
 	
 	@Column
-	private String description;
+	private String clubName;
+	
+	@Column
+	private String clubMail;
+	
+	@Column
+	private String clubPhoneNumber;
 	
 	@Column
 	private String createdBy;
@@ -37,14 +43,6 @@ public class Contact {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
 	}
 
 	public String getCreatedBy() {
@@ -78,4 +76,29 @@ public class Contact {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
+
+	public String getClubName() {
+		return clubName;
+	}
+
+	public void setClubName(String clubName) {
+		this.clubName = clubName;
+	}
+
+	public String getClubMail() {
+		return clubMail;
+	}
+
+	public void setClubMail(String clubMail) {
+		this.clubMail = clubMail;
+	}
+
+	public String getClubPhoneNumber() {
+		return clubPhoneNumber;
+	}
+
+	public void setClubPhoneNumber(String clubPhoneNumber) {
+		this.clubPhoneNumber = clubPhoneNumber;
+	}
+	
 }
