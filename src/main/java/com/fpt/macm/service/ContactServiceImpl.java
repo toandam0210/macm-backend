@@ -46,4 +46,40 @@ public class ContactServiceImpl implements ContactService{
 		return responseMessage;
 	}
 
+	@Override
+	public ResponseMessage updateContact(Contact contact) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Contact oldContacts = contactRepository.findAll().get(0);
+			
+			oldContacts.setClubMail(contact.getClubMail());
+			oldContacts.setClubName(contact.getClubName());
+			oldContacts.setClubPhoneNumber(contact.getClubPhoneNumber());
+			
+			contactRepository.save(oldContacts);
+			
+			responseMessage.setMessage("Ok");;
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	public ResponseMessage updateSocialNetwork(List<SocialNetwork> socialNetworks) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			socialNetworkRepository.deleteAll();
+			socialNetworkRepository.saveAll(socialNetworks);
+			
+			responseMessage.setMessage("Ok");;
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }
