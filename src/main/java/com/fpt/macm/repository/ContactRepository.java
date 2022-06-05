@@ -7,5 +7,5 @@ import com.fpt.macm.model.Contact;
 
 @Repository
 public interface ContactRepository extends JpaRepository<Contact, Integer>{
-	
+
 }
