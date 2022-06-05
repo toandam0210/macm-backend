@@ -1,5 +1,7 @@
 package com.fpt.macm.service;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fpt.macm.dto.UserDto;
@@ -16,4 +18,5 @@ public interface UserService {
 	ResponseMessage getAllMemberAndCollaborator(int pageNo, int pageSize, String sortBy);
 	ResponseMessage addAnMemberOrCollaborator(User user);
 	ResponseMessage deleteAdmin(String studentId, Role role);
+	ResponseMessage updateListStatusForUser(List<User> users);
 }

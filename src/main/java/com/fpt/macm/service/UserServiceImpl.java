@@ -223,4 +223,23 @@ public class UserServiceImpl implements UserService {
 		}
 		return responseMessage;
 	}
+	
+	@Override
+	public ResponseMessage updateListStatusForUser(List<User> users) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			for (User user : users) {
+				User tempUser = userRepository.findByStudentId(user.getStudentId()).get();
+				tempUser.setActive(user.isActive());
+				userRepository.save(tempUser);
+			}
+			responseMessage.setData(users);
+			responseMessage.setMessage(Constant.MSG_005);
+			responseMessage.setTotalResult(users.size());
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
 }
