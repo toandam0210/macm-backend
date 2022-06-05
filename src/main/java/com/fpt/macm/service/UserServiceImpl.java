@@ -203,14 +203,14 @@ public class UserServiceImpl implements UserService {
 			User user = userOp.get();
 			if (user.getRole().getName().equals(ERole.ROLE_HeadCulture.name())
 					|| user.getRole().getName().equals(ERole.ROLE_ViceHeadCulture.name())) {
-				role.setId(11);
+				role.setId(Constant.ROLE_ID_MEMBER_CULTURE);
 				user.setRole(role);
 			} else if (user.getRole().getName().equals(ERole.ROLE_HeadCommunication.name())
 					|| user.getRole().getName().equals(ERole.ROLE_ViceHeadCommunication.name())) {
-				role.setId(10);
+				role.setId(Constant.ROLE_ID_MEMBER_COMMUNICATION);
 				user.setRole(role);
 			} else {
-				role.setId(12);
+				role.setId(Constant.ROLE_ID_MEMBER_TECHNIQUE);
 				user.setRole(role);
 			}
 

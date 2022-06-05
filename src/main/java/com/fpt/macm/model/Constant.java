@@ -8,6 +8,9 @@ public class Constant {
 	public static final String MSG_005 = "Cập nhật thông tin thành công";
 	public static final String MSG_006 = "Thêm danh sách thành viên thành công";
 	public static final String MSG_007 = "Thêm thành viên thành công";
+	public static final int ROLE_ID_MEMBER_CULTURE = 11;
+	public static final int ROLE_ID_MEMBER_COMMUNICATION = 10;
+	public static final int ROLE_ID_MEMBER_TECHNIQUE = 12;
 	public static final String[] ROLES = { "Chủ nhiệm", "Phó chủ nhiệm", "Thủ quỹ", "Trưởng ban văn hóa",
 			"Phó ban văn hóa", "Trưởng ban truyền thông", "Phó ban truyền thông", "Trưởng ban chuyên môn",
 			"Phó ban chuyên môn", "Thành viên ban truyền thông", "Thành viên ban văn hóa", "Thành viên ban chuyên môn",
