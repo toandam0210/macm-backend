@@ -6,7 +6,8 @@ public class Constant {
 	public static final String MSG_003 = "CTV không thể thành BCN";
 	public static final String MSG_004 = "Gỡ quyền quản trị thành công";
 	public static final String MSG_005 = "Cập nhật thông tin thành công";
-	public static final String MSG_006 = "Thêm danh sách thành công";
+	public static final String MSG_006 = "Thêm danh sách thành viên thành công";
+	public static final String MSG_007 = "Thêm thành viên thành công";
 	public static final String[] ROLES = { "Chủ nhiệm", "Phó chủ nhiệm", "Thủ quỹ", "Trưởng ban văn hóa",
 			"Phó ban văn hóa", "Trưởng ban truyền thông", "Phó ban truyền thông", "Trưởng ban chuyên môn",
 			"Phó ban chuyên môn", "Thành viên ban truyền thông", "Thành viên ban văn hóa", "Thành viên ban chuyên môn",
