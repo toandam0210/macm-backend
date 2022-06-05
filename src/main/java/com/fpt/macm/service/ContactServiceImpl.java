@@ -1,5 +1,6 @@
 package com.fpt.macm.service;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +59,7 @@ public class ContactServiceImpl implements ContactService{
 			oldContacts.setClubPhoneNumber(contact.getClubPhoneNumber());
 			
 			contactRepository.save(oldContacts);
-			
-			responseMessage.setMessage("Ok");;
+			responseMessage.setData(Arrays.asList(oldContacts));
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -73,8 +73,7 @@ public class ContactServiceImpl implements ContactService{
 		try {
 			socialNetworkRepository.deleteAll();
 			socialNetworkRepository.saveAll(socialNetworks);
-			
-			responseMessage.setMessage("Ok");;
+			responseMessage.setData(socialNetworks);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
