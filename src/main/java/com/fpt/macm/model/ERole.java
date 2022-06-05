@@ -10,6 +10,10 @@ public enum ERole {
 	ROLE_ViceHeadCommunication,
 	ROLE_HeadTechnique,
 	ROLE_ViceHeadTechnique,
-	ROLE_Member,
-	ROLE_Collaborator
+	ROLE_MemberCulture,
+	ROLE_MemberCommunication,
+	ROLE_MemberTechnique,
+	ROLE_CollaboratorCulture,
+	ROLE_CollaboratorCommunication,
+	ROLE_CollaboratorTechnique
 }

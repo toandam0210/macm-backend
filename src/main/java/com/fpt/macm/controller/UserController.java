@@ -16,42 +16,40 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fpt.macm.dto.UserDto;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
-import com.fpt.macm.service.AdminService;
+import com.fpt.macm.model.User;
 import com.fpt.macm.service.UserService;
 
 @RestController
-@RequestMapping("/api/admin/vicehead")
-public class ViceHeadClubController {
-	
-	@Autowired
-	AdminService adminService;
+@RequestMapping("/api/admin/hr")
+public class UserController {
+
 	
 	@Autowired
 	UserService userSerivce;
 	
 	@GetMapping("/getbystudentid/{studentId}")
 	ResponseEntity<ResponseMessage> getStudentByStudentId(@PathVariable(name = "studentId") String studentId){
-			return new ResponseEntity<ResponseMessage>(adminService.getUserByStudentId(studentId), HttpStatus.OK);
+			return new ResponseEntity<ResponseMessage>(userSerivce.getUserByStudentId(studentId), HttpStatus.OK);
 	}
 	
-	@PutMapping("/updaterolebystudentid/{studentId}")
-	ResponseEntity<ResponseMessage> updateMemberToAdminByStudentId(@PathVariable(name = "studentId") String studentId, @RequestBody Role role){
-		return new ResponseEntity<ResponseMessage>(adminService.updateMemberToAdminByStudentId(studentId, role), HttpStatus.OK);
+	@GetMapping("/viceheadclub/getalladmin")
+	ResponseEntity<ResponseMessage> getAllAdminForViceHeadClub(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
+			return new ResponseEntity<ResponseMessage>(userSerivce.getAllAdminForViceHeadClub(pageNo,pageSize,sortBy), HttpStatus.OK);
 	}
 	
-	@GetMapping("/getalladmin")
-	ResponseEntity<ResponseMessage> getAllAdmin(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
-			return new ResponseEntity<ResponseMessage>(adminService.getAllAdmin(pageNo,pageSize,sortBy), HttpStatus.OK);
+	@GetMapping("/headclub/getalladmin")
+	ResponseEntity<ResponseMessage> getAllAdminForHeadClub(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
+			return new ResponseEntity<ResponseMessage>(userSerivce.getAllAdminForHeadClub(pageNo,pageSize,sortBy), HttpStatus.OK);
+	}
+		
+	@PutMapping("/updateuser/{studentId}")
+	ResponseEntity<ResponseMessage> updateAdminByStudentId(@PathVariable(name = "studentId") String studentId, @RequestBody UserDto userDto){
+		return new ResponseEntity<ResponseMessage>(userSerivce.updateUser(studentId, userDto), HttpStatus.OK);
 	}
 	
 	@PutMapping("/deleteadmin/{studentId}")
-	ResponseEntity<ResponseMessage> updateAdminToMemberByStudentId(@PathVariable(name = "studentId") String studentId, @RequestBody Role role){
-		return new ResponseEntity<ResponseMessage>(adminService.updateAdminToMemberByStudentId(studentId, role), HttpStatus.OK);
-	}
-	
-	@PutMapping("/updateadmin/{studentId}")
-	ResponseEntity<ResponseMessage> updateAdminByStudentId(@PathVariable(name = "studentId") String studentId, @RequestBody UserDto userDto){
-		return new ResponseEntity<ResponseMessage>(adminService.updateAdmin(studentId, userDto), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> deleteAdminByStudentId(@PathVariable(name = "studentId") String studentId, @RequestBody Role role){
+		return new ResponseEntity<ResponseMessage>(userSerivce.deleteAdmin(studentId, role), HttpStatus.OK);
 	}
 	
 	@PostMapping("/uploadfilemember")
@@ -62,6 +60,11 @@ public class ViceHeadClubController {
 	@GetMapping("/getallmemberandcollaborator")
 	ResponseEntity<ResponseMessage> getAllMemberAndCollaborator(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
 			return new ResponseEntity<ResponseMessage>(userSerivce.getAllMemberAndCollaborator(pageNo,pageSize,sortBy), HttpStatus.OK);
+	}
+	
+	@PostMapping("/adduser")
+	ResponseEntity<ResponseMessage> addNewMember(@RequestBody User user){
+		return new ResponseEntity<ResponseMessage>(userSerivce.addAnMemberOrCollaborator(user),HttpStatus.OK);
 	}
 	
 }
