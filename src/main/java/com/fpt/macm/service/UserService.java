@@ -1,6 +1,9 @@
 package com.fpt.macm.service;
 
+import java.io.IOException;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,4 +22,5 @@ public interface UserService {
 	ResponseMessage addAnMemberOrCollaborator(User user);
 	ResponseMessage deleteAdmin(String studentId, Role role);
 	ResponseMessage updateListStatusForUser(List<User> users);
+	void export(HttpServletResponse response)throws IOException;
 }
