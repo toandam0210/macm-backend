@@ -1,13 +1,19 @@
 package com.fpt.macm.service;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,8 +22,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.supercsv.io.CsvBeanWriter;
+import org.supercsv.io.ICsvBeanWriter;
+import org.supercsv.prefs.CsvPreference;
 
 import com.fpt.macm.dto.UserDto;
+import com.fpt.macm.dto.UserToCsvDto;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ERole;
 import com.fpt.macm.model.ResponseMessage;
@@ -223,7 +233,7 @@ public class UserServiceImpl implements UserService {
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
 	public ResponseMessage updateListStatusForUser(List<User> users) {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -241,5 +251,109 @@ public class UserServiceImpl implements UserService {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
+	}
+
+	@Override
+	public void export(HttpServletResponse response) throws IOException {
+		response.setContentType("text/csv; charset=UTF-8");
+		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+		String currentDateTime = dateFormatter.format(new Date());
+		String headerKey = "Content-Disposition";
+		String headerValue = "attachment; filename=users_" + currentDateTime + ".csv";
+		response.setHeader(headerKey, headerValue);
+		response.setCharacterEncoding("UTF-8");
+		ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
+		String[] csvHeader = { "student_id", "name", "date_of_birth", "phone", "email", "gender", "image", "is_active",
+				"role", "current_address" };
+		String[] nameMapping = { "studentId", "name", "dateOfBirth", "phone", "email", "gender", "image", "isActive",
+				"role", "currentAddress" };
+		csvWriter.writeHeader(csvHeader);
+		List<User> users = (List<User>) userRepository.findAll();
+		List<UserToCsvDto> userToCsvDtos = new ArrayList<UserToCsvDto>();
+		for (User user : users) {
+			UserToCsvDto userToCsvDto = convertUserToUserCsv(user);
+			userToCsvDtos.add(userToCsvDto);
+		}
+		for (UserToCsvDto userToCsvDto : userToCsvDtos) {
+			csvWriter.write(userToCsvDto, nameMapping);
+		}
+		csvWriter.close();
+	}
+	
+	public void convertUserRoleFromDbToCsv(User user, UserToCsvDto userToCsvDto) {
+		switch (user.getRole().getName()) {
+		case "ROLE_HeadClub":
+			userToCsvDto.setRole("Chủ nhiệm");
+			break;
+		case "ROLE_ViceHeadClub":
+			userToCsvDto.setRole("Phó chủ nhiệm");
+			break;
+		case "ROLE_Treasurer":
+			userToCsvDto.setRole("Thủ quỹ");
+			break;
+		case "ROLE_HeadCulture":
+			userToCsvDto.setRole("Trưởng ban văn hóa");
+			break;
+		case "ROLE_ViceHeadCulture":
+			userToCsvDto.setRole("Phó ban văn hóa");
+			break;
+		case "ROLE_HeadCommunication":
+			userToCsvDto.setRole("Trưởng ban truyền thông");
+			break;
+		case "ROLE_ViceHeadCommunication":
+			userToCsvDto.setRole("Phó ban truyền thông");
+			break;
+		case "ROLE_HeadTechnique":
+			userToCsvDto.setRole("Trưởng ban chuyên môn");
+			break;
+		case "ROLE_ViceHeadTechnique":
+			userToCsvDto.setRole("Phó ban chuyên môn");
+			break;
+		case "ROLE_Member_Commnication":
+			userToCsvDto.setRole("Thành viên ban truyền thông");
+			break;
+		case "ROLE_Member_Culture":
+			userToCsvDto.setRole("Thành viên ban văn hóa");
+			break;
+		case "ROLE_Member_Technique":
+			userToCsvDto.setRole("Thành viên ban chuyên môn");
+			break;
+		case "ROLE_Collaborator_Commnunication":
+			userToCsvDto.setRole("CTV truyền thông");
+			break;
+		case "ROLE_Collaborator_Culture":
+			userToCsvDto.setRole("CTV văn hóa");
+			break;
+		case "ROLE_Collaborator_Technique":
+			userToCsvDto.setRole("CTV chuyên môn");
+			break;
+
+		default:
+			userToCsvDto.setRole("Thành viên ban chuyên môn");
+			break;
+		}
+	}
+	
+	public UserToCsvDto convertUserToUserCsv(User user) {
+		UserToCsvDto userToCsvDto = new UserToCsvDto();
+		userToCsvDto.setStudentId(user.getStudentId());
+		userToCsvDto.setName(user.getName());
+		userToCsvDto.setDateOfBirth(user.getDateOfBirth());
+		userToCsvDto.setPhone(user.getPhone());
+		userToCsvDto.setEmail(user.getEmail());
+		if (user.isGender()) {
+			userToCsvDto.setGender("Nam");
+		} else {
+			userToCsvDto.setGender("Nữ");
+		}
+		userToCsvDto.setImage(user.getImage());
+		if (user.isActive()) {
+			userToCsvDto.setIsActive("Hoạt động");
+		} else {
+			userToCsvDto.setIsActive("Không hoạt động");
+		}
+		convertUserRoleFromDbToCsv(user, userToCsvDto);
+		userToCsvDto.setCurrentAddress(user.getCurrentAddress());
+		return userToCsvDto;
 	}
 }
