@@ -20,13 +20,10 @@ public class News {
 	private String title;
 	
 	@Column
-	private String author;
-	
-	@Column
 	private String description;
 	
 	@Column
-	private String status;
+	private boolean status;
 	
 	@Column
 	private String createdBy;
@@ -56,14 +53,6 @@ public class News {
 		this.title = title;
 	}
 
-	public String getAuthor() {
-		return author;
-	}
-
-	public void setAuthor(String author) {
-		this.author = author;
-	}
-
 	public String getDescription() {
 		return description;
 	}
@@ -72,11 +61,11 @@ public class News {
 		this.description = description;
 	}
 
-	public String getStatus() {
+	public boolean getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(boolean status) {
 		this.status = status;
 	}
 
