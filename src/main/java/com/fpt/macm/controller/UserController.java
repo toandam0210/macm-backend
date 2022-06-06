@@ -1,6 +1,9 @@
 package com.fpt.macm.controller;
 
+import java.io.IOException;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,53 +28,66 @@ import com.fpt.macm.service.UserService;
 @RequestMapping("/api/admin/hr")
 public class UserController {
 
-	
 	@Autowired
 	UserService userSerivce;
-	
+
 	@GetMapping("/getbystudentid/{studentId}")
-	ResponseEntity<ResponseMessage> getStudentByStudentId(@PathVariable(name = "studentId") String studentId){
-			return new ResponseEntity<ResponseMessage>(userSerivce.getUserByStudentId(studentId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getStudentByStudentId(@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.getUserByStudentId(studentId), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/viceheadclub/getalladmin")
-	ResponseEntity<ResponseMessage> getAllAdminForViceHeadClub(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
-			return new ResponseEntity<ResponseMessage>(userSerivce.getAllAdminForViceHeadClub(pageNo,pageSize,sortBy), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllAdminForViceHeadClub(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.getAllAdminForViceHeadClub(pageNo, pageSize, sortBy),
+				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headclub/getalladmin")
-	ResponseEntity<ResponseMessage> getAllAdminForHeadClub(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
-			return new ResponseEntity<ResponseMessage>(userSerivce.getAllAdminForHeadClub(pageNo,pageSize,sortBy), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllAdminForHeadClub(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.getAllAdminForHeadClub(pageNo, pageSize, sortBy),
+				HttpStatus.OK);
 	}
-		
+
 	@PutMapping("/updateuser/{studentId}")
-	ResponseEntity<ResponseMessage> updateAdminByStudentId(@PathVariable(name = "studentId") String studentId, @RequestBody UserDto userDto){
+	ResponseEntity<ResponseMessage> updateAdminByStudentId(@PathVariable(name = "studentId") String studentId,
+			@RequestBody UserDto userDto) {
 		return new ResponseEntity<ResponseMessage>(userSerivce.updateUser(studentId, userDto), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/deleteadmin/{studentId}")
-	ResponseEntity<ResponseMessage> deleteAdminByStudentId(@PathVariable(name = "studentId") String studentId, @RequestBody Role role){
+	ResponseEntity<ResponseMessage> deleteAdminByStudentId(@PathVariable(name = "studentId") String studentId,
+			@RequestBody Role role) {
 		return new ResponseEntity<ResponseMessage>(userSerivce.deleteAdmin(studentId, role), HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/uploadfilemember")
-	ResponseEntity<ResponseMessage> addListMemberFromCsv(@RequestParam("file") MultipartFile file) throws Exception{
-		return new ResponseEntity<ResponseMessage>(userSerivce.addListMemberAndCollaboratorFromFileCsv(file),HttpStatus.OK);
+	ResponseEntity<ResponseMessage> addListMemberFromCsv(@RequestParam("file") MultipartFile file) throws Exception {
+		return new ResponseEntity<ResponseMessage>(userSerivce.addListMemberAndCollaboratorFromFileCsv(file),
+				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/getallmemberandcollaborator")
-	ResponseEntity<ResponseMessage> getAllMemberAndCollaborator(@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
-			return new ResponseEntity<ResponseMessage>(userSerivce.getAllMemberAndCollaborator(pageNo,pageSize,sortBy), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllMemberAndCollaborator(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.getAllMemberAndCollaborator(pageNo, pageSize, sortBy),
+				HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/adduser")
-	ResponseEntity<ResponseMessage> addNewMember(@RequestBody User user){
-		return new ResponseEntity<ResponseMessage>(userSerivce.addAnMemberOrCollaborator(user),HttpStatus.OK);
+	ResponseEntity<ResponseMessage> addNewMember(@RequestBody User user) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.addAnMemberOrCollaborator(user), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/updatestatus")
-	ResponseEntity<ResponseMessage> updateListStatusForUser(@RequestBody List<User> users){
-		return new ResponseEntity<ResponseMessage>(userSerivce.updateListStatusForUser(users),HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateListStatusForUser(@RequestBody List<User> users) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.updateListStatusForUser(users), HttpStatus.OK);
 	}
-	
+
+	@GetMapping("/users/export")
+	void exportListUserToCsv(HttpServletResponse httpServletResponse) throws IOException {
+		userSerivce.export(httpServletResponse);
+	}
+
 }
