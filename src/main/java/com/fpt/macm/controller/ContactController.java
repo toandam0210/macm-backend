@@ -17,28 +17,28 @@ import com.fpt.macm.model.SocialNetwork;
 import com.fpt.macm.service.ContactService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/contact")
 public class ContactController {
 
 	@Autowired
 	ContactService contactService;
 	
-	@GetMapping("/contact")
+	@GetMapping("/getallcontact")
 	ResponseEntity<ResponseMessage> getAllContact(){
 			return new ResponseEntity<ResponseMessage>(contactService.getAllContact(), HttpStatus.OK);
 	}
 	
-	@GetMapping("/contact/socialnetwork")
+	@GetMapping("/headcommunication/getallsocialnetwork")
 	ResponseEntity<ResponseMessage> getAllSocialNetwork(){
 			return new ResponseEntity<ResponseMessage>(contactService.getAllSocialNetwork(), HttpStatus.OK);
 	}
 	
-	@PutMapping("/contact/updatecontact")
+	@PutMapping("/headcommunication/updatecontact")
 	ResponseEntity<ResponseMessage> updateContact(@RequestBody Contact contact){
 		return new ResponseEntity<ResponseMessage>(contactService.updateContact(contact),HttpStatus.OK);
 	}
 	
-	@PutMapping("/contact/updatesocialnetwork")
+	@PutMapping("/headcommunication/updatesocialnetwork")
 	ResponseEntity<ResponseMessage> updateContact(@RequestBody List<SocialNetwork> socialNetworks){
 		return new ResponseEntity<ResponseMessage>(contactService.updateSocialNetwork(socialNetworks),HttpStatus.OK);
 	}
