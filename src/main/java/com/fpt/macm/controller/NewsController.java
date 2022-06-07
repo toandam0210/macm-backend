@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,4 +33,8 @@ public class NewsController {
 		return new ResponseEntity<ResponseMessage>(newsService.getAllNews(pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 	
+	@GetMapping("/communication/getnewsbyid/{newsId}")
+	ResponseEntity<ResponseMessage> getNewsById(@PathVariable(name = "newsId") int newsId){
+		return new ResponseEntity<ResponseMessage>(newsService.getNewsById(newsId), HttpStatus.OK);
+	}
 }
