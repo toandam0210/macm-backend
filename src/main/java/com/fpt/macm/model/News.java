@@ -10,16 +10,16 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "`news`")
+@Table(name = "news")
 public class News {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column(name = "title", columnDefinition = "nvarchar(255)", nullable = false)
+	@Column(name = "title")
 	private String title;
 	
-	@Column(name = "description", columnDefinition = "nvarchar(Max)", nullable = false)
+	@Column(name = "description")
 	private String description;
 	
 	@Column
