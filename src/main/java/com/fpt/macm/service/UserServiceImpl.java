@@ -157,8 +157,8 @@ public class UserServiceImpl implements UserService {
 			user.setCreatedBy("toandv");
 			user.setCreatedOn(LocalDate.now());
 			users.add(user);
+			userRepository.save(user);
 		}
-		userRepository.saveAll(users);
 		responseMessage.setData(users);
 		responseMessage.setTotalResult(users.size());
 		responseMessage.setMessage(Constant.MSG_006);
