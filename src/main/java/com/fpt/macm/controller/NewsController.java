@@ -3,6 +3,7 @@ package com.fpt.macm.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +24,12 @@ public class NewsController {
 	@PostMapping("/communication/createnews")
 	ResponseEntity<ResponseMessage> createNews(@RequestBody News news, @RequestParam boolean isSendNotification){
 		return new ResponseEntity<ResponseMessage>(newsService.createNews(news, isSendNotification), HttpStatus.OK);
+	}
+	
+	@GetMapping("/communication/getallnews")
+	ResponseEntity<ResponseMessage> getAllNews(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
+		return new ResponseEntity<ResponseMessage>(newsService.getAllNews(pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 	
 }

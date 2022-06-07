@@ -16,10 +16,10 @@ public class News {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column
+	@Column(name = "title", columnDefinition = "nvarchar(255)", nullable = false)
 	private String title;
 	
-	@Column
+	@Column(name = "description", columnDefinition = "nvarchar(Max)", nullable = false)
 	private String description;
 	
 	@Column
