@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -66,6 +67,21 @@ public class NewsServiceImpl implements NewsService{
 			responseMessage.setData(newsList);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getNewsById(int newsId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<News> newsOp = newsRepository.findById(newsId);
+			News news = newsOp.get();
+			responseMessage.setData(Arrays.asList(news));
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
