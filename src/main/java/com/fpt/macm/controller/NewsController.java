@@ -27,8 +27,9 @@ public class NewsController {
 	}
 	
 	@GetMapping("/communication/getallnews")
-	ResponseEntity<ResponseMessage> getAllNews(){
-		return new ResponseEntity<ResponseMessage>(newsService.getAllNews(), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllNews(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
+		return new ResponseEntity<ResponseMessage>(newsService.getAllNews(pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 	
 }
