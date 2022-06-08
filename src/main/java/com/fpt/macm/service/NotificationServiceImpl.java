@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Notification;
 import com.fpt.macm.model.NotificationToUser;
 import com.fpt.macm.model.ResponseMessage;
@@ -35,6 +36,7 @@ public class NotificationServiceImpl implements NotificationService{
 		try {
 			List<Notification> notification = notificationRepository.findAll();
 			responseMessage.setData(notification);
+			responseMessage.setMessage(Constant.MSG_016);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -52,6 +54,7 @@ public class NotificationServiceImpl implements NotificationService{
 			
 			notificationRepository.save(notification);
 			responseMessage.setData(Arrays.asList(notification));
+			responseMessage.setMessage(Constant.MSG_017);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -83,6 +86,7 @@ public class NotificationServiceImpl implements NotificationService{
 			
 			
 			responseMessage.setData(notificationToUsers);
+			responseMessage.setMessage(Constant.MSG_018);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

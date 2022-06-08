@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.News;
 import com.fpt.macm.model.Notification;
 import com.fpt.macm.model.ResponseMessage;
@@ -46,6 +47,7 @@ public class NewsServiceImpl implements NewsService{
 			}
 			
 			responseMessage.setData(Arrays.asList(news));
+			responseMessage.setMessage(Constant.MSG_012);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -67,6 +69,7 @@ public class NewsServiceImpl implements NewsService{
 			responseMessage.setData(newsList);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
+			responseMessage.setMessage(Constant.MSG_013);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -82,6 +85,65 @@ public class NewsServiceImpl implements NewsService{
 			Optional<News> newsOp = newsRepository.findById(newsId);
 			News news = newsOp.get();
 			responseMessage.setData(Arrays.asList(news));
+			responseMessage.setMessage(Constant.MSG_014);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage deleteNewsById(int newsId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<News> newsOp = newsRepository.findById(newsId);
+			News news = newsOp.get();
+			newsRepository.delete(news);
+			responseMessage.setData(Arrays.asList(news));
+			responseMessage.setMessage(Constant.MSG_015);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage editNews(int newsId, News news) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<News> newsOp = newsRepository.findById(newsId);
+			News oldNews = newsOp.get();
+			oldNews.setTitle(news.getTitle());
+			oldNews.setDescription(news.getDescription());
+			oldNews.setUpdatedBy("toandv");
+			oldNews.setUpdatedOn(LocalDateTime.now());
+			newsRepository.save(oldNews);
+			responseMessage.setData(Arrays.asList(oldNews));
+			responseMessage.setMessage(Constant.MSG_023);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateNewsStatus(int newsId, boolean status) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<News> newsOp = newsRepository.findById(newsId);
+			News news = newsOp.get();
+			news.setStatus(status);
+			news.setUpdatedBy("toandv");
+			news.setUpdatedOn(LocalDateTime.now());
+			newsRepository.save(news);
+			responseMessage.setData(Arrays.asList(news));
+			responseMessage.setMessage(Constant.MSG_024);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
