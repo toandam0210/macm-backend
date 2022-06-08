@@ -49,4 +49,9 @@ public class NewsController {
 	ResponseEntity<ResponseMessage> editNews(@PathVariable(name = "newsId") int newsId, @RequestBody News news){
 		return new ResponseEntity<ResponseMessage>(newsService.editNews(newsId, news), HttpStatus.OK);
 	}
+	
+	@PutMapping("/headcommunication/updatenewsstatus/{newsId}")
+	ResponseEntity<ResponseMessage> updateNewsStatus(@PathVariable(name = "newsId") int newsId, @RequestParam boolean status){
+		return new ResponseEntity<ResponseMessage>(newsService.updateNewsStatus(newsId, status), HttpStatus.OK);
+	}
 }
