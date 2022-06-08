@@ -85,10 +85,10 @@ public class NewsServiceImpl implements NewsService{
 			Optional<News> newsOp = newsRepository.findById(newsId);
 			News news = newsOp.get();
 			responseMessage.setData(Arrays.asList(news));
+			responseMessage.setMessage(Constant.MSG_014);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
-			responseMessage.setMessage(Constant.MSG_014);
 		}
 		return responseMessage;
 	}
