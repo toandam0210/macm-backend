@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Rule;
 import com.fpt.macm.repository.RuleRepository;
@@ -24,6 +25,7 @@ public class RuleServiceImpl implements RuleService{
 		try {
 			List<Rule> rules = ruleRepository.findAll();
 			responseMessage.setData(rules);
+			responseMessage.setMessage(Constant.MSG_019);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -40,6 +42,7 @@ public class RuleServiceImpl implements RuleService{
 			rule.setCreatedOn(LocalDateTime.now());
 			ruleRepository.save(rule);
 			responseMessage.setData(Arrays.asList(rule));
+			responseMessage.setMessage(Constant.MSG_020);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -59,6 +62,7 @@ public class RuleServiceImpl implements RuleService{
 			currentRule.setDescription(rule.getDescription());
 			ruleRepository.save(currentRule);
 			responseMessage.setData(Arrays.asList(currentRule));
+			responseMessage.setMessage(Constant.MSG_021);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -75,6 +79,7 @@ public class RuleServiceImpl implements RuleService{
 			Rule rule = ruleOp.get();
 			ruleRepository.delete(rule);
 			responseMessage.setData(Arrays.asList(rule));
+			responseMessage.setMessage(Constant.MSG_022);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.News;
 import com.fpt.macm.model.Notification;
 import com.fpt.macm.model.ResponseMessage;
@@ -46,6 +47,7 @@ public class NewsServiceImpl implements NewsService{
 			}
 			
 			responseMessage.setData(Arrays.asList(news));
+			responseMessage.setMessage(Constant.MSG_012);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -67,6 +69,7 @@ public class NewsServiceImpl implements NewsService{
 			responseMessage.setData(newsList);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
+			responseMessage.setMessage(Constant.MSG_013);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -85,6 +88,7 @@ public class NewsServiceImpl implements NewsService{
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
+			responseMessage.setMessage(Constant.MSG_014);
 		}
 		return responseMessage;
 	}
@@ -98,6 +102,7 @@ public class NewsServiceImpl implements NewsService{
 			News news = newsOp.get();
 			newsRepository.delete(news);
 			responseMessage.setData(Arrays.asList(news));
+			responseMessage.setMessage(Constant.MSG_015);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

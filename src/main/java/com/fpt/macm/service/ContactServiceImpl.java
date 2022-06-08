@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Contact;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.SocialNetwork;
@@ -28,6 +29,7 @@ public class ContactServiceImpl implements ContactService{
 		try {
 			List<Contact> contacts = contactRepository.findAll();
 			responseMessage.setData(contacts);
+			responseMessage.setMessage(Constant.MSG_008);
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
@@ -41,6 +43,7 @@ public class ContactServiceImpl implements ContactService{
 		try {
 			List<SocialNetwork> socialNetworks = socialNetworkRepository.findAll();
 			responseMessage.setData(socialNetworks);
+			responseMessage.setMessage(Constant.MSG_009);
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
@@ -60,6 +63,7 @@ public class ContactServiceImpl implements ContactService{
 			
 			contactRepository.save(oldContacts);
 			responseMessage.setData(Arrays.asList(oldContacts));
+			responseMessage.setMessage(Constant.MSG_010);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -74,6 +78,7 @@ public class ContactServiceImpl implements ContactService{
 			socialNetworkRepository.deleteAll();
 			socialNetworkRepository.saveAll(socialNetworks);
 			responseMessage.setData(socialNetworks);
+			responseMessage.setMessage(Constant.MSG_011);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
