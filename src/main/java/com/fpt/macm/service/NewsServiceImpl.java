@@ -89,4 +89,20 @@ public class NewsServiceImpl implements NewsService{
 		return responseMessage;
 	}
 
+	@Override
+	public ResponseMessage deleteNewsById(int newsId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<News> newsOp = newsRepository.findById(newsId);
+			News news = newsOp.get();
+			newsRepository.delete(news);
+			responseMessage.setData(Arrays.asList(news));
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }
