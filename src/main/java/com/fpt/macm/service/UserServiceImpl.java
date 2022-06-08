@@ -157,8 +157,8 @@ public class UserServiceImpl implements UserService {
 			user.setCreatedBy("toandv");
 			user.setCreatedOn(LocalDate.now());
 			users.add(user);
-			userRepository.save(user);
 		}
+		userRepository.saveAll(users);
 		responseMessage.setData(users);
 		responseMessage.setTotalResult(users.size());
 		responseMessage.setMessage(Constant.MSG_006);
@@ -279,7 +279,7 @@ public class UserServiceImpl implements UserService {
 		}
 		csvWriter.close();
 	}
-	
+
 	public void convertUserRoleFromDbToCsv(User user, UserToCsvDto userToCsvDto) {
 		switch (user.getRole().getName()) {
 		case "ROLE_HeadClub":
@@ -333,7 +333,7 @@ public class UserServiceImpl implements UserService {
 			break;
 		}
 	}
-	
+
 	public UserToCsvDto convertUserToUserCsv(User user) {
 		UserToCsvDto userToCsvDto = new UserToCsvDto();
 		userToCsvDto.setStudentId(user.getStudentId());
