@@ -131,4 +131,24 @@ public class NewsServiceImpl implements NewsService{
 		return responseMessage;
 	}
 
+	@Override
+	public ResponseMessage updateNewsStatus(int newsId, boolean status) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<News> newsOp = newsRepository.findById(newsId);
+			News news = newsOp.get();
+			news.setStatus(status);
+			news.setUpdatedBy("toandv");
+			news.setUpdatedOn(LocalDateTime.now());
+			newsRepository.save(news);
+			responseMessage.setData(Arrays.asList(news));
+			responseMessage.setMessage(Constant.MSG_024);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }
