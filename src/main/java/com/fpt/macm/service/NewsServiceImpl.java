@@ -110,4 +110,25 @@ public class NewsServiceImpl implements NewsService{
 		return responseMessage;
 	}
 
+	@Override
+	public ResponseMessage editNews(int newsId, News news) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<News> newsOp = newsRepository.findById(newsId);
+			News oldNews = newsOp.get();
+			oldNews.setTitle(news.getTitle());
+			oldNews.setDescription(news.getDescription());
+			oldNews.setUpdatedBy("toandv");
+			oldNews.setUpdatedOn(LocalDateTime.now());
+			newsRepository.save(oldNews);
+			responseMessage.setData(Arrays.asList(oldNews));
+			responseMessage.setMessage(Constant.MSG_023);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }
