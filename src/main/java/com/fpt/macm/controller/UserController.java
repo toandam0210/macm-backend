@@ -90,4 +90,10 @@ public class UserController {
 		userSerivce.export(httpServletResponse);
 	}
 
+	@GetMapping("/users/search")
+	ResponseEntity<ResponseMessage> searchUserByStudentIdOrName(@RequestParam(name = "inputSearch")String inputSearch,@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id")String sortBy) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.searchUserByStudentIdOrName(inputSearch,pageNo,pageSize,sortBy), HttpStatus.OK);
+	}
+
 }

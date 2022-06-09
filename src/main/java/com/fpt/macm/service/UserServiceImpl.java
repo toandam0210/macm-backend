@@ -280,4 +280,26 @@ public class UserServiceImpl implements UserService {
 		}
 		csvWriter.close();
 	}
+
+	@Override
+	public ResponseMessage searchUserByStudentIdOrName(String inputSearch,int pageNo, int pageSize, String sortBy) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
+			Page<User> pageResponse = userRepository.searchByStudentIdOrName(inputSearch,paging);
+			List<User> users = new ArrayList<User>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				users = pageResponse.getContent();
+			}
+			responseMessage.setMessage(Constant.MSG_001);
+			responseMessage.setData(users);
+			responseMessage.setPageNo(pageNo);
+			responseMessage.setPageSize(pageSize);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+
+		return responseMessage;
+	}
 }
