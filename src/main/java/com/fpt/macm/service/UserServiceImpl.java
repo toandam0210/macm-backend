@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.supercsv.io.CsvBeanWriter;
@@ -34,6 +33,7 @@ import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.UserRepository;
+import com.fpt.macm.utils.Utils;
 import com.univocity.parsers.common.record.Record;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage getAllAdminForViceHeadClub(int pageNo, int pageSize, String sortBy) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.findAdminForViceHeadClubByRoleId(paging);
 			List<User> admins = new ArrayList<User>();
 			if (pageResponse != null && pageResponse.hasContent()) {
@@ -84,7 +84,8 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage getAllAdminForHeadClub(int pageNo, int pageSize, String sortBy) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			
+			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.findAdminForHeadClubByRoleId(paging);
 			List<User> admins = new ArrayList<User>();
 			if (pageResponse != null && pageResponse.hasContent()) {
@@ -170,7 +171,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage getAllMemberAndCollaborator(int pageNo, int pageSize, String sortBy) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.findMemberAndCollaboratorByRoleId(paging);
 			List<User> users = new ArrayList<User>();
 			if (pageResponse != null && pageResponse.hasContent()) {
@@ -271,89 +272,12 @@ public class UserServiceImpl implements UserService {
 		List<User> users = (List<User>) userRepository.findAll();
 		List<UserToCsvDto> userToCsvDtos = new ArrayList<UserToCsvDto>();
 		for (User user : users) {
-			UserToCsvDto userToCsvDto = convertUserToUserCsv(user);
+			UserToCsvDto userToCsvDto = Utils.convertUserToUserCsv(user);
 			userToCsvDtos.add(userToCsvDto);
 		}
 		for (UserToCsvDto userToCsvDto : userToCsvDtos) {
 			csvWriter.write(userToCsvDto, nameMapping);
 		}
 		csvWriter.close();
-	}
-
-	public void convertUserRoleFromDbToCsv(User user, UserToCsvDto userToCsvDto) {
-		switch (user.getRole().getName()) {
-		case "ROLE_HeadClub":
-			userToCsvDto.setRole("Chủ nhiệm");
-			break;
-		case "ROLE_ViceHeadClub":
-			userToCsvDto.setRole("Phó chủ nhiệm");
-			break;
-		case "ROLE_Treasurer":
-			userToCsvDto.setRole("Thủ quỹ");
-			break;
-		case "ROLE_HeadCulture":
-			userToCsvDto.setRole("Trưởng ban văn hóa");
-			break;
-		case "ROLE_ViceHeadCulture":
-			userToCsvDto.setRole("Phó ban văn hóa");
-			break;
-		case "ROLE_HeadCommunication":
-			userToCsvDto.setRole("Trưởng ban truyền thông");
-			break;
-		case "ROLE_ViceHeadCommunication":
-			userToCsvDto.setRole("Phó ban truyền thông");
-			break;
-		case "ROLE_HeadTechnique":
-			userToCsvDto.setRole("Trưởng ban chuyên môn");
-			break;
-		case "ROLE_ViceHeadTechnique":
-			userToCsvDto.setRole("Phó ban chuyên môn");
-			break;
-		case "ROLE_Member_Commnication":
-			userToCsvDto.setRole("Thành viên ban truyền thông");
-			break;
-		case "ROLE_Member_Culture":
-			userToCsvDto.setRole("Thành viên ban văn hóa");
-			break;
-		case "ROLE_Member_Technique":
-			userToCsvDto.setRole("Thành viên ban chuyên môn");
-			break;
-		case "ROLE_Collaborator_Commnunication":
-			userToCsvDto.setRole("CTV truyền thông");
-			break;
-		case "ROLE_Collaborator_Culture":
-			userToCsvDto.setRole("CTV văn hóa");
-			break;
-		case "ROLE_Collaborator_Technique":
-			userToCsvDto.setRole("CTV chuyên môn");
-			break;
-
-		default:
-			userToCsvDto.setRole("Thành viên ban chuyên môn");
-			break;
-		}
-	}
-
-	public UserToCsvDto convertUserToUserCsv(User user) {
-		UserToCsvDto userToCsvDto = new UserToCsvDto();
-		userToCsvDto.setStudentId(user.getStudentId());
-		userToCsvDto.setName(user.getName());
-		userToCsvDto.setDateOfBirth(user.getDateOfBirth());
-		userToCsvDto.setPhone(user.getPhone());
-		userToCsvDto.setEmail(user.getEmail());
-		if (user.isGender()) {
-			userToCsvDto.setGender("Nam");
-		} else {
-			userToCsvDto.setGender("Nữ");
-		}
-		userToCsvDto.setImage(user.getImage());
-		if (user.isActive()) {
-			userToCsvDto.setIsActive("Hoạt động");
-		} else {
-			userToCsvDto.setIsActive("Không hoạt động");
-		}
-		convertUserRoleFromDbToCsv(user, userToCsvDto);
-		userToCsvDto.setCurrentAddress(user.getCurrentAddress());
-		return userToCsvDto;
 	}
 }
