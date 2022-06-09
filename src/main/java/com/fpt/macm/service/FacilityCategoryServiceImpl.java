@@ -2,7 +2,9 @@ package com.fpt.macm.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,5 +41,58 @@ public class FacilityCategoryServiceImpl implements FacilityCategoryService {
 		}
 		return responseMessage;
 	}
+
+	@Override
+	public ResponseMessage getAllCategories() {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<FacilityCategory> facilityCategories = facilityCategoryRepository.findAllFacilityCategory();
+			if (facilityCategories.size() != 0) {
+				responseMessage.setData(facilityCategories);
+				responseMessage.setMessage(Constant.MSG_026);
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateCategory(FacilityCategory facilityCategory, int id) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository.findById(id);
+			if (facilityCategoryOp.isPresent()) {
+				FacilityCategory currentFacilityCategory = facilityCategoryOp.get();
+				currentFacilityCategory.setName(facilityCategory.getName());
+				currentFacilityCategory.setUpdatedBy("toandv");
+				currentFacilityCategory.setUpdatedOn(LocalDateTime.now());
+				facilityCategoryRepository.save(currentFacilityCategory);
+				responseMessage.setData(Arrays.asList(currentFacilityCategory));
+				responseMessage.setMessage(Constant.MSG_027);
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage deleteCategory(int id) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository.findById(id);
+			if (facilityCategoryOp.isPresent()) {
+				FacilityCategory currentFacilityCategory = facilityCategoryOp.get();
+				currentFacilityCategory.setStatus(false);
+				currentFacilityCategory.setUpdatedBy("toandv");
+				currentFacilityCategory.setUpdatedOn(LocalDateTime.now());
+				facilityCategoryRepository.save(currentFacilityCategory);
+				responseMessage.setMessage(Constant.MSG_028);
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;	}
 
 }
