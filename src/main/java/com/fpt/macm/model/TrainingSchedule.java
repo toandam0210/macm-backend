@@ -1,6 +1,8 @@
 package com.fpt.macm.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,13 +24,13 @@ public class TrainingSchedule {
 	private int id;
 	
 	@Column
-	private LocalDateTime date;
+	private LocalDate date;
 	
 	@Column
-	private LocalDateTime startTime;
+	private LocalTime startTime;
 	
 	@Column
-	private LocalDateTime finishTime;
+	private LocalTime finishTime;
 	
 	@OneToMany(mappedBy = "trainingSchedule", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<AttendanceStatus> attendanceStatus = new HashSet<AttendanceStatus>();
@@ -53,27 +55,27 @@ public class TrainingSchedule {
 		this.id = id;
 	}
 
-	public LocalDateTime getDate() {
+	public LocalDate getDate() {
 		return date;
 	}
 
-	public void setDate(LocalDateTime date) {
+	public void setDate(LocalDate date) {
 		this.date = date;
 	}
 
-	public LocalDateTime getStartTime() {
+	public LocalTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(LocalDateTime startTime) {
+	public void setStartTime(LocalTime startTime) {
 		this.startTime = startTime;
 	}
 
-	public LocalDateTime getFinishTime() {
+	public LocalTime getFinishTime() {
 		return finishTime;
 	}
 
-	public void setFinishTime(LocalDateTime finishTime) {
+	public void setFinishTime(LocalTime finishTime) {
 		this.finishTime = finishTime;
 	}
 

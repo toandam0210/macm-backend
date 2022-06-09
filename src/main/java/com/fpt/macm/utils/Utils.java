@@ -1,5 +1,8 @@
 package com.fpt.macm.utils;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import org.springframework.data.domain.Sort;
 
 import com.fpt.macm.dto.UserToCsvDto;
@@ -127,5 +130,10 @@ public class Utils {
 		convertUserRoleFromDbToCsv(user, userToCsvDto);
 		userToCsvDto.setCurrentAddress(user.getCurrentAddress());
 		return userToCsvDto;
+	}
+	
+	public static LocalDate ConvertStringToLocalDate(String input) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+		return LocalDate.parse(input, formatter);
 	}
 }
