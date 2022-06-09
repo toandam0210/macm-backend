@@ -1,19 +1,14 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -26,9 +21,6 @@ public class Facility {
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "facilityCategoryId")
 	private FacilityCategory facilityCategory;
-	
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<FacilityStatus> facilityStatus = new HashSet<FacilityStatus>();
 	
 	@Column
 	private String name;
@@ -101,13 +93,6 @@ public class Facility {
 		this.updatedOn = updatedOn;
 	}
 
-	public Set<FacilityStatus> getFacilityStatus() {
-		return facilityStatus;
-	}
-
-	public void setFacilityStatus(Set<FacilityStatus> facilityStatus) {
-		this.facilityStatus = facilityStatus;
-	}
 	
 	
 	

@@ -12,8 +12,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "facility_status")
-public class FacilityStatus {
+@Table(name = "facility_request")
+public class FacilityRequest {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
@@ -23,22 +24,19 @@ public class FacilityStatus {
 	private Facility facility;
 	
 	@Column
-	private boolean status;
+	private int quantity;
 	
 	@Column
-	private int quantity;
+	private double unitPrice;
+	
+	@Column
+	private boolean status;
 	
 	@Column
 	private String createdBy;
 
 	@Column
 	private LocalDateTime createdOn;
-
-	@Column
-	private String updatedBy;
-
-	@Column
-	private LocalDateTime updatedOn;
 
 	public int getId() {
 		return id;
@@ -56,20 +54,28 @@ public class FacilityStatus {
 		this.facility = facility;
 	}
 
-	public boolean getStatus() {
-		return status;
-	}
-
-	public void setStatus(boolean status) {
-		this.status = status;
-	}
-
 	public int getQuantity() {
 		return quantity;
 	}
 
 	public void setQuantity(int quantity) {
 		this.quantity = quantity;
+	}
+
+	public double getUnitPrice() {
+		return unitPrice;
+	}
+
+	public void setUnitPrice(double unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
 	}
 
 	public String getCreatedBy() {
@@ -87,22 +93,7 @@ public class FacilityStatus {
 	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
 	}
-
-	public String getUpdatedBy() {
-		return updatedBy;
-	}
-
-	public void setUpdatedBy(String updatedBy) {
-		this.updatedBy = updatedBy;
-	}
-
-	public LocalDateTime getUpdatedOn() {
-		return updatedOn;
-	}
-
-	public void setUpdatedOn(LocalDateTime updatedOn) {
-		this.updatedOn = updatedOn;
-	}
-
-
+	
+	
+	
 }
