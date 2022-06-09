@@ -1,19 +1,14 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -27,11 +22,8 @@ public class FacilityStatus {
 	@JoinColumn(name = "facilityId")
 	private Facility facility;
 	
-	@OneToMany(mappedBy = "facilityStatus", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<FacilityReport> facilityReports = new HashSet<FacilityReport>();
-	
 	@Column
-	private String status;
+	private boolean status;
 	
 	@Column
 	private int quantity;
@@ -64,11 +56,11 @@ public class FacilityStatus {
 		this.facility = facility;
 	}
 
-	public String getStatus() {
+	public boolean getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(boolean status) {
 		this.status = status;
 	}
 
@@ -112,14 +104,5 @@ public class FacilityStatus {
 		this.updatedOn = updatedOn;
 	}
 
-	public Set<FacilityReport> getFacilityReports() {
-		return facilityReports;
-	}
-
-	public void setFacilityReports(Set<FacilityReport> facilityReports) {
-		this.facilityReports = facilityReports;
-	}
-	
-	
 
 }
