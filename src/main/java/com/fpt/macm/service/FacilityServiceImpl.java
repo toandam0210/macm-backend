@@ -68,7 +68,7 @@ public class FacilityServiceImpl implements FacilityService{
 	
 	private boolean isExistFacility(List<Facility> oldFacilities, Facility newFacility) {
 		for (Facility oldFacility : oldFacilities) {
-			if (oldFacility.getName().equals(newFacility.getName()) && oldFacility.getFacilityCategory().equals(newFacility.getFacilityCategory())) {
+			if (oldFacility.getName().equals(newFacility.getName()) && oldFacility.getFacilityCategory().getId() == newFacility.getFacilityCategory().getId()) {
 				return true;
 			}
 		}
