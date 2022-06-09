@@ -19,7 +19,7 @@ import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.service.TrainingScheduleService;
 
 @RestController
-@RequestMapping("/api/training_schedule")
+@RequestMapping("/api/training_schedule/")
 public class TrainingScheduleController {
 	@Autowired
 	TrainingScheduleService trainingScheduleService;
@@ -29,23 +29,23 @@ public class TrainingScheduleController {
 			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getListTrainingSchedule(month, year), HttpStatus.OK);
 	}
 	
-	@PostMapping("/addnewsession")
+	@PostMapping("/headtechnique/addnewsession")
 	ResponseEntity<ResponseMessage> createTrainingSession(@RequestBody TrainingSchedule trainingSchedule) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSession(trainingSchedule), HttpStatus.OK);
 	}
 	
-	@PostMapping("/addnewschedule")
+	@PostMapping("/headtechnique/addnewschedule")
 	ResponseEntity<ResponseMessage> createTrainingSchedule(@RequestParam(name = "startDate") String startDate, @RequestParam(name = "finishDate") String finishDate, 
 			@RequestBody List<String> dayOfWeek, @RequestParam(name = "startTime") String startTime, @RequestParam(name = "finishTime") String finishTime) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSchedule(startDate, finishDate, dayOfWeek, startTime, finishTime), HttpStatus.OK);
 	}
 	
-	@PutMapping("/updatesession/{trainingId}")
+	@PutMapping("/headtechnique/updatesession/{trainingId}")
 	ResponseEntity<ResponseMessage> updateTrainingSessionTime(@PathVariable(name = "trainingId") int trainingId, @RequestBody TrainingSchedule trainingSchedule) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.updateTrainingSessionTime(trainingId, trainingSchedule), HttpStatus.OK);
 	}
 	
-	@PutMapping("/deletesession/{trainingId}")
+	@PutMapping("/headtechnique/deletesession/{trainingId}")
 	ResponseEntity<ResponseMessage> deleteTrainingSession(@PathVariable(name = "trainingId") int trainingId) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.deleteTrainingSession(trainingId), HttpStatus.OK);
 	}

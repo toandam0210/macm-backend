@@ -3,7 +3,6 @@ package com.fpt.macm.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,6 +15,8 @@ import org.springframework.stereotype.Service;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.repository.TrainingScheduleRepository;
+import com.fpt.macm.utils.Utils;
+
 
 @Service
 public class TrainingScheduleServiceImpl implements TrainingScheduleService{
@@ -28,12 +29,12 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-			LocalDate startDate2 = LocalDate.parse(startDate, formatter);
-			LocalDate finishDate2 = LocalDate.parse(finishDate, formatter);
+			LocalDate startDate2 = Utils.ConvertStringToLocalDate(startDate);
+			LocalDate finishDate2 = Utils.ConvertStringToLocalDate(finishDate);
 			
 			LocalTime startTime2 = LocalTime.parse(startTime);
 			LocalTime finishTime2 = LocalTime.parse(finishTime);
+			
 			List<TrainingSchedule> listTraining = new ArrayList<TrainingSchedule>();
 			while(startDate2.compareTo(finishDate2) <= 0) {
 				if(startDate2.compareTo(LocalDate.now()) > 0) {
