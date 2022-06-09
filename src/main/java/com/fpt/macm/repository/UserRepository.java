@@ -22,4 +22,7 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	
 	@Query(value = "select * from \"user\" where role_id > 9", nativeQuery = true)
 	Page<User> findMemberAndCollaboratorByRoleId(Pageable pageable);
+	
+	@Query(value = "select * from \"user\" where student_id like CONCAT('%', ?1, '%') or \"name\" like CONCAT('%', ?1, '%')",nativeQuery = true)
+	Page<User> searchByStudentIdOrName(String searchInput, Pageable pageable);
 }

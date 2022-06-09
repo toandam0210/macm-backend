@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fpt.macm.dto.UserDto;
@@ -23,4 +24,5 @@ public interface UserService {
 	ResponseMessage deleteAdmin(String studentId, Role role);
 	ResponseMessage updateListStatusForUser(List<User> users);
 	void export(HttpServletResponse response)throws IOException;
+	ResponseMessage searchUserByStudentIdOrName(String inputSearch,int pageNo, int pageSize, String sortBy);
 }
