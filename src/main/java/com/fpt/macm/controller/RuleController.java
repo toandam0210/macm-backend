@@ -17,7 +17,7 @@ import com.fpt.macm.model.Rule;
 import com.fpt.macm.service.RuleService;
 
 @RestController
-@RequestMapping("/api/rule")
+@RequestMapping("/api/rule")	
 public class RuleController {
 
 	@Autowired
