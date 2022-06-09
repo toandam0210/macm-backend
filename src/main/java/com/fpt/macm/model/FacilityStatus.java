@@ -27,11 +27,8 @@ public class FacilityStatus {
 	@JoinColumn(name = "facilityId")
 	private Facility facility;
 	
-	@OneToMany(mappedBy = "facilityStatus", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<FacilityReport> facilityReports = new HashSet<FacilityReport>();
-	
 	@Column
-	private String status;
+	private boolean status;
 	
 	@Column
 	private int quantity;
@@ -64,11 +61,11 @@ public class FacilityStatus {
 		this.facility = facility;
 	}
 
-	public String getStatus() {
+	public boolean getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(boolean status) {
 		this.status = status;
 	}
 
@@ -112,14 +109,5 @@ public class FacilityStatus {
 		this.updatedOn = updatedOn;
 	}
 
-	public Set<FacilityReport> getFacilityReports() {
-		return facilityReports;
-	}
-
-	public void setFacilityReports(Set<FacilityReport> facilityReports) {
-		this.facilityReports = facilityReports;
-	}
-	
-	
 
 }

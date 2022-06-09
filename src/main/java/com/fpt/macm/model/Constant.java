@@ -36,4 +36,6 @@ public class Constant {
 	public static final String MSG_026 = "Lấy danh sách loại CSVC thành công";
 	public static final String MSG_027 = "Chỉnh sửa loại CSVC thành công";
 	public static final String MSG_028 = "Xóa loại CSVC thành công";
+	public static final String MSG_029 = "Tạo CSVC mới thành công";
+	public static final String MSG_030 = "CSVC này đã tồn tại";
 }

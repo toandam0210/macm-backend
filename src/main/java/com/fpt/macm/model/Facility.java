@@ -27,9 +27,6 @@ public class Facility {
 	@JoinColumn(name = "facilityCategoryId")
 	private FacilityCategory facilityCategory;
 	
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<FacilityStatus> facilityStatus = new HashSet<FacilityStatus>();
-	
 	@Column
 	private String name;
 	
@@ -101,13 +98,6 @@ public class Facility {
 		this.updatedOn = updatedOn;
 	}
 
-	public Set<FacilityStatus> getFacilityStatus() {
-		return facilityStatus;
-	}
-
-	public void setFacilityStatus(Set<FacilityStatus> facilityStatus) {
-		this.facilityStatus = facilityStatus;
-	}
 	
 	
 	
