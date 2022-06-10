@@ -1,13 +1,19 @@
 package com.fpt.macm.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.dto.FacilityDto;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Facility;
 import com.fpt.macm.model.FacilityReport;
@@ -86,7 +92,7 @@ public class FacilityServiceImpl implements FacilityService {
 		try {
 			Optional<Facility> facilityOp = facilityRepository.findById(facilityId);
 			Facility oldFacility = facilityOp.get();
-			
+
 			if (!isExistFacilityToUpdate(oldFacility, facility)) {
 				oldFacility.setName(facility.getName());
 				oldFacility.setFacilityCategory(facility.getFacilityCategory());
@@ -96,7 +102,12 @@ public class FacilityServiceImpl implements FacilityService {
 				responseMessage.setData(Arrays.asList(oldFacility));
 				responseMessage.setMessage(Constant.MSG_032);
 
-				updateFacilityStatus(facilityId, quantityUsable, quantityBroken);
+				int oldQuantityUsable = facilityStatusRepository.findByFacilityIdAndStatus(facilityId, true).get().getQuantity();
+				int oldQuantityBroken = facilityStatusRepository.findByFacilityIdAndStatus(facilityId, false).get().getQuantity();
+
+				if (oldQuantityUsable != quantityUsable || oldQuantityBroken != quantityBroken) {
+					updateFacilityStatus(facilityId, quantityUsable, quantityBroken);
+				}
 			} else {
 				responseMessage.setMessage(Constant.MSG_030);
 			}
@@ -151,6 +162,44 @@ public class FacilityServiceImpl implements FacilityService {
 		facilityReport.setCreatedBy("toandv");
 		facilityReport.setCreatedOn(LocalDateTime.now());
 		facilityReportRepository.save(facilityReport);
+	}
+
+	@Override
+	public ResponseMessage getAllFacility(int pageNo, int pageSize, String sortBy) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<Facility> pageResponse = facilityRepository.findAll(paging);
+			List<Facility> facilities = new ArrayList<Facility>();
+			List<FacilityDto> facilitiesDto = new ArrayList<FacilityDto>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				facilities = pageResponse.getContent();
+			}
+			for (Facility facility : facilities) {
+				FacilityDto facilityDto = new FacilityDto();
+				facilityDto.setFacilityId(facility.getId());
+				facilityDto.setFacilityName(facility.getName());
+				facilityDto.setFacilityCategoryName(facility.getFacilityCategory().getName());
+
+				FacilityStatus facilityStatusUsable = facilityStatusRepository
+						.findByFacilityIdAndStatus(facility.getId(), true).get();
+				facilityDto.setQuantityUsable(facilityStatusUsable.getQuantity());
+				FacilityStatus facilityStatusBroken = facilityStatusRepository
+						.findByFacilityIdAndStatus(facility.getId(), false).get();
+				facilityDto.setQuantityBroken(facilityStatusBroken.getQuantity());
+
+				facilitiesDto.add(facilityDto);
+			}
+			responseMessage.setData(facilitiesDto);
+			responseMessage.setPageNo(pageNo);
+			responseMessage.setPageSize(pageSize);
+			responseMessage.setMessage(Constant.MSG_033);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 
 }
