@@ -39,4 +39,5 @@ public class Constant {
 	public static final String MSG_029 = "Tạo CSVC mới thành công";
 	public static final String MSG_030 = "CSVC này đã tồn tại";
 	public static final String MSG_031 = "Tạo yêu cầu mua CSVC thành công";
+	public static final String MSG_032 = "Cập nhật CSVC thành công";
 }
