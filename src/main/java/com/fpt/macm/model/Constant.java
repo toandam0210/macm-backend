@@ -41,4 +41,8 @@ public class Constant {
 	public static final String MSG_031 = "Tạo yêu cầu mua CSVC thành công";
 	public static final String MSG_032 = "Cập nhật CSVC thành công";
 	public static final String MSG_033 = "Lấy tất cả CSVC thành công";
+	public static final String MSG_034 = "Lấy báo cáo CSVC thành công";
+	public static final String FACILITY_STATUS_001 = "Thêm";
+	public static final String FACILITY_STATUS_002 = "Mất";
+	public static final String FACILITY_STATUS_003 = "Hỏng";
 }

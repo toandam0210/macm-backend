@@ -26,6 +26,12 @@ public class Facility {
 	private String name;
 	
 	@Column
+	private int quantityUsable;
+	
+	@Column
+	private int quantityBroken;
+	
+	@Column
 	private String createdBy;
 
 	@Column
@@ -91,6 +97,22 @@ public class Facility {
 
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
+	}
+
+	public int getQuantityUsable() {
+		return quantityUsable;
+	}
+
+	public void setQuantityUsable(int quantityUsable) {
+		this.quantityUsable = quantityUsable;
+	}
+
+	public int getQuantityBroken() {
+		return quantityBroken;
+	}
+
+	public void setQuantityBroken(int quantityBroken) {
+		this.quantityBroken = quantityBroken;
 	}
 
 	
