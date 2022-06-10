@@ -7,5 +7,5 @@ public interface FacilityService {
 
 	ResponseMessage createNewFacility(Facility facility);
 	ResponseMessage updateFacilityById(int facilityId, Facility facility, int quantityUsable, int quantityBroken);
-	
+	ResponseMessage getAllFacility(int pageNo, int pageSize, String sortBy);
 }
