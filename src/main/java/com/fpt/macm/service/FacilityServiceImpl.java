@@ -125,21 +125,22 @@ public class FacilityServiceImpl implements FacilityService {
 		int quantityBrokenDifference = newQuantityBroken - oldQuantityBroken;
 
 		if (quantityUsableDifference > 0) {
-			description += "Thêm " + quantityUsableDifference;
+			description += Constant.FACILITY_STATUS_001 + " " + quantityUsableDifference;
 		} else if (quantityUsableDifference == 0) {
 			if (quantityBrokenDifference < 0) {
-				description += "Mất " + (-quantityBrokenDifference);
+				description += Constant.FACILITY_STATUS_002 + " " + (-quantityBrokenDifference);
 			}
 		} else {
 			if (quantityBrokenDifference == 0) {
-				description += "Mất " + (-quantityUsableDifference);
+				description += Constant.FACILITY_STATUS_002 + " " + (-quantityUsableDifference);
 			} else if (quantityBrokenDifference == -quantityUsableDifference) {
-				description += "Hỏng " + (quantityBrokenDifference);
+				description += Constant.FACILITY_STATUS_003 + " " + (quantityBrokenDifference);
 			} else if (quantityBrokenDifference > 0 && quantityBrokenDifference < -quantityUsableDifference) {
-				description += "Hỏng " + (quantityBrokenDifference) + " và Mất "
-						+ (-quantityUsableDifference - quantityBrokenDifference);
+				description += Constant.FACILITY_STATUS_003 + " " + (quantityBrokenDifference) + " và "
+						+ Constant.FACILITY_STATUS_002 + " " + (-quantityUsableDifference - quantityBrokenDifference);
 			} else {
-				description += "Mất " + (-quantityUsableDifference + -quantityBrokenDifference);
+				description += Constant.FACILITY_STATUS_002 + " "
+						+ (-quantityUsableDifference + -quantityBrokenDifference);
 			}
 		}
 
