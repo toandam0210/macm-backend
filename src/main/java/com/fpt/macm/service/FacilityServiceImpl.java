@@ -17,20 +17,15 @@ import com.fpt.macm.dto.FacilityDto;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Facility;
 import com.fpt.macm.model.FacilityReport;
-import com.fpt.macm.model.FacilityStatus;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.repository.FacilityReportRepository;
 import com.fpt.macm.repository.FacilityRepository;
-import com.fpt.macm.repository.FacilityStatusRepository;
 
 @Service
 public class FacilityServiceImpl implements FacilityService {
 
 	@Autowired
 	FacilityRepository facilityRepository;
-
-	@Autowired
-	FacilityStatusRepository facilityStatusRepository;
 
 	@Autowired
 	FacilityReportRepository facilityReportRepository;
@@ -41,14 +36,13 @@ public class FacilityServiceImpl implements FacilityService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			if (!isExistFacilityToCreate(facility)) {
+				facility.setQuantityUsable(0);
+				facility.setQuantityBroken(0);
 				facility.setCreatedBy("toandv");
 				facility.setCreatedOn(LocalDateTime.now());
 				facilityRepository.save(facility);
 				responseMessage.setData(Arrays.asList(facility));
 				responseMessage.setMessage(Constant.MSG_029);
-
-				createFacilityStatus(facility, true);
-				createFacilityStatus(facility, false);
 			} else {
 				responseMessage.setMessage(Constant.MSG_030);
 			}
@@ -57,20 +51,6 @@ public class FacilityServiceImpl implements FacilityService {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
-	}
-
-	private void createFacilityStatus(Facility facility, boolean status) {
-		Optional<Facility> facilityOp = facilityRepository.findFacilityByFacilityNameAndFacilityCategoryId(
-				facility.getName(), facility.getFacilityCategory().getId());
-		Facility newFacility = facilityOp.get();
-
-		FacilityStatus facilityStatus = new FacilityStatus();
-		facilityStatus.setFacility(newFacility);
-		facilityStatus.setQuantity(0);
-		facilityStatus.setStatus(status);
-		facilityStatus.setCreatedBy("toandv");
-		facilityStatus.setCreatedOn(LocalDateTime.now());
-		facilityStatusRepository.save(facilityStatus);
 	}
 
 	private boolean isExistFacilityToCreate(Facility newFacility) {
@@ -85,8 +65,7 @@ public class FacilityServiceImpl implements FacilityService {
 	}
 
 	@Override
-	public ResponseMessage updateFacilityById(int facilityId, Facility facility, int quantityUsable,
-			int quantityBroken) {
+	public ResponseMessage updateFacilityById(int facilityId, Facility facility) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -96,18 +75,18 @@ public class FacilityServiceImpl implements FacilityService {
 			if (!isExistFacilityToUpdate(oldFacility, facility)) {
 				oldFacility.setName(facility.getName());
 				oldFacility.setFacilityCategory(facility.getFacilityCategory());
+
+				if (oldFacility.getQuantityUsable() != facility.getQuantityUsable()
+						|| oldFacility.getQuantityBroken() != facility.getQuantityBroken()) {
+					createFacilityReport(oldFacility, facility);
+					oldFacility.setQuantityUsable(facility.getQuantityUsable());
+					oldFacility.setQuantityBroken(facility.getQuantityBroken());
+				}
 				oldFacility.setUpdatedBy("toandv");
 				oldFacility.setUpdatedOn(LocalDateTime.now());
 				facilityRepository.save(oldFacility);
 				responseMessage.setData(Arrays.asList(oldFacility));
 				responseMessage.setMessage(Constant.MSG_032);
-
-				int oldQuantityUsable = facilityStatusRepository.findByFacilityIdAndStatus(facilityId, true).get().getQuantity();
-				int oldQuantityBroken = facilityStatusRepository.findByFacilityIdAndStatus(facilityId, false).get().getQuantity();
-
-				if (oldQuantityUsable != quantityUsable || oldQuantityBroken != quantityBroken) {
-					updateFacilityStatus(facilityId, quantityUsable, quantityBroken);
-				}
 			} else {
 				responseMessage.setMessage(Constant.MSG_030);
 			}
@@ -134,34 +113,45 @@ public class FacilityServiceImpl implements FacilityService {
 		return false;
 	}
 
-	private void updateFacilityStatus(int facilityId, int quantityUsable, int quantityBroken) {
-		List<FacilityStatus> listFacilityStatus = facilityStatusRepository.findByFacilityId(facilityId);
-		for (FacilityStatus facilityStatus : listFacilityStatus) {
-			if (facilityStatus.getStatus()) {
-				facilityStatus.setQuantity(quantityUsable);
-				facilityStatus.setUpdatedBy("toandv");
-				facilityStatus.setUpdatedOn(LocalDateTime.now());
-				facilityStatusRepository.save(facilityStatus);
+	private void createFacilityReport(Facility oldFacility, Facility newFacility) {
+		int newQuantityUsable = newFacility.getQuantityUsable();
+		int oldQuantityUsable = oldFacility.getQuantityUsable();
+		int newQuantityBroken = newFacility.getQuantityBroken();
+		int oldQuantityBroken = oldFacility.getQuantityBroken();
 
-				createFacilityReport(facilityStatus);
+		String description = "";
+
+		int quantityUsableDifference = newQuantityUsable - oldQuantityUsable;
+		int quantityBrokenDifference = newQuantityBroken - oldQuantityBroken;
+
+		if (quantityUsableDifference > 0) {
+			description += "Thêm " + quantityUsableDifference;
+		} else if (quantityUsableDifference == 0) {
+			if (quantityBrokenDifference < 0) {
+				description += "Mất " + (-quantityBrokenDifference);
+			}
+		} else {
+			if (quantityBrokenDifference == 0) {
+				description += "Mất " + (-quantityUsableDifference);
+			} else if (quantityBrokenDifference == -quantityUsableDifference) {
+				description += "Hỏng " + (quantityBrokenDifference);
+			} else if (quantityBrokenDifference > 0 && quantityBrokenDifference < -quantityUsableDifference) {
+				description += "Hỏng " + (quantityBrokenDifference) + " và Mất "
+						+ (-quantityUsableDifference - quantityBrokenDifference);
 			} else {
-				facilityStatus.setQuantity(quantityBroken);
-				facilityStatus.setUpdatedBy("toandv");
-				facilityStatus.setUpdatedOn(LocalDateTime.now());
-				facilityStatusRepository.save(facilityStatus);
-
-				createFacilityReport(facilityStatus);
+				description += "Mất " + (-quantityUsableDifference + -quantityBrokenDifference);
 			}
 		}
-	}
 
-	private void createFacilityReport(FacilityStatus facilityStatus) {
-		FacilityReport facilityReport = new FacilityReport();
-		facilityReport.setFacilityStatus(facilityStatus);
-		facilityReport.setQuantity(facilityStatus.getQuantity());
-		facilityReport.setCreatedBy("toandv");
-		facilityReport.setCreatedOn(LocalDateTime.now());
-		facilityReportRepository.save(facilityReport);
+		if (description != "") {
+			FacilityReport facilityReport = new FacilityReport();
+			facilityReport.setFacility(oldFacility);
+			facilityReport.setDescription(description);
+			facilityReport.setCreatedBy("toandv");
+			facilityReport.setCreatedOn(LocalDateTime.now());
+
+			facilityReportRepository.save(facilityReport);
+		}
 	}
 
 	@Override
@@ -181,13 +171,8 @@ public class FacilityServiceImpl implements FacilityService {
 				facilityDto.setFacilityId(facility.getId());
 				facilityDto.setFacilityName(facility.getName());
 				facilityDto.setFacilityCategoryName(facility.getFacilityCategory().getName());
-
-				FacilityStatus facilityStatusUsable = facilityStatusRepository
-						.findByFacilityIdAndStatus(facility.getId(), true).get();
-				facilityDto.setQuantityUsable(facilityStatusUsable.getQuantity());
-				FacilityStatus facilityStatusBroken = facilityStatusRepository
-						.findByFacilityIdAndStatus(facility.getId(), false).get();
-				facilityDto.setQuantityBroken(facilityStatusBroken.getQuantity());
+				facilityDto.setQuantityUsable(facility.getQuantityUsable());
+				facilityDto.setQuantityBroken(facility.getQuantityBroken());
 
 				facilitiesDto.add(facilityDto);
 			}

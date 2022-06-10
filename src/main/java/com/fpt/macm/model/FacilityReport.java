@@ -19,23 +19,17 @@ public class FacilityReport {
 	private int id;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "facilityStatusId")
-	private FacilityStatus facilityStatus;
+	@JoinColumn(name = "facilityId")
+	private Facility facility;
 
 	@Column
-	private int quantity;
-	
+	private String description;
+
 	@Column
 	private String createdBy;
 
 	@Column
 	private LocalDateTime createdOn;
-
-	@Column
-	private String updatedBy;
-
-	@Column
-	private LocalDateTime updatedOn;
 
 	public int getId() {
 		return id;
@@ -45,20 +39,20 @@ public class FacilityReport {
 		this.id = id;
 	}
 
-	public FacilityStatus getFacilityStatus() {
-		return facilityStatus;
+	public Facility getFacility() {
+		return facility;
 	}
 
-	public void setFacilityStatus(FacilityStatus facilityStatus) {
-		this.facilityStatus = facilityStatus;
+	public void setFacility(Facility facility) {
+		this.facility = facility;
 	}
 
-	public int getQuantity() {
-		return quantity;
+	public String getDescription() {
+		return description;
 	}
 
-	public void setQuantity(int quantity) {
-		this.quantity = quantity;
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 	public String getCreatedBy() {
@@ -77,21 +71,4 @@ public class FacilityReport {
 		this.createdOn = createdOn;
 	}
 
-	public String getUpdatedBy() {
-		return updatedBy;
-	}
-
-	public void setUpdatedBy(String updatedBy) {
-		this.updatedBy = updatedBy;
-	}
-
-	public LocalDateTime getUpdatedOn() {
-		return updatedOn;
-	}
-
-	public void setUpdatedOn(LocalDateTime updatedOn) {
-		this.updatedOn = updatedOn;
-	}
-	
-	
 }

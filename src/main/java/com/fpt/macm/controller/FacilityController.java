@@ -29,8 +29,8 @@ public class FacilityController {
 	}
 	
 	@PutMapping("/headtechnique/updatefacilitybyid/{facilityId}")
-	ResponseEntity<ResponseMessage> updateFacilityById(@PathVariable(name = "facilityId") int facilityId, @RequestBody Facility facility, @RequestParam int quantityUsable, @RequestParam int quantityBroken){
-		return new ResponseEntity<ResponseMessage>(facilityService.updateFacilityById(facilityId, facility, quantityUsable, quantityBroken), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateFacilityById(@PathVariable(name = "facilityId") int facilityId, @RequestBody Facility facility){
+		return new ResponseEntity<ResponseMessage>(facilityService.updateFacilityById(facilityId, facility), HttpStatus.OK);
 	}
 	
 	@GetMapping("/headtechnique/getallfacility")
