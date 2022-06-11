@@ -20,7 +20,7 @@ public interface UserService {
 	ResponseMessage updateUser(String studentId, UserDto userDto);
 	ResponseMessage addListMemberAndCollaboratorFromFileCsv(MultipartFile file) throws Exception;
 	ResponseMessage getAllMemberAndCollaborator(int pageNo, int pageSize, String sortBy);
-	ResponseMessage addAnMemberOrCollaborator(User user);
+	ResponseMessage addAnMemberOrCollaborator(UserDto userDto);
 	ResponseMessage deleteAdmin(String studentId, Role role);
 	ResponseMessage updateListStatusForUser(List<User> users);
 	void export(HttpServletResponse response)throws IOException;

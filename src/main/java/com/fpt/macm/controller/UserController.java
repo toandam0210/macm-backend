@@ -76,7 +76,7 @@ public class UserController {
 	}
 
 	@PostMapping("/adduser")
-	ResponseEntity<ResponseMessage> addNewMember(@RequestBody User user) {
+	ResponseEntity<ResponseMessage> addNewMember(@RequestBody UserDto user) {
 		return new ResponseEntity<ResponseMessage>(userSerivce.addAnMemberOrCollaborator(user), HttpStatus.OK);
 	}
 

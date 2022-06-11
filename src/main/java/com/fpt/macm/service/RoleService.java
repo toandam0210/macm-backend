@@ -7,4 +7,5 @@ import com.fpt.macm.model.Role;
 
 public interface RoleService {
 	ResponseMessage addListRole(List<Role> roles);
+	ResponseMessage getAllRole();
 }

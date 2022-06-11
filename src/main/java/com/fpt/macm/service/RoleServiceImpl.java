@@ -27,4 +27,16 @@ public class RoleServiceImpl implements RoleService {
 		return responseMessage;
 	}
 
+	@Override
+	public ResponseMessage getAllRole() {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<Role> roles = roleRepository.findAll();
+			responseMessage.setData(roles);
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }

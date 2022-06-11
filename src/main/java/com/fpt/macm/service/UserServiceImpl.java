@@ -32,6 +32,7 @@ import com.fpt.macm.model.ERole;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
 import com.fpt.macm.model.User;
+import com.fpt.macm.repository.RoleRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 import com.univocity.parsers.common.record.Record;
@@ -43,6 +44,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired 
+	RoleRepository roleRepository;
 
 	@Override
 	public ResponseMessage getUserByStudentId(String studentId) {
@@ -110,7 +114,10 @@ public class UserServiceImpl implements UserService {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
 			User user = userOp.get();
 			user.setStudentId(userDto.getStudentId());
-			user.setRole(userDto.getRole());
+			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
+			if(roleOptional.isPresent()) {
+			user.setRole(roleOptional.get());
+			}
 			user.setEmail(userDto.getEmail());
 			user.setPhone(userDto.getPhoneNumber());
 			user.setCurrentAddress(userDto.getCurrentAddress());
@@ -190,9 +197,22 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage addAnMemberOrCollaborator(User user) {
+	public ResponseMessage addAnMemberOrCollaborator(UserDto userDto) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			User user = new User();
+			user.setStudentId(userDto.getStudentId());
+			user.setName(userDto.getName());
+			user.setGender(userDto.isGender());
+			user.setDateOfBirth(userDto.getDateOfBirth());
+			user.setEmail(userDto.getEmail());
+			user.setImage(userDto.getImage());
+			user.setPhone(userDto.getPhone());
+			user.setCurrentAddress(userDto.getCurrentAddress());
+			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
+			if(roleOptional.isPresent()) {
+			user.setRole(roleOptional.get());
+			}
 			user.setActive(true);
 			user.setCreatedBy("toandv");
 			user.setCreatedOn(LocalDate.now());
