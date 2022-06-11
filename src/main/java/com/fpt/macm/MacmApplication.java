@@ -21,8 +21,6 @@ public class MacmApplication {
 			reg.addMapping("/**")
 	        .allowedOrigins("*")
 	        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-	        .allowedHeaders("*")
-	        .allowCredentials(true)
 	        .maxAge(3600);
 		}
 		};
