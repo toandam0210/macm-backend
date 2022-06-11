@@ -14,7 +14,7 @@ import com.fpt.macm.model.User;
 public interface UserRepository extends PagingAndSortingRepository<User, Integer>{
 	Optional<User> findByStudentId(String studentId);
 	
-	@Query(value = "select * from \"user\" where role_id < 10 and role_id >2", nativeQuery = true)
+	@Query(value = "select * from \"user\" where role_id < 10 and role_id > 2", nativeQuery = true)
 	Page<User> findAdminForViceHeadClubByRoleId(Pageable pageable);
 	
 	@Query(value = "select * from \"user\" where role_id < 10 and role_id >0", nativeQuery = true)
@@ -25,4 +25,6 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	
 	@Query(value = "select * from \"user\" where student_id like CONCAT('%', ?1, '%') or \"name\" like CONCAT('%', ?1, '%')",nativeQuery = true)
 	Page<User> searchByStudentIdOrName(String searchInput, Pageable pageable);
+	
+	Optional<User> findByEmail(String email);
 }

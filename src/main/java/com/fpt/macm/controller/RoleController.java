@@ -30,4 +30,8 @@ public class RoleController {
 	ResponseEntity<ResponseMessage> getAllRoles(){
 		return new ResponseEntity<ResponseMessage>(roleService.getAllRole(), HttpStatus.OK);
 	}
+	@GetMapping("/viceheadclub/getroles")
+	ResponseEntity<ResponseMessage> getRolesForViceHeadClub(){
+		return new ResponseEntity<ResponseMessage>(roleService.getRoleForViceHeadClub(), HttpStatus.OK);
+	}
 }

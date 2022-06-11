@@ -45,4 +45,5 @@ public class Constant {
 	public static final String FACILITY_STATUS_001 = "Thêm";
 	public static final String FACILITY_STATUS_002 = "Mất";
 	public static final String FACILITY_STATUS_003 = "Hỏng";
+	public static final String MSG_035 = "Không thể cập nhật chức vụ của chủ nhiệm";
 }

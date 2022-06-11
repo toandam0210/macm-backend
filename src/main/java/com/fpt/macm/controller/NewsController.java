@@ -29,13 +29,13 @@ public class NewsController {
 		return new ResponseEntity<ResponseMessage>(newsService.createNews(news, isSendNotification), HttpStatus.OK);
 	}
 	
-	@GetMapping("/headcommunication/getallnews")
+	@GetMapping("/getallnews")
 	ResponseEntity<ResponseMessage> getAllNews(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
 		return new ResponseEntity<ResponseMessage>(newsService.getAllNews(pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 	
-	@GetMapping("/headcommunication/getnewsbyid/{newsId}")
+	@GetMapping("/getnewsbyid/{newsId}")
 	ResponseEntity<ResponseMessage> getNewsById(@PathVariable(name = "newsId") int newsId){
 		return new ResponseEntity<ResponseMessage>(newsService.getNewsById(newsId), HttpStatus.OK);
 	}
