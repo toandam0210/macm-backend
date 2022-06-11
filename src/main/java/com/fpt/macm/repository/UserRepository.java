@@ -25,4 +25,6 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	
 	@Query(value = "select * from \"user\" where student_id like CONCAT('%', ?1, '%') or \"name\" like CONCAT('%', ?1, '%')",nativeQuery = true)
 	Page<User> searchByStudentIdOrName(String searchInput, Pageable pageable);
+	
+	Optional<User> findByEmail(String email);
 }
