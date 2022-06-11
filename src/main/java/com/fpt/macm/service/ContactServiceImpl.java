@@ -70,20 +70,4 @@ public class ContactServiceImpl implements ContactService{
 		}
 		return responseMessage;
 	}
-
-	public ResponseMessage updateSocialNetwork(List<SocialNetwork> socialNetworks) {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			socialNetworkRepository.deleteAll();
-			socialNetworkRepository.saveAll(socialNetworks);
-			responseMessage.setData(socialNetworks);
-			responseMessage.setMessage(Constant.MSG_011);
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
 }
