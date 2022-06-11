@@ -19,7 +19,7 @@ public class MacmApplication {
 		@Override
 		public void addCorsMappings(CorsRegistry reg) {
 			reg.addMapping("/**")
-	        .allowedOrigins("http://localhost:3000,http://localhost:8080")
+	        .allowedOrigins("*")
 	        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 	        .allowedHeaders("*")
 	        .allowCredentials(true)
