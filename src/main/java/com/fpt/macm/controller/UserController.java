@@ -1,7 +1,6 @@
 package com.fpt.macm.controller;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,7 +20,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fpt.macm.dto.UserDto;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
-import com.fpt.macm.model.User;
 import com.fpt.macm.service.UserService;
 
 @RestController
@@ -81,8 +79,8 @@ public class UserController {
 	}
 
 	@PutMapping("/updatestatus")
-	ResponseEntity<ResponseMessage> updateListStatusForUser(@RequestBody List<User> users) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.updateListStatusForUser(users), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateListStatusForUser(@RequestParam String studentId) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.updateStatusForUser(studentId), HttpStatus.OK);
 	}
 
 	@GetMapping("/users/export")
