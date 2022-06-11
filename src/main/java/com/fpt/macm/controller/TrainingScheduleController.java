@@ -19,7 +19,7 @@ import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.service.TrainingScheduleService;
 
 @RestController
-@RequestMapping("/api/training_schedule/")
+@RequestMapping("/api/trainingschedule")
 public class TrainingScheduleController {
 	@Autowired
 	TrainingScheduleService trainingScheduleService;

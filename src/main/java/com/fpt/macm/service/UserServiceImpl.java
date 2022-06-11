@@ -44,8 +44,8 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	UserRepository userRepository;
-	
-	@Autowired 
+
+	@Autowired
 	RoleRepository roleRepository;
 
 	@Override
@@ -88,7 +88,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage getAllAdminForHeadClub(int pageNo, int pageSize, String sortBy) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			
+
 			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.findAdminForHeadClubByRoleId(paging);
 			List<User> admins = new ArrayList<User>();
@@ -114,18 +114,22 @@ public class UserServiceImpl implements UserService {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
 			User user = userOp.get();
 			user.setStudentId(userDto.getStudentId());
+			Role currentUserRole = user.getRole();
 			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
-			if(roleOptional.isPresent()) {
-			user.setRole(roleOptional.get());
+			if (currentUserRole.getName().equals(ERole.ROLE_HeadClub.name())
+					&& !roleOptional.get().getName().equals(currentUserRole.getName())) {
+				responseMessage.setMessage(Constant.MSG_035);
+			} else {
+				user.setRole(roleOptional.get());
+				user.setEmail(userDto.getEmail());
+				user.setPhone(userDto.getPhoneNumber());
+				user.setCurrentAddress(userDto.getCurrentAddress());
+				user.setUpdatedBy("toandv");
+				user.setUpdatedOn(LocalDateTime.now());
+				userRepository.save(user);
+				responseMessage.setData(Arrays.asList(user));
+				responseMessage.setMessage(Constant.MSG_005);
 			}
-			user.setEmail(userDto.getEmail());
-			user.setPhone(userDto.getPhoneNumber());
-			user.setCurrentAddress(userDto.getCurrentAddress());
-			user.setUpdatedBy("toandv");
-			user.setUpdatedOn(LocalDateTime.now());
-			userRepository.save(user);
-			responseMessage.setData(Arrays.asList(user));
-			responseMessage.setMessage(Constant.MSG_005);
 
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
@@ -210,8 +214,8 @@ public class UserServiceImpl implements UserService {
 			user.setPhone(userDto.getPhone());
 			user.setCurrentAddress(userDto.getCurrentAddress());
 			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
-			if(roleOptional.isPresent()) {
-			user.setRole(roleOptional.get());
+			if (roleOptional.isPresent()) {
+				user.setRole(roleOptional.get());
 			}
 			user.setActive(true);
 			user.setCreatedBy("toandv");
@@ -227,20 +231,23 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage deleteAdmin(String studentId, Role role) {
+	public ResponseMessage deleteAdmin(String studentId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
 			User user = userOp.get();
 			if (user.getRole().getName().equals(ERole.ROLE_HeadCulture.name())
 					|| user.getRole().getName().equals(ERole.ROLE_ViceHeadCulture.name())) {
+				Role role = new Role();
 				role.setId(Constant.ROLE_ID_MEMBER_CULTURE);
 				user.setRole(role);
 			} else if (user.getRole().getName().equals(ERole.ROLE_HeadCommunication.name())
 					|| user.getRole().getName().equals(ERole.ROLE_ViceHeadCommunication.name())) {
+				Role role = new Role();
 				role.setId(Constant.ROLE_ID_MEMBER_COMMUNICATION);
 				user.setRole(role);
 			} else {
+				Role role = new Role();
 				role.setId(Constant.ROLE_ID_MEMBER_TECHNIQUE);
 				user.setRole(role);
 			}
@@ -302,11 +309,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage searchUserByStudentIdOrName(String inputSearch,int pageNo, int pageSize, String sortBy) {
+	public ResponseMessage searchUserByStudentIdOrName(String inputSearch, int pageNo, int pageSize, String sortBy) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
-			Page<User> pageResponse = userRepository.searchByStudentIdOrName(inputSearch,paging);
+			Page<User> pageResponse = userRepository.searchByStudentIdOrName(inputSearch, paging);
 			List<User> users = new ArrayList<User>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				users = pageResponse.getContent();
@@ -322,4 +329,14 @@ public class UserServiceImpl implements UserService {
 
 		return responseMessage;
 	}
+
+//	@Override
+//	public ResponseMessage userLogin() {
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+//		User user = userRepository.findByEmail(username).get();
+//		responseMessage.setData(Arrays.asList(user));
+//		responseMessage.setMessage("Login successful");
+//		return responseMessage;
+//	}
 }

@@ -32,7 +32,7 @@ public class UserController {
 	UserService userSerivce;
 
 	@GetMapping("/getbystudentid/{studentId}")
-	ResponseEntity<ResponseMessage> getStudentByStudentId(@PathVariable(name = "studentId") String studentId) {
+	ResponseEntity<ResponseMessage> getUserByStudentId(@PathVariable(name = "studentId") String studentId) {
 		return new ResponseEntity<ResponseMessage>(userSerivce.getUserByStudentId(studentId), HttpStatus.OK);
 	}
 
@@ -59,7 +59,7 @@ public class UserController {
 	@PutMapping("/deleteadmin/{studentId}")
 	ResponseEntity<ResponseMessage> deleteAdminByStudentId(@PathVariable(name = "studentId") String studentId,
 			@RequestBody Role role) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.deleteAdmin(studentId, role), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userSerivce.deleteAdmin(studentId), HttpStatus.OK);
 	}
 
 	@PostMapping("/uploadfilemember")
