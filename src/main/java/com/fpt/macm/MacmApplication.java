@@ -18,7 +18,12 @@ public class MacmApplication {
 		return new WebMvcConfigurer() {
 		@Override
 		public void addCorsMappings(CorsRegistry reg) {
-			reg.addMapping("/**").allowedOrigins("*");
+			reg.addMapping("/**")
+	        .allowedOrigins("http://localhost:3000,http://localhost:8080")
+	        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+	        .allowedHeaders("*")
+	        .allowCredentials(true)
+	        .maxAge(3600);
 		}
 		};
 	}
