@@ -1,7 +1,6 @@
 package com.fpt.macm.service;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -9,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fpt.macm.dto.UserDto;
 import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.User;
 
 public interface UserService {
 	ResponseMessage getUserByStudentId(String studentId);
@@ -20,7 +18,7 @@ public interface UserService {
 	ResponseMessage getAllMemberAndCollaborator(int pageNo, int pageSize, String sortBy);
 	ResponseMessage addAnMemberOrCollaborator(UserDto userDto);
 	ResponseMessage deleteAdmin(String studentId);
-	ResponseMessage updateListStatusForUser(List<User> users);
+	ResponseMessage updateStatusForUser(String studentId);
 	void export(HttpServletResponse response)throws IOException;
 	ResponseMessage searchUserByStudentIdOrName(String inputSearch,int pageNo, int pageSize, String sortBy);
 //	ResponseMessage userLogin();

@@ -263,17 +263,22 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage updateListStatusForUser(List<User> users) {
+	public ResponseMessage updateStatusForUser(String studentId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			for (User user : users) {
-				User tempUser = userRepository.findByStudentId(user.getStudentId()).get();
-				tempUser.setActive(user.isActive());
-				userRepository.save(tempUser);
+			User user = new User();
+			Optional<User> userOptional = userRepository.findByStudentId(studentId);
+			if(userOptional.isPresent()) {
+				 user = userOptional.get();
+				if(user.isActive()) {
+					user.setActive(false);
+				}else {
+					user.setActive(true);
+				}
+				userRepository.save(user);
 			}
-			responseMessage.setData(users);
+			responseMessage.setData(Arrays.asList(user));
 			responseMessage.setMessage(Constant.MSG_005);
-			responseMessage.setTotalResult(users.size());
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
