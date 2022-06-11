@@ -1,19 +1,14 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -27,11 +22,14 @@ public class Facility {
 	@JoinColumn(name = "facilityCategoryId")
 	private FacilityCategory facilityCategory;
 	
-	@OneToMany(mappedBy = "facility", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<FacilityStatus> facilityStatus = new HashSet<FacilityStatus>();
-	
 	@Column
 	private String name;
+	
+	@Column
+	private int quantityUsable;
+	
+	@Column
+	private int quantityBroken;
 	
 	@Column
 	private String createdBy;
@@ -101,13 +99,22 @@ public class Facility {
 		this.updatedOn = updatedOn;
 	}
 
-	public Set<FacilityStatus> getFacilityStatus() {
-		return facilityStatus;
+	public int getQuantityUsable() {
+		return quantityUsable;
 	}
 
-	public void setFacilityStatus(Set<FacilityStatus> facilityStatus) {
-		this.facilityStatus = facilityStatus;
+	public void setQuantityUsable(int quantityUsable) {
+		this.quantityUsable = quantityUsable;
 	}
+
+	public int getQuantityBroken() {
+		return quantityBroken;
+	}
+
+	public void setQuantityBroken(int quantityBroken) {
+		this.quantityBroken = quantityBroken;
+	}
+
 	
 	
 	

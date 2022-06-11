@@ -1,5 +1,6 @@
 package com.fpt.macm.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -33,7 +34,7 @@ public class User {
 	private boolean gender;
 
 	@Column
-	private LocalDateTime dateOfBirth;
+	private LocalDate dateOfBirth;
 
 	@Column
 	private String email;
@@ -45,12 +46,12 @@ public class User {
 	private String phone;
 
 	@Column
-	private boolean isMember;
-
-	@Column
 	private boolean isActive;
 	
-	@OneToMany(mappedBy = "`user`", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	@Column
+	private String currentAddress;
+	
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
 	private Set<AttendanceStatus> attendanceStatus = new HashSet<AttendanceStatus>();
 	
 	@ManyToOne(optional = false)
@@ -70,7 +71,7 @@ public class User {
 	private String createdBy;
 
 	@Column
-	private LocalDateTime createdOn;
+	private LocalDate createdOn;
 
 	@Column
 	private String updatedBy;
@@ -134,14 +135,6 @@ public class User {
 		this.phone = phone;
 	}
 
-	public boolean isMember() {
-		return isMember;
-	}
-
-	public void setMember(boolean isMember) {
-		this.isMember = isMember;
-	}
-
 	public boolean isActive() {
 		return isActive;
 	}
@@ -174,19 +167,19 @@ public class User {
 		this.updatedBy = updatedBy;
 	}
 
-	public LocalDateTime getDateOfBirth() {
+	public LocalDate getDateOfBirth() {
 		return dateOfBirth;
 	}
 
-	public void setDateOfBirth(LocalDateTime dateOfBirth) {
+	public void setDateOfBirth(LocalDate dateOfBirth) {
 		this.dateOfBirth = dateOfBirth;
 	}
 
-	public LocalDateTime getCreatedOn() {
+	public LocalDate getCreatedOn() {
 		return createdOn;
 	}
 
-	public void setCreatedOn(LocalDateTime createdOn) {
+	public void setCreatedOn(LocalDate createdOn) {
 		this.createdOn = createdOn;
 	}
 
@@ -228,6 +221,14 @@ public class User {
 
 	public void setMembershipStatus(Set<MembershipStatus> membershipStatus) {
 		this.membershipStatus = membershipStatus;
+	}
+
+	public String getCurrentAddress() {
+		return currentAddress;
+	}
+
+	public void setCurrentAddress(String currentAddress) {
+		this.currentAddress = currentAddress;
 	}
 	
 	

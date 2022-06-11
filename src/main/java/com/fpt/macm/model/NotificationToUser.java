@@ -12,22 +12,24 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "facility_report")
-public class FacilityReport {
+@Table(name = "Notification_to_user")
+public class NotificationToUser {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-
+	
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "facilityId")
-	private Facility facility;
-
+	@JoinColumn(name = "notification_id")
+	private Notification notification;
+	
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "user_id")
+	private User user;
+	
 	@Column
-	private String description;
-
-	@Column
-	private String createdBy;
-
+	private boolean isRead;
+	
 	@Column
 	private LocalDateTime createdOn;
 
@@ -39,28 +41,28 @@ public class FacilityReport {
 		this.id = id;
 	}
 
-	public Facility getFacility() {
-		return facility;
+	public Notification getNotification() {
+		return notification;
 	}
 
-	public void setFacility(Facility facility) {
-		this.facility = facility;
+	public void setNotification(Notification notification) {
+		this.notification = notification;
 	}
 
-	public String getDescription() {
-		return description;
+	public User getUser() {
+		return user;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
-	public String getCreatedBy() {
-		return createdBy;
+	public boolean isRead() {
+		return isRead;
 	}
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
+	public void setRead(boolean isRead) {
+		this.isRead = isRead;
 	}
 
 	public LocalDateTime getCreatedOn() {
@@ -70,5 +72,6 @@ public class FacilityReport {
 	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
 	}
-
+	
+	
 }

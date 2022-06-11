@@ -7,20 +7,27 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "news")
-public class News {
+@Table(name = "facility_request")
+public class FacilityRequest {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column(name = "title")
-	private String title;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "facilityId")
+	private Facility facility;
 	
-	@Column(name = "description")
-	private String description;
+	@Column
+	private int quantity;
+	
+	@Column
+	private double unitPrice;
 	
 	@Column
 	private boolean status;
@@ -31,12 +38,6 @@ public class News {
 	@Column
 	private LocalDateTime createdOn;
 
-	@Column
-	private String updatedBy;
-
-	@Column
-	private LocalDateTime updatedOn;
-
 	public int getId() {
 		return id;
 	}
@@ -45,23 +46,31 @@ public class News {
 		this.id = id;
 	}
 
-	public String getTitle() {
-		return title;
+	public Facility getFacility() {
+		return facility;
 	}
 
-	public void setTitle(String title) {
-		this.title = title;
+	public void setFacility(Facility facility) {
+		this.facility = facility;
 	}
 
-	public String getDescription() {
-		return description;
+	public int getQuantity() {
+		return quantity;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 
-	public boolean getStatus() {
+	public double getUnitPrice() {
+		return unitPrice;
+	}
+
+	public void setUnitPrice(double unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+
+	public boolean isStatus() {
 		return status;
 	}
 
@@ -84,23 +93,7 @@ public class News {
 	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
 	}
-
-	public String getUpdatedBy() {
-		return updatedBy;
-	}
-
-	public void setUpdatedBy(String updatedBy) {
-		this.updatedBy = updatedBy;
-	}
-
-	public LocalDateTime getUpdatedOn() {
-		return updatedOn;
-	}
-
-	public void setUpdatedOn(LocalDateTime updatedOn) {
-		this.updatedOn = updatedOn;
-	}
 	
 	
-
+	
 }

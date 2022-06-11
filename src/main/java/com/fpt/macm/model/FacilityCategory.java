@@ -1,17 +1,12 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 
@@ -25,8 +20,9 @@ public class FacilityCategory {
 	@Column
 	private String name;
 	
-	@OneToMany(mappedBy = "facilityCategory", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<Facility> facilities = new HashSet<Facility>();
+	@Column
+	private boolean status;
+
 	
 	@Column
 	private String createdBy;
@@ -88,15 +84,13 @@ public class FacilityCategory {
 		this.updatedOn = updatedOn;
 	}
 
-	public Set<Facility> getFacilities() {
-		return facilities;
+	public boolean isStatus() {
+		return status;
 	}
 
-	public void setFacilities(Set<Facility> facilities) {
-		this.facilities = facilities;
+	public void setStatus(boolean status) {
+		this.status = status;
 	}
-	
-	
 	
 
 }
