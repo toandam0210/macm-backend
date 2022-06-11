@@ -2,6 +2,8 @@ package com.fpt.macm.service;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +25,7 @@ public class RuleServiceImpl implements RuleService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<Rule> rules = ruleRepository.findAll();
+			List<Rule> rules = ruleRepository.findAllRuleAndSortById();
 			responseMessage.setData(rules);
 			responseMessage.setMessage(Constant.MSG_019);
 		} catch (Exception e) {
