@@ -128,9 +128,13 @@ public class UserServiceImpl implements UserService {
 				responseMessage.setMessage(Constant.MSG_035);
 			} else {
 				user.setRole(roleOptional.get());
+				user.setName(userDto.getName());
 				user.setEmail(userDto.getEmail());
 				user.setPhone(userDto.getPhone());
 				user.setCurrentAddress(userDto.getCurrentAddress());
+				user.setDateOfBirth(userDto.getDateOfBirth());
+				user.setGender(userDto.isGender());
+				user.setStudentId(userDto.getStudentId());
 				user.setUpdatedBy("toandv");
 				user.setUpdatedOn(LocalDateTime.now());
 				userRepository.save(user);
