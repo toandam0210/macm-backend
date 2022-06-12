@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.Facility;
+import com.fpt.macm.model.FacilityRequest;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.service.FacilityService;
 
@@ -37,5 +38,16 @@ public class FacilityController {
 	ResponseEntity<ResponseMessage> getAllFacility(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
 		return new ResponseEntity<ResponseMessage>(facilityService.getAllFacility(pageNo, pageSize, sortBy), HttpStatus.OK);
+	}
+	
+	@GetMapping("/headtechnique/getfacilityreport")
+	ResponseEntity<ResponseMessage> getFacilityReport() {
+		return new ResponseEntity<ResponseMessage>(facilityService.getAllReport(), HttpStatus.OK);
+	}
+
+	@PostMapping("/headtechnique/createrequesttobuyfacility")
+	ResponseEntity<ResponseMessage> createRequestToBuyFacilily(@RequestBody FacilityRequest facilityRequest) {
+		return new ResponseEntity<ResponseMessage>(facilityService.createRequestToBuyFacility(facilityRequest),
+				HttpStatus.OK);
 	}
 }
