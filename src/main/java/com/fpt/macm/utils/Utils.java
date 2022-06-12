@@ -5,9 +5,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.data.domain.Sort;
 
-import com.fpt.macm.dto.UserToCsvDto;
 import com.fpt.macm.model.Role;
-import com.fpt.macm.model.User;
 
 public class Utils {
 	public static final String SORT_BY_NAME_ASC = "SORT_BY_NAME_ASC";
@@ -56,83 +54,6 @@ public class Utils {
 		}
 	}
 	
-	public static void convertUserRoleFromDbToCsv(User user, UserToCsvDto userToCsvDto) {
-		switch (user.getRole().getName()) {
-		case "ROLE_HeadClub":
-			userToCsvDto.setRole("Chủ nhiệm");
-			break;
-		case "ROLE_ViceHeadClub":
-			userToCsvDto.setRole("Phó chủ nhiệm");
-			break;
-		case "ROLE_Treasurer":
-			userToCsvDto.setRole("Thủ quỹ");
-			break;
-		case "ROLE_HeadCulture":
-			userToCsvDto.setRole("Trưởng ban văn hóa");
-			break;
-		case "ROLE_ViceHeadCulture":
-			userToCsvDto.setRole("Phó ban văn hóa");
-			break;
-		case "ROLE_HeadCommunication":
-			userToCsvDto.setRole("Trưởng ban truyền thông");
-			break;
-		case "ROLE_ViceHeadCommunication":
-			userToCsvDto.setRole("Phó ban truyền thông");
-			break;
-		case "ROLE_HeadTechnique":
-			userToCsvDto.setRole("Trưởng ban chuyên môn");
-			break;
-		case "ROLE_ViceHeadTechnique":
-			userToCsvDto.setRole("Phó ban chuyên môn");
-			break;
-		case "ROLE_Member_Commnication":
-			userToCsvDto.setRole("Thành viên ban truyền thông");
-			break;
-		case "ROLE_Member_Culture":
-			userToCsvDto.setRole("Thành viên ban văn hóa");
-			break;
-		case "ROLE_Member_Technique":
-			userToCsvDto.setRole("Thành viên ban chuyên môn");
-			break;
-		case "ROLE_Collaborator_Commnunication":
-			userToCsvDto.setRole("CTV truyền thông");
-			break;
-		case "ROLE_Collaborator_Culture":
-			userToCsvDto.setRole("CTV văn hóa");
-			break;
-		case "ROLE_Collaborator_Technique":
-			userToCsvDto.setRole("CTV chuyên môn");
-			break;
-
-		default:
-			userToCsvDto.setRole("Thành viên ban chuyên môn");
-			break;
-		}
-	}
-	
-	public static UserToCsvDto convertUserToUserCsv(User user) {
-		UserToCsvDto userToCsvDto = new UserToCsvDto();
-		userToCsvDto.setStudentId(user.getStudentId());
-		userToCsvDto.setName(user.getName());
-		userToCsvDto.setDateOfBirth(user.getDateOfBirth());
-		userToCsvDto.setPhone(user.getPhone());
-		userToCsvDto.setEmail(user.getEmail());
-		if (user.isGender()) {
-			userToCsvDto.setGender("Nam");
-		} else {
-			userToCsvDto.setGender("Nữ");
-		}
-		userToCsvDto.setImage(user.getImage());
-		if (user.isActive()) {
-			userToCsvDto.setIsActive("Hoạt động");
-		} else {
-			userToCsvDto.setIsActive("Không hoạt động");
-		}
-		convertUserRoleFromDbToCsv(user, userToCsvDto);
-		userToCsvDto.setCurrentAddress(user.getCurrentAddress());
-		return userToCsvDto;
-	}
-	
 	public static LocalDate ConvertStringToLocalDate(String input) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		return LocalDate.parse(input, formatter);
@@ -177,18 +98,109 @@ public class Utils {
 			role.setName("Thành viên ban chuyên môn");
 			break;
 		case "ROLE_Collaborator_Commnunication":
-			role.setName("CTV truyền thông");
+			role.setName("CTV ban truyền thông");
 			break;
 		case "ROLE_Collaborator_Culture":
-			role.setName("CTV văn hóa");
+			role.setName("CTV ban văn hóa");
 			break;
 		case "ROLE_Collaborator_Technique":
-			role.setName("CTV chuyên môn");
+			role.setName("CTV ban chuyên môn");
 			break;
 
 		default:
 			role.setName("Thành viên ban chuyên môn");
 			break;
+		}
+	}
+	public static void convertRoleFromExcelToDb(String roleInExcel, Role role) {
+		switch (roleInExcel) {
+		case "Chủ nhiệm":
+			role.setId(1);
+			break;
+		case "Phó chủ nhiệm":
+			role.setId(2);
+			break;
+		case "Thủ quỹ":
+			role.setId(3);
+			break;
+		case "Trưởng ban văn hóa":
+			role.setId(4);
+			break;
+		case "Phó ban văn hóa":
+			role.setId(5);
+			break;
+		case "Trưởng ban truyền thông":
+			role.setId(6);
+			break;
+		case "Phó ban truyền thông":
+			role.setId(7);
+			break;
+		case "Trưởng ban chuyên môn":
+			role.setId(8);
+			break;
+		case "Phó ban chuyên môn":
+			role.setId(9);
+			break;
+		case "Thành viên ban truyền thông":
+			role.setId(10);
+			break;
+		case "Thành viên ban văn hóa":
+			role.setId(11);
+			break;
+		case "Thành viên ban chuyên môn":
+			role.setId(12);
+			break;
+		case "CTV ban truyền thông":
+			role.setId(13);
+			break;
+		case "CTV ban văn hóa":
+			role.setId(14);
+			break;
+		case "CTV ban chuyên môn":
+			role.setId(15);
+			break;
+
+		default:
+			role.setId(12);
+			break;
+		}
+	}
+	
+	public static String convertRoleFromDbToExcel(Role role) {
+		switch (role.getId()) {
+		case 1:
+			return "Chủ nhiệm";
+		case 2:
+			return "Phó chủ nhiệm";
+		case 3:
+			return "Thủ quỹ";
+		case 4:
+			return "Trưởng ban văn hóa";
+		case 5:
+			return "Phó ban văn hóa";
+		case 6:
+			return "Trưởng ban truyền thông";
+		case 7:
+			return "Phó ban truyền thông";
+		case 8:
+			return "Trưởng ban chuyên môn";
+		case 9:
+			return "Phó ban chuyên môn";
+		case 10:
+			return "Thành viên ban truyền thông";
+		case 11:
+			return "Thành viên ban văn hóa";
+		case 12:
+			return "Thành viên ban chuyên môn";
+		case 13:
+			return "CTV ban truyền thông";
+		case 14:
+			return "CTV ban văn hóa";
+		case 15:
+			return "CTV ban chuyên môn";
+
+		default:
+			return "Thành viên ban chuyên môn";
 		}
 	}
 }
