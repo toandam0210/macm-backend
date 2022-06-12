@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fpt.macm.dto.UserDto;
 import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Role;
 import com.fpt.macm.service.UserService;
 
 @RestController
@@ -55,8 +54,7 @@ public class UserController {
 	}
 
 	@PutMapping("/deleteadmin/{studentId}")
-	ResponseEntity<ResponseMessage> deleteAdminByStudentId(@PathVariable(name = "studentId") String studentId,
-			@RequestBody Role role) {
+	ResponseEntity<ResponseMessage> deleteAdminByStudentId(@PathVariable(name = "studentId") String studentId) {
 		return new ResponseEntity<ResponseMessage>(userSerivce.deleteAdmin(studentId), HttpStatus.OK);
 	}
 
