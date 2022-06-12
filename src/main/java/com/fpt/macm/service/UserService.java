@@ -21,5 +21,5 @@ public interface UserService {
 	ResponseMessage updateStatusForUser(String studentId);
 	void export(HttpServletResponse response)throws IOException;
 	ResponseMessage searchUserByStudentIdOrName(String inputSearch,int pageNo, int pageSize, String sortBy);
-//	ResponseMessage userLogin();
+	ResponseMessage userLogin();
 }
