@@ -20,7 +20,8 @@ public class MacmApplication {
 		public void addCorsMappings(CorsRegistry reg) {
 			reg.addMapping("/**")
 	        .allowedOrigins("*")
-	        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS");
+	        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+	        .maxAge(3600);
 		}
 		};
 	}
