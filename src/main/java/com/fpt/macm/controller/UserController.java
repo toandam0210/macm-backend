@@ -88,11 +88,11 @@ public class UserController {
 	}
 
 	@PostMapping("/users/import")
-	ResponseEntity<ResponseMessage> addListMemberFromExcel(@RequestParam("file") MultipartFile file) throws Exception {
+	ResponseEntity<ResponseMessage> addListUserFromExcel(@RequestParam("file") MultipartFile file) throws Exception {
 		return new ResponseEntity<ResponseMessage>(userSerivce.addUsersFromExcel(file), HttpStatus.OK);
 	}
 	@GetMapping("/users/export")
-	  public ResponseEntity<Resource> getFile() {
+	  public ResponseEntity<Resource> exportListUserToExcel() {
 	    String filename = "users.xlsx";
 	    InputStreamResource file = new InputStreamResource(userSerivce.exportUsersToExcel());
 
