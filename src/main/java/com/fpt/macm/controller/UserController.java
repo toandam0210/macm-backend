@@ -5,7 +5,11 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -58,12 +62,6 @@ public class UserController {
 		return new ResponseEntity<ResponseMessage>(userSerivce.deleteAdmin(studentId), HttpStatus.OK);
 	}
 
-	@PostMapping("/uploadfilemember")
-	ResponseEntity<ResponseMessage> addListMemberFromCsv(@RequestParam("file") MultipartFile file) throws Exception {
-		return new ResponseEntity<ResponseMessage>(userSerivce.addListMemberAndCollaboratorFromFileCsv(file),
-				HttpStatus.OK);
-	}
-
 	@GetMapping("/getallmemberandcollaborator")
 	ResponseEntity<ResponseMessage> getAllMemberAndCollaborator(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
@@ -81,15 +79,27 @@ public class UserController {
 		return new ResponseEntity<ResponseMessage>(userSerivce.updateStatusForUser(studentId), HttpStatus.OK);
 	}
 
-	@GetMapping("/users/export")
-	void exportListUserToCsv(HttpServletResponse httpServletResponse) throws IOException {
-		userSerivce.export(httpServletResponse);
+	@GetMapping("/users/search")
+	ResponseEntity<ResponseMessage> searchUserByStudentIdOrName(@RequestParam(name = "inputSearch") String inputSearch,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(
+				userSerivce.searchUserByStudentIdOrName(inputSearch, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 
-	@GetMapping("/users/search")
-	ResponseEntity<ResponseMessage> searchUserByStudentIdOrName(@RequestParam(name = "inputSearch")String inputSearch,@RequestParam(defaultValue = "0") int pageNo,
-			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id")String sortBy) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.searchUserByStudentIdOrName(inputSearch,pageNo,pageSize,sortBy), HttpStatus.OK);
+	@PostMapping("/users/import")
+	ResponseEntity<ResponseMessage> addListMemberFromExcel(@RequestParam("file") MultipartFile file) throws Exception {
+		return new ResponseEntity<ResponseMessage>(userSerivce.addUsersFromExcel(file), HttpStatus.OK);
 	}
+	@GetMapping("/users/export")
+	  public ResponseEntity<Resource> getFile() {
+	    String filename = "users.xlsx";
+	    InputStreamResource file = new InputStreamResource(userSerivce.exportUsersToExcel());
+
+	    return ResponseEntity.ok()
+	        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+	        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
+	        .body(file);
+	  }
 
 }
