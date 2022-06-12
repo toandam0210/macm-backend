@@ -54,6 +54,7 @@ public class UserServiceImpl implements UserService {
 		try {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
 			User user = userOp.get();
+			Utils.convertNameOfRole(user.getRole());
 			responseMessage.setData(Arrays.asList(user));
 			responseMessage.setMessage(Constant.MSG_001);
 		} catch (Exception e) {
@@ -71,6 +72,9 @@ public class UserServiceImpl implements UserService {
 			List<User> admins = new ArrayList<User>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				admins = pageResponse.getContent();
+			}
+			for (User admin : admins) {
+				Utils.convertNameOfRole(admin.getRole());
 			}
 			responseMessage.setMessage(Constant.MSG_001);
 			responseMessage.setData(admins);
@@ -94,6 +98,9 @@ public class UserServiceImpl implements UserService {
 			List<User> admins = new ArrayList<User>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				admins = pageResponse.getContent();
+			}
+			for (User admin : admins) {
+				Utils.convertNameOfRole(admin.getRole());
 			}
 			responseMessage.setMessage(Constant.MSG_001);
 			responseMessage.setData(admins);
@@ -122,7 +129,7 @@ public class UserServiceImpl implements UserService {
 			} else {
 				user.setRole(roleOptional.get());
 				user.setEmail(userDto.getEmail());
-				user.setPhone(userDto.getPhoneNumber());
+				user.setPhone(userDto.getPhone());
 				user.setCurrentAddress(userDto.getCurrentAddress());
 				user.setUpdatedBy("toandv");
 				user.setUpdatedOn(LocalDateTime.now());
@@ -187,6 +194,9 @@ public class UserServiceImpl implements UserService {
 			List<User> users = new ArrayList<User>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				users = pageResponse.getContent();
+			}
+			for (User user : users) {
+				Utils.convertNameOfRole(user.getRole());
 			}
 			responseMessage.setMessage(Constant.MSG_001);
 			responseMessage.setData(users);
@@ -322,6 +332,9 @@ public class UserServiceImpl implements UserService {
 			List<User> users = new ArrayList<User>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				users = pageResponse.getContent();
+			}
+			for (User user : users) {
+				Utils.convertNameOfRole(user.getRole());
 			}
 			responseMessage.setMessage(Constant.MSG_001);
 			responseMessage.setData(users);

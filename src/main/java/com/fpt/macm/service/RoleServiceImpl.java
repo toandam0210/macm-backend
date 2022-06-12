@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
 import com.fpt.macm.repository.RoleRepository;
+import com.fpt.macm.utils.Utils;
 
 @Service
 public class RoleServiceImpl implements RoleService {
@@ -32,6 +33,9 @@ public class RoleServiceImpl implements RoleService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<Role> roles = roleRepository.findAll();
+			for (Role role : roles) {
+				Utils.convertNameOfRole(role);
+			}
 			responseMessage.setData(roles);
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());

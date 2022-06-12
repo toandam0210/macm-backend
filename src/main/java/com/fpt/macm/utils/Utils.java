@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import org.springframework.data.domain.Sort;
 
 import com.fpt.macm.dto.UserToCsvDto;
+import com.fpt.macm.model.Role;
 import com.fpt.macm.model.User;
 
 public class Utils {
@@ -135,5 +136,59 @@ public class Utils {
 	public static LocalDate ConvertStringToLocalDate(String input) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		return LocalDate.parse(input, formatter);
+	}
+	
+	public static void convertNameOfRole(Role role) {
+		switch (role.getName()) {
+		case "ROLE_HeadClub":
+			role.setName("Chủ nhiệm");
+			break;
+		case "ROLE_ViceHeadClub":
+			role.setName("Phó chủ nhiệm");
+			break;
+		case "ROLE_Treasurer":
+			role.setName("Thủ quỹ");
+			break;
+		case "ROLE_HeadCulture":
+			role.setName("Trưởng ban văn hóa");
+			break;
+		case "ROLE_ViceHeadCulture":
+			role.setName("Phó ban văn hóa");
+			break;
+		case "ROLE_HeadCommunication":
+			role.setName("Trưởng ban truyền thông");
+			break;
+		case "ROLE_ViceHeadCommunication":
+			role.setName("Phó ban truyền thông");
+			break;
+		case "ROLE_HeadTechnique":
+			role.setName("Trưởng ban chuyên môn");
+			break;
+		case "ROLE_ViceHeadTechnique":
+			role.setName("Phó ban chuyên môn");
+			break;
+		case "ROLE_Member_Commnication":
+			role.setName("Thành viên ban truyền thông");
+			break;
+		case "ROLE_Member_Culture":
+			role.setName("Thành viên ban văn hóa");
+			break;
+		case "ROLE_Member_Technique":
+			role.setName("Thành viên ban chuyên môn");
+			break;
+		case "ROLE_Collaborator_Commnunication":
+			role.setName("CTV truyền thông");
+			break;
+		case "ROLE_Collaborator_Culture":
+			role.setName("CTV văn hóa");
+			break;
+		case "ROLE_Collaborator_Technique":
+			role.setName("CTV chuyên môn");
+			break;
+
+		default:
+			role.setName("Thành viên ban chuyên môn");
+			break;
+		}
 	}
 }
