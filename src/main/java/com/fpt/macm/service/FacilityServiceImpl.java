@@ -14,12 +14,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.FacilityDto;
+import com.fpt.macm.dto.FacilityReportDto;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Facility;
 import com.fpt.macm.model.FacilityReport;
+import com.fpt.macm.model.FacilityRequest;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.repository.FacilityReportRepository;
 import com.fpt.macm.repository.FacilityRepository;
+import com.fpt.macm.repository.FacilityRequestRepository;
 
 @Service
 public class FacilityServiceImpl implements FacilityService {
@@ -29,6 +32,9 @@ public class FacilityServiceImpl implements FacilityService {
 
 	@Autowired
 	FacilityReportRepository facilityReportRepository;
+	
+	@Autowired
+	FacilityRequestRepository facilityRequestRepository;
 
 	@Override
 	public ResponseMessage createNewFacility(Facility facility) {
@@ -78,15 +84,28 @@ public class FacilityServiceImpl implements FacilityService {
 
 				if (oldFacility.getQuantityUsable() != facility.getQuantityUsable()
 						|| oldFacility.getQuantityBroken() != facility.getQuantityBroken()) {
-					createFacilityReport(oldFacility, facility);
-					oldFacility.setQuantityUsable(facility.getQuantityUsable());
-					oldFacility.setQuantityBroken(facility.getQuantityBroken());
+					if (isValidQuantity(oldFacility.getQuantityUsable(), oldFacility.getQuantityBroken(), facility.getQuantityUsable(), facility.getQuantityBroken())) {
+						createFacilityReport(oldFacility, facility);
+						oldFacility.setQuantityUsable(facility.getQuantityUsable());
+						oldFacility.setQuantityBroken(facility.getQuantityBroken());
+						oldFacility.setUpdatedBy("toandv");
+						oldFacility.setUpdatedOn(LocalDateTime.now());
+						facilityRepository.save(oldFacility);
+						responseMessage.setData(Arrays.asList(oldFacility));
+						responseMessage.setMessage(Constant.MSG_032);
+					}
+					else {
+						responseMessage.setMessage(Constant.MSG_046);
+					}
 				}
-				oldFacility.setUpdatedBy("toandv");
-				oldFacility.setUpdatedOn(LocalDateTime.now());
-				facilityRepository.save(oldFacility);
-				responseMessage.setData(Arrays.asList(oldFacility));
-				responseMessage.setMessage(Constant.MSG_032);
+				else {
+					oldFacility.setUpdatedBy("toandv");
+					oldFacility.setUpdatedOn(LocalDateTime.now());
+					facilityRepository.save(oldFacility);
+					responseMessage.setData(Arrays.asList(oldFacility));
+					responseMessage.setMessage(Constant.MSG_032);
+				}
+				
 			} else {
 				responseMessage.setMessage(Constant.MSG_030);
 			}
@@ -111,6 +130,14 @@ public class FacilityServiceImpl implements FacilityService {
 		}
 
 		return false;
+	}
+	
+	private boolean isValidQuantity(int oldQuantityUsable, int oldQuantityBroken, int newQuantityUsable, int newQuantityBroken) {
+		if ((oldQuantityUsable - newQuantityUsable) > 0 && (oldQuantityUsable - newQuantityUsable) < (newQuantityBroken - oldQuantityBroken)) {
+			return false;
+		}
+		
+		return true;
 	}
 
 	private void createFacilityReport(Facility oldFacility, Facility newFacility) {
@@ -138,7 +165,7 @@ public class FacilityServiceImpl implements FacilityService {
 			} else if (quantityBrokenDifference > 0 && quantityBrokenDifference < -quantityUsableDifference) {
 				description += Constant.FACILITY_STATUS_003 + " " + (quantityBrokenDifference) + " và "
 						+ Constant.FACILITY_STATUS_002 + " " + (-quantityUsableDifference - quantityBrokenDifference);
-			} else {
+			} else if (quantityBrokenDifference < 0) {
 				description += Constant.FACILITY_STATUS_002 + " "
 						+ (-quantityUsableDifference + -quantityBrokenDifference);
 			}
@@ -181,6 +208,49 @@ public class FacilityServiceImpl implements FacilityService {
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
 			responseMessage.setMessage(Constant.MSG_033);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllReport() {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<FacilityReportDto> facilityReportsDto = new ArrayList<FacilityReportDto>();
+
+			List<FacilityReport> facilityReports = (List<FacilityReport>) facilityReportRepository.findAll();
+			for (FacilityReport facilityReport : facilityReports) {
+				FacilityReportDto facilityReportDto = new FacilityReportDto();
+				String description = facilityReport.getDescription() + " " + facilityReport.getFacility().getName();
+				facilityReportDto.setDescription(description);
+				facilityReportDto.setCreatedOn(facilityReport.getCreatedOn());
+
+				facilityReportsDto.add(facilityReportDto);
+			}
+			responseMessage.setData(facilityReportsDto);
+			responseMessage.setMessage(Constant.MSG_034);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage createRequestToBuyFacility(FacilityRequest facilityRequest) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			facilityRequest.setCreatedBy("toandv");
+			facilityRequest.setCreatedOn(LocalDateTime.now());
+			facilityRequest.setStatus(true);
+			facilityRequestRepository.save(facilityRequest);
+			responseMessage.setData(Arrays.asList(facilityRequest));
+			responseMessage.setMessage(Constant.MSG_031);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

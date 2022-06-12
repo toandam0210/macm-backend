@@ -56,4 +56,5 @@ public class Constant {
     public static final String MSG_043 = "Không thành công. Không thể cập nhật buổi tập trong quá khứ";
     public static final String MSG_044 = "Xóa buổi tập thành công";
     public static final String MSG_045 = "Không thành công. Không thể xóa buổi tập trong quá khứ";
+    public static final String MSG_046 = "Số lượng không hợp lệ";
 }
