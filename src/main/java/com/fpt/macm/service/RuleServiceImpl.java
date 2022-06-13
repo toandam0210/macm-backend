@@ -37,6 +37,7 @@ public class RuleServiceImpl implements RuleService{
 			responseMessage.setData(rules);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
+			responseMessage.setTotalPage(pageResponse.getTotalPages());
 			responseMessage.setMessage(Constant.MSG_019);
 			
 		} catch (Exception e) {

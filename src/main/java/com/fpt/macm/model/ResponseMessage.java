@@ -10,6 +10,7 @@ public class ResponseMessage {
 	private int pageSize;
 	private int pageNo;
 	private int totalResult;
+	private int totalPage;
 	public List<?> getData() {
 		return data;
 	}
@@ -45,6 +46,12 @@ public class ResponseMessage {
 	}
 	public void setTotalResult(int totalResult) {
 		this.totalResult = totalResult;
+	}
+	public int getTotalPage() {
+		return totalPage;
+	}
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
 	}
 	
 }
