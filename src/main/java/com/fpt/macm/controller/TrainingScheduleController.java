@@ -25,8 +25,8 @@ public class TrainingScheduleController {
 	TrainingScheduleService trainingScheduleService;
 	
 	@GetMapping("/gettrainingschedule")
-	ResponseEntity<ResponseMessage> getTrainingScheduleByMonthAndYear(@RequestParam(name = "month") int month, @RequestParam(name = "year") int year){
-			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getListTrainingSchedule(month, year), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getTrainingScheduleByMonthAndYear(){
+			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getListTrainingSchedule(), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headtechnique/addnewsession")

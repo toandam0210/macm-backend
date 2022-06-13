@@ -46,7 +46,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					while(startDate2.compareTo(finishDate2) <= 0) {
 						if(startDate2.compareTo(LocalDate.now()) > 0) {
 							if(dayOfWeek.contains(startDate2.getDayOfWeek().toString())) {
-								List<TrainingSchedule> getSession = trainingScheduleRepository.getTrainingSchedule(startDate2, startDate2);
+								List<TrainingSchedule> getSession = trainingScheduleRepository.getTrainingSchedule(startDate2);
 								if (getSession.isEmpty()) {
 									TrainingSchedule trainingSchedule = new TrainingSchedule();
 									trainingSchedule.setDate(startDate2);
@@ -88,7 +88,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 				responseMessage.setMessage(Constant.MSG_038);
 			} else {
 				if(trainingSchedule.getDate().compareTo(LocalDate.now()) > 0) {
-					List<TrainingSchedule> getSession = trainingScheduleRepository.getTrainingSchedule(trainingSchedule.getDate(), trainingSchedule.getDate());
+					List<TrainingSchedule> getSession = trainingScheduleRepository.getTrainingSchedule(trainingSchedule.getDate());
 					if (getSession.isEmpty()) {
 						trainingSchedule.setCreatedBy("LinhLHN");
 						trainingSchedule.setCreatedOn(LocalDateTime.now());
@@ -114,15 +114,13 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 	}
 
 	@Override
-	public ResponseMessage getListTrainingSchedule(int month, int year) {
+	public ResponseMessage getListTrainingSchedule() {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			LocalDate firstDay = LocalDate.now().withDayOfMonth(1).withMonth(month).withYear(year);
-			LocalDate lastDay = firstDay.with(TemporalAdjusters.lastDayOfMonth());
-			List<TrainingSchedule> listSchedule = trainingScheduleRepository.getTrainingSchedule(firstDay, lastDay);
+			List<TrainingSchedule> listSchedule = trainingScheduleRepository.findAll();
 			responseMessage.setData(listSchedule);
-			responseMessage.setMessage("Danh sách lịch tập tháng " + month + " năm " + year);
+			responseMessage.setMessage("Danh sách lịch tập");
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
