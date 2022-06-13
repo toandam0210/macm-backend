@@ -58,4 +58,7 @@ public class Constant {
     public static final String MSG_045 = "Không thành công. Không thể xóa buổi tập trong quá khứ";
     public static final String MSG_046 = "Số lượng không hợp lệ";
     public static final String MSG_047 = "Export thành công";
+    public static final String MSG_048 = "Người dùng với MSSV: ";
+    public static final String MSG_049 = "Người dùng với Email: ";
+    public static final String MSG_050 = " đã tồn tại. ";
 }
