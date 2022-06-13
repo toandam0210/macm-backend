@@ -1,11 +1,16 @@
 package com.fpt.macm.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.model.Constant;
@@ -19,13 +24,21 @@ public class RuleServiceImpl implements RuleService{
 	@Autowired RuleRepository ruleRepository;
 	
 	@Override
-	public ResponseMessage getAllRule() {
+	public ResponseMessage getAllRule(int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<Rule> rules = ruleRepository.findAllRuleAndSortById();
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<Rule> pageResponse = ruleRepository.findAll(paging);
+			List<Rule> rules = new ArrayList<Rule>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				rules = pageResponse.getContent();
+			}
 			responseMessage.setData(rules);
+			responseMessage.setPageNo(pageNo);
+			responseMessage.setPageSize(pageSize);
 			responseMessage.setMessage(Constant.MSG_019);
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
