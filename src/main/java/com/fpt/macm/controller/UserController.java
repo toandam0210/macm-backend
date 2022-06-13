@@ -1,9 +1,5 @@
 package com.fpt.macm.controller;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
@@ -52,7 +48,7 @@ public class UserController {
 	}
 
 	@PutMapping("/updateuser/{studentId}")
-	ResponseEntity<ResponseMessage> updateAdminByStudentId(@PathVariable(name = "studentId") String studentId,
+	ResponseEntity<ResponseMessage> updateUserByStudentId(@PathVariable(name = "studentId") String studentId,
 			@RequestBody UserDto userDto) {
 		return new ResponseEntity<ResponseMessage>(userSerivce.updateUser(studentId, userDto), HttpStatus.OK);
 	}
@@ -75,7 +71,7 @@ public class UserController {
 	}
 
 	@PutMapping("/updatestatus")
-	ResponseEntity<ResponseMessage> updateListStatusForUser(@RequestParam String studentId) {
+	ResponseEntity<ResponseMessage> updateStatusForUser(@RequestParam String studentId) {
 		return new ResponseEntity<ResponseMessage>(userSerivce.updateStatusForUser(studentId), HttpStatus.OK);
 	}
 

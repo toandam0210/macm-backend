@@ -109,25 +109,48 @@ public class UserServiceImpl implements UserService {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
 			User user = userOp.get();
 			user.setStudentId(userDto.getStudentId());
+			List<User> users = (List<User>) userRepository.findAll();
+			users.remove(user);
+			boolean checkDuplicateEmail = false;
+			boolean checkDuplicateStudentId = false;
 			Role currentUserRole = user.getRole();
 			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
 			if (currentUserRole.getName().equals(ERole.ROLE_HeadClub.name())
 					&& !roleOptional.get().getName().equals(currentUserRole.getName())) {
 				responseMessage.setMessage(Constant.MSG_035);
 			} else {
-				user.setRole(roleOptional.get());
-				user.setName(userDto.getName());
-				user.setEmail(userDto.getEmail());
-				user.setPhone(userDto.getPhone());
-				user.setCurrentAddress(userDto.getCurrentAddress());
-				user.setDateOfBirth(userDto.getDateOfBirth());
-				user.setGender(userDto.isGender());
-				user.setStudentId(userDto.getStudentId());
-				user.setUpdatedBy("toandv");
-				user.setUpdatedOn(LocalDateTime.now());
-				userRepository.save(user);
-				responseMessage.setData(Arrays.asList(user));
-				responseMessage.setMessage(Constant.MSG_005);
+				for (User currentUser : users) {
+					if (currentUser.getStudentId().equals(userDto.getStudentId())) {
+						checkDuplicateStudentId = true;
+					} else if (currentUser.getEmail().equals(userDto.getEmail())) {
+						checkDuplicateEmail = true;
+					}
+				}
+				if (!checkDuplicateEmail && !checkDuplicateStudentId) {
+					user.setRole(roleOptional.get());
+					user.setName(userDto.getName());
+					user.setEmail(userDto.getEmail());
+					user.setPhone(userDto.getPhone());
+					user.setCurrentAddress(userDto.getCurrentAddress());
+					user.setDateOfBirth(userDto.getDateOfBirth());
+					user.setGender(userDto.isGender());
+					user.setStudentId(userDto.getStudentId());
+					user.setUpdatedBy("toandv");
+					user.setUpdatedOn(LocalDateTime.now());
+					userRepository.save(user);
+					responseMessage.setData(Arrays.asList(user));
+					responseMessage.setMessage(Constant.MSG_005);
+				} else {
+					String messageError = "";
+					if (checkDuplicateStudentId) {
+						messageError += Constant.MSG_048 + userDto.getStudentId() + Constant.MSG_050;
+					}
+					if (checkDuplicateEmail) {
+						messageError += Constant.MSG_049 + userDto.getEmail() + Constant.MSG_050;
+					}
+					responseMessage.setMessage(messageError);
+					responseMessage.setCode(400);
+				}
 			}
 
 		} catch (Exception e) {
@@ -165,25 +188,47 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage addAnMemberOrCollaborator(UserDto userDto) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			User user = new User();
-			user.setStudentId(userDto.getStudentId());
-			user.setName(userDto.getName());
-			user.setGender(userDto.isGender());
-			user.setDateOfBirth(userDto.getDateOfBirth());
-			user.setEmail(userDto.getEmail());
-			user.setImage(userDto.getImage());
-			user.setPhone(userDto.getPhone());
-			user.setCurrentAddress(userDto.getCurrentAddress());
-			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
-			if (roleOptional.isPresent()) {
-				user.setRole(roleOptional.get());
+			List<User> users = (List<User>) userRepository.findAll();
+			boolean checkDuplicateEmail = false;
+			boolean checkDuplicateStudentId = false;
+			for (User user : users) {
+				if (user.getStudentId().equals(userDto.getStudentId())) {
+					checkDuplicateStudentId = true;
+				} else if (user.getEmail().equals(userDto.getEmail())) {
+					checkDuplicateEmail = true;
+				}
 			}
-			user.setActive(true);
-			user.setCreatedBy("toandv");
-			user.setCreatedOn(LocalDate.now());
-			userRepository.save(user);
-			responseMessage.setData(Arrays.asList(user));
-			responseMessage.setMessage(Constant.MSG_007);
+			if (!checkDuplicateEmail && !checkDuplicateStudentId) {
+				User user = new User();
+				user.setStudentId(userDto.getStudentId());
+				user.setName(userDto.getName());
+				user.setGender(userDto.isGender());
+				user.setDateOfBirth(userDto.getDateOfBirth());
+				user.setEmail(userDto.getEmail());
+				user.setImage(userDto.getImage());
+				user.setPhone(userDto.getPhone());
+				user.setCurrentAddress(userDto.getCurrentAddress());
+				Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
+				if (roleOptional.isPresent()) {
+					user.setRole(roleOptional.get());
+				}
+				user.setActive(true);
+				user.setCreatedBy("toandv");
+				user.setCreatedOn(LocalDate.now());
+				userRepository.save(user);
+				responseMessage.setData(Arrays.asList(user));
+				responseMessage.setMessage(Constant.MSG_007);
+			} else {
+				String messageError = "";
+				if (checkDuplicateStudentId) {
+					messageError += Constant.MSG_048 + userDto.getStudentId() + Constant.MSG_050;
+				}
+				if (checkDuplicateEmail) {
+					messageError += Constant.MSG_049 + userDto.getEmail() + Constant.MSG_050;
+				}
+				responseMessage.setMessage(messageError);
+				responseMessage.setCode(400);
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
@@ -285,19 +330,44 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage addUsersFromExcel(MultipartFile file) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<User> users = ExcelHelper.excelToUsers(file.getInputStream());
-			userRepository.saveAll(users);
-			responseMessage.setData(users);
-			responseMessage.setMessage(Constant.MSG_006);
+			List<User> usersFromExcel = ExcelHelper.excelToUsers(file.getInputStream());
+			List<User> users = (List<User>) userRepository.findAll();
+			boolean checkDuplicateEmail = false;
+			boolean checkDuplicateStudentId = false;
+			String messageError = "";
+			for (User userFromExcel : usersFromExcel) {
+				for (User user : users) {
+					if (userFromExcel.getStudentId().equals(user.getStudentId())) {
+						checkDuplicateStudentId = true;
+					} else if (userFromExcel.getEmail().equals(user.getEmail())) {
+						checkDuplicateEmail = true;
+					}
+				}
+				if (!checkDuplicateEmail && !checkDuplicateStudentId) {
+					userRepository.saveAll(usersFromExcel);
+					responseMessage.setData(usersFromExcel);
+					responseMessage.setMessage(Constant.MSG_006);
+				} else {
+					if (checkDuplicateStudentId) {
+						messageError += Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
+					}
+					if (checkDuplicateEmail) {
+						messageError += Constant.MSG_049 + userFromExcel.getEmail() + Constant.MSG_050;
+					}
+				}
+				responseMessage.setMessage(messageError);
+				responseMessage.setCode(400);
+			}
+
 			return responseMessage;
 		} catch (IOException e) {
 			throw new RuntimeException("fail to store excel data: " + e.getMessage());
 		}
 	}
-	
+
 	public ByteArrayInputStream exportUsersToExcel() {
-	    List<User> users = (List<User>) userRepository.findAll();
-	    ByteArrayInputStream in = ExcelHelper.usersToExcel(users);
-	    return in;
-	  }
+		List<User> users = (List<User>) userRepository.findAll();
+		ByteArrayInputStream in = ExcelHelper.usersToExcel(users);
+		return in;
+	}
 }

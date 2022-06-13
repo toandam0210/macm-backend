@@ -1,9 +1,6 @@
 package com.fpt.macm.service;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.web.multipart.MultipartFile;
 
