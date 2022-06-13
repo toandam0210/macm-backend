@@ -67,6 +67,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					} 
 					else {
 						trainingScheduleRepository.saveAll(listTraining);
+						responseMessage.setData(listTraining);
 						responseMessage.setMessage(Constant.MSG_036);
 					}
 				}
@@ -144,6 +145,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 				getSession.setUpdatedBy("LinhLHN");
 				getSession.setUpdatedOn(LocalDateTime.now());
 				trainingScheduleRepository.save(getSession);
+				responseMessage.setData(Arrays.asList(getSession));
 				responseMessage.setMessage(Constant.MSG_042);
 			}
 			else {
@@ -165,6 +167,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 			TrainingSchedule getSession = currentSession.get();
 			if(getSession.getDate().compareTo(LocalDate.now()) > 0) {
 				trainingScheduleRepository.delete(getSession);
+				responseMessage.setData(Arrays.asList(getSession));
 				responseMessage.setMessage(Constant.MSG_044);
 			}
 			else {
