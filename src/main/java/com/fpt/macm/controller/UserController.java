@@ -48,7 +48,7 @@ public class UserController {
 	}
 
 	@PutMapping("/updateuser/{studentId}")
-	ResponseEntity<ResponseMessage> updateAdminByStudentId(@PathVariable(name = "studentId") String studentId,
+	ResponseEntity<ResponseMessage> updateUserByStudentId(@PathVariable(name = "studentId") String studentId,
 			@RequestBody UserDto userDto) {
 		return new ResponseEntity<ResponseMessage>(userSerivce.updateUser(studentId, userDto), HttpStatus.OK);
 	}
