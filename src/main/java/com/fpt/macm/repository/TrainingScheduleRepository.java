@@ -11,6 +11,6 @@ import com.fpt.macm.model.TrainingSchedule;
 
 @Repository
 public interface TrainingScheduleRepository extends JpaRepository<TrainingSchedule, Integer>{
-	@Query(value = "SELECT * FROM training_schedule t WHERE t.date BETWEEN ?1 AND ?2", nativeQuery = true)
-	List<TrainingSchedule> getTrainingSchedule(LocalDate firstDay, LocalDate lastDay);
+	@Query(value = "SELECT * FROM training_schedule t WHERE t.date = ?1", nativeQuery = true)
+	List<TrainingSchedule> getTrainingSchedule(LocalDate getDay);
 }
