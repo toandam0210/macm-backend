@@ -31,4 +31,7 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	
 	@Query(value = "select * from \"user\" where role_id in (13,14,15)", nativeQuery = true)
 	List<User> findCollaborator();
+	
+	@Query(value = "select * from \"user\" where role_id in (10,11,12)", nativeQuery = true)
+	Page<User> findMember(Pageable pageable);
 }
