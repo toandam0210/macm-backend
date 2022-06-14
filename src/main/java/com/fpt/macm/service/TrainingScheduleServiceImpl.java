@@ -3,7 +3,6 @@ package com.fpt.macm.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,8 +45,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					while(startDate2.compareTo(finishDate2) <= 0) {
 						if(startDate2.compareTo(LocalDate.now()) > 0) {
 							if(dayOfWeek.contains(startDate2.getDayOfWeek().toString())) {
-								List<TrainingSchedule> getSession = trainingScheduleRepository.getTrainingSchedule(startDate2);
-								if (getSession.isEmpty()) {
+								Optional<TrainingSchedule> getSessionOp = trainingScheduleRepository.findByDate(startDate2);
+								if (!getSessionOp.isPresent()) {
 									TrainingSchedule trainingSchedule = new TrainingSchedule();
 									trainingSchedule.setDate(startDate2);
 									trainingSchedule.setStartTime(startTime2);
@@ -88,8 +87,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 				responseMessage.setMessage(Constant.MSG_038);
 			} else {
 				if(trainingSchedule.getDate().compareTo(LocalDate.now()) > 0) {
-					List<TrainingSchedule> getSession = trainingScheduleRepository.getTrainingSchedule(trainingSchedule.getDate());
-					if (getSession.isEmpty()) {
+					Optional<TrainingSchedule> getSessionOp = trainingScheduleRepository.findByDate(trainingSchedule.getDate());
+					if (!getSessionOp.isPresent()) {
 						trainingSchedule.setCreatedBy("LinhLHN");
 						trainingSchedule.setCreatedOn(LocalDateTime.now());
 						trainingSchedule.setUpdatedBy("LinhLHN");
@@ -170,6 +169,27 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 			}
 			else {
 				responseMessage.setMessage(Constant.MSG_045);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getTrainingSessionByDate(String date) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
+			Optional<TrainingSchedule> getSessionOp = trainingScheduleRepository.findByDate(getDate);
+			if(getSessionOp.isPresent()) {
+				TrainingSchedule getSession = getSessionOp.get();
+				responseMessage.setData(Arrays.asList(getSession));
+			}
+			else {
+				responseMessage.setMessage(Constant.MSG_051);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

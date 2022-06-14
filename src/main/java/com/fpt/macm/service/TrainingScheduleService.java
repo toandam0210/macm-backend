@@ -11,4 +11,5 @@ public interface TrainingScheduleService {
 	ResponseMessage getListTrainingSchedule();
 	ResponseMessage updateTrainingSessionTime(int trainingId, TrainingSchedule updateTraningSession);
 	ResponseMessage deleteTrainingSession(int trainingId);
+	ResponseMessage getTrainingSessionByDate(String date);
 }
