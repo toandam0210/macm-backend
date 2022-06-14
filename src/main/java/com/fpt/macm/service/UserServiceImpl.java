@@ -121,7 +121,8 @@ public class UserServiceImpl implements UserService {
 				for (User currentUser : users) {
 					if (currentUser.getStudentId().equals(userDto.getStudentId())) {
 						checkDuplicateStudentId = true;
-					} else if (currentUser.getEmail().equals(userDto.getEmail())) {
+					}
+					if (currentUser.getEmail().equals(userDto.getEmail())) {
 						checkDuplicateEmail = true;
 					}
 				}
@@ -193,7 +194,8 @@ public class UserServiceImpl implements UserService {
 			for (User user : users) {
 				if (user.getStudentId().equals(userDto.getStudentId())) {
 					checkDuplicateStudentId = true;
-				} else if (user.getEmail().equals(userDto.getEmail())) {
+				}
+				if (user.getEmail().equals(userDto.getEmail())) {
 					checkDuplicateEmail = true;
 				}
 			}
@@ -338,7 +340,8 @@ public class UserServiceImpl implements UserService {
 				for (User user : users) {
 					if (userFromExcel.getStudentId().equals(user.getStudentId())) {
 						checkDuplicateStudentId = true;
-					} else if (userFromExcel.getEmail().equals(user.getEmail())) {
+					}
+					if (userFromExcel.getEmail().equals(user.getEmail())) {
 						checkDuplicateEmail = true;
 					}
 				}
@@ -386,7 +389,7 @@ public class UserServiceImpl implements UserService {
 			responseMessage.setData(members);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
-			
+
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
