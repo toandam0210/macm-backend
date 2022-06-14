@@ -20,4 +20,5 @@ public interface UserService {
 //	ResponseMessage userLogin();
 	ResponseMessage addUsersFromExcel(MultipartFile file);
 	ByteArrayInputStream exportUsersToExcel();
+	ResponseMessage findAllMember(int pageNo, int pageSize, String sortBy);
 }

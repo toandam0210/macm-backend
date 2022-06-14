@@ -372,4 +372,25 @@ public class UserServiceImpl implements UserService {
 		ByteArrayInputStream in = ExcelHelper.usersToExcel(users);
 		return in;
 	}
+
+	@Override
+	public ResponseMessage findAllMember(int pageNo, int pageSize, String sortBy) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
+			Page<User> pageResponse = userRepository.findMember(paging);
+			List<User> members = new ArrayList<User>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				members = pageResponse.getContent();
+			}
+			responseMessage.setMessage(Constant.MSG_001);
+			responseMessage.setData(members);
+			responseMessage.setPageNo(pageNo);
+			responseMessage.setPageSize(pageSize);
+			
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
 }

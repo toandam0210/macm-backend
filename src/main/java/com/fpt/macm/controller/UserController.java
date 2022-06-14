@@ -87,15 +87,20 @@ public class UserController {
 	ResponseEntity<ResponseMessage> addListUserFromExcel(@RequestParam("file") MultipartFile file) throws Exception {
 		return new ResponseEntity<ResponseMessage>(userSerivce.addUsersFromExcel(file), HttpStatus.OK);
 	}
-	@GetMapping("/users/export")
-	  public ResponseEntity<Resource> exportListUserToExcel() {
-	    String filename = "users.xlsx";
-	    InputStreamResource file = new InputStreamResource(userSerivce.exportUsersToExcel());
 
-	    return ResponseEntity.ok()
-	        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
-	        .contentType(MediaType.parseMediaType("application/vnd.ms-excel"))
-	        .body(file);
-	  }
+	@GetMapping("/users/export")
+	public ResponseEntity<Resource> exportListUserToExcel() {
+		String filename = "users.xlsx";
+		InputStreamResource file = new InputStreamResource(userSerivce.exportUsersToExcel());
+
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+				.contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(file);
+	}
+
+	@GetMapping("/viceheadclub/getallmembers")
+	ResponseEntity<ResponseMessage> getAllMembers(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.findAllMember(pageNo, pageSize, sortBy), HttpStatus.OK);
+	}
 
 }
