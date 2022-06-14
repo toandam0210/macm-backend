@@ -108,7 +108,6 @@ public class UserServiceImpl implements UserService {
 		try {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
 			User user = userOp.get();
-			user.setStudentId(userDto.getStudentId());
 			List<User> users = (List<User>) userRepository.findAll();
 			users.remove(user);
 			boolean checkDuplicateEmail = false;
