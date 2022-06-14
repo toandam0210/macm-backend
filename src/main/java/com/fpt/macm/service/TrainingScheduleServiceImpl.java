@@ -3,6 +3,7 @@ package com.fpt.macm.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,8 +46,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					while(startDate2.compareTo(finishDate2) <= 0) {
 						if(startDate2.compareTo(LocalDate.now()) > 0) {
 							if(dayOfWeek.contains(startDate2.getDayOfWeek().toString())) {
-								Optional<TrainingSchedule> getSessionOp = trainingScheduleRepository.getTrainingSchedule(startDate2);
-								if (getSessionOp.isEmpty()) {
+								List<TrainingSchedule> getSession = trainingScheduleRepository.getTrainingSchedule(startDate2);
+								if (getSession.isEmpty()) {
 									TrainingSchedule trainingSchedule = new TrainingSchedule();
 									trainingSchedule.setDate(startDate2);
 									trainingSchedule.setStartTime(startTime2);
@@ -56,9 +57,6 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 									trainingSchedule.setUpdatedBy("LinhLHN");
 									trainingSchedule.setUpdatedOn(LocalDateTime.now());
 									listTraining.add(trainingSchedule);
-								}
-								else {
-									responseMessage.setMessage(Constant.MSG_041 + startDate2.toString());
 								}
 							}
 						}
@@ -90,8 +88,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 				responseMessage.setMessage(Constant.MSG_038);
 			} else {
 				if(trainingSchedule.getDate().compareTo(LocalDate.now()) > 0) {
-					Optional<TrainingSchedule> getSessionOp = trainingScheduleRepository.getTrainingSchedule(trainingSchedule.getDate());
-					if (getSessionOp.isEmpty()) {
+					List<TrainingSchedule> getSession = trainingScheduleRepository.getTrainingSchedule(trainingSchedule.getDate());
+					if (getSession.isEmpty()) {
 						trainingSchedule.setCreatedBy("LinhLHN");
 						trainingSchedule.setCreatedOn(LocalDateTime.now());
 						trainingSchedule.setUpdatedBy("LinhLHN");
@@ -101,7 +99,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 						responseMessage.setMessage(Constant.MSG_037);
 					}
 					else {
-						responseMessage.setMessage(Constant.MSG_041 + trainingSchedule.getDate().toString());
+						responseMessage.setMessage(Constant.MSG_041);
 					}
 				}
 				else {
@@ -172,27 +170,6 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 			}
 			else {
 				responseMessage.setMessage(Constant.MSG_045);
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
-	public ResponseMessage getTrainingSessionByDate(String date) {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
-			Optional<TrainingSchedule> getSessionOp = trainingScheduleRepository.getTrainingSchedule(getDate);
-			if(getSessionOp.isPresent()) {
-				TrainingSchedule getSession = getSessionOp.get();
-				responseMessage.setData(Arrays.asList(getSession));
-			}
-			else {
-				responseMessage.setData(null);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
