@@ -344,6 +344,8 @@ public class UserServiceImpl implements UserService {
 					}
 				}
 				if (!checkDuplicateEmail && !checkDuplicateStudentId) {
+					userFromExcel.setCreatedOn(LocalDate.now());
+					userFromExcel.setCreatedBy("toandv");
 					userRepository.saveAll(usersFromExcel);
 					responseMessage.setData(usersFromExcel);
 					responseMessage.setMessage(Constant.MSG_006);
