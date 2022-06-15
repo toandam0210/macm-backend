@@ -88,22 +88,22 @@ public class Utils {
 		case "ROLE_ViceHeadTechnique":
 			role.setName("Phó ban chuyên môn");
 			break;
-		case "ROLE_Member_Commnication":
+		case "ROLE_MemberCommnication":
 			role.setName("Thành viên ban truyền thông");
 			break;
-		case "ROLE_Member_Culture":
+		case "ROLE_MemberCulture":
 			role.setName("Thành viên ban văn hóa");
 			break;
-		case "ROLE_Member_Technique":
+		case "ROLE_MemberTechnique":
 			role.setName("Thành viên ban chuyên môn");
 			break;
-		case "ROLE_Collaborator_Commnunication":
+		case "ROLE_CollaboratorCommnunication":
 			role.setName("CTV ban truyền thông");
 			break;
-		case "ROLE_Collaborator_Culture":
+		case "ROLE_CollaboratorCulture":
 			role.setName("CTV ban văn hóa");
 			break;
-		case "ROLE_Collaborator_Technique":
+		case "ROLE_CollaboratorTechnique":
 			role.setName("CTV ban chuyên môn");
 			break;
 
