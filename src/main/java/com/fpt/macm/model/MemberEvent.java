@@ -26,11 +26,12 @@ public class MemberEvent {
 	@JoinColumn(name = "userId")
 	private User user;
 	
-	@Column
-	private String roleInEvent;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "role_in_event")
+	private RoleEvent roleEvent;
 	
 	@Column
-	private String attendanceStatus;
+	private boolean attendanceStatus;
 	
 	@Column
 	private String createdBy;
@@ -68,19 +69,20 @@ public class MemberEvent {
 		this.user = user;
 	}
 
-	public String getRoleInEvent() {
-		return roleInEvent;
+
+	public RoleEvent getRoleEvent() {
+		return roleEvent;
 	}
 
-	public void setRoleInEvent(String roleInEvent) {
-		this.roleInEvent = roleInEvent;
+	public void setRoleEvent(RoleEvent roleEvent) {
+		this.roleEvent = roleEvent;
 	}
 
-	public String getAttendanceStatus() {
+	public boolean getAttendanceStatus() {
 		return attendanceStatus;
 	}
 
-	public void setAttendanceStatus(String attendanceStatus) {
+	public void setAttendanceStatus(boolean attendanceStatus) {
 		this.attendanceStatus = attendanceStatus;
 	}
 
