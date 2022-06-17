@@ -16,13 +16,59 @@ import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.repository.MemberEventRepository;
 
 @Service
-public class MemberEventServiceImpl implements MemberEventService{
+public class MemberEventServiceImpl implements MemberEventService {
 
 	@Autowired
 	MemberEventRepository memberEventRepository;
-	
+
 	@Override
-	public ResponseMessage getAllMemberOfEvent(int eventId, int pageNo, int pageSize, String sortBy) {
+	public ResponseMessage getAllUserOfEventByEventId(int eventId, int pageNo, int pageSize, String sortBy) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<MemberEvent> pageResponse = memberEventRepository.findAllUserEventByEventId(eventId, paging);
+			List<MemberEvent> memberEvents = new ArrayList<MemberEvent>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				memberEvents = pageResponse.getContent();
+			}
+			responseMessage.setData(memberEvents);
+			responseMessage.setPageNo(pageNo);
+			responseMessage.setPageSize(pageSize);
+			responseMessage.setMessage(Constant.MSG_052);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllOrganizingCommitteeOfEventByEventId(int eventId, int pageNo, int pageSize,
+			String sortBy) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<MemberEvent> pageResponse = memberEventRepository.findAllOrganizingCommitteeEventByEventId(eventId, paging);
+			List<MemberEvent> memberEvents = new ArrayList<MemberEvent>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				memberEvents = pageResponse.getContent();
+			}
+
+			responseMessage.setData(memberEvents);
+			responseMessage.setPageNo(pageNo);
+			responseMessage.setPageSize(pageSize);
+			responseMessage.setMessage(Constant.MSG_053);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllMemberOfEventByEventId(int eventId, int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -32,10 +78,11 @@ public class MemberEventServiceImpl implements MemberEventService{
 			if (pageResponse != null && pageResponse.hasContent()) {
 				memberEvents = pageResponse.getContent();
 			}
+
 			responseMessage.setData(memberEvents);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
-			responseMessage.setMessage(Constant.MSG_052);
+			responseMessage.setMessage(Constant.MSG_054);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

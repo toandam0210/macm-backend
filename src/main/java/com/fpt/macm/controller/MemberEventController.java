@@ -19,12 +19,27 @@ public class MemberEventController {
 	@Autowired
 	MemberEventService memberEventService;
 
+	@GetMapping("/headculture/getalluserevent/{eventId}")
+	ResponseEntity<ResponseMessage> getAllUserEvent(@PathVariable(name = "eventId") int eventId,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(
+				memberEventService.getAllUserOfEventByEventId(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
+	}
+	
+	@GetMapping("/headculture/getallorganizingcommitteeevent/{eventId}")
+	ResponseEntity<ResponseMessage> getAllOrganizingCommitteeEvent(@PathVariable(name = "eventId") int eventId,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(
+				memberEventService.getAllOrganizingCommitteeOfEventByEventId(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
+	}
+	
 	@GetMapping("/headculture/getallmemberevent/{eventId}")
 	ResponseEntity<ResponseMessage> getAllMemberEvent(@PathVariable(name = "eventId") int eventId,
 			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
 			@RequestParam(defaultValue = "id") String sortBy) {
 		return new ResponseEntity<ResponseMessage>(
-				memberEventService.getAllMemberOfEvent(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
+				memberEventService.getAllMemberOfEventByEventId(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
-
 }

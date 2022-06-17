@@ -1,17 +1,12 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -47,9 +42,6 @@ public class Event {
 
 	@Column
 	private LocalDateTime updatedOn;
-	
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<MemberEvent> membersEvent = new HashSet<MemberEvent>();
 
 	public int getId() {
 		return id;
@@ -130,14 +122,5 @@ public class Event {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
-
-	public Set<MemberEvent> getMembersEvent() {
-		return membersEvent;
-	}
-
-	public void setMembersEvent(Set<MemberEvent> membersEvent) {
-		this.membersEvent = membersEvent;
-	}
-	
 	
 }

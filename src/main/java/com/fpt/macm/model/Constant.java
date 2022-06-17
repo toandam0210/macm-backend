@@ -62,5 +62,7 @@ public class Constant {
     public static final String MSG_049 = "Người dùng với Email: ";
     public static final String MSG_050 = " đã tồn tại. ";
     public static final String MSG_051 = "Không có lịch tập trong ngày này";
-    public static final String MSG_052 = "Lấy danh sách thành viên tham gia sự kiện thành công";
+    public static final String MSG_052 = "Lấy danh sách người dùng tham gia sự kiện thành công";
+    public static final String MSG_053 = "Lấy danh sách thành viên ban tổ chức sự kiện thành công";
+    public static final String MSG_054 = "Lấy danh sách thành viên và CTV tham gia sự kiện thành công";
 }
