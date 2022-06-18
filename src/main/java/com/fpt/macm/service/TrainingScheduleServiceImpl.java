@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.dto.ScheduleDto;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.TrainingSchedule;
@@ -25,7 +26,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 	TrainingScheduleRepository trainingScheduleRepository;
 	
 	@Override
-	public ResponseMessage createTrainingSchedule(String startDate, String finishDate, List<String> dayOfWeek, String startTime, String finishTime) {
+	public ResponseMessage createPreviewTrainingSchedule(String startDate, String finishDate, List<String> dayOfWeek, String startTime, String finishTime) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -38,36 +39,32 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 				LocalTime startTime2 = LocalTime.parse(startTime);
 				LocalTime finishTime2 = LocalTime.parse(finishTime);
 				
-				List<TrainingSchedule> listTraining = new ArrayList<TrainingSchedule>();
+				List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
 				if(finishDate2.compareTo(LocalDate.now()) < 0) {
 					responseMessage.setMessage(Constant.MSG_039);
 				} else {
 					while(startDate2.compareTo(finishDate2) <= 0) {
-						if(startDate2.compareTo(LocalDate.now()) > 0) {
-							if(dayOfWeek.contains(startDate2.getDayOfWeek().toString())) {
-								Optional<TrainingSchedule> getSessionOp = trainingScheduleRepository.findByDate(startDate2);
-								if (!getSessionOp.isPresent()) {
-									TrainingSchedule trainingSchedule = new TrainingSchedule();
-									trainingSchedule.setDate(startDate2);
-									trainingSchedule.setStartTime(startTime2);
-									trainingSchedule.setFinishTime(finishTime2);
-									trainingSchedule.setCreatedBy("LinhLHN");
-									trainingSchedule.setCreatedOn(LocalDateTime.now());
-									trainingSchedule.setUpdatedBy("LinhLHN");
-									trainingSchedule.setUpdatedOn(LocalDateTime.now());
-									listTraining.add(trainingSchedule);
-								}
+						if(startDate2.compareTo(LocalDate.now()) > 0 && dayOfWeek.contains(startDate2.getDayOfWeek().toString())) {
+							ScheduleDto trainingSessionDto = new ScheduleDto();
+							trainingSessionDto.setDate(startDate2);
+							trainingSessionDto.setTitle("Lịch tập");
+							trainingSessionDto.setStartTime(startTime2);
+							trainingSessionDto.setFinishTime(finishTime2);
+							if(getTrainingSessionByDate(startDate2) == null) {
+								trainingSessionDto.setExisted(false);
 							}
-						}
+							else {
+								trainingSessionDto.setExisted(true);
+							}
+							listPreview.add(trainingSessionDto);
+						} 
 						startDate2 = startDate2.plusDays(1);
 					}
-					if(listTraining.isEmpty()) {
+					if(listPreview.isEmpty()) {
 						responseMessage.setMessage(Constant.MSG_040);
 					} 
 					else {
-						trainingScheduleRepository.saveAll(listTraining);
-						responseMessage.setData(listTraining);
-						responseMessage.setMessage(Constant.MSG_036);
+						responseMessage.setData(listPreview);
 					}
 				}
 			}
@@ -87,8 +84,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 				responseMessage.setMessage(Constant.MSG_038);
 			} else {
 				if(trainingSchedule.getDate().compareTo(LocalDate.now()) > 0) {
-					Optional<TrainingSchedule> getSessionOp = trainingScheduleRepository.findByDate(trainingSchedule.getDate());
-					if (!getSessionOp.isPresent()) {
+					if (getTrainingSessionByDate(trainingSchedule.getDate()) == null) {
 						trainingSchedule.setCreatedBy("LinhLHN");
 						trainingSchedule.setCreatedOn(LocalDateTime.now());
 						trainingSchedule.setUpdatedBy("LinhLHN");
@@ -183,13 +179,56 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
-			Optional<TrainingSchedule> getSessionOp = trainingScheduleRepository.findByDate(getDate);
-			if(getSessionOp.isPresent()) {
-				TrainingSchedule getSession = getSessionOp.get();
-				responseMessage.setData(Arrays.asList(getSession));
+			if(getTrainingSessionByDate(getDate) != null) {
+				responseMessage.setData(Arrays.asList(getTrainingSessionByDate(getDate)));
 			}
 			else {
 				responseMessage.setMessage(Constant.MSG_051);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
+	public TrainingSchedule getTrainingSessionByDate(LocalDate date) {
+		try {
+			Optional<TrainingSchedule> getSessionOp = trainingScheduleRepository.findByDate(date);
+			if(getSessionOp.isPresent()) {
+				return getSessionOp.get();
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+
+	@Override
+	public ResponseMessage createTrainingSchedule(List<ScheduleDto> listPreview) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<TrainingSchedule> listTraining = new ArrayList<TrainingSchedule>();
+			for (ScheduleDto scheduleDto : listPreview) {
+				if(!scheduleDto.getExisted()) {
+					TrainingSchedule trainingSchedule = new TrainingSchedule();
+					trainingSchedule.setDate(scheduleDto.getDate());
+					trainingSchedule.setStartTime(scheduleDto.getStartTime());
+					trainingSchedule.setFinishTime(scheduleDto.getFinishTime());
+					trainingSchedule.setCreatedBy("LinhLHN");
+					trainingSchedule.setCreatedOn(LocalDateTime.now());
+					trainingSchedule.setUpdatedBy("LinhLHN");
+					trainingSchedule.setUpdatedOn(LocalDateTime.now());
+					listTraining.add(trainingSchedule);
+				}
+			}
+			if(listTraining.isEmpty()) {
+				responseMessage.setMessage(Constant.MSG_040);
+			} else {
+				trainingScheduleRepository.saveAll(listTraining);
+				responseMessage.setData(listTraining);
+				responseMessage.setMessage(Constant.MSG_036);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
