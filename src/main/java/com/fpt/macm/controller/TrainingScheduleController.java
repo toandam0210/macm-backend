@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.macm.dto.ScheduleDto;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.service.TrainingScheduleService;
@@ -39,10 +40,15 @@ public class TrainingScheduleController {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSession(trainingSchedule), HttpStatus.OK);
 	}
 	
-	@PostMapping("/headtechnique/addnewschedule")
-	ResponseEntity<ResponseMessage> createTrainingSchedule(@RequestParam(name = "startDate") String startDate, @RequestParam(name = "finishDate") String finishDate, 
+	@PostMapping("/headtechnique/createpreview")
+	ResponseEntity<ResponseMessage> createPreview(@RequestParam(name = "startDate") String startDate, @RequestParam(name = "finishDate") String finishDate, 
 			@RequestBody List<String> dayOfWeek, @RequestParam(name = "startTime") String startTime, @RequestParam(name = "finishTime") String finishTime) {
-		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSchedule(startDate, finishDate, dayOfWeek, startTime, finishTime), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createPreviewTrainingSchedule(startDate, finishDate, dayOfWeek, startTime, finishTime), HttpStatus.OK);
+	}
+	
+	@PostMapping("/headtechnique/addnewschedule")
+	ResponseEntity<ResponseMessage> createTrainingSchedule(@RequestBody List<ScheduleDto> listPreview) {
+		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSchedule(listPreview), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headtechnique/updatesession/{trainingId}")
