@@ -21,4 +21,7 @@ public interface UserService {
 	ResponseMessage addUsersFromExcel(MultipartFile file);
 	ByteArrayInputStream exportUsersToExcel();
 	ResponseMessage findAllMember(int pageNo, int pageSize, String sortBy);
+	ResponseMessage getAllUser();
+	ResponseMessage getMembersActiveBySemester(String semester);
+	ResponseMessage getAdminActiveBySemester(String semester);
 }

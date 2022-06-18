@@ -102,5 +102,20 @@ public class UserController {
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
 		return new ResponseEntity<ResponseMessage>(userSerivce.findAllMember(pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
+	
+	@GetMapping("/viceheadclub/getallusers")
+	ResponseEntity<ResponseMessage> getAllUsers() {
+		return new ResponseEntity<ResponseMessage>(userSerivce.getAllUser(), HttpStatus.OK);
+	}
+	
+	@GetMapping("/viceheadclub/getmembers/semester")
+	ResponseEntity<ResponseMessage> getMembersBySemester(@RequestParam String semester) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.getMembersActiveBySemester(semester), HttpStatus.OK);
+	}
+	
+	@GetMapping("/viceheadclub/getadmins/semester")
+	ResponseEntity<ResponseMessage> getAdminsBySemester(@RequestParam String semester) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.getAdminActiveBySemester(semester), HttpStatus.OK);
+	}
 
 }
