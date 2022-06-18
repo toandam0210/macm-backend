@@ -61,6 +61,9 @@ public class User {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
+	@Column
+	private int generation;
 
 	public int getId() {
 		return id;
@@ -181,6 +184,16 @@ public class User {
 	public void setCurrentAddress(String currentAddress) {
 		this.currentAddress = currentAddress;
 	}
+
+	public int getGeneration() {
+		return generation;
+	}
+
+	public void setGeneration(int generation) {
+		this.generation = generation;
+	}
+	
+	
 	
 	
 	

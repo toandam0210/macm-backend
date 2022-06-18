@@ -13,6 +13,7 @@ public class UserDto {
 	private String phone;
 	private boolean isActive;
 	private String name;
+	private int generation;
 	
 	public String getStudentId() {
 		return studentId;
@@ -73,6 +74,12 @@ public class UserDto {
 	}
 	public void setName(String name) {
 		this.name = name;
+	}
+	public int getGeneration() {
+		return generation;
+	}
+	public void setGeneration(int generation) {
+		this.generation = generation;
 	}
 	
 	
