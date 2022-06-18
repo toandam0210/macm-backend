@@ -22,8 +22,10 @@ import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ERole;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
+import com.fpt.macm.model.StatusSemester;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.RoleRepository;
+import com.fpt.macm.repository.StatusSemesterRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 
@@ -35,6 +37,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	RoleRepository roleRepository;
+
+	@Autowired
+	StatusSemesterRepository semesterRepository;
 
 	@Override
 	public ResponseMessage getUserByStudentId(String studentId) {
@@ -137,6 +142,7 @@ public class UserServiceImpl implements UserService {
 					user.setStudentId(userDto.getStudentId());
 					user.setUpdatedBy("toandv");
 					user.setUpdatedOn(LocalDateTime.now());
+					user.setGeneration(userDto.getGeneration());
 					userRepository.save(user);
 					responseMessage.setData(Arrays.asList(user));
 					responseMessage.setMessage(Constant.MSG_005);
@@ -209,6 +215,7 @@ public class UserServiceImpl implements UserService {
 				user.setImage(userDto.getImage());
 				user.setPhone(userDto.getPhone());
 				user.setCurrentAddress(userDto.getCurrentAddress());
+				user.setGeneration(userDto.getGeneration());
 				Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
 				if (roleOptional.isPresent()) {
 					user.setRole(roleOptional.get());
@@ -389,6 +396,106 @@ public class UserServiceImpl implements UserService {
 			responseMessage.setData(members);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
+
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllUser() {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<User> users = (List<User>) userRepository.findAll();
+			if (users.size() > 0) {
+				responseMessage.setData(users);
+				responseMessage.setTotalResult(users.size());
+				responseMessage.setMessage(Constant.MSG_001);
+			} else {
+				responseMessage.setMessage("Không có người dùng");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getMembersActiveBySemester(String semester) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<StatusSemester> statusSemesters = semesterRepository.findBySemester(semester);
+			List<User> allMembers = userRepository.findMemberWithoutPaging();
+			List<User> users = new ArrayList<User>();
+			int countDeactive = 0;
+			if (statusSemesters.size() > 0) {
+				for (StatusSemester statusSemester : statusSemesters) {
+					for (User user : allMembers) {
+						if (statusSemester.getUser().getStudentId().equals(user.getStudentId())) {
+							Optional<User> userOp = userRepository
+									.findByStudentId(statusSemester.getUser().getStudentId());
+							User userDeactive = userOp.get();
+							userDeactive.setActive(false);
+							users.add(userDeactive);
+						}
+					}
+				}
+				countDeactive = users.size();
+				allMembers.removeAll(users);
+				for (User user : allMembers) {
+					user.setActive(true);
+					users.add(user);
+				}
+				responseMessage.setData(users);
+				responseMessage.setMessage(Constant.MSG_001);
+				responseMessage.setTotalResult(users.size());
+				responseMessage.setTotalDeactive(countDeactive);
+				responseMessage.setTotalActive(users.size() - countDeactive);
+			} else {
+				responseMessage.setMessage("Không có dữ liệu");
+			}
+
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
+	@Override
+	public ResponseMessage getAdminActiveBySemester(String semester) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<StatusSemester> statusSemesters = semesterRepository.findBySemester(semester);
+			List<User> allAdmins = userRepository.findAllAdmin();
+			List<User> users = new ArrayList<User>();
+			int countDeactive = 0;
+			if (statusSemesters.size() > 0) {
+				for (StatusSemester statusSemester : statusSemesters) {
+					for (User user : allAdmins) {
+						if (statusSemester.getUser().getStudentId().equals(user.getStudentId())) {
+							Optional<User> userOp = userRepository
+									.findByStudentId(statusSemester.getUser().getStudentId());
+							User userDeactive = userOp.get();
+							userDeactive.setActive(false);
+							users.add(userDeactive);
+						}
+					}
+				}
+				countDeactive = users.size();
+				allAdmins.removeAll(users);
+				for (User user : allAdmins) {
+					user.setActive(true);
+					users.add(user);
+				}
+				responseMessage.setData(users);
+				responseMessage.setMessage(Constant.MSG_001);
+				responseMessage.setTotalResult(users.size());
+				responseMessage.setTotalDeactive(countDeactive);
+				responseMessage.setTotalActive(users.size() - countDeactive);
+			} else {
+				responseMessage.setMessage("Không có dữ liệu");
+			}
 
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());

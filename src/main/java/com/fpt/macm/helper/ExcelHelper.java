@@ -24,7 +24,7 @@ import com.fpt.macm.utils.Utils;
 public class ExcelHelper {
 	public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 	static String[] HEADERs = { "MSSV", "Tên", "Ngày sinh", "SĐT", "Email", "Giới tính", "Trạng thái hoạt động",
-			"Vai trò", "Địa chỉ" };
+			"Vai trò", "Địa chỉ", "Generation"};
 	static String SHEET = "Users";
 	
 	public static boolean hasExcelFormat(MultipartFile file) {
@@ -65,6 +65,7 @@ public class ExcelHelper {
 				}
 				row.createCell(7).setCellValue(Utils.convertRoleFromDbToExcel(user.getRole()));
 				row.createCell(8).setCellValue(user.getCurrentAddress());
+				row.createCell(9).setCellValue(user.getGeneration());
 			}
 			workbook.write(out);
 			return new ByteArrayInputStream(out.toByteArray());
@@ -133,6 +134,10 @@ public class ExcelHelper {
 						break;
 					case 8:
 						user.setCurrentAddress(currentCell.getStringCellValue());
+						break;
+					case 9:
+						String generation = currentCell.getStringCellValue();
+						user.setGeneration(Integer.parseInt(generation));
 					default:
 						break;
 					}
