@@ -42,14 +42,14 @@ public class User {
 
 	@Column
 	private boolean isActive;
-	
+
 	@Column
 	private String currentAddress;
-	
+
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "roleId")
 	private Role role;
-	
+
 	@Column
 	private String createdBy;
 
@@ -61,7 +61,7 @@ public class User {
 
 	@Column
 	private LocalDateTime updatedOn;
-	
+
 	@Column
 	private int generation;
 
@@ -192,12 +192,5 @@ public class User {
 	public void setGeneration(int generation) {
 		this.generation = generation;
 	}
-	
-	
-	
-	
-	
-	
-	
 
 }

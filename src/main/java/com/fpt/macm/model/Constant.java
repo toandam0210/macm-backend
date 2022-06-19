@@ -68,4 +68,7 @@ public class Constant {
     public static final String MSG_055 = "Cập nhật điểm danh thành công";
     public static final String MSG_056 = "Hôm nay không có buổi tập";
     public static final String MSG_057 = "Lấy danh sách điểm danh thành công";
+    public static final String MSG_058 = "Lấy danh sách người dùng tham gia sự kiện thành công";
+    public static final String MSG_059 = "Lấy danh sách thành viên ban tổ chức sự kiện thành công";
+    public static final String MSG_060 = "Lấy danh sách thành viên và CTV tham gia sự kiện thành công";
 }
