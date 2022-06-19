@@ -148,7 +148,7 @@ public class EventServiceImpl implements EventService{
 			LocalDate startDate2 = Utils.ConvertStringToLocalDate(startDate);
 			LocalDate finishDate2 = Utils.ConvertStringToLocalDate(finishDate);
 			if(finishDate2.compareTo(LocalDate.now()) < 0) {
-				responseMessage.setMessage(Constant.MSG_062);
+				responseMessage.setMessage(Constant.MSG_072);
 			} else {
 				List<Event> eventList = new ArrayList<Event>();
 				while(startDate2.compareTo(finishDate2) <= 0) {
@@ -180,7 +180,7 @@ public class EventServiceImpl implements EventService{
 		try {
 			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
 			if(listSchedule.size() > 0) {
-				responseMessage.setData(Arrays.asList(listSchedule.get(0)));
+				responseMessage.setData(Arrays.asList(listSchedule.get(0).getDate()));
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

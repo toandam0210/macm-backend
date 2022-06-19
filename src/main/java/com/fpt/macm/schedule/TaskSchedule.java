@@ -1,6 +1,7 @@
 package com.fpt.macm.schedule;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -10,12 +11,16 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.fpt.macm.model.Role;
+import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.model.AdminSemester;
+import com.fpt.macm.model.AttendanceStatus;
 import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.AdminSemesterRepository;
+import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.StatusSemesterRepository;
 import com.fpt.macm.repository.UserRepository;
+import com.fpt.macm.service.TrainingScheduleServiceImpl;
 
 @Component
 public class TaskSchedule {
@@ -28,6 +33,12 @@ public class TaskSchedule {
 	
 	@Autowired
 	AdminSemesterRepository adminSemesterRepository;
+	
+	@Autowired
+	AttendanceStatusRepository attendanceStatusRepository;
+	
+	@Autowired
+	TrainingScheduleServiceImpl trainingScheduleServiceImpl;
 	Logger logger = LoggerFactory.getLogger(TaskSchedule.class);
 
 	@Scheduled(cron = "* 0 0 * * *")
@@ -82,6 +93,23 @@ public class TaskSchedule {
 				adminSemester.setRole(user.getRole());
 				adminSemesterRepository.save(adminSemester);
 				logger.info("add admin oke");
+			}
+		}
+	}
+	
+	@Scheduled(cron = "1 0 0 * * *")
+	public void addListAttendanceStatus() {
+		TrainingSchedule trainingSchedule = trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now());
+		if(trainingSchedule != null) {
+			List<User> users = (List<User>) userRepository.findAll();
+			for (User user : users) {
+				AttendanceStatus attendanceStatus = new AttendanceStatus();
+				attendanceStatus.setUser(user);
+				attendanceStatus.setTrainingSchedule(trainingSchedule);
+				attendanceStatus.setCreatedOn(LocalDateTime.now());
+				attendanceStatus.setCreatedBy("toandv");
+				attendanceStatus.setStatus(false);
+				attendanceStatusRepository.save(attendanceStatus);
 			}
 		}
 	}

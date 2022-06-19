@@ -52,7 +52,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 				
 				List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
 				if(finishDate2.compareTo(LocalDate.now()) < 0) {
-					responseMessage.setMessage(Constant.MSG_055);
+					responseMessage.setMessage(Constant.MSG_065);
 				} else {
 					while(startDate2.compareTo(finishDate2) <= 0) {
 						if(startDate2.compareTo(LocalDate.now()) > 0) {
@@ -121,7 +121,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 				eventScheduleRepository.saveAll(listEventSchedule);
 				commonScheduleRepository.saveAll(listCommon);
 				responseMessage.setData(listEventSchedule);
-				responseMessage.setMessage(Constant.MSG_056);
+				responseMessage.setMessage(Constant.MSG_066);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -147,7 +147,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 						eventSchedule.setUpdatedOn(LocalDateTime.now());
 						eventScheduleRepository.save(eventSchedule);
 						responseMessage.setData(Arrays.asList(eventSchedule));
-						responseMessage.setMessage(Constant.MSG_057);
+						responseMessage.setMessage(Constant.MSG_067);
 						CommonSchedule commonSession = new CommonSchedule();
 						commonSession.setTitle(eventSchedule.getEvent().getName());
 						commonSession.setDate(eventSchedule.getDate());
@@ -162,7 +162,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 					}
 				}
 				else {
-					responseMessage.setMessage(Constant.MSG_055);
+					responseMessage.setMessage(Constant.MSG_065);
 				}
 			}
 		} catch (Exception e) {
@@ -216,7 +216,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 				getEventSession.setUpdatedOn(LocalDateTime.now());
 				eventScheduleRepository.save(getEventSession);
 				responseMessage.setData(Arrays.asList(getEventSession));
-				responseMessage.setMessage(Constant.MSG_058);
+				responseMessage.setMessage(Constant.MSG_068);
 				CommonSchedule commonSession = commonScheduleService.getCommonSessionByDate(getEventSession.getDate());
 				commonSession.setStartTime(updateCommonSession.getStartTime());
 				commonSession.setFinishTime(updateCommonSession.getFinishTime());
@@ -224,7 +224,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 				commonScheduleRepository.save(commonSession);
 			}
 			else {
-				responseMessage.setMessage(Constant.MSG_059);
+				responseMessage.setMessage(Constant.MSG_069);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -248,7 +248,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 				commonScheduleRepository.delete(commonSession);
 			}
 			else {
-				responseMessage.setMessage(Constant.MSG_060);
+				responseMessage.setMessage(Constant.MSG_070);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -267,7 +267,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 				responseMessage.setData(Arrays.asList(getEventSessionByDate(getDate)));
 			}
 			else {
-				responseMessage.setMessage(Constant.MSG_061);
+				responseMessage.setMessage(Constant.MSG_071);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

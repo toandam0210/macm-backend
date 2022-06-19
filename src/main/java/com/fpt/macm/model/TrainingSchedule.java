@@ -3,17 +3,12 @@ package com.fpt.macm.model;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -31,9 +26,6 @@ public class TrainingSchedule {
 	
 	@Column
 	private LocalTime finishTime;
-	
-	@OneToMany(mappedBy = "trainingSchedule", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<AttendanceStatus> attendanceStatus = new HashSet<AttendanceStatus>();
 	
 	@Column
 	private String createdBy;
@@ -111,15 +103,4 @@ public class TrainingSchedule {
 		this.updatedOn = updatedOn;
 	}
 
-	public Set<AttendanceStatus> getAttendanceStatus() {
-		return attendanceStatus;
-	}
-
-	public void setAttendanceStatus(Set<AttendanceStatus> attendanceStatus) {
-		this.attendanceStatus = attendanceStatus;
-	}
-	
-	
-	
-	
 }
