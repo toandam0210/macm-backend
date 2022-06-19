@@ -51,7 +51,7 @@ public class Constant {
     public static final String MSG_038 = "Không thành công. Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc";
     public static final String MSG_039 = "Không thành công. Không thể thêm lịch tập vào quá khứ";
     public static final String MSG_040 = "Không thành công. Không có ngày nào đạt yêu cầu";
-    public static final String MSG_041 = "Không thành công. Đã có lịch tập trong ngày này";
+    public static final String MSG_041 = "Không thành công. Đã có lịch trong ngày này";
     public static final String MSG_042 = "Cập nhật buổi tập thành công";
     public static final String MSG_043 = "Không thành công. Không thể cập nhật buổi tập trong quá khứ";
     public static final String MSG_044 = "Xóa buổi tập thành công";
@@ -65,4 +65,15 @@ public class Constant {
     public static final String MSG_052 = "Tạo sự kiện thành công";
     public static final String MSG_053 = "Cập nhật sự kiện thành công";
     public static final String MSG_054 = "Xóa sự kiện thành công";
+    public static final String MSG_055 = "Không thành công. Không thể thêm lịch sự kiện vào quá khứ";
+    public static final String MSG_056 = "Thêm lịch sự kiện thành công";
+    public static final String MSG_057 = "Thêm buổi sự kiện thành công";
+    public static final String MSG_058 = "Cập nhật buổi sự kiện thành công";
+    public static final String MSG_059 = "Không thành công. Không thể cập nhật buổi sự kiện trong quá khứ";
+    public static final String MSG_060 = "Xóa buổi sự kiện thành công";
+    public static final String MSG_061 = "Không có lịch sự kiện trong ngày này";
+    public static final String MSG_062 = "Tìm không hợp lệ. Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc";
+    public static final String MSG_063 = "Danh sách sự kiện: ";
+    public static final String MSG_064 = "Không thể xóa, sự kiện đã bắt đầu";
+    public static final String MSG_065 = "Không thể cập nhật, sự kiện đã bắt đầu";
 }

@@ -43,4 +43,14 @@ public class EventController {
 	ResponseEntity<ResponseMessage> deleteEvent(@PathVariable(name = "id") int id) {
 		return new ResponseEntity<ResponseMessage>(eventService.deleteEvent(id), HttpStatus.OK);
 	}
+	
+	@GetMapping("/geteventsbydate")
+	ResponseEntity<ResponseMessage> getEventByDate(@RequestParam String startDate, @RequestParam String finishDate) {
+		return new ResponseEntity<ResponseMessage>(eventService.getEventsByDate(startDate, finishDate), HttpStatus.OK);
+	}
+	
+	@GetMapping("/headculture/updatesession/{eventId}")
+	ResponseEntity<ResponseMessage> getStartDateOfEvent(@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(eventService.getStartDateOfEvent(eventId), HttpStatus.OK);
+	}
 }
