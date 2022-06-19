@@ -1,17 +1,12 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -26,10 +21,7 @@ public class MembershipInfo {
 	
 	@Column
 	private double amount;
-	
-	@OneToMany(mappedBy = "membershipInfo", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<MembershipStatus>  membershipStatus  = new HashSet<MembershipStatus>();
-	
+		
 	@Column
 	private String createdBy;
 
@@ -64,14 +56,6 @@ public class MembershipInfo {
 
 	public void setAmount(double amount) {
 		this.amount = amount;
-	}
-
-	public Set<MembershipStatus> getMembershipStatus() {
-		return membershipStatus;
-	}
-
-	public void setMembershipStatus(Set<MembershipStatus> membershipStatus) {
-		this.membershipStatus = membershipStatus;
 	}
 
 	public String getCreatedBy() {

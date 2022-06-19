@@ -120,5 +120,6 @@ public class Constant {
 	public static final String MSG_071 = "Không có lịch sự kiện trong ngày này";
 	public static final String MSG_072 = "Tìm không hợp lệ. Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc";
 	public static final String MSG_073 = "Lấy tất cả yêu cầu mua CSVC thành công";
-
+	public static final String MSG_074 = "Kì này chưa bắt đầu thu membership";
+	public static final String MSG_075 = "Cập nhật membership status thành công";
 }

@@ -47,6 +47,7 @@ public class MemberEvent {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
 
 	public int getId() {
 		return id;
@@ -92,10 +93,6 @@ public class MemberEvent {
 		return paymentStatus;
 	}
 
-	public void setPaymentStatus(boolean paymentStatus) {
-		this.paymentStatus = paymentStatus;
-	}
-
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -127,5 +124,15 @@ public class MemberEvent {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
+
+	public boolean isPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(boolean paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
+	
+	
 
 }

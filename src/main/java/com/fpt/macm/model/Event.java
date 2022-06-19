@@ -36,6 +36,9 @@ public class Event {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
+	@Column
+	private double totalAmount;
 
 	public int getId() {
 		return id;
@@ -100,5 +103,14 @@ public class Event {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
+
+	public double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+	
 	
 }
