@@ -56,4 +56,14 @@ public class FacilityController {
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
 		return new ResponseEntity<ResponseMessage>(facilityService.getAllRequestToBuyFacility(pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
+	
+	@PutMapping("/treasurer/approverequesttobuyfacility/{facilityRequestId}")
+	ResponseEntity<ResponseMessage> approveRequestToBuyFacility(@PathVariable(name = "facilityRequestId") int facilityRequestId){
+		return new ResponseEntity<ResponseMessage>(facilityService.approveRequestToBuyFacility(facilityRequestId), HttpStatus.OK);
+	}
+	
+	@PutMapping("/treasurer/declinerequesttobuyfacility/{facilityRequestId}")
+	ResponseEntity<ResponseMessage> declineRequestToBuyFacility(@PathVariable(name = "facilityRequestId") int facilityRequestId){
+		return new ResponseEntity<ResponseMessage>(facilityService.declineRequestToBuyFacility(facilityRequestId), HttpStatus.OK);
+	}
 }

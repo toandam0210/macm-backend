@@ -15,10 +15,14 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.MemberEventDto;
 import com.fpt.macm.dto.RoleEventDto;
+import com.fpt.macm.model.ClubFund;
 import com.fpt.macm.model.Constant;
+import com.fpt.macm.model.Event;
 import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.RoleEvent;
+import com.fpt.macm.repository.ClubFundRepository;
+import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.utils.Utils;
 
@@ -27,6 +31,12 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 	@Autowired
 	MemberEventRepository memberEventRepository;
+	
+	@Autowired
+	ClubFundRepository clubFundRepository;
+	
+	@Autowired
+	EventRepository eventRepository;
 
 	@Override
 	public ResponseMessage getAllUserOfEventByEventId(int eventId, int pageNo, int pageSize, String sortBy) {
@@ -226,12 +236,28 @@ public class MemberEventServiceImpl implements MemberEventService {
 		try {
 			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
 			MemberEvent memberEvent = memberEventOp.get();
-			memberEvent.setPaymentStatus(!memberEvent.getPaymentStatus());
-			memberEvent.setUpdatedBy("toandv");
-			memberEvent.setUpdatedOn(LocalDateTime.now());
-			memberEventRepository.save(memberEvent);
-			responseMessage.setData(Arrays.asList(memberEvent));
-			responseMessage.setMessage(Constant.MSG_062);
+			if (!memberEvent.getPaymentStatus()) {
+//				List<ClubFund> clubFunds = clubFundRepository.findAll();
+//				ClubFund clubFund = clubFunds.get(0);
+//				double fundAmount = clubFund.getFundAmount();
+//				
+//				Optional<Event> eventOp = eventRepository.findById(memberEvent.getEvent().getId());
+//				Event event = eventOp.get();
+//				double eventFee = event.getTotalAmount();
+//				
+//				clubFund.setFundAmount(fundAmount + eventFee);
+//				clubFundRepository.save(clubFund);
+				
+				memberEvent.setPaymentStatus(!memberEvent.getPaymentStatus());
+				memberEvent.setUpdatedBy("toandv");
+				memberEvent.setUpdatedOn(LocalDateTime.now());
+				memberEventRepository.save(memberEvent);
+				responseMessage.setData(Arrays.asList(memberEvent));
+				responseMessage.setMessage(Constant.MSG_062);
+			} else {
+				responseMessage.setMessage(Constant.MSG_079);
+			}
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

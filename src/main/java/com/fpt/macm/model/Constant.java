@@ -122,4 +122,11 @@ public class Constant {
 	public static final String MSG_073 = "Lấy tất cả yêu cầu mua CSVC thành công";
 	public static final String MSG_074 = "Kì này chưa bắt đầu thu membership";
 	public static final String MSG_075 = "Cập nhật membership status thành công";
+	public static final String FACILITY_REQUEST_STATUS_PENDING = "Đang chờ duyệt";
+	public static final String FACILITY_REQUEST_STATUS_APPROVED = "Đã chấp nhận";
+	public static final String FACILITY_REQUEST_STATUS_DECLINED = "Đã từ chối";
+	public static final String MSG_076 = "Chấp nhận yêu cầu mua cơ sở vật chất thành công";
+	public static final String MSG_077 = "Số dư quỹ không đủ";
+	public static final String MSG_078 = "Từ chối yêu cầu mua cơ sở vật chất thành công";
+	public static final String MSG_079 = "Không thể chỉnh sửa vì người dùng đã đóng tiền";
 }
