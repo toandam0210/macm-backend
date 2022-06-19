@@ -10,8 +10,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.fpt.macm.model.Role;
-import com.fpt.macm.model.StatusSemester;
+import com.fpt.macm.model.AdminSemester;
+import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.User;
+import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.StatusSemesterRepository;
 import com.fpt.macm.repository.UserRepository;
 
@@ -23,6 +25,9 @@ public class TaskSchedule {
 
 	@Autowired
 	StatusSemesterRepository semesterRepository;
+	
+	@Autowired
+	AdminSemesterRepository adminSemesterRepository;
 	Logger logger = LoggerFactory.getLogger(TaskSchedule.class);
 
 	@Scheduled(cron = "* 0 0 * * *")
@@ -42,12 +47,12 @@ public class TaskSchedule {
 		}
 	}
 	@Scheduled(cron = "1 0 0 * * *")
-	public void addMemberDeactiveBySemester() {
-		List<User> users = userRepository.findMembersAndAdmin();
+	public void addUserBySemester() {
+		List<User> members = userRepository.findMemberWithoutPaging();
+		List<User> admins = userRepository.findAllAdmin();
 		if (LocalDate.now().getDayOfMonth() == 15 && LocalDate.now().getMonthValue() % 4 == 1) {
-			for (User user : users) {
-				StatusSemester statusSemester = new StatusSemester();
-				if (!user.isActive()) {
+			for (User user : members) {
+				MemberSemester statusSemester = new MemberSemester();
 					statusSemester.setUser(user);
 					if (LocalDate.now().getMonthValue() == 1) {
 						statusSemester.setSemester("Spring" + LocalDate.now().getYear());
@@ -58,11 +63,26 @@ public class TaskSchedule {
 					if (LocalDate.now().getMonthValue() == 9) {
 						statusSemester.setSemester("Fall" + LocalDate.now().getYear());
 					}
+					statusSemester.setStatus(user.isActive());
 					semesterRepository.save(statusSemester);
-					logger.info("add oke");
+					logger.info("add member oke");
+			}
+			for (User user : admins) {
+				AdminSemester adminSemester = new AdminSemester();
+				adminSemester.setUser(user);
+				if (LocalDate.now().getMonthValue() == 1) {
+					adminSemester.setSemester("Spring" + LocalDate.now().getYear());
 				}
+				if (LocalDate.now().getMonthValue() == 5) {
+					adminSemester.setSemester("Summer" + LocalDate.now().getYear());
+				}
+				if (LocalDate.now().getMonthValue() == 9) {
+					adminSemester.setSemester("Fall" + LocalDate.now().getYear());
+				}
+				adminSemester.setRole(user.getRole());
+				adminSemesterRepository.save(adminSemester);
+				logger.info("add admin oke");
 			}
 		}
-		logger.info("oke");
 	}
 }

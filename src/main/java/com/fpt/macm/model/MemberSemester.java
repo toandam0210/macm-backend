@@ -10,8 +10,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "status_semester")
-public class StatusSemester {
+@Table(name = "member_semester")
+public class MemberSemester {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
@@ -22,6 +22,9 @@ public class StatusSemester {
 	
 	@Column
 	private String semester;
+	
+	@Column
+	private boolean status;
 
 	public int getId() {
 		return id;
@@ -45,6 +48,14 @@ public class StatusSemester {
 
 	public void setSemester(String semester) {
 		this.semester = semester;
+	}
+
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
 	}
 	
 	

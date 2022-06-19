@@ -110,12 +110,12 @@ public class UserController {
 	
 	@GetMapping("/viceheadclub/getmembers/semester")
 	ResponseEntity<ResponseMessage> getMembersBySemester(@RequestParam String semester) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.getMembersActiveBySemester(semester), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userSerivce.getMembersBySemester(semester), HttpStatus.OK);
 	}
 	
 	@GetMapping("/viceheadclub/getadmins/semester")
 	ResponseEntity<ResponseMessage> getAdminsBySemester(@RequestParam String semester) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.getAdminActiveBySemester(semester), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userSerivce.getAdminBySemester(semester), HttpStatus.OK);
 	}
 
 }

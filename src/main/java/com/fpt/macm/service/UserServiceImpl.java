@@ -18,12 +18,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fpt.macm.dto.UserDto;
 import com.fpt.macm.helper.ExcelHelper;
+import com.fpt.macm.model.AdminSemester;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ERole;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
-import com.fpt.macm.model.StatusSemester;
+import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.User;
+import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.RoleRepository;
 import com.fpt.macm.repository.StatusSemesterRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -40,6 +42,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	StatusSemesterRepository semesterRepository;
+	
+	@Autowired
+	AdminSemesterRepository adminSemesterRepository;
 
 	@Override
 	public ResponseMessage getUserByStudentId(String studentId) {
@@ -422,31 +427,23 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage getMembersActiveBySemester(String semester) {
+	public ResponseMessage getMembersBySemester(String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<StatusSemester> statusSemesters = semesterRepository.findBySemester(semester);
-			List<User> allMembers = userRepository.findMemberWithoutPaging();
+			List<MemberSemester> statusSemesters = semesterRepository.findBySemester(semester);
 			List<User> users = new ArrayList<User>();
 			int countDeactive = 0;
 			if (statusSemesters.size() > 0) {
-				for (StatusSemester statusSemester : statusSemesters) {
-					for (User user : allMembers) {
-						if (statusSemester.getUser().getStudentId().equals(user.getStudentId())) {
+				for (MemberSemester statusSemester : statusSemesters) {
 							Optional<User> userOp = userRepository
 									.findByStudentId(statusSemester.getUser().getStudentId());
-							User userDeactive = userOp.get();
-							userDeactive.setActive(false);
-							users.add(userDeactive);
+							User user = userOp.get();
+							user.setActive(statusSemester.isStatus());
+							if(!user.isActive()) {
+								countDeactive++;
+							}
+							users.add(user);
 						}
-					}
-				}
-				countDeactive = users.size();
-				allMembers.removeAll(users);
-				for (User user : allMembers) {
-					user.setActive(true);
-					users.add(user);
-				}
 				responseMessage.setData(users);
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(users.size());
@@ -463,36 +460,22 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public ResponseMessage getAdminActiveBySemester(String semester) {
+	public ResponseMessage getAdminBySemester(String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<StatusSemester> statusSemesters = semesterRepository.findBySemester(semester);
-			List<User> allAdmins = userRepository.findAllAdmin();
+			List<AdminSemester> statusSemesters = adminSemesterRepository.findBySemester(semester);
 			List<User> users = new ArrayList<User>();
-			int countDeactive = 0;
 			if (statusSemesters.size() > 0) {
-				for (StatusSemester statusSemester : statusSemesters) {
-					for (User user : allAdmins) {
-						if (statusSemester.getUser().getStudentId().equals(user.getStudentId())) {
+				for (AdminSemester statusSemester : statusSemesters) {
 							Optional<User> userOp = userRepository
 									.findByStudentId(statusSemester.getUser().getStudentId());
-							User userDeactive = userOp.get();
-							userDeactive.setActive(false);
-							users.add(userDeactive);
+							User user = userOp.get();
+							user.setRole(statusSemester.getRole());
+							users.add(user);
 						}
-					}
-				}
-				countDeactive = users.size();
-				allAdmins.removeAll(users);
-				for (User user : allAdmins) {
-					user.setActive(true);
-					users.add(user);
-				}
 				responseMessage.setData(users);
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(users.size());
-				responseMessage.setTotalDeactive(countDeactive);
-				responseMessage.setTotalActive(users.size() - countDeactive);
 			} else {
 				responseMessage.setMessage("Không có dữ liệu");
 			}
