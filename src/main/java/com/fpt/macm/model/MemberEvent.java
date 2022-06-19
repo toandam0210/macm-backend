@@ -44,6 +44,9 @@ public class MemberEvent {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
+	@Column
+	private boolean paymentStatus;
 
 	public int getId() {
 		return id;
@@ -116,5 +119,15 @@ public class MemberEvent {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
+
+	public boolean isPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(boolean paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
+	
+	
 
 }

@@ -31,8 +31,6 @@ public class EventServiceImpl implements EventService{
 		try {
 			event.setCreatedBy("LinhLHN");
 			event.setCreatedOn(LocalDateTime.now());
-			event.setUpdatedBy("LinhLHN");
-			event.setUpdatedOn(LocalDateTime.now());
 			eventRepository.save(event);
 			responseMessage.setData(Arrays.asList(event));
 			responseMessage.setMessage(Constant.MSG_052);
@@ -53,6 +51,7 @@ public class EventServiceImpl implements EventService{
 			getEvent.setName(event.getName());
 			getEvent.setDescription(event.getDescription());
 			getEvent.setMaxQuantityComitee(event.getMaxQuantityComitee());
+			getEvent.setTotalAmount(event.getTotalAmount());
 			getEvent.setUpdatedBy("LinhLHN");
 			getEvent.setUpdatedOn(LocalDateTime.now());
 			eventRepository.save(getEvent);
