@@ -31,15 +31,16 @@ public class MemberEventController {
 		return new ResponseEntity<ResponseMessage>(
 				memberEventService.getAllUserOfEventByEventId(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headculture/getallorganizingcommitteeevent/{eventId}")
 	ResponseEntity<ResponseMessage> getAllOrganizingCommitteeEvent(@PathVariable(name = "eventId") int eventId,
 			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
 			@RequestParam(defaultValue = "id") String sortBy) {
 		return new ResponseEntity<ResponseMessage>(
-				memberEventService.getAllOrganizingCommitteeOfEventByEventId(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
+				memberEventService.getAllOrganizingCommitteeOfEventByEventId(eventId, pageNo, pageSize, sortBy),
+				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headculture/getallmemberevent/{eventId}")
 	ResponseEntity<ResponseMessage> getAllMemberEvent(@PathVariable(name = "eventId") int eventId,
 			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
@@ -47,12 +48,13 @@ public class MemberEventController {
 		return new ResponseEntity<ResponseMessage>(
 				memberEventService.getAllMemberOfEventByEventId(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headculture/updateuserroleevent")
-	ResponseEntity<ResponseMessage> updateUserRoleEvent(@RequestBody List<MemberEventDto> membersEventDto){
-		return new ResponseEntity<ResponseMessage>(memberEventService.updateUserRoleInEvent(membersEventDto), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateUserRoleEvent(@RequestBody List<MemberEventDto> membersEventDto) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.updateUserRoleInEvent(membersEventDto),
+				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headculture/getallusercanceljoinevent/{eventId}")
 	ResponseEntity<ResponseMessage> getAllUserCancelJoinEvent(@PathVariable(name = "eventId") int eventId,
 			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
@@ -60,5 +62,11 @@ public class MemberEventController {
 		return new ResponseEntity<ResponseMessage>(
 				memberEventService.getAllUserCancelJoinEvent(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
-	
+
+	@PutMapping("/treasurer/updateusereventpaymentstatus/{memberEventId}")
+	ResponseEntity<ResponseMessage> updateUserEventPaymentStatus(
+			@PathVariable(name = "memberEventId") int memberEventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.updateMemberEventPaymentStatus(memberEventId),
+				HttpStatus.OK);
+	}
 }
