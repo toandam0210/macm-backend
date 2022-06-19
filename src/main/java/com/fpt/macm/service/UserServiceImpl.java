@@ -73,15 +73,18 @@ public class UserServiceImpl implements UserService {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.findAdminForViceHeadClubByRoleId(paging);
 			List<User> admins = new ArrayList<User>();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				admins = pageResponse.getContent();
 			}
 			for (User admin : admins) {
-				Utils.convertNameOfRole(admin.getRole());
+				UserDto userDto = convertUserToUserDto(admin);
+				usersDto.add(userDto);
 			}
 			responseMessage.setMessage(Constant.MSG_001);
-			responseMessage.setData(admins);
+			responseMessage.setData(usersDto);
 			responseMessage.setPageNo(pageNo);
+			responseMessage.setTotalResult(usersDto.size());
 			responseMessage.setPageSize(pageSize);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -99,15 +102,18 @@ public class UserServiceImpl implements UserService {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.findAdminForHeadClubByRoleId(paging);
 			List<User> admins = new ArrayList<User>();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				admins = pageResponse.getContent();
 			}
 			for (User admin : admins) {
-				Utils.convertNameOfRole(admin.getRole());
+				UserDto userDto = convertUserToUserDto(admin);
+				usersDto.add(userDto);
 			}
 			responseMessage.setMessage(Constant.MSG_001);
-			responseMessage.setData(admins);
+			responseMessage.setData(usersDto);
 			responseMessage.setPageNo(pageNo);
+			responseMessage.setTotalResult(usersDto.size());
 			responseMessage.setPageSize(pageSize);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -182,16 +188,19 @@ public class UserServiceImpl implements UserService {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.findMemberAndCollaboratorByRoleId(paging);
 			List<User> users = new ArrayList<User>();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				users = pageResponse.getContent();
 			}
 			for (User user : users) {
-				Utils.convertNameOfRole(user.getRole());
+				UserDto userDto = convertUserToUserDto(user);
+				usersDto.add(userDto);
 			}
 			responseMessage.setMessage(Constant.MSG_001);
-			responseMessage.setData(users);
+			responseMessage.setData(usersDto);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
+			responseMessage.setTotalResult(usersDto.size());
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -317,16 +326,19 @@ public class UserServiceImpl implements UserService {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.searchByStudentIdOrName(inputSearch, paging);
 			List<User> users = new ArrayList<User>();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				users = pageResponse.getContent();
 			}
 			for (User user : users) {
-				Utils.convertNameOfRole(user.getRole());
+				UserDto userDto = convertUserToUserDto(user);
+				usersDto.add(userDto);
 			}
 			responseMessage.setMessage(Constant.MSG_001);
-			responseMessage.setData(users);
+			responseMessage.setData(usersDto);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
+			responseMessage.setTotalResult(usersDto.size());
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -436,7 +448,7 @@ public class UserServiceImpl implements UserService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<MemberSemester> statusSemesters = statusSemesterRepository.findBySemester(semester);
-			List<User> users = new ArrayList<User>();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			int countDeactive = 0;
 			if (statusSemesters.size() > 0) {
 				for (MemberSemester statusSemester : statusSemesters) {
@@ -447,13 +459,14 @@ public class UserServiceImpl implements UserService {
 							if(!user.isActive()) {
 								countDeactive++;
 							}
-							users.add(user);
+							UserDto userDto = convertUserToUserDto(user);
+							usersDto.add(userDto);
 						}
-				responseMessage.setData(users);
+				responseMessage.setData(usersDto);
 				responseMessage.setMessage(Constant.MSG_001);
-				responseMessage.setTotalResult(users.size());
+				responseMessage.setTotalResult(usersDto.size());
 				responseMessage.setTotalDeactive(countDeactive);
-				responseMessage.setTotalActive(users.size() - countDeactive);
+				responseMessage.setTotalActive(usersDto.size() - countDeactive);
 			} else {
 				responseMessage.setMessage("Không có dữ liệu");
 			}
@@ -470,17 +483,19 @@ public class UserServiceImpl implements UserService {
 		try {
 			List<AdminSemester> statusSemesters = adminSemesterRepository.findBySemester(semester);
 			List<User> users = new ArrayList<User>();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (statusSemesters.size() > 0) {
 				for (AdminSemester statusSemester : statusSemesters) {
 							Optional<User> userOp = userRepository
 									.findByStudentId(statusSemester.getUser().getStudentId());
 							User user = userOp.get();
 							user.setRole(statusSemester.getRole());
-							users.add(user);
+							UserDto userDto = convertUserToUserDto(user);
+							usersDto.add(userDto);
 						}
-				responseMessage.setData(users);
+				responseMessage.setData(usersDto);
 				responseMessage.setMessage(Constant.MSG_001);
-				responseMessage.setTotalResult(users.size());
+				responseMessage.setTotalResult(usersDto.size());
 			} else {
 				responseMessage.setMessage("Không có dữ liệu");
 			}
@@ -503,5 +518,23 @@ public class UserServiceImpl implements UserService {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
+	}
+	
+	private UserDto convertUserToUserDto(User user) {
+		UserDto userDto = new UserDto();
+		userDto.setId(user.getId());
+		userDto.setStudentId(user.getStudentId());
+		userDto.setEmail(user.getEmail());
+		userDto.setGender(user.isGender());
+		userDto.setGeneration(user.getGeneration());
+		userDto.setImage(user.getImage());
+		userDto.setName(user.getName());
+		userDto.setPhone(user.getPhone());
+		userDto.setActive(user.isActive());
+		userDto.setCurrentAddress(user.getCurrentAddress());
+		userDto.setDateOfBirth(user.getDateOfBirth());
+		userDto.setRoleId(user.getRole().getId());
+		userDto.setRoleName(Utils.convertRoleFromDbToExcel(user.getRole()));
+		return userDto;
 	}
 }
