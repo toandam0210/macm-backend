@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.FacilityDto;
 import com.fpt.macm.dto.FacilityReportDto;
+import com.fpt.macm.dto.FacilityRequestDto;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Facility;
 import com.fpt.macm.model.FacilityReport;
@@ -251,6 +252,32 @@ public class FacilityServiceImpl implements FacilityService {
 			facilityRequestRepository.save(facilityRequest);
 			responseMessage.setData(Arrays.asList(facilityRequest));
 			responseMessage.setMessage(Constant.MSG_031);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllRequestToBuyFacility(int pageNo, int pageSize, String sortBy) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<FacilityRequest> facilityRequests = (List<FacilityRequest>) facilityRequestRepository.findAll();
+			List<FacilityRequestDto> facilityRequestsDto = new ArrayList<FacilityRequestDto>();
+			for (FacilityRequest facilityRequest : facilityRequests) {
+				FacilityRequestDto facilityRequestDto = new FacilityRequestDto();
+				facilityRequestDto.setId(facilityRequest.getId());
+				facilityRequestDto.setFacilityName(facilityRequest.getFacility().getName());
+				facilityRequestDto.setFacilityCategory(facilityRequest.getFacility().getFacilityCategory().getName());
+				facilityRequestDto.setQuantity(facilityRequest.getQuantity());
+				facilityRequestDto.setUnitPrice(facilityRequest.getUnitPrice());
+				facilityRequestDto.setStatus(facilityRequest.getStatus());
+				facilityRequestsDto.add(facilityRequestDto);
+			}
+			responseMessage.setData(facilityRequestsDto);
+			responseMessage.setMessage(Constant.MSG_073);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

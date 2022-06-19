@@ -50,4 +50,10 @@ public class FacilityController {
 		return new ResponseEntity<ResponseMessage>(facilityService.createRequestToBuyFacility(facilityRequest),
 				HttpStatus.OK);
 	}
+	
+	@GetMapping("/treasurer/getallrequesttobuyfacility")
+	ResponseEntity<ResponseMessage> getAllRequestToBuyFacility(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
+		return new ResponseEntity<ResponseMessage>(facilityService.getAllRequestToBuyFacility(pageNo, pageSize, sortBy), HttpStatus.OK);
+	}
 }

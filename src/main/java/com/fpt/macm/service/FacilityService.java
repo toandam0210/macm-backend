@@ -11,4 +11,5 @@ public interface FacilityService {
 	ResponseMessage getAllFacility(int pageNo, int pageSize, String sortBy);
 	ResponseMessage getAllReport();
 	ResponseMessage createRequestToBuyFacility(FacilityRequest facilityRequest);
+	ResponseMessage getAllRequestToBuyFacility(int pageNo, int pageSize, String sortBy);
 }
