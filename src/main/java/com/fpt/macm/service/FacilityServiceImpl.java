@@ -277,7 +277,7 @@ public class FacilityServiceImpl implements FacilityService {
 				facilityRequestsDto.add(facilityRequestDto);
 			}
 			responseMessage.setData(facilityRequestsDto);
-			responseMessage.setMessage(Constant.MSG_063);
+			responseMessage.setMessage(Constant.MSG_073);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
