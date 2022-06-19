@@ -34,6 +34,9 @@ public class MemberEvent {
 	private boolean attendanceStatus;
 
 	@Column
+	private boolean paymentStatus;
+
+	@Column
 	private String createdBy;
 
 	@Column
@@ -83,6 +86,14 @@ public class MemberEvent {
 
 	public void setAttendanceStatus(boolean attendanceStatus) {
 		this.attendanceStatus = attendanceStatus;
+	}
+
+	public boolean getPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(boolean paymentStatus) {
+		this.paymentStatus = paymentStatus;
 	}
 
 	public String getCreatedBy() {
