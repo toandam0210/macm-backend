@@ -3,6 +3,7 @@ package com.fpt.macm.dto;
 import java.time.LocalDate;
 
 public class UserDto {
+	private int id;
 	private String studentId;
 	private String email;
 	private String currentAddress;
@@ -14,6 +15,7 @@ public class UserDto {
 	private boolean isActive;
 	private String name;
 	private int generation;
+	private String roleName;
 	
 	public String getStudentId() {
 		return studentId;
@@ -80,6 +82,18 @@ public class UserDto {
 	}
 	public void setGeneration(int generation) {
 		this.generation = generation;
+	}
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
+	public String getRoleName() {
+		return roleName;
+	}
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
 	}
 	
 	
