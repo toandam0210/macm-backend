@@ -30,7 +30,7 @@ public class MemberEvent {
 	private String roleInEvent;
 	
 	@Column
-	private String attendanceStatus;
+	private Boolean attendanceStatus;
 	
 	@Column
 	private String createdBy;
@@ -76,11 +76,11 @@ public class MemberEvent {
 		this.roleInEvent = roleInEvent;
 	}
 
-	public String getAttendanceStatus() {
+	public Boolean getAttendanceStatus() {
 		return attendanceStatus;
 	}
 
-	public void setAttendanceStatus(String attendanceStatus) {
+	public void setAttendanceStatus(Boolean attendanceStatus) {
 		this.attendanceStatus = attendanceStatus;
 	}
 
