@@ -1,29 +1,37 @@
 package com.fpt.macm.model;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "event")
-public class Event {
+@Table(name = "event_schedule")
+public class EventSchedule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column
-	private String name;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "eventId")
+	private Event event;
 	
 	@Column
-	private String description;
+	private LocalDate date;
 	
 	@Column
-	private int maxQuantityComitee;
+	private LocalTime startTime;
+	
+	@Column
+	private LocalTime finishTime;
 	
 	@Column
 	private String createdBy;
@@ -45,28 +53,36 @@ public class Event {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public Event getEvent() {
+		return event;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setEvent(Event event) {
+		this.event = event;
 	}
 
-	public String getDescription() {
-		return description;
+	public LocalDate getDate() {
+		return date;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setDate(LocalDate date) {
+		this.date = date;
 	}
 
-	public int getMaxQuantityComitee() {
-		return maxQuantityComitee;
+	public LocalTime getStartTime() {
+		return startTime;
 	}
 
-	public void setMaxQuantityComitee(int maxQuantityComitee) {
-		this.maxQuantityComitee = maxQuantityComitee;
+	public void setStartTime(LocalTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public LocalTime getFinishTime() {
+		return finishTime;
+	}
+
+	public void setFinishTime(LocalTime finishTime) {
+		this.finishTime = finishTime;
 	}
 
 	public String getCreatedBy() {
@@ -100,5 +116,6 @@ public class Event {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
+	
 	
 }

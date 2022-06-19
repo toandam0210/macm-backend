@@ -17,22 +17,22 @@ public class MemberEvent {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "eventId")
 	private Event event;
-	
+
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "userId")
 	private User user;
-	
+
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "role_in_event")
 	private RoleEvent roleEvent;
-	
+
 	@Column
 	private boolean attendanceStatus;
-	
+
 	@Column
 	private String createdBy;
 
@@ -68,7 +68,6 @@ public class MemberEvent {
 	public void setUser(User user) {
 		this.user = user;
 	}
-
 
 	public RoleEvent getRoleEvent() {
 		return roleEvent;
@@ -117,8 +116,5 @@ public class MemberEvent {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
-	
-	
-	
-	
+
 }

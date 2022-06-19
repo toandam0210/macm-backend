@@ -35,7 +35,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 			responseMessage.setData(memberEvents);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
-			responseMessage.setMessage(Constant.MSG_052);
+			responseMessage.setMessage(Constant.MSG_058);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -59,7 +59,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 			responseMessage.setData(memberEvents);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
-			responseMessage.setMessage(Constant.MSG_053);
+			responseMessage.setMessage(Constant.MSG_059);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -82,7 +82,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 			responseMessage.setData(memberEvents);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
-			responseMessage.setMessage(Constant.MSG_054);
+			responseMessage.setMessage(Constant.MSG_060);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

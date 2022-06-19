@@ -20,15 +20,15 @@ public class AttendanceStatus {
 	private int id;
 	
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "userId")
+	@JoinColumn(name = "userId", nullable = false)
 	private User user;
 	
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "traningScheduleId")
+	@JoinColumn(name = "traningScheduleId", nullable = false)
 	private TrainingSchedule trainingSchedule;
 	
 	@Column
-	private String status;
+	private boolean status;
 	
 	@Column
 	private String createdBy;
@@ -41,6 +41,71 @@ public class AttendanceStatus {
 
 	@Column
 	private LocalDateTime updatedOn;
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public TrainingSchedule getTrainingSchedule() {
+		return trainingSchedule;
+	}
+
+	public void setTrainingSchedule(TrainingSchedule trainingSchedule) {
+		this.trainingSchedule = trainingSchedule;
+	}
+
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public LocalDateTime getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(LocalDateTime createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public String getUpdatedBy() {
+		return updatedBy;
+	}
+
+	public void setUpdatedBy(String updatedBy) {
+		this.updatedBy = updatedBy;
+	}
+
+	public LocalDateTime getUpdatedOn() {
+		return updatedOn;
+	}
+
+	public void setUpdatedOn(LocalDateTime updatedOn) {
+		this.updatedOn = updatedOn;
+	}
+	
 	
 	
 	

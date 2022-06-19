@@ -22,6 +22,6 @@ public interface UserService {
 	ByteArrayInputStream exportUsersToExcel();
 	ResponseMessage findAllMember(int pageNo, int pageSize, String sortBy);
 	ResponseMessage getAllUser();
-	ResponseMessage getMembersActiveBySemester(String semester);
-	ResponseMessage getAdminActiveBySemester(String semester);
+	ResponseMessage getMembersBySemester(String semester);
+	ResponseMessage getAdminBySemester(String semester);
 }

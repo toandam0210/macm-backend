@@ -62,7 +62,13 @@ public class Constant {
     public static final String MSG_049 = "Người dùng với Email: ";
     public static final String MSG_050 = " đã tồn tại. ";
     public static final String MSG_051 = "Không có lịch tập trong ngày này";
-    public static final String MSG_052 = "Lấy danh sách người dùng tham gia sự kiện thành công";
-    public static final String MSG_053 = "Lấy danh sách thành viên ban tổ chức sự kiện thành công";
-    public static final String MSG_054 = "Lấy danh sách thành viên và CTV tham gia sự kiện thành công";
+    public static final String MSG_052 = "Tạo sự kiện thành công";
+    public static final String MSG_053 = "Cập nhật sự kiện thành công";
+    public static final String MSG_054 = "Xóa sự kiện thành công";
+    public static final String MSG_055 = "Cập nhật điểm danh thành công";
+    public static final String MSG_056 = "Hôm nay không có buổi tập";
+    public static final String MSG_057 = "Lấy danh sách điểm danh thành công";
+    public static final String MSG_058 = "Lấy danh sách người dùng tham gia sự kiện thành công";
+    public static final String MSG_059 = "Lấy danh sách thành viên ban tổ chức sự kiện thành công";
+    public static final String MSG_060 = "Lấy danh sách thành viên và CTV tham gia sự kiện thành công";
 }
