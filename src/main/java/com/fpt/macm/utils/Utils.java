@@ -5,7 +5,10 @@ import java.time.format.DateTimeFormatter;
 
 import org.springframework.data.domain.Sort;
 
+import com.fpt.macm.dto.RoleEventDto;
+import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Role;
+import com.fpt.macm.model.RoleEvent;
 
 public class Utils {
 	public static final String SORT_BY_NAME_ASC = "SORT_BY_NAME_ASC";
@@ -53,110 +56,111 @@ public class Utils {
 			return Sort.by(ID_FIELD).ascending();
 		}
 	}
-	
+
 	public static LocalDate ConvertStringToLocalDate(String input) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		return LocalDate.parse(input, formatter);
 	}
-	
+
 	public static void convertNameOfRole(Role role) {
 		switch (role.getName()) {
-		case "ROLE_HeadClub":
-			role.setName("Chủ nhiệm");
+		case Constant.ROLE_HEAD_CLUB:
+			role.setName(Constant.ROLE_HEAD_CLUB_VN);
 			break;
-		case "ROLE_ViceHeadClub":
-			role.setName("Phó chủ nhiệm");
+		case Constant.ROLE_VICE_HEAD_CLUB:
+			role.setName(Constant.ROLE_VICE_HEAD_CLUB_VN);
 			break;
-		case "ROLE_Treasurer":
-			role.setName("Thủ quỹ");
+		case Constant.ROLE_TREASURER:
+			role.setName(Constant.ROLE_TREASURER_VN);
 			break;
-		case "ROLE_HeadCulture":
-			role.setName("Trưởng ban văn hóa");
+		case Constant.ROLE_HEAD_CULTURE:
+			role.setName(Constant.ROLE_HEAD_CULTURE_VN);
 			break;
-		case "ROLE_ViceHeadCulture":
-			role.setName("Phó ban văn hóa");
+		case Constant.ROLE_VICE_HEAD_CULTURE:
+			role.setName(Constant.ROLE_VICE_HEAD_CULTURE_VN);
 			break;
-		case "ROLE_HeadCommunication":
-			role.setName("Trưởng ban truyền thông");
+		case Constant.ROLE_HEAD_COMMUNICATION:
+			role.setName(Constant.ROLE_HEAD_COMMUNICATION_VN);
 			break;
-		case "ROLE_ViceHeadCommunication":
-			role.setName("Phó ban truyền thông");
+		case Constant.ROLE_VICE_HEAD_COMMUNICATION:
+			role.setName(Constant.ROLE_VICE_HEAD_COMMUNICATION_VN);
 			break;
-		case "ROLE_HeadTechnique":
-			role.setName("Trưởng ban chuyên môn");
+		case Constant.ROLE_HEAD_TECHNIQUE:
+			role.setName(Constant.ROLE_HEAD_TECHNIQUE_VN);
 			break;
-		case "ROLE_ViceHeadTechnique":
-			role.setName("Phó ban chuyên môn");
+		case Constant.ROLE_VICE_HEAD_TECHNIQUE:
+			role.setName(Constant.ROLE_VICE_HEAD_TECHNIQUE_VN);
 			break;
-		case "ROLE_MemberCommnication":
-			role.setName("Thành viên ban truyền thông");
+		case Constant.ROLE_MEMBER_COMMUNICATION:
+			role.setName(Constant.ROLE_MEMBER_COMMUNICATION_VN);
 			break;
-		case "ROLE_MemberCulture":
-			role.setName("Thành viên ban văn hóa");
+		case Constant.ROLE_MEMBER_CULTURE:
+			role.setName(Constant.ROLE_MEMBER_CULTURE_VN);
 			break;
-		case "ROLE_MemberTechnique":
-			role.setName("Thành viên ban chuyên môn");
+		case Constant.ROLE_MEMBER_TECHNIQUE:
+			role.setName(Constant.ROLE_MEMBER_TECHNIQUE_VN);
 			break;
-		case "ROLE_CollaboratorCommnunication":
-			role.setName("CTV ban truyền thông");
+		case Constant.ROLE_COLLABORATOR_COMMUNICATION:
+			role.setName(Constant.ROLE_COLLABORATOR_COMMUNICATION_VN);
 			break;
-		case "ROLE_CollaboratorCulture":
-			role.setName("CTV ban văn hóa");
+		case Constant.ROLE_COLLABORATOR_CULTURE:
+			role.setName(Constant.ROLE_COLLABORATOR_CULTURE_VN);
 			break;
-		case "ROLE_CollaboratorTechnique":
-			role.setName("CTV ban chuyên môn");
+		case Constant.ROLE_COLLABORATOR_TECHNIQUE:
+			role.setName(Constant.ROLE_COLLABORATOR_TECHNIQUE_VN);
 			break;
 
 		default:
-			role.setName("Thành viên ban chuyên môn");
+			role.setName(Constant.ROLE_MEMBER_TECHNIQUE_VN);
 			break;
 		}
 	}
+
 	public static void convertRoleFromExcelToDb(String roleInExcel, Role role) {
 		switch (roleInExcel) {
-		case "Chủ nhiệm":
+		case Constant.ROLE_HEAD_CLUB_VN:
 			role.setId(1);
 			break;
-		case "Phó chủ nhiệm":
+		case Constant.ROLE_VICE_HEAD_CLUB_VN:
 			role.setId(2);
 			break;
-		case "Thủ quỹ":
+		case Constant.ROLE_TREASURER_VN:
 			role.setId(3);
 			break;
-		case "Trưởng ban văn hóa":
+		case Constant.ROLE_HEAD_CULTURE_VN:
 			role.setId(4);
 			break;
-		case "Phó ban văn hóa":
+		case Constant.ROLE_VICE_HEAD_CULTURE_VN:
 			role.setId(5);
 			break;
-		case "Trưởng ban truyền thông":
+		case Constant.ROLE_HEAD_COMMUNICATION_VN:
 			role.setId(6);
 			break;
-		case "Phó ban truyền thông":
+		case Constant.ROLE_VICE_HEAD_COMMUNICATION_VN:
 			role.setId(7);
 			break;
-		case "Trưởng ban chuyên môn":
+		case Constant.ROLE_HEAD_TECHNIQUE_VN:
 			role.setId(8);
 			break;
-		case "Phó ban chuyên môn":
+		case Constant.ROLE_VICE_HEAD_TECHNIQUE_VN:
 			role.setId(9);
 			break;
-		case "Thành viên ban truyền thông":
+		case Constant.ROLE_MEMBER_COMMUNICATION_VN:
 			role.setId(10);
 			break;
-		case "Thành viên ban văn hóa":
+		case Constant.ROLE_MEMBER_CULTURE_VN:
 			role.setId(11);
 			break;
-		case "Thành viên ban chuyên môn":
+		case Constant.ROLE_MEMBER_TECHNIQUE_VN:
 			role.setId(12);
 			break;
-		case "CTV ban truyền thông":
+		case Constant.ROLE_COLLABORATOR_COMMUNICATION_VN:
 			role.setId(13);
 			break;
-		case "CTV ban văn hóa":
+		case Constant.ROLE_COLLABORATOR_CULTURE_VN:
 			role.setId(14);
 			break;
-		case "CTV ban chuyên môn":
+		case Constant.ROLE_COLLABORATOR_TECHNIQUE_VN:
 			role.setId(15);
 			break;
 
@@ -165,42 +169,65 @@ public class Utils {
 			break;
 		}
 	}
-	
+
 	public static String convertRoleFromDbToExcel(Role role) {
 		switch (role.getId()) {
 		case 1:
-			return "Chủ nhiệm";
+			return Constant.ROLE_HEAD_CLUB_VN;
 		case 2:
-			return "Phó chủ nhiệm";
+			return Constant.ROLE_VICE_HEAD_CLUB_VN;
 		case 3:
-			return "Thủ quỹ";
+			return Constant.ROLE_TREASURER_VN;
 		case 4:
-			return "Trưởng ban văn hóa";
+			return Constant.ROLE_HEAD_CULTURE_VN;
 		case 5:
-			return "Phó ban văn hóa";
+			return Constant.ROLE_VICE_HEAD_CULTURE_VN;
 		case 6:
-			return "Trưởng ban truyền thông";
+			return Constant.ROLE_HEAD_COMMUNICATION_VN;
 		case 7:
-			return "Phó ban truyền thông";
+			return Constant.ROLE_VICE_HEAD_COMMUNICATION_VN;
 		case 8:
-			return "Trưởng ban chuyên môn";
+			return Constant.ROLE_HEAD_TECHNIQUE_VN;
 		case 9:
-			return "Phó ban chuyên môn";
+			return Constant.ROLE_VICE_HEAD_TECHNIQUE_VN;
 		case 10:
-			return "Thành viên ban truyền thông";
+			return Constant.ROLE_MEMBER_COMMUNICATION_VN;
 		case 11:
-			return "Thành viên ban văn hóa";
+			return Constant.ROLE_MEMBER_CULTURE_VN;
 		case 12:
-			return "Thành viên ban chuyên môn";
+			return Constant.ROLE_MEMBER_TECHNIQUE_VN;
 		case 13:
-			return "CTV ban truyền thông";
+			return Constant.ROLE_COLLABORATOR_COMMUNICATION_VN;
 		case 14:
-			return "CTV ban văn hóa";
+			return Constant.ROLE_COLLABORATOR_CULTURE_VN;
 		case 15:
-			return "CTV ban chuyên môn";
+			return Constant.ROLE_COLLABORATOR_TECHNIQUE_VN;
 
 		default:
-			return "Thành viên ban chuyên môn";
+			return Constant.ROLE_MEMBER_TECHNIQUE_VN;
+		}
+	}
+
+	public static void convertNameOfEventRole(RoleEvent roleEvent, RoleEventDto roleEventDto) {
+		switch (roleEvent.getName()) {
+		case Constant.ROLE_EVENT_MEMBER:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
+			break;
+		case Constant.ROLE_EVENT_COLLABORATOR:
+			roleEventDto.setName(Constant.ROLE_EVENT_COLLABORATOR_VN);
+			break;
+		case Constant.ROLE_EVENT_MEMBER_COMMUNICATION:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_COMMUNICATION_VN);
+			break;
+		case Constant.ROLE_EVENT_MEMBER_CULTURE:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_CULTURE_VN);
+			break;
+		case Constant.ROLE_EVENT_MEMBER_LOGISTIC:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_LOGISTIC_VN);
+			break;
+		default:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
+			break;
 		}
 	}
 }
