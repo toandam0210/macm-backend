@@ -34,13 +34,23 @@ public class EventController {
 		return new ResponseEntity<ResponseMessage>(eventService.getEventsByName(name, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 	
-	@PutMapping("/headculture/updateevent")
+	@PutMapping("/headculture/updateevent/{eventId}")
 	ResponseEntity<ResponseMessage> updateEvent(@PathVariable(name = "id") int id, @RequestBody Event event) {
 		return new ResponseEntity<ResponseMessage>(eventService.updateEvent(id, event), HttpStatus.OK);
 	}
 	
-	@PutMapping("/headculture/deleteevent")
+	@PutMapping("/headculture/deleteevent/{eventId}")
 	ResponseEntity<ResponseMessage> deleteEvent(@PathVariable(name = "id") int id) {
 		return new ResponseEntity<ResponseMessage>(eventService.deleteEvent(id), HttpStatus.OK);
+	}
+	
+	@GetMapping("/geteventsbydate")
+	ResponseEntity<ResponseMessage> getEventByDate(@RequestParam String startDate, @RequestParam String finishDate) {
+		return new ResponseEntity<ResponseMessage>(eventService.getEventsByDate(startDate, finishDate), HttpStatus.OK);
+	}
+	
+	@GetMapping("/headculture/getstartdate/{eventId}")
+	ResponseEntity<ResponseMessage> getStartDateOfEvent(@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(eventService.getStartDateOfEvent(eventId), HttpStatus.OK);
 	}
 }

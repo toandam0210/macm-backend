@@ -34,6 +34,9 @@ public class MemberEvent {
 	private boolean attendanceStatus;
 
 	@Column
+	private boolean paymentStatus;
+
+	@Column
 	private String createdBy;
 
 	@Column
@@ -45,8 +48,6 @@ public class MemberEvent {
 	@Column
 	private LocalDateTime updatedOn;
 	
-	@Column
-	private boolean paymentStatus;
 
 	public int getId() {
 		return id;
@@ -86,6 +87,10 @@ public class MemberEvent {
 
 	public void setAttendanceStatus(boolean attendanceStatus) {
 		this.attendanceStatus = attendanceStatus;
+	}
+
+	public boolean getPaymentStatus() {
+		return paymentStatus;
 	}
 
 	public String getCreatedBy() {

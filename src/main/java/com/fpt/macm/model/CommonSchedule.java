@@ -31,13 +31,7 @@ public class CommonSchedule {
 	private LocalTime finishTime;
 	
 	@Column
-	private String createdBy;
-
-	@Column
 	private LocalDateTime createdOn;
-
-	@Column
-	private String updatedBy;
 
 	@Column
 	private LocalDateTime updatedOn;
@@ -82,28 +76,12 @@ public class CommonSchedule {
 		this.finishTime = finishTime;
 	}
 
-	public String getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-
 	public LocalDateTime getCreatedOn() {
 		return createdOn;
 	}
 
 	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
-	}
-
-	public String getUpdatedBy() {
-		return updatedBy;
-	}
-
-	public void setUpdatedBy(String updatedBy) {
-		this.updatedBy = updatedBy;
 	}
 
 	public LocalDateTime getUpdatedOn() {

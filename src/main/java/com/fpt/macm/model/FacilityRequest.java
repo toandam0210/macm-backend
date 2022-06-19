@@ -70,7 +70,7 @@ public class FacilityRequest {
 		this.unitPrice = unitPrice;
 	}
 
-	public boolean isStatus() {
+	public boolean getStatus() {
 		return status;
 	}
 

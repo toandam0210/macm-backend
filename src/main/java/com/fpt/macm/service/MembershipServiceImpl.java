@@ -43,7 +43,7 @@ public class MembershipServiceImpl implements MembershipService{
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(membershipStatusDtos.size());
 			}else {
-				responseMessage.setMessage("Kì này chưa bắt đầu thu membership");
+				responseMessage.setMessage(Constant.MSG_074);
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
