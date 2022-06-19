@@ -16,11 +16,13 @@ import org.springframework.stereotype.Service;
 import com.fpt.macm.dto.FacilityDto;
 import com.fpt.macm.dto.FacilityReportDto;
 import com.fpt.macm.dto.FacilityRequestDto;
+import com.fpt.macm.model.ClubFund;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Facility;
 import com.fpt.macm.model.FacilityReport;
 import com.fpt.macm.model.FacilityRequest;
 import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.FacilityReportRepository;
 import com.fpt.macm.repository.FacilityRepository;
 import com.fpt.macm.repository.FacilityRequestRepository;
@@ -33,9 +35,12 @@ public class FacilityServiceImpl implements FacilityService {
 
 	@Autowired
 	FacilityReportRepository facilityReportRepository;
-	
+
 	@Autowired
 	FacilityRequestRepository facilityRequestRepository;
+
+	@Autowired
+	ClubFundRepository clubFundRepository;
 
 	@Override
 	public ResponseMessage createNewFacility(Facility facility) {
@@ -85,7 +90,8 @@ public class FacilityServiceImpl implements FacilityService {
 
 				if (oldFacility.getQuantityUsable() != facility.getQuantityUsable()
 						|| oldFacility.getQuantityBroken() != facility.getQuantityBroken()) {
-					if (isValidQuantity(oldFacility.getQuantityUsable(), oldFacility.getQuantityBroken(), facility.getQuantityUsable(), facility.getQuantityBroken())) {
+					if (isValidQuantity(oldFacility.getQuantityUsable(), oldFacility.getQuantityBroken(),
+							facility.getQuantityUsable(), facility.getQuantityBroken())) {
 						createFacilityReport(oldFacility, facility);
 						oldFacility.setQuantityUsable(facility.getQuantityUsable());
 						oldFacility.setQuantityBroken(facility.getQuantityBroken());
@@ -94,19 +100,17 @@ public class FacilityServiceImpl implements FacilityService {
 						facilityRepository.save(oldFacility);
 						responseMessage.setData(Arrays.asList(oldFacility));
 						responseMessage.setMessage(Constant.MSG_032);
-					}
-					else {
+					} else {
 						responseMessage.setMessage(Constant.MSG_046);
 					}
-				}
-				else {
+				} else {
 					oldFacility.setUpdatedBy("toandv");
 					oldFacility.setUpdatedOn(LocalDateTime.now());
 					facilityRepository.save(oldFacility);
 					responseMessage.setData(Arrays.asList(oldFacility));
 					responseMessage.setMessage(Constant.MSG_032);
 				}
-				
+
 			} else {
 				responseMessage.setMessage(Constant.MSG_030);
 			}
@@ -132,12 +136,14 @@ public class FacilityServiceImpl implements FacilityService {
 
 		return false;
 	}
-	
-	private boolean isValidQuantity(int oldQuantityUsable, int oldQuantityBroken, int newQuantityUsable, int newQuantityBroken) {
-		if ((oldQuantityUsable - newQuantityUsable) > 0 && (oldQuantityUsable - newQuantityUsable) < (newQuantityBroken - oldQuantityBroken)) {
+
+	private boolean isValidQuantity(int oldQuantityUsable, int oldQuantityBroken, int newQuantityUsable,
+			int newQuantityBroken) {
+		if ((oldQuantityUsable - newQuantityUsable) > 0
+				&& (oldQuantityUsable - newQuantityUsable) < (newQuantityBroken - oldQuantityBroken)) {
 			return false;
 		}
-		
+
 		return true;
 	}
 
@@ -248,7 +254,7 @@ public class FacilityServiceImpl implements FacilityService {
 		try {
 			facilityRequest.setCreatedBy("toandv");
 			facilityRequest.setCreatedOn(LocalDateTime.now());
-			facilityRequest.setStatus(true);
+			facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_PENDING);
 			facilityRequestRepository.save(facilityRequest);
 			responseMessage.setData(Arrays.asList(facilityRequest));
 			responseMessage.setMessage(Constant.MSG_031);
@@ -278,6 +284,57 @@ public class FacilityServiceImpl implements FacilityService {
 			}
 			responseMessage.setData(facilityRequestsDto);
 			responseMessage.setMessage(Constant.MSG_073);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage approveRequestToBuyFacility(int facilityRequestId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<ClubFund> clubFunds = clubFundRepository.findAll();
+			ClubFund clubFund = clubFunds.get(0);
+			double fundAmount = clubFund.getFundAmount();
+
+			Optional<FacilityRequest> facilityRequestOp = facilityRequestRepository.findById(facilityRequestId);
+			FacilityRequest facilityRequest = facilityRequestOp.get();
+			double totalAmount = facilityRequest.getQuantity() * facilityRequest.getUnitPrice();
+
+			if (fundAmount >= totalAmount) {
+				clubFund.setFundAmount(fundAmount - totalAmount);
+				clubFundRepository.save(clubFund);
+
+				facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_APPROVED);
+				facilityRequestRepository.save(facilityRequest);
+
+				responseMessage.setData(Arrays.asList(facilityRequest));
+				responseMessage.setMessage(Constant.MSG_076);
+			} else {
+				responseMessage.setMessage(Constant.MSG_077);
+			}
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage declineRequestToBuyFacility(int facilityRequestId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<FacilityRequest> facilityRequestOp = facilityRequestRepository.findById(facilityRequestId);
+			FacilityRequest facilityRequest = facilityRequestOp.get();
+			facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_DECLINED);
+			facilityRequestRepository.save(facilityRequest);
+			responseMessage.setData(Arrays.asList(facilityRequest));
+			responseMessage.setMessage(Constant.MSG_078);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
