@@ -109,5 +109,17 @@ public class Constant {
 	public static final String ROLE_EVENT_MEMBER_CULTURE = "ROLE_MemberCulture";
 	public static final String ROLE_EVENT_MEMBER_CULTURE_VN = "Thành viên ban văn hóa";
 	public static final String MSG_062 = "Cập nhật trạng thái đóng tiền tham gia sự kiện của người dùng thành công";
+	
+	public static final String MSG_063 = "Danh sách sự kiện: ";
+    public static final String MSG_064 = "Không thể xóa, sự kiện đã bắt đầu";
+    public static final String MSG_065 = "Không thành công. Không thể thêm lịch sự kiện vào quá khứ";
+    public static final String MSG_066 = "Thêm lịch sự kiện thành công";
+    public static final String MSG_067 = "Thêm buổi sự kiện thành công";
+    public static final String MSG_068 = "Cập nhật buổi sự kiện thành công";
+    public static final String MSG_069 = "Không thành công. Không thể cập nhật buổi sự kiện trong quá khứ";
+    public static final String MSG_070 = "Xóa buổi sự kiện thành công";
+    public static final String MSG_071 = "Không có lịch sự kiện trong ngày này";
+    public static final String MSG_072 = "Tìm không hợp lệ. Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc";
+    
 
 }

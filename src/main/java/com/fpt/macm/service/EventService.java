@@ -9,4 +9,6 @@ public interface EventService {
 	ResponseMessage deleteEvent(int id);
 	ResponseMessage getEventsByName(String name, int pageNo, int pageSize, String sortBy);
 	ResponseMessage getEventById(int id);
+	ResponseMessage getEventsByDate(String startDate, String finishDate);
+	ResponseMessage getStartDateOfEvent(int eventId);
 }

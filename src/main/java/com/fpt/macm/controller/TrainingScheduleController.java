@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.dto.ScheduleDto;
+import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.service.TrainingScheduleService;
@@ -52,8 +53,8 @@ public class TrainingScheduleController {
 	}
 	
 	@PutMapping("/headtechnique/updatesession/{trainingId}")
-	ResponseEntity<ResponseMessage> updateTrainingSessionTime(@PathVariable(name = "trainingId") int trainingId, @RequestBody TrainingSchedule trainingSchedule) {
-		return new ResponseEntity<ResponseMessage>(trainingScheduleService.updateTrainingSessionTime(trainingId, trainingSchedule), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateTrainingSessionTime(@PathVariable(name = "trainingId") int trainingId, @RequestBody CommonSchedule commonSchedule) {
+		return new ResponseEntity<ResponseMessage>(trainingScheduleService.updateTrainingSessionTime(trainingId, commonSchedule), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headtechnique/deletesession/{trainingId}")
