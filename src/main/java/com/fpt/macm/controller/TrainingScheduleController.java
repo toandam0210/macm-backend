@@ -31,7 +31,7 @@ public class TrainingScheduleController {
 	}
 
 	@GetMapping("/gettrainingsession")
-	ResponseEntity<ResponseMessage> getTrainingSession(@RequestParam(name = "date") String date){
+	ResponseEntity<ResponseMessage> getTrainingSession(@RequestParam String date){
 			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getTrainingSessionByDate(date), HttpStatus.OK);
 	}
 	
@@ -41,8 +41,8 @@ public class TrainingScheduleController {
 	}
 	
 	@PostMapping("/headtechnique/createpreview")
-	ResponseEntity<ResponseMessage> createPreview(@RequestParam(name = "startDate") String startDate, @RequestParam(name = "finishDate") String finishDate, 
-			@RequestBody List<String> dayOfWeek, @RequestParam(name = "startTime") String startTime, @RequestParam(name = "finishTime") String finishTime) {
+	ResponseEntity<ResponseMessage> createPreview(@RequestParam String startDate, @RequestParam String finishDate, 
+			@RequestBody List<String> dayOfWeek, @RequestParam String startTime, @RequestParam String finishTime) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createPreviewTrainingSchedule(startDate, finishDate, dayOfWeek, startTime, finishTime), HttpStatus.OK);
 	}
 	
