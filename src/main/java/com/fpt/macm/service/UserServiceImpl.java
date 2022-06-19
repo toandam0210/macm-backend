@@ -23,10 +23,12 @@ import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ERole;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
+import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.RoleRepository;
+import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.StatusSemesterRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
@@ -41,10 +43,13 @@ public class UserServiceImpl implements UserService {
 	RoleRepository roleRepository;
 
 	@Autowired
-	StatusSemesterRepository semesterRepository;
+	StatusSemesterRepository statusSemesterRepository;
 	
 	@Autowired
 	AdminSemesterRepository adminSemesterRepository;
+	
+	@Autowired
+	SemesterRepository semesterRepository;
 
 	@Override
 	public ResponseMessage getUserByStudentId(String studentId) {
@@ -430,7 +435,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage getMembersBySemester(String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberSemester> statusSemesters = semesterRepository.findBySemester(semester);
+			List<MemberSemester> statusSemesters = statusSemesterRepository.findBySemester(semester);
 			List<User> users = new ArrayList<User>();
 			int countDeactive = 0;
 			if (statusSemesters.size() > 0) {
@@ -480,6 +485,20 @@ public class UserServiceImpl implements UserService {
 				responseMessage.setMessage("Không có dữ liệu");
 			}
 
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getSemester() {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<Semester> semesters = semesterRepository.findTop3Semester();
+			responseMessage.setData(semesters);
+			responseMessage.setMessage("Lấy kì thành công");
+			responseMessage.setTotalResult(semesters.size());
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}

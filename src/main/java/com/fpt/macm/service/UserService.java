@@ -24,4 +24,5 @@ public interface UserService {
 	ResponseMessage getAllUser();
 	ResponseMessage getMembersBySemester(String semester);
 	ResponseMessage getAdminBySemester(String semester);
+	ResponseMessage getSemester();
 }
