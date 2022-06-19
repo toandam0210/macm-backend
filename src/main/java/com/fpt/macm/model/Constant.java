@@ -109,5 +109,6 @@ public class Constant {
 	public static final String ROLE_EVENT_MEMBER_CULTURE = "ROLE_MemberCulture";
 	public static final String ROLE_EVENT_MEMBER_CULTURE_VN = "Thành viên ban văn hóa";
 	public static final String MSG_062 = "Cập nhật trạng thái đóng tiền tham gia sự kiện của người dùng thành công";
+	public static final String MSG_063 = "Lấy tất cả yêu cầu mua CSVC thành công";
 
 }
