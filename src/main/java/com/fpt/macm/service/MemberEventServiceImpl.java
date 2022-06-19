@@ -2,6 +2,7 @@ package com.fpt.macm.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -211,6 +212,26 @@ public class MemberEventServiceImpl implements MemberEventService {
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
 			responseMessage.setMessage(Constant.MSG_058);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateMemberEventPaymentStatus(int memberEventId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
+			MemberEvent memberEvent = memberEventOp.get();
+			memberEvent.setPaymentStatus(!memberEvent.getPaymentStatus());
+			memberEvent.setUpdatedBy("toandv");
+			memberEvent.setUpdatedOn(LocalDateTime.now());
+			memberEventRepository.save(memberEvent);
+			responseMessage.setData(Arrays.asList(memberEvent));
+			responseMessage.setMessage(Constant.MSG_062);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

@@ -12,5 +12,6 @@ public interface MemberEventService {
 	ResponseMessage getAllMemberOfEventByEventId(int eventId, int pageNo, int pageSize, String sortBy);
 	ResponseMessage updateUserRoleInEvent(List<MemberEventDto> membersEventDto);
 	ResponseMessage getAllUserCancelJoinEvent(int eventId, int pageNo, int pageSize, String sortBy);
+	ResponseMessage updateMemberEventPaymentStatus(int memberEventId);
 	
 }
