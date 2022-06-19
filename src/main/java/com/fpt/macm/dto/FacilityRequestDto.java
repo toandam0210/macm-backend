@@ -7,7 +7,7 @@ public class FacilityRequestDto {
 	private String facilityCategory;
 	private int quantity;
 	private double unitPrice;
-	private boolean status;
+	private String status;
 
 	public int getId() {
 		return id;
@@ -49,11 +49,11 @@ public class FacilityRequestDto {
 		this.unitPrice = unitPrice;
 	}
 
-	public boolean isStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(boolean status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 
