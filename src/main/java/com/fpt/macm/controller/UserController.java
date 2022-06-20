@@ -71,8 +71,8 @@ public class UserController {
 	}
 
 	@PutMapping("/updatestatus")
-	ResponseEntity<ResponseMessage> updateStatusForUser(@RequestParam String studentId) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.updateStatusForUser(studentId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateStatusForUser(@RequestParam String studentId, @RequestParam String semester) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.updateStatusForUser(studentId,semester), HttpStatus.OK);
 	}
 
 	@GetMapping("/users/search")
