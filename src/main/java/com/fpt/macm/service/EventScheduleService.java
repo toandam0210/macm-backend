@@ -9,7 +9,7 @@ import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.ResponseMessage;
 
 public interface EventScheduleService {
-	ResponseMessage createPreviewEventSchedule(int eventId, String startDate, String finishDate, String startTime, String finishTime);
+	ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime);
 	ResponseMessage createEventSchedule(int eventId, List<ScheduleDto> listPreview);
 	ResponseMessage createEventSession(int eventId, EventSchedule eventSchedule);
 	ResponseMessage getListEventSchedule();
