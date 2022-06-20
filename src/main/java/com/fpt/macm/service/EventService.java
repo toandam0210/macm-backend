@@ -1,5 +1,7 @@
 package com.fpt.macm.service;
 
+import java.time.LocalDate;
+
 import com.fpt.macm.model.Event;
 import com.fpt.macm.model.ResponseMessage;
 
@@ -9,6 +11,7 @@ public interface EventService {
 	ResponseMessage deleteEvent(int id);
 	ResponseMessage getEventsByName(String name, int pageNo, int pageSize, String sortBy);
 	ResponseMessage getEventById(int id);
-	ResponseMessage getEventsByDate(String startDate, String finishDate);
+	ResponseMessage getEventsByDate(LocalDate startDate, LocalDate finishDate);
 	ResponseMessage getStartDateOfEvent(int eventId);
+	ResponseMessage getEventsBySemester(int semesterId);
 }

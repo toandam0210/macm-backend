@@ -33,7 +33,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	public ResponseMessage takeAttendanceByStudentId(String studentId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			TrainingSchedule trainingSchedule = trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now());
+			TrainingSchedule trainingSchedule = (TrainingSchedule) trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now()).getData().get(0);
 			if (trainingSchedule != null) {
 				Optional<User> userOp = userRepository.findByStudentId(studentId);
 				User user = userOp.get();

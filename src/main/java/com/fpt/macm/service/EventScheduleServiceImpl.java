@@ -16,6 +16,7 @@ import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.Semester;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
@@ -36,32 +37,44 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	@Autowired
 	CommonScheduleService commonScheduleService;
 	
+	@Autowired
+	SemesterService semesterService;
+	
 	@Override
 	public ResponseMessage createPreviewEventSchedule(int eventId, String startDate, String finishDate, String startTime, String finishTime) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			if(startTime.compareTo(finishTime) >= 0) {
+			if(startDate.compareTo(finishDate) > 0) {
+				responseMessage.setMessage(Constant.MSG_081);
+			}
+			else if(startTime.compareTo(finishTime) >= 0) {
 				responseMessage.setMessage(Constant.MSG_038);
-			} else {
-				LocalDate startDate2 = Utils.ConvertStringToLocalDate(startDate);
-				LocalDate finishDate2 = Utils.ConvertStringToLocalDate(finishDate);
+			}
+			else if(finishDate.compareTo(LocalDate.now().toString()) < 0) {
+				responseMessage.setMessage(Constant.MSG_065);
+			}
+			else {
+				LocalDate startLocalDate = Utils.ConvertStringToLocalDate(startDate);
+				LocalDate finishLocalDate = Utils.ConvertStringToLocalDate(finishDate);
 				
-				LocalTime startTime2 = LocalTime.parse(startTime);
-				LocalTime finishTime2 = LocalTime.parse(finishTime);
+				LocalTime startLocalTime = LocalTime.parse(startTime);
+				LocalTime finishLocalTime = LocalTime.parse(finishTime);
 				
-				List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
-				if(finishDate2.compareTo(LocalDate.now()) < 0) {
-					responseMessage.setMessage(Constant.MSG_065);
-				} else {
-					while(startDate2.compareTo(finishDate2) <= 0) {
-						if(startDate2.compareTo(LocalDate.now()) > 0) {
+				Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+				if(finishLocalDate.compareTo(currentSemester.getEndDate()) > 0) {
+					responseMessage.setMessage(Constant.MSG_080);
+				} 
+				else {
+					List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
+					while(startLocalDate.compareTo(finishLocalDate) <= 0) {
+						if(startLocalDate.compareTo(LocalDate.now()) > 0) {
 							ScheduleDto eventSessionDto = new ScheduleDto();
-							eventSessionDto.setDate(startDate2);
+							eventSessionDto.setDate(startLocalDate);
 							eventSessionDto.setTitle(eventRepository.findById(eventId).get().getName());
-							eventSessionDto.setStartTime(startTime2);
-							eventSessionDto.setFinishTime(finishTime2);
-							if(commonScheduleService.getCommonSessionByDate(startDate2) == null) {
+							eventSessionDto.setStartTime(startLocalTime);
+							eventSessionDto.setFinishTime(finishLocalTime);
+							if(commonScheduleService.getCommonSessionByDate(startLocalDate) == null) {
 								eventSessionDto.setExisted(false);
 							}
 							else {
@@ -69,7 +82,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 							}
 							listPreview.add(eventSessionDto);
 						} 
-						startDate2 = startDate2.plusDays(1);
+						startLocalDate = startLocalDate.plusDays(1);
 					}
 					if(listPreview.isEmpty()) {
 						responseMessage.setMessage(Constant.MSG_040);
@@ -258,13 +271,14 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	}
 	
 	@Override
-	public ResponseMessage getEventSessionByDate(String date) {
+	public ResponseMessage getEventSessionByDate(LocalDate date) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
-			if(getEventSessionByDate(getDate) != null) {
-				responseMessage.setData(Arrays.asList(getEventSessionByDate(getDate)));
+			Optional<EventSchedule> getEventSessionOp = eventScheduleRepository.findByDate(date);
+			EventSchedule getEventSession = getEventSessionOp.get();
+			if(getEventSession != null) {
+				responseMessage.setData(Arrays.asList(getEventSession));
 			}
 			else {
 				responseMessage.setMessage(Constant.MSG_071);
@@ -274,19 +288,6 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
-	}
-	
-	@Override
-	public EventSchedule getEventSessionByDate(LocalDate date) {
-		try {
-			Optional<EventSchedule> getEventSessionOp = eventScheduleRepository.findByDate(date);
-			if(getEventSessionOp.isPresent()) {
-				return getEventSessionOp.get();
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-		}
-		return null;
 	}
 
 }
