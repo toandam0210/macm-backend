@@ -41,7 +41,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	SemesterService semesterService;
 	
 	@Override
-	public ResponseMessage createPreviewEventSchedule(int eventId, String startDate, String finishDate, String startTime, String finishTime) {
+	public ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -71,7 +71,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 						if(startLocalDate.compareTo(LocalDate.now()) > 0) {
 							ScheduleDto eventSessionDto = new ScheduleDto();
 							eventSessionDto.setDate(startLocalDate);
-							eventSessionDto.setTitle(eventRepository.findById(eventId).get().getName());
+							eventSessionDto.setTitle(eventName);
 							eventSessionDto.setStartTime(startLocalTime);
 							eventSessionDto.setFinishTime(finishLocalTime);
 							if(commonScheduleService.getCommonSessionByDate(startLocalDate) == null) {
