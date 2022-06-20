@@ -39,6 +39,17 @@ public class Event {
 	
 	@Column
 	private double totalAmount;
+	
+	@Column
+	private double amount_per_register;
+
+	public double getAmount_per_register() {
+		return amount_per_register;
+	}
+
+	public void setAmount_per_register(double amount_per_register) {
+		this.amount_per_register = amount_per_register;
+	}
 
 	public int getId() {
 		return id;
