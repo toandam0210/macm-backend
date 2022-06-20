@@ -242,7 +242,11 @@ public class UserServiceImpl implements UserService {
 				if (roleOptional.isPresent()) {
 					user.setRole(roleOptional.get());
 				}
-				if(userDto.getRoleId() > 9 && userDto.getRoleId() < 13) {
+				user.setActive(true);
+				user.setCreatedBy("toandv");
+				user.setCreatedOn(LocalDate.now());
+				userRepository.save(user);
+				if (userDto.getRoleId() > 9 && userDto.getRoleId() < 13) {
 					MemberSemester memberSemester = new MemberSemester();
 					memberSemester.setUser(user);
 					memberSemester.setStatus(true);
@@ -250,10 +254,6 @@ public class UserServiceImpl implements UserService {
 					memberSemester.setSemester(semester.getName());
 					memberSemesterRepository.save(memberSemester);
 				}
-				user.setActive(true);
-				user.setCreatedBy("toandv");
-				user.setCreatedOn(LocalDate.now());
-				userRepository.save(user);
 				responseMessage.setData(Arrays.asList(user));
 				responseMessage.setMessage(Constant.MSG_007);
 			} else {
@@ -295,16 +295,16 @@ public class UserServiceImpl implements UserService {
 				role.setId(Constant.ROLE_ID_MEMBER_TECHNIQUE);
 				user.setRole(role);
 			}
+
+			AdminSemester adminSemester = adminSemesterRepository.findByUserId(user.getId()).get();
+			adminSemesterRepository.delete(adminSemester);
+			userRepository.save(user);
 			MemberSemester memberSemester = new MemberSemester();
 			memberSemester.setUser(user);
 			memberSemester.setStatus(true);
 			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			memberSemester.setSemester(semester.getName());
 			memberSemesterRepository.save(memberSemester);
-			
-			AdminSemester adminSemester = adminSemesterRepository.findByUserId(user.getId()).get();
-			adminSemesterRepository.delete(adminSemester);
-			userRepository.save(user);
 			responseMessage.setData(Arrays.asList(user));
 			responseMessage.setMessage(Constant.MSG_004);
 
@@ -536,6 +536,7 @@ public class UserServiceImpl implements UserService {
 		}
 		return responseMessage;
 	}
+
 	private UserDto convertUserToUserDto(User user) {
 		UserDto userDto = new UserDto();
 		userDto.setId(user.getId());
