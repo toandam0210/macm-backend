@@ -18,9 +18,10 @@ import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.Semester;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
-import com.fpt.macm.utils.Utils;
+import com.fpt.macm.repository.SemesterRepository;
 
 @Service
 public class EventServiceImpl implements EventService{
@@ -30,6 +31,9 @@ public class EventServiceImpl implements EventService{
 	
 	@Autowired
 	EventScheduleRepository eventScheduleRepository;
+	
+	@Autowired
+	SemesterRepository semesterRepository;
 	
 	@Autowired
 	EventScheduleService eventScheduleService;
@@ -141,25 +145,23 @@ public class EventServiceImpl implements EventService{
 	}
 
 	@Override
-	public ResponseMessage getEventsByDate(String startDate, String finishDate) {
+	public ResponseMessage getEventsByDate(LocalDate startDate, LocalDate finishDate) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			LocalDate startDate2 = Utils.ConvertStringToLocalDate(startDate);
-			LocalDate finishDate2 = Utils.ConvertStringToLocalDate(finishDate);
-			if(finishDate2.compareTo(LocalDate.now()) < 0) {
+			if(finishDate.compareTo(LocalDate.now()) < 0) {
 				responseMessage.setMessage(Constant.MSG_072);
 			} else {
 				List<Event> eventList = new ArrayList<Event>();
-				while(startDate2.compareTo(finishDate2) <= 0) {
-					EventSchedule getEventSession = eventScheduleService.getEventSessionByDate(startDate2);
+				while(startDate.compareTo(finishDate) <= 0) {
+					EventSchedule getEventSession = (EventSchedule) eventScheduleService.getEventSessionByDate(startDate).getData().get(0);
 					if(getEventSession != null) {
 						Event getEvent = getEventSession.getEvent();
 						if(!eventList.contains(getEvent)) {
 							eventList.add(getEvent);
 						}
 					}
-					startDate2.plusDays(1);
+					startDate.plusDays(1);
 				}
 				if(eventList.size() > 0) {
 					responseMessage.setData(eventList);
@@ -188,7 +190,20 @@ public class EventServiceImpl implements EventService{
 		}
 		return responseMessage;
 	}
-	
-	
 
+	@Override
+	public ResponseMessage getEventsBySemester(int semesterId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Semester getSemester = semesterRepository.findById(semesterId).get();
+			responseMessage.setData(getEventsByDate(getSemester.getStartDate(), getSemester.getEndDate()).getData());
+			responseMessage.setMessage(Constant.MSG_083 + getSemester.getName());
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
 }

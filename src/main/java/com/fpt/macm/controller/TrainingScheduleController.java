@@ -30,11 +30,6 @@ public class TrainingScheduleController {
 	ResponseEntity<ResponseMessage> getTrainingSchedule(){
 			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getListTrainingSchedule(), HttpStatus.OK);
 	}
-
-	@GetMapping("/gettrainingsession")
-	ResponseEntity<ResponseMessage> getTrainingSession(@RequestParam String date){
-			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getTrainingSessionByDate(date), HttpStatus.OK);
-	}
 	
 	@PostMapping("/headtechnique/addnewsession")
 	ResponseEntity<ResponseMessage> createTrainingSession(@RequestBody TrainingSchedule trainingSchedule) {
@@ -60,5 +55,10 @@ public class TrainingScheduleController {
 	@PutMapping("/headtechnique/deletesession/{trainingId}")
 	ResponseEntity<ResponseMessage> deleteTrainingSession(@PathVariable(name = "trainingId") int trainingId) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.deleteTrainingSession(trainingId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/gettrainingschedulebysemester/{semesterId}")
+	ResponseEntity<ResponseMessage> getTrainingScheduleBySemester(@PathVariable(name = "semesterId") int semesterId){
+			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getTraningScheduleBySemester(semesterId), HttpStatus.OK);
 	}
 }

@@ -37,11 +37,6 @@ public class EventScheduleController {
 			return new ResponseEntity<ResponseMessage>(eventScheduleService.getListEventScheduleByEvent(eventId), HttpStatus.OK);
 	}
 	
-	@GetMapping("/geteventsession")
-	ResponseEntity<ResponseMessage> getEventSession(@RequestParam String date){
-			return new ResponseEntity<ResponseMessage>(eventScheduleService.getEventSessionByDate(date), HttpStatus.OK);
-	}
-	
 	@PostMapping("/headculture/addnewsession/{eventId}")
 	ResponseEntity<ResponseMessage> createEventSession(@PathVariable(name = "eventId") int eventId, @RequestBody EventSchedule eventSchedule) {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.createEventSession(eventId, eventSchedule), HttpStatus.OK);

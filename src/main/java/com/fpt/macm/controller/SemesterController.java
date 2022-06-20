@@ -11,13 +11,18 @@ import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.service.SemesterService;
 
 @RestController
-@RequestMapping("/api/admin")	
+@RequestMapping("/api/semester")	
 public class SemesterController {
 	@Autowired
 	SemesterService semesterService;
 
-	@GetMapping("/semester/currentsemester")
+	@GetMapping("/currentsemester")
 	ResponseEntity<ResponseMessage> getCurrentSemester() {
 		return new ResponseEntity<ResponseMessage>(semesterService.getCurrentSemester(), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getTop3Semesters")
+	ResponseEntity<ResponseMessage> getTop3Semesters() {
+		return new ResponseEntity<ResponseMessage>(semesterService.getTop3Semesters(), HttpStatus.OK);
 	}
 }
