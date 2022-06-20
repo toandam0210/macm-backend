@@ -13,6 +13,6 @@ import com.fpt.macm.model.AdminSemester;
 public interface AdminSemesterRepository extends JpaRepository<AdminSemester, Integer> {
 	List<AdminSemester> findBySemester(String semester);
 	
-	@Query(value = "select * from admin_semester where user_id = ?1 and semester like ?2")
+	@Query(value = "select * from admin_semester where user_id = ?1 and semester like ?2", nativeQuery = true)
 	Optional<AdminSemester> findByUserId(int userId, String semester);
 }
