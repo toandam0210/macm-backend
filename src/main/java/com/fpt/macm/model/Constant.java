@@ -133,4 +133,6 @@ public class Constant {
 	public static final String MSG_081 = "Không thành công. Ngày bắt đầu không thể lớn hơn ngày kết thúc";
 	public static final String MSG_082 = "Lịch tập theo kỳ ";
 	public static final String MSG_083 = "Lịch sự kiện theo kỳ ";
+	public static final String MSG_084 = "Cập nhật điểm danh cho sự kiện thành công";
+	public static final String MSG_085 = "Hôm nay không có sự kiện";
 }
