@@ -275,7 +275,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage deleteAdmin(String studentId) {
+	public ResponseMessage deleteAdmin(String studentId, String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
@@ -296,14 +296,14 @@ public class UserServiceImpl implements UserService {
 				user.setRole(role);
 			}
 
-			AdminSemester adminSemester = adminSemesterRepository.findByUserId(user.getId()).get();
+			AdminSemester adminSemester = adminSemesterRepository.findByUserId(user.getId(), semester).get();
 			adminSemesterRepository.delete(adminSemester);
 			userRepository.save(user);
 			MemberSemester memberSemester = new MemberSemester();
 			memberSemester.setUser(user);
 			memberSemester.setStatus(true);
-			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-			memberSemester.setSemester(semester.getName());
+			Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+			memberSemester.setSemester(currentSemester.getName());
 			memberSemesterRepository.save(memberSemester);
 			responseMessage.setData(Arrays.asList(user));
 			responseMessage.setMessage(Constant.MSG_004);

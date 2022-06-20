@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.fpt.macm.model.AdminSemester;
@@ -12,5 +13,6 @@ import com.fpt.macm.model.AdminSemester;
 public interface AdminSemesterRepository extends JpaRepository<AdminSemester, Integer> {
 	List<AdminSemester> findBySemester(String semester);
 	
-	Optional<AdminSemester> findByUserId(int userId);
+	@Query(value = "select * from admin_semester where user_id = ?1 and semester like ?2")
+	Optional<AdminSemester> findByUserId(int userId, String semester);
 }

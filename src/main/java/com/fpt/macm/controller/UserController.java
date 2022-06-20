@@ -54,8 +54,8 @@ public class UserController {
 	}
 
 	@PutMapping("/deleteadmin/{studentId}")
-	ResponseEntity<ResponseMessage> deleteAdminByStudentId(@PathVariable(name = "studentId") String studentId) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.deleteAdmin(studentId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> deleteAdminByStudentId(@PathVariable(name = "studentId") String studentId, @RequestParam String semester) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.deleteAdmin(studentId,semester), HttpStatus.OK);
 	}
 
 	@GetMapping("/getallmemberandcollaborator")
