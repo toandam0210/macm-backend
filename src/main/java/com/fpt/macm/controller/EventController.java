@@ -1,5 +1,7 @@
 package com.fpt.macm.controller;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,7 +47,7 @@ public class EventController {
 	}
 	
 	@GetMapping("/geteventsbydate")
-	ResponseEntity<ResponseMessage> getEventByDate(@RequestParam String startDate, @RequestParam String finishDate) {
+	ResponseEntity<ResponseMessage> getEventByDate(@RequestParam LocalDate startDate, @RequestParam LocalDate finishDate) {
 		return new ResponseEntity<ResponseMessage>(eventService.getEventsByDate(startDate, finishDate), HttpStatus.OK);
 	}
 	

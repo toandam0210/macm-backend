@@ -37,4 +37,19 @@ public class SemesterServiceImpl implements SemesterService {
 		return responseMessage;
 	}
 
+	@Override
+	public ResponseMessage getTop3Semesters() {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<Semester> semesters = semesterRepository.findTop3Semester();
+			responseMessage.setData(semesters);
+			responseMessage.setMessage("Lấy kì thành công");
+			responseMessage.setTotalResult(semesters.size());
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }

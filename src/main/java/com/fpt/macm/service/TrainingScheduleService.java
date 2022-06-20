@@ -1,5 +1,6 @@
 package com.fpt.macm.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.fpt.macm.dto.ScheduleDto;
@@ -14,5 +15,6 @@ public interface TrainingScheduleService {
 	ResponseMessage getListTrainingSchedule();
 	ResponseMessage updateTrainingSessionTime(int trainingScheduleId, CommonSchedule updateCommonSession);
 	ResponseMessage deleteTrainingSession(int trainingScheduleId);
-	ResponseMessage getTrainingSessionByDate(String date);
+	ResponseMessage getTrainingSessionByDate(LocalDate date);
+	ResponseMessage getTraningScheduleBySemester(int semesterId);
 }

@@ -23,7 +23,6 @@ import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ERole;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
-import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.AdminSemesterRepository;
@@ -484,7 +483,6 @@ public class UserServiceImpl implements UserService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<AdminSemester> statusSemesters = adminSemesterRepository.findBySemester(semester);
-			List<User> users = new ArrayList<User>();
 			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (statusSemesters.size() > 0) {
 				for (AdminSemester statusSemester : statusSemesters) {
@@ -502,20 +500,6 @@ public class UserServiceImpl implements UserService {
 				responseMessage.setMessage("Không có dữ liệu");
 			}
 
-		} catch (Exception e) {
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
-	public ResponseMessage getSemester() {
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<Semester> semesters = semesterRepository.findTop3Semester();
-			responseMessage.setData(semesters);
-			responseMessage.setMessage("Lấy kì thành công");
-			responseMessage.setTotalResult(semesters.size());
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
