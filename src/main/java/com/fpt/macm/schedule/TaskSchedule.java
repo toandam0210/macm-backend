@@ -10,22 +10,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.fpt.macm.model.Role;
-import com.fpt.macm.model.Semester;
-import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.model.AdminSemester;
 import com.fpt.macm.model.AttendanceStatus;
+import com.fpt.macm.model.CollaboratorReport;
 import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.MembershipInfo;
 import com.fpt.macm.model.MembershipStatus;
+import com.fpt.macm.model.Role;
+import com.fpt.macm.model.Semester;
+import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
+import com.fpt.macm.repository.CollaboratorReportRepository;
+import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.MembershipShipInforRepository;
 import com.fpt.macm.repository.MembershipStatusRepository;
 import com.fpt.macm.repository.SemesterRepository;
-import com.fpt.macm.repository.StatusSemesterRepository;
 import com.fpt.macm.repository.UserRepository;
+import com.fpt.macm.service.SemesterService;
 import com.fpt.macm.service.TrainingScheduleServiceImpl;
 
 @Component
@@ -35,7 +38,7 @@ public class TaskSchedule {
 	UserRepository userRepository;
 
 	@Autowired
-	StatusSemesterRepository stautsSemesterRepository;
+	MemberSemesterRepository stautsSemesterRepository;
 
 	@Autowired
 	AdminSemesterRepository adminSemesterRepository;
@@ -53,24 +56,56 @@ public class TaskSchedule {
 	SemesterRepository semesterRepository;
 
 	@Autowired
+	CollaboratorReportRepository collaboratorReportRepository;
+
+	@Autowired
 	MembershipShipInforRepository membershipShipInforRepository;
+
+	@Autowired
+	SemesterService semesterService;
 	Logger logger = LoggerFactory.getLogger(TaskSchedule.class);
 
-	@Scheduled(cron = "* 0 0 * * *")
+	@Scheduled(cron = "1 0 0 * * *")
 	public void updateCollaboratorRole() {
 		List<User> listCollaborator = userRepository.findCollaborator();
 		Role role = new Role();
+		CollaboratorReport collaboratorReport = new CollaboratorReport();
+		int countPassed = 0;
+		int countNotPassed = 0;
+		int countMale = 0;
+		int countFemale = 0;
+		Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+		collaboratorReport.setNumberJoin(listCollaborator.size());
+		collaboratorReport.setSemester(semester);
 		for (User collaborator : listCollaborator) {
 			if (LocalDate.now().compareTo(collaborator.getCreatedOn().plusMonths(1).plusDays(1)) == 0) {
+				if (collaborator.isGender()) {
+					countMale++;
+				} else {
+					countFemale++;
+				}
 				if (collaborator.isActive()) {
+					countPassed++;
 					role.setId(collaborator.getRole().getId() - 3);
 					collaborator.setRole(role);
 					userRepository.save(collaborator);
 				} else {
+					countNotPassed++;
+					List<AttendanceStatus> attendanceStatus = attendanceStatusRepository
+							.findByUserId(collaborator.getId());
+					for (AttendanceStatus user : attendanceStatus) {
+						attendanceStatusRepository.delete(user);
+					}
 					userRepository.delete(collaborator);
 				}
 			}
 		}
+		collaboratorReport.setNumberPassed(countPassed);
+		collaboratorReport.setNumberNotPassed(countNotPassed);
+		collaboratorReport.setNumberMale(countMale);
+		collaboratorReport.setNumberFemale(countFemale);
+		collaboratorReportRepository.save(collaboratorReport);
+		logger.info("report oke");
 	}
 
 	@Scheduled(cron = "1 1 0 * * *")
@@ -121,18 +156,21 @@ public class TaskSchedule {
 		if (trainingSchedule != null) {
 			List<User> users = (List<User>) userRepository.findAll();
 			for (User user : users) {
-				AttendanceStatus attendanceStatus = new AttendanceStatus();
-				attendanceStatus.setUser(user);
-				attendanceStatus.setTrainingSchedule(trainingSchedule);
-				attendanceStatus.setCreatedOn(LocalDateTime.now());
-				attendanceStatus.setCreatedBy("toandv");
-				attendanceStatus.setStatus(false);
-				attendanceStatusRepository.save(attendanceStatus);
+				if (user.isActive()) {
+					AttendanceStatus attendanceStatus = new AttendanceStatus();
+					attendanceStatus.setUser(user);
+					attendanceStatus.setTrainingSchedule(trainingSchedule);
+					attendanceStatus.setCreatedOn(LocalDateTime.now());
+					attendanceStatus.setCreatedBy("toandv");
+					attendanceStatus.setStatus(false);
+					attendanceStatusRepository.save(attendanceStatus);
+					logger.info("atten oke");
+				}
 			}
 		}
 	}
 
-	@Scheduled(cron = "1 3 0 * * *")
+	@Scheduled(cron = "1 0 0 * * *")
 	public void addListMembershipStatus() {
 		if (LocalDate.now().getDayOfMonth() > 17 && LocalDate.now().getDayOfMonth() <= 24
 				&& LocalDate.now().getMonthValue() % 4 == 1
@@ -161,7 +199,7 @@ public class TaskSchedule {
 		}
 	}
 
-	@Scheduled(cron = "1 4 0 * * *")
+	@Scheduled(cron = "1 0 0 * * *")
 	public void addSemester() {
 		if (LocalDate.now().getDayOfMonth() <= 7 && LocalDate.now().getMonthValue() % 4 == 1
 				&& LocalDate.now().getDayOfWeek().toString().compareTo("MONDAY") == 0) {

@@ -21,15 +21,15 @@ import com.fpt.macm.helper.ExcelHelper;
 import com.fpt.macm.model.AdminSemester;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ERole;
+import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
 import com.fpt.macm.model.Semester;
-import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.AdminSemesterRepository;
+import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.RoleRepository;
 import com.fpt.macm.repository.SemesterRepository;
-import com.fpt.macm.repository.StatusSemesterRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 
@@ -43,13 +43,16 @@ public class UserServiceImpl implements UserService {
 	RoleRepository roleRepository;
 
 	@Autowired
-	StatusSemesterRepository statusSemesterRepository;
-	
+	MemberSemesterRepository memberSemesterRepository;
+
 	@Autowired
 	AdminSemesterRepository adminSemesterRepository;
-	
+
 	@Autowired
 	SemesterRepository semesterRepository;
+
+	@Autowired
+	SemesterService semesterService;
 
 	@Override
 	public ResponseMessage getUserByStudentId(String studentId) {
@@ -239,6 +242,14 @@ public class UserServiceImpl implements UserService {
 				if (roleOptional.isPresent()) {
 					user.setRole(roleOptional.get());
 				}
+				if(userDto.getRoleId() > 9 && userDto.getRoleId() < 13) {
+					MemberSemester memberSemester = new MemberSemester();
+					memberSemester.setUser(user);
+					memberSemester.setStatus(true);
+					Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+					memberSemester.setSemester(semester.getName());
+					memberSemesterRepository.save(memberSemester);
+				}
 				user.setActive(true);
 				user.setCreatedBy("toandv");
 				user.setCreatedOn(LocalDate.now());
@@ -284,7 +295,15 @@ public class UserServiceImpl implements UserService {
 				role.setId(Constant.ROLE_ID_MEMBER_TECHNIQUE);
 				user.setRole(role);
 			}
-
+			MemberSemester memberSemester = new MemberSemester();
+			memberSemester.setUser(user);
+			memberSemester.setStatus(true);
+			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+			memberSemester.setSemester(semester.getName());
+			memberSemesterRepository.save(memberSemester);
+			
+			AdminSemester adminSemester = adminSemesterRepository.findByUserId(user.getId()).get();
+			adminSemesterRepository.delete(adminSemester);
 			userRepository.save(user);
 			responseMessage.setData(Arrays.asList(user));
 			responseMessage.setMessage(Constant.MSG_004);
@@ -304,11 +323,12 @@ public class UserServiceImpl implements UserService {
 			if (userOptional.isPresent()) {
 				user = userOptional.get();
 				user.setActive(!user.isActive());
-				Optional<MemberSemester> memberSemesterOp = statusSemesterRepository.findByUserIdAndSemester(user.getId(), semester);
-				if(memberSemesterOp.isPresent()) {
+				Optional<MemberSemester> memberSemesterOp = memberSemesterRepository
+						.findByUserIdAndSemester(user.getId(), semester);
+				if (memberSemesterOp.isPresent()) {
 					MemberSemester memberSemester = memberSemesterOp.get();
 					memberSemester.setStatus(!memberSemester.isStatus());
-					statusSemesterRepository.save(memberSemester);
+					memberSemesterRepository.save(memberSemester);
 				}
 				userRepository.save(user);
 			}
@@ -449,21 +469,32 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage getMembersBySemester(String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberSemester> statusSemesters = statusSemesterRepository.findBySemester(semester);
+			List<MemberSemester> statusSemesters = memberSemesterRepository.findBySemester(semester);
+			Semester currentSemester = semesterRepository.findByName(semester).get();
+			List<User> collaborators = userRepository.findCollaborator();
 			List<UserDto> usersDto = new ArrayList<UserDto>();
 			int countDeactive = 0;
 			if (statusSemesters.size() > 0) {
-				for (MemberSemester statusSemester : statusSemesters) {
-							Optional<User> userOp = userRepository
-									.findByStudentId(statusSemester.getUser().getStudentId());
-							User user = userOp.get();
-							user.setActive(statusSemester.isStatus());
-							if(!user.isActive()) {
-								countDeactive++;
-							}
-							UserDto userDto = convertUserToUserDto(user);
-							usersDto.add(userDto);
+				for (User collaborator : collaborators) {
+					if (collaborator.getCreatedOn().isAfter(currentSemester.getStartDate().minusDays(1))
+							&& collaborator.getCreatedOn().isBefore(currentSemester.getEndDate().plusDays(1))) {
+						UserDto collaboratorDto = convertUserToUserDto(collaborator);
+						usersDto.add(collaboratorDto);
+						if (!collaborator.isActive()) {
+							countDeactive++;
 						}
+					}
+				}
+				for (MemberSemester statusSemester : statusSemesters) {
+					Optional<User> userOp = userRepository.findByStudentId(statusSemester.getUser().getStudentId());
+					User user = userOp.get();
+					user.setActive(statusSemester.isStatus());
+					if (!user.isActive()) {
+						countDeactive++;
+					}
+					UserDto userDto = convertUserToUserDto(user);
+					usersDto.add(userDto);
+				}
 				responseMessage.setData(usersDto);
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(usersDto.size());
@@ -478,23 +509,21 @@ public class UserServiceImpl implements UserService {
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
 	public ResponseMessage getAdminBySemester(String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<AdminSemester> statusSemesters = adminSemesterRepository.findBySemester(semester);
-			List<User> users = new ArrayList<User>();
 			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (statusSemesters.size() > 0) {
 				for (AdminSemester statusSemester : statusSemesters) {
-							Optional<User> userOp = userRepository
-									.findByStudentId(statusSemester.getUser().getStudentId());
-							User user = userOp.get();
-							user.setRole(statusSemester.getRole());
-							UserDto userDto = convertUserToUserDto(user);
-							usersDto.add(userDto);
-						}
+					Optional<User> userOp = userRepository.findByStudentId(statusSemester.getUser().getStudentId());
+					User user = userOp.get();
+					user.setRole(statusSemester.getRole());
+					UserDto userDto = convertUserToUserDto(user);
+					usersDto.add(userDto);
+				}
 				responseMessage.setData(usersDto);
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(usersDto.size());
@@ -521,7 +550,7 @@ public class UserServiceImpl implements UserService {
 		}
 		return responseMessage;
 	}
-	
+
 	private UserDto convertUserToUserDto(User user) {
 		UserDto userDto = new UserDto();
 		userDto.setId(user.getId());
