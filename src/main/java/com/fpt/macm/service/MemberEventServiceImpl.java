@@ -161,26 +161,17 @@ public class MemberEventServiceImpl implements MemberEventService {
 	}
 
 	@Override
-	public ResponseMessage updateUserRoleInEvent(List<MemberEventDto> membersEventDto) {
+	public ResponseMessage updateUserRoleInEvent(int memberEventId, RoleEvent roleEvent) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberEvent> listUpdatedRoleEvent = new ArrayList<MemberEvent>();
-			for (MemberEventDto memberEventDto : membersEventDto) {
-				Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventDto.getId());
-				MemberEvent newMemberEvent = memberEventOp.get();
-				if (memberEventDto.getRoleEventDto().getId() != newMemberEvent.getRoleEvent().getId()) {
-					RoleEvent roleEvent = new RoleEvent();
-					roleEvent.setId(memberEventDto.getRoleEventDto().getId());
-					roleEvent.setName(memberEventDto.getRoleEventDto().getName());
-					newMemberEvent.setRoleEvent(roleEvent);
-					newMemberEvent.setUpdatedBy("toandv");
-					newMemberEvent.setUpdatedOn(LocalDateTime.now());
-					listUpdatedRoleEvent.add(newMemberEvent);
-					memberEventRepository.save(newMemberEvent);
-				}
-			}
-			responseMessage.setData(listUpdatedRoleEvent);
+			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
+			MemberEvent memberEvent = memberEventOp.get();
+			memberEvent.setRoleEvent(roleEvent);
+			memberEvent.setUpdatedBy("toandv");
+			memberEvent.setUpdatedOn(LocalDateTime.now());
+			memberEventRepository.save(memberEvent);
+			responseMessage.setData(Arrays.asList(memberEvent));
 			responseMessage.setMessage(Constant.MSG_061);
 		} catch (Exception e) {
 			// TODO: handle exception
