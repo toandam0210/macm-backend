@@ -296,17 +296,19 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage updateStatusForUser(String studentId) {
+	public ResponseMessage updateStatusForUser(String studentId, String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			User user = new User();
 			Optional<User> userOptional = userRepository.findByStudentId(studentId);
 			if (userOptional.isPresent()) {
 				user = userOptional.get();
-				if (user.isActive()) {
-					user.setActive(false);
-				} else {
-					user.setActive(true);
+				user.setActive(!user.isActive());
+				Optional<MemberSemester> memberSemesterOp = statusSemesterRepository.findByUserIdAndSemester(user.getId(), semester);
+				if(memberSemesterOp.isPresent()) {
+					MemberSemester memberSemester = memberSemesterOp.get();
+					memberSemester.setStatus(!memberSemester.isStatus());
+					statusSemesterRepository.save(memberSemester);
 				}
 				userRepository.save(user);
 			}
