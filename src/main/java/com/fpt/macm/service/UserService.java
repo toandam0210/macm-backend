@@ -14,7 +14,7 @@ public interface UserService {
 	ResponseMessage updateUser(String studentId, UserDto userDto);
 	ResponseMessage getAllMemberAndCollaborator(int pageNo, int pageSize, String sortBy);
 	ResponseMessage addAnMemberOrCollaborator(UserDto userDto);
-	ResponseMessage deleteAdmin(String studentId);
+	ResponseMessage deleteAdmin(String studentId, String semester);
 	ResponseMessage updateStatusForUser(String studentId, String semester);
 	ResponseMessage searchUserByStudentIdOrName(String inputSearch,int pageNo, int pageSize, String sortBy);
 //	ResponseMessage userLogin();
