@@ -237,16 +237,16 @@ public class MemberEventServiceImpl implements MemberEventService {
 			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
 			MemberEvent memberEvent = memberEventOp.get();
 			if (!memberEvent.getPaymentStatus()) {
-//				List<ClubFund> clubFunds = clubFundRepository.findAll();
-//				ClubFund clubFund = clubFunds.get(0);
-//				double fundAmount = clubFund.getFundAmount();
-//				
-//				Optional<Event> eventOp = eventRepository.findById(memberEvent.getEvent().getId());
-//				Event event = eventOp.get();
-//				double eventFee = event.getTotalAmount();
-//				
-//				clubFund.setFundAmount(fundAmount + eventFee);
-//				clubFundRepository.save(clubFund);
+				List<ClubFund> clubFunds = clubFundRepository.findAll();
+				ClubFund clubFund = clubFunds.get(0);
+				double fundAmount = clubFund.getFundAmount();
+				
+				Optional<Event> eventOp = eventRepository.findById(memberEvent.getEvent().getId());
+				Event event = eventOp.get();
+				double eventFee = event.getAmount_per_register();
+				
+				clubFund.setFundAmount(fundAmount + eventFee);
+				clubFundRepository.save(clubFund);
 				
 				memberEvent.setPaymentStatus(!memberEvent.getPaymentStatus());
 				memberEvent.setUpdatedBy("toandv");
