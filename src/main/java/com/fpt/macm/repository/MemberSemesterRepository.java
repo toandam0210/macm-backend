@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import com.fpt.macm.model.MemberSemester;
 
 @Repository
-public interface StatusSemesterRepository extends JpaRepository<MemberSemester, Integer> {
+public interface MemberSemesterRepository extends JpaRepository<MemberSemester, Integer> {
 	
 	List<MemberSemester> findBySemester(String semester);
 	

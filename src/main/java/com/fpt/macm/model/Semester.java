@@ -2,11 +2,15 @@ package com.fpt.macm.model;
 
 import java.time.LocalDate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -24,7 +28,11 @@ public class Semester {
 	
 	@Column
 	private LocalDate endDate;
-
+	
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JoinColumn(name = "collaborator_report_id", referencedColumnName = "id")
+	private CollaboratorReport collaboratorReport;
+	
 	public int getId() {
 		return id;
 	}

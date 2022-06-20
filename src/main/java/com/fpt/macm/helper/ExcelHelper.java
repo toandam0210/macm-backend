@@ -136,8 +136,7 @@ public class ExcelHelper {
 						user.setCurrentAddress(currentCell.getStringCellValue());
 						break;
 					case 9:
-						String generation = currentCell.getStringCellValue();
-						user.setGeneration(Integer.parseInt(generation));
+						user.setGeneration((int) currentCell.getNumericCellValue());
 					default:
 						break;
 					}
