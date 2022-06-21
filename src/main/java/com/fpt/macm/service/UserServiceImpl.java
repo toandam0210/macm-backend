@@ -470,18 +470,19 @@ public class UserServiceImpl implements UserService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<MemberSemester> statusSemesters = memberSemesterRepository.findBySemester(semester);
-			Semester currentSemester = semesterRepository.findByName(semester).get();
+			Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			List<User> collaborators = userRepository.findCollaborator();
 			List<UserDto> usersDto = new ArrayList<UserDto>();
 			int countDeactive = 0;
 			if (statusSemesters.size() > 0) {
-				for (User collaborator : collaborators) {
-					if (collaborator.getCreatedOn().isAfter(currentSemester.getStartDate().minusDays(1))
-							&& collaborator.getCreatedOn().isBefore(currentSemester.getEndDate().plusDays(1))) {
-						UserDto collaboratorDto = convertUserToUserDto(collaborator);
-						usersDto.add(collaboratorDto);
-						if (!collaborator.isActive()) {
-							countDeactive++;
+				if (collaborators.size() > 0) {
+					for (User collaborator : collaborators) {
+						if (semester.equals(currentSemester.getName())) {
+							UserDto collaboratorDto = convertUserToUserDto(collaborator);
+							usersDto.add(collaboratorDto);
+							if (!collaborator.isActive()) {
+								countDeactive++;
+							}
 						}
 					}
 				}
