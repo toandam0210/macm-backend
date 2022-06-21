@@ -56,7 +56,7 @@ public class EventController {
 		return new ResponseEntity<ResponseMessage>(eventService.getStartDateOfEvent(eventId), HttpStatus.OK);
 	}
 	
-	@GetMapping("/geteventsbysemester/{semester}")
+	@GetMapping("/geteventsbysemester")
 	ResponseEntity<ResponseMessage> getEventBySemester(@RequestParam(defaultValue = "") String semester) {
 		return new ResponseEntity<ResponseMessage>(eventService.getEventsBySemester(semester), HttpStatus.OK);
 	}
