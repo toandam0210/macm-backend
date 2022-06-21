@@ -78,6 +78,7 @@ public class EventServiceImpl implements EventService{
 				getEvent.setMaxQuantityComitee(event.getMaxQuantityComitee());
 				getEvent.setTotalAmount(event.getTotalAmount());
 				getEvent.setAmount_per_register(event.getAmount_per_register());
+				getEvent.setDescription(event.getDescription());
 				getEvent.setUpdatedBy("LinhLHN");
 				getEvent.setUpdatedOn(LocalDateTime.now());
 				eventRepository.save(getEvent);
