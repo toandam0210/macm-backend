@@ -42,10 +42,10 @@ public class EventScheduleController {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.createEventSession(eventId, eventSchedule), HttpStatus.OK);
 	}
 	
-	@PostMapping("/headculture/createpreview/{eventId}")
-	ResponseEntity<ResponseMessage> createPreviewEventSchedule(@PathVariable(name = "eventId") int eventId, @RequestParam String startDate, 
+	@PostMapping("/headculture/createpreview/")
+	ResponseEntity<ResponseMessage> createPreviewEventSchedule(@RequestParam String eventName, @RequestParam String startDate, 
 			@RequestParam String finishDate, @RequestParam String startTime, @RequestParam String finishTime) {
-		return new ResponseEntity<ResponseMessage>(eventScheduleService.createPreviewEventSchedule(eventId, startDate, finishDate, startTime, finishTime), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(eventScheduleService.createPreviewEventSchedule(eventName, startDate, finishDate, startTime, finishTime), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headculture/addnewschedule/{eventId}")
