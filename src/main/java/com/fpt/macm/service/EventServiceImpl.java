@@ -103,6 +103,8 @@ public class EventServiceImpl implements EventService{
 			else {
 				Optional<Event> eventOp = eventRepository.findById(id);
 				Event event = eventOp.get();
+				List<EventSchedule> eventSchedule = eventScheduleRepository.findByEventId(event.getId());
+				eventScheduleRepository.deleteAll(eventSchedule);
 				eventRepository.delete(event);
 				responseMessage.setData(Arrays.asList(event));
 				responseMessage.setMessage(Constant.MSG_054);
