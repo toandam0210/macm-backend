@@ -6,7 +6,9 @@ public class EventDto {
 	private int id;
 	private String status;
 	private String name;
+	private int maxQuantityComitee;
 	private double amountPerMemberRegister;
+	private double totalAmount;
 	private LocalDate startDate;
 
 	public String getStatus() {
@@ -48,6 +50,22 @@ public class EventDto {
 	public void setId(int id) {
 		this.id = id;
 	}
-	
 
+	public int getMaxQuantityComitee() {
+		return maxQuantityComitee;
+	}
+
+	public void setMaxQuantityComitee(int maxQuantityComitee) {
+		this.maxQuantityComitee = maxQuantityComitee;
+	}
+
+	public double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+	
+	
 }
