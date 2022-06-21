@@ -10,6 +10,7 @@ public class EventDto {
 	private double amountPerMemberRegister;
 	private double totalAmount;
 	private LocalDate startDate;
+	private String description;
 
 	public String getStatus() {
 		return status;
@@ -65,6 +66,14 @@ public class EventDto {
 
 	public void setTotalAmount(double totalAmount) {
 		this.totalAmount = totalAmount;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 	
 	
