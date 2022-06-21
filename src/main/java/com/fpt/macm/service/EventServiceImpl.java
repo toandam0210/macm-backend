@@ -38,13 +38,18 @@ public class EventServiceImpl implements EventService{
 	@Autowired
 	EventScheduleService eventScheduleService;
 	
+	@Autowired
+	SemesterService semesterService;
+	
 	@Override
 	public ResponseMessage createEvent(Event event) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			event.setCreatedBy("LinhLHN");
 			event.setCreatedOn(LocalDateTime.now());
+			event.setSemester(semester.getName());
 			eventRepository.save(event);
 			responseMessage.setData(Arrays.asList(event));
 			responseMessage.setMessage(Constant.MSG_052);
@@ -154,9 +159,9 @@ public class EventServiceImpl implements EventService{
 			} else {
 				List<Event> eventList = new ArrayList<Event>();
 				while(startDate.compareTo(finishDate) <= 0) {
-					EventSchedule getEventSession = (EventSchedule) eventScheduleService.getEventSessionByDate(startDate).getData().get(0);
-					if(getEventSession != null) {
-						Event getEvent = getEventSession.getEvent();
+					List<EventSchedule> getEventSession = (List<EventSchedule>) eventScheduleService.getEventSessionByDate(startDate).getData();
+					if(getEventSession.size() > 0) {
+						Event getEvent = getEventSession.get(0).getEvent();
 						if(!eventList.contains(getEvent)) {
 							eventList.add(getEvent);
 						}
@@ -192,15 +197,18 @@ public class EventServiceImpl implements EventService{
 	}
 
 	@Override
-	public ResponseMessage getEventsBySemester(int semesterId) {
+	public ResponseMessage getEventsBySemester(String semester) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Semester getSemester = semesterRepository.findById(semesterId).get();
-			responseMessage.setData(getEventsByDate(getSemester.getStartDate(), getSemester.getEndDate()).getData());
-			responseMessage.setMessage(Constant.MSG_083 + getSemester.getName());
+			List<Event> events = eventRepository.findBySemester(semester);
+			if(events.size() > 0) {
+				responseMessage.setData(events);
+				responseMessage.setMessage("Lấy danh sách event thành công" + semester);
+				responseMessage.setTotalResult(events.size());
+			}
+			
 		} catch (Exception e) {
-			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;

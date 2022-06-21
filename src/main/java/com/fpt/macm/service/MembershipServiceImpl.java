@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.MembershipStatusDto;
 import com.fpt.macm.model.Constant;
+import com.fpt.macm.model.MembershipInfo;
 import com.fpt.macm.model.MembershipStatus;
 import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.repository.MembershipShipInforRepository;
 import com.fpt.macm.repository.MembershipStatusRepository;
 import com.fpt.macm.utils.Utils;
 
@@ -20,6 +22,9 @@ import com.fpt.macm.utils.Utils;
 public class MembershipServiceImpl implements MembershipService{
 	@Autowired
 	MembershipStatusRepository membershipStatusRepository;
+	
+	@Autowired
+	MembershipShipInforRepository membershipShipInforRepository;
 
 	@Override
 	public ResponseMessage getListMemberPayMembershipBySemester(int membershipInfoId) {
@@ -63,6 +68,23 @@ public class MembershipServiceImpl implements MembershipService{
 			membershipStatusRepository.save(membershipStatus);
 			responseMessage.setData(Arrays.asList(membershipStatus));
 			responseMessage.setMessage("Cập nhật membership status thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateMembershipBySemester(double amount ,String semester) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<MembershipInfo> membershipInfoOp = membershipShipInforRepository.findBySemester(semester);
+			if(membershipInfoOp.isPresent()) {
+				MembershipInfo membershipInfo = membershipInfoOp.get();
+				membershipInfo.setAmount(amount);
+				responseMessage.setData(Arrays.asList(membershipInfo));
+				responseMessage.setMessage(Constant.MSG_005);
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}

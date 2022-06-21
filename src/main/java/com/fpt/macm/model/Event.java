@@ -42,6 +42,9 @@ public class Event {
 	
 	@Column
 	private double amount_per_register;
+	
+	@Column
+	private String semester;
 
 	public double getAmount_per_register() {
 		return amount_per_register;
@@ -122,6 +125,16 @@ public class Event {
 	public void setTotalAmount(double totalAmount) {
 		this.totalAmount = totalAmount;
 	}
+
+	public String getSemester() {
+		return semester;
+	}
+
+	public void setSemester(String semester) {
+		this.semester = semester;
+	}
+	
+	
 	
 	
 }

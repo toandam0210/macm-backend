@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.ResponseMessage;
@@ -27,5 +28,10 @@ public class MembershipController {
 	@PutMapping("/treasure/membership/update/{id}")
 	ResponseEntity<ResponseMessage> updateMembershipStatus(@PathVariable(name = "id") int id) {
 		return new ResponseEntity<ResponseMessage>(membershipService.updateStatusPaymenMembershipById(id), HttpStatus.OK);
+	}
+	
+	@PutMapping("/treasure/membership/membershipinfo/{semester}")
+	ResponseEntity<ResponseMessage> updateMembershipInfo(@RequestParam double amount ,@PathVariable(name = "semester") String semester) {
+		return new ResponseEntity<ResponseMessage>(membershipService.updateMembershipBySemester(amount, semester), HttpStatus.OK);
 	}
 }
