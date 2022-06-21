@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.dto.EventDto;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
@@ -124,7 +125,26 @@ public class EventServiceImpl implements EventService{
 			if (pageResponse != null && pageResponse.hasContent()) {
 				eventList = pageResponse.getContent();
 			}
-			responseMessage.setData(eventList);
+			List<EventDto> eventDtos = new ArrayList<EventDto>();
+			for (Event event : eventList) {
+				LocalDate startDate = (LocalDate) getStartDateOfEvent(event.getId()).getData().get(0);
+				LocalDate endDate = getEndDateOfEvent(event.getId());
+				EventDto eventDto = new EventDto();
+				if(LocalDate.now().isBefore(startDate)) {
+					eventDto.setStatus("Chưa diễn ra");
+				}else if(LocalDate.now().isAfter(endDate)) {
+					eventDto.setStatus("Đã kết thúc");
+				}else {
+					eventDto.setStatus("Đang diễn ra");
+				}
+				eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
+				eventDto.setStartDate(startDate);
+				eventDto.setName(event.getName());
+				eventDto.setId(event.getId());
+				eventDtos.add(eventDto);
+				
+			}
+			responseMessage.setData(eventDtos);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
 		} catch (Exception e) {
@@ -157,6 +177,7 @@ public class EventServiceImpl implements EventService{
 			if(finishDate.compareTo(LocalDate.now()) < 0) {
 				responseMessage.setMessage(Constant.MSG_072);
 			} else {
+				List<EventDto> eventDtos = new ArrayList<EventDto>();
 				List<Event> eventList = new ArrayList<Event>();
 				while(startDate.compareTo(finishDate) <= 0) {
 					List<EventSchedule> getEventSession = (List<EventSchedule>) eventScheduleService.getEventSessionByDate(startDate).getData();
@@ -169,7 +190,25 @@ public class EventServiceImpl implements EventService{
 					startDate.plusDays(1);
 				}
 				if(eventList.size() > 0) {
-					responseMessage.setData(eventList);
+					for (Event event : eventList) {
+						LocalDate startDateEvent = (LocalDate) getStartDateOfEvent(event.getId()).getData().get(0);
+						LocalDate endDate = getEndDateOfEvent(event.getId());
+						EventDto eventDto = new EventDto();
+						if(LocalDate.now().isBefore(startDateEvent)) {
+							eventDto.setStatus("Chưa diễn ra");
+						}else if(LocalDate.now().isAfter(endDate)) {
+							eventDto.setStatus("Đã kết thúc");
+						}else {
+							eventDto.setStatus("Đang diễn ra");
+						}
+						eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
+						eventDto.setStartDate(startDate);
+						eventDto.setName(event.getName());
+						eventDto.setId(event.getId());
+						eventDtos.add(eventDto);
+						
+					}
+					responseMessage.setData(eventDtos);
 					responseMessage.setMessage(Constant.MSG_063);
 				}
 			}
@@ -195,6 +234,15 @@ public class EventServiceImpl implements EventService{
 		}
 		return responseMessage;
 	}
+	
+	public LocalDate getEndDateOfEvent(int eventId) {
+		List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
+		if(listSchedule.size() > 0) {
+			LocalDate endDate = listSchedule.get(listSchedule.size()-1).getDate();
+			return endDate;
+		}
+		return null;
+	}
 
 	@Override
 	public ResponseMessage getEventsBySemester(String semester) {
@@ -202,12 +250,29 @@ public class EventServiceImpl implements EventService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<Event> events = eventRepository.findBySemester(semester);
-			if(events.size() > 0) {
-				responseMessage.setData(events);
-				responseMessage.setMessage("Lấy danh sách event thành công" + semester);
-				responseMessage.setTotalResult(events.size());
+			List<EventDto> eventDtos = new ArrayList<EventDto>();
+			for (Event event : events) {
+				LocalDate startDate = (LocalDate) getStartDateOfEvent(event.getId()).getData().get(0);
+				LocalDate endDate = getEndDateOfEvent(event.getId());
+				EventDto eventDto = new EventDto();
+				if(LocalDate.now().isBefore(startDate)) {
+					eventDto.setStatus("Chưa diễn ra");
+				}else if(LocalDate.now().isAfter(endDate)) {
+					eventDto.setStatus("Đã kết thúc");
+				}else {
+					eventDto.setStatus("Đang diễn ra");
+				}
+				eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
+				eventDto.setStartDate(startDate);
+				eventDto.setName(event.getName());
+				eventDto.setId(event.getId());
+				eventDtos.add(eventDto);
+				
 			}
-			
+			responseMessage.setData(eventDtos);
+			responseMessage.setMessage("Lấy danh sách event thành công" + semester);
+			responseMessage.setTotalResult(eventDtos.size());
+
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
