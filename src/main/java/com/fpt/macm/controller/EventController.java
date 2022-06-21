@@ -55,4 +55,9 @@ public class EventController {
 	ResponseEntity<ResponseMessage> getStartDateOfEvent(@PathVariable(name = "eventId") int eventId) {
 		return new ResponseEntity<ResponseMessage>(eventService.getStartDateOfEvent(eventId), HttpStatus.OK);
 	}
+	
+	@GetMapping("/geteventsbysemester/{semesterId}")
+	ResponseEntity<ResponseMessage> getEventBySemester(@PathVariable(name = "semesterId") int semesterId) {
+		return new ResponseEntity<ResponseMessage>(eventService.getEventsBySemester(semesterId), HttpStatus.OK);
+	}
 }
