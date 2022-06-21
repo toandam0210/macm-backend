@@ -37,12 +37,12 @@ public class EventController {
 	}
 	
 	@PutMapping("/headculture/updateevent/{eventId}")
-	ResponseEntity<ResponseMessage> updateEvent(@PathVariable(name = "id") int id, @RequestBody Event event) {
+	ResponseEntity<ResponseMessage> updateEvent(@PathVariable(name = "eventId") int id, @RequestBody Event event) {
 		return new ResponseEntity<ResponseMessage>(eventService.updateEvent(id, event), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headculture/deleteevent/{eventId}")
-	ResponseEntity<ResponseMessage> deleteEvent(@PathVariable(name = "id") int id) {
+	ResponseEntity<ResponseMessage> deleteEvent(@PathVariable(name = "eventId") int id) {
 		return new ResponseEntity<ResponseMessage>(eventService.deleteEvent(id), HttpStatus.OK);
 	}
 	

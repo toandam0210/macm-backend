@@ -46,20 +46,21 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			if(startDate.compareTo(finishDate) > 0) {
+			LocalDate startLocalDate = Utils.ConvertStringToLocalDate(startDate);
+			LocalDate finishLocalDate = Utils.ConvertStringToLocalDate(finishDate);
+			
+			LocalTime startLocalTime = LocalTime.parse(startTime);
+			LocalTime finishLocalTime = LocalTime.parse(finishTime);
+			
+			if(startLocalDate.compareTo(finishLocalDate) > 0) {
 				responseMessage.setMessage(Constant.MSG_081);
 			}
-			else if(startTime.compareTo(finishTime) >= 0) {
+			else if(startLocalTime.compareTo(finishLocalTime) >= 0) {
 				responseMessage.setMessage(Constant.MSG_038);
 			} 
-			else if(finishDate.compareTo(LocalDate.now().toString()) < 0) {
+			else if(finishLocalDate.compareTo(LocalDate.now()) < 0) {
 				responseMessage.setMessage(Constant.MSG_039);
 			} else {
-				LocalDate startLocalDate = Utils.ConvertStringToLocalDate(startDate);
-				LocalDate finishLocalDate = Utils.ConvertStringToLocalDate(finishDate);
-				
-				LocalTime startLocalTime = LocalTime.parse(startTime);
-				LocalTime finishLocalTime = LocalTime.parse(finishTime);
 				
 				Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 				if(finishLocalDate.compareTo(currentSemester.getEndDate()) > 0) {

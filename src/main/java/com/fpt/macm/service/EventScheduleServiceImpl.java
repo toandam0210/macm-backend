@@ -49,6 +49,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 			LocalDate finishLocalDate = Utils.ConvertStringToLocalDate(finishDate);
 			LocalTime startLocalTime = LocalTime.parse(startTime);
 			LocalTime finishLocalTime = LocalTime.parse(finishTime);
+			
 			if(startLocalDate.compareTo(finishLocalDate) > 0) {
 				responseMessage.setMessage(Constant.MSG_081);
 			}
