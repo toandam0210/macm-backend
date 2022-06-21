@@ -140,6 +140,8 @@ public class EventServiceImpl implements EventService{
 					eventDto.setStatus("Đang diễn ra");
 				}
 				eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
+				eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
+				eventDto.setTotalAmount(event.getTotalAmount());
 				eventDto.setStartDate(startDate);
 				eventDto.setName(event.getName());
 				eventDto.setId(event.getId());
@@ -204,6 +206,8 @@ public class EventServiceImpl implements EventService{
 							eventDto.setStatus("Đang diễn ra");
 						}
 						eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
+						eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
+						eventDto.setTotalAmount(event.getTotalAmount());
 						eventDto.setStartDate(startDate);
 						eventDto.setName(event.getName());
 						eventDto.setId(event.getId());
@@ -265,6 +269,8 @@ public class EventServiceImpl implements EventService{
 					eventDto.setStatus("Đang diễn ra");
 				}
 				eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
+				eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
+				eventDto.setTotalAmount(event.getTotalAmount());
 				eventDto.setStartDate(startDate);
 				eventDto.setName(event.getName());
 				eventDto.setId(event.getId());
