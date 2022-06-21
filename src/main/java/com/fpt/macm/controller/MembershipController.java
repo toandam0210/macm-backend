@@ -34,4 +34,8 @@ public class MembershipController {
 	ResponseEntity<ResponseMessage> updateMembershipInfo(@RequestParam double amount ,@PathVariable(name = "semester") String semester) {
 		return new ResponseEntity<ResponseMessage>(membershipService.updateMembershipBySemester(amount, semester), HttpStatus.OK);
 	}
+	@GetMapping("/treasure/membership/membershipinfo")
+	ResponseEntity<ResponseMessage> updateMembershipInfo(@PathVariable(name = "semester") String semester) {
+		return new ResponseEntity<ResponseMessage>(membershipService.getMembershipInfoBySemester(semester), HttpStatus.OK);
+	}
 }

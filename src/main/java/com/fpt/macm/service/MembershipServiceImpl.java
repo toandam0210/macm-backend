@@ -92,4 +92,20 @@ public class MembershipServiceImpl implements MembershipService{
 		return responseMessage;
 	}
 
+	@Override
+	public ResponseMessage getMembershipInfoBySemester(String semester) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<MembershipInfo> membershipInfoOp = membershipShipInforRepository.findBySemester(semester);
+			if(membershipInfoOp.isPresent()) {
+				MembershipInfo membershipInfo = membershipInfoOp.get();
+				responseMessage.setData(Arrays.asList(membershipInfo));
+				responseMessage.setMessage(Constant.MSG_005);
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }
