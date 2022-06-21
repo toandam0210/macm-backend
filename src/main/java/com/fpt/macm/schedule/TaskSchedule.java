@@ -89,6 +89,19 @@ public class TaskSchedule {
 					role.setId(collaborator.getRole().getId() - 3);
 					collaborator.setRole(role);
 					userRepository.save(collaborator);
+					MemberSemester statusSemester = new MemberSemester();
+					statusSemester.setUser(collaborator);
+					if (LocalDate.now().getMonthValue() == 1) {
+						statusSemester.setSemester("Spring" + LocalDate.now().getYear());
+					}
+					if (LocalDate.now().getMonthValue() == 5) {
+						statusSemester.setSemester("Summer" + LocalDate.now().getYear());
+					}
+					if (LocalDate.now().getMonthValue() == 9) {
+						statusSemester.setSemester("Fall" + LocalDate.now().getYear());
+					}
+					statusSemester.setStatus(collaborator.isActive());
+					stautsSemesterRepository.save(statusSemester);
 				} else {
 					countNotPassed++;
 					List<AttendanceStatus> attendanceStatus = attendanceStatusRepository
