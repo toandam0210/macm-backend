@@ -82,6 +82,7 @@ public class MembershipServiceImpl implements MembershipService{
 			if(membershipInfoOp.isPresent()) {
 				MembershipInfo membershipInfo = membershipInfoOp.get();
 				membershipInfo.setAmount(amount);
+				membershipShipInforRepository.save(membershipInfo);
 				responseMessage.setData(Arrays.asList(membershipInfo));
 				responseMessage.setMessage(Constant.MSG_005);
 			}
