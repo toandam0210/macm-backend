@@ -57,7 +57,7 @@ public class EventController {
 	}
 	
 	@GetMapping("/geteventsbysemester/{semester}")
-	ResponseEntity<ResponseMessage> getEventBySemester(@PathVariable(name = "semester") String semester) {
+	ResponseEntity<ResponseMessage> getEventBySemester(@RequestParam(defaultValue = "") String semester) {
 		return new ResponseEntity<ResponseMessage>(eventService.getEventsBySemester(semester), HttpStatus.OK);
 	}
 }

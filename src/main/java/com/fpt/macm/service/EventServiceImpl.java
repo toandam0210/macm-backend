@@ -255,6 +255,9 @@ public class EventServiceImpl implements EventService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			if(semester == "") {
+				semester = semesterRepository.findTop3Semester().get(0).getName();
+			}
 			List<Event> events = eventRepository.findBySemester(semester);
 			List<EventDto> eventDtos = new ArrayList<EventDto>();
 			for (Event event : events) {
