@@ -563,55 +563,56 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage searchByMultipleField(List<UserDto> userDtos,String name, String studentId, String email, String gender,
-			Integer generation, Integer roleId, String isActive, String dateFrom, String dateTo) {
+	public ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email,
+			String gender, Integer generation, Integer roleId, String isActive, String dateFrom, String dateTo) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<UserDto> userDtoResponse = userDtos;
-			LocalDate dateFromlc = LocalDate.parse(dateFrom);
-			LocalDate dateTolc = LocalDate.parse(dateTo);
-				for(int i = 0; i<userDtos.size();i++) {
-				if(name != null && !userDtos.get(i).getName().toLowerCase().contains(name.toLowerCase())) {
+			for (int i = 0; i < userDtos.size(); i++) {
+				if (name != null && !userDtos.get(i).getName().toLowerCase().contains(name.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if(studentId != null && !userDtos.get(i).getStudentId().toLowerCase().contains(studentId.toLowerCase())) {
+				if (studentId != null
+						&& !userDtos.get(i).getStudentId().toLowerCase().contains(studentId.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if(email != null && !userDtos.get(i).getEmail().toLowerCase().contains(email.toLowerCase())) {
+				if (email != null && !userDtos.get(i).getEmail().toLowerCase().contains(email.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if(gender != null && !userDtos.get(i).isGender().toString().toLowerCase().equals(gender.toLowerCase())) {
+				if (gender != null
+						&& !userDtos.get(i).isGender().toString().toLowerCase().equals(gender.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if(generation != null && userDtos.get(i).getGeneration() != generation) {
+				if (generation != null && userDtos.get(i).getGeneration() != generation) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if(roleId != null && userDtos.get(i).getRoleId() != roleId) {
+				if (roleId != null && userDtos.get(i).getRoleId() != roleId) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if(isActive != null && !userDtos.get(i).isActive().toString().toLowerCase().equals(isActive.toLowerCase())) {
+				if (isActive != null
+						&& !userDtos.get(i).isActive().toString().toLowerCase().equals(isActive.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if(dateFrom != null && userDtos.get(i).getDateOfBirth().isBefore(dateFromlc)) {
+				if (dateFrom != null && userDtos.get(i).getDateOfBirth().isBefore(LocalDate.parse(dateFrom))) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if(dateTo != null && userDtos.get(i).getDateOfBirth().isAfter(dateTolc)) {
+				if (dateTo != null && userDtos.get(i).getDateOfBirth().isAfter(LocalDate.parse(dateTo))) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
