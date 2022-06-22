@@ -25,5 +25,5 @@ public interface UserService {
 	ResponseMessage getAllUser();
 	ResponseMessage getMembersBySemester(String semester);
 	ResponseMessage getAdminBySemester(String semester);
-	ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email, String gender, Integer generation, Integer roleId, String isActive, Integer month, Integer year);
+	ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email, String gender, Integer generation, Integer roleId, String isActive, String dateFrom, String dateTo);
 }
