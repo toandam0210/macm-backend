@@ -1,11 +1,14 @@
 package com.fpt.macm.repository;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.MemberEvent;
 
 @Repository
@@ -22,4 +25,7 @@ public interface MemberEventRepository extends PagingAndSortingRepository<Member
 	
 	@Query(value = "SELECT * FROM member_event WHERE event_id = ?1 AND attendance_status = false", nativeQuery = true)
 	Page<MemberEvent> findAllUserCancelJoinEventByEventId(int eventId, Pageable pageable);
+	
+	@Query(value = "select * from member_event where event_id = ?1", nativeQuery = true)
+	List<MemberEvent> findByEventId(int eventId);
 }

@@ -13,7 +13,7 @@ import com.fpt.macm.model.Event;
 @Repository
 public interface EventRepository extends JpaRepository<Event, Integer>{
 	@Query(value = "select * from event where name like %?1%", nativeQuery = true)
-	Page<Event> findByName(Pageable pageable, String name);
+	Page<Event> findByName(String name, Pageable pageable);
 	
 	@Query(value = "select * from event where semester like %?1%", nativeQuery = true)
 	List<Event> findBySemester(String semester);

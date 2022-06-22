@@ -18,10 +18,12 @@ import com.fpt.macm.dto.EventDto;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
+import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
+import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.SemesterRepository;
 
 @Service
@@ -32,6 +34,9 @@ public class EventServiceImpl implements EventService{
 	
 	@Autowired
 	EventScheduleRepository eventScheduleRepository;
+	
+	@Autowired
+	MemberEventRepository memberEventRepository;
 	
 	@Autowired
 	SemesterRepository semesterRepository;
@@ -104,8 +109,9 @@ public class EventServiceImpl implements EventService{
 			else {
 				Optional<Event> eventOp = eventRepository.findById(id);
 				Event event = eventOp.get();
-				List<EventSchedule> eventSchedule = eventScheduleRepository.findByEventId(event.getId());
-				eventScheduleRepository.deleteAll(eventSchedule);
+				List<MemberEvent> listMember = memberEventRepository.findByEventId(event.getId());
+				eventScheduleRepository.deleteAll(listSchedule);
+				memberEventRepository.deleteAll(listMember);
 				eventRepository.delete(event);
 				responseMessage.setData(Arrays.asList(event));
 				responseMessage.setMessage(Constant.MSG_054);
@@ -123,22 +129,26 @@ public class EventServiceImpl implements EventService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
-			Page<Event> pageResponse = eventRepository.findByName(paging, name);
+			Page<Event> pageResponse = eventRepository.findByName(name, paging);
 			List<Event> eventList = new ArrayList<Event>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				eventList = pageResponse.getContent();
 			}
 			List<EventDto> eventDtos = new ArrayList<EventDto>();
 			for (Event event : eventList) {
-				LocalDate startDate = (LocalDate) getStartDateOfEvent(event.getId()).getData().get(0);
-				LocalDate endDate = getEndDateOfEvent(event.getId());
+				LocalDate startDate = getStartDate(event.getId());
 				EventDto eventDto = new EventDto();
-				if(LocalDate.now().isBefore(startDate)) {
+				if(startDate != null) {
+					LocalDate endDate = getEndDate(event.getId());
+					if(LocalDate.now().isBefore(startDate)) {
+						eventDto.setStatus("Chưa diễn ra");
+					}else if(LocalDate.now().isAfter(endDate)) {
+						eventDto.setStatus("Đã kết thúc");
+					}else {
+						eventDto.setStatus("Đang diễn ra");
+					}
+				} else {
 					eventDto.setStatus("Chưa diễn ra");
-				}else if(LocalDate.now().isAfter(endDate)) {
-					eventDto.setStatus("Đã kết thúc");
-				}else {
-					eventDto.setStatus("Đang diễn ra");
 				}
 				eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
 				eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
@@ -197,7 +207,7 @@ public class EventServiceImpl implements EventService{
 				if(eventList.size() > 0) {
 					for (Event event : eventList) {
 						LocalDate startDateEvent = (LocalDate) getStartDateOfEvent(event.getId()).getData().get(0);
-						LocalDate endDate = getEndDateOfEvent(event.getId());
+						LocalDate endDate = getEndDate(event.getId());
 						EventDto eventDto = new EventDto();
 						if(LocalDate.now().isBefore(startDateEvent)) {
 							eventDto.setStatus("Chưa diễn ra");
@@ -242,11 +252,10 @@ public class EventServiceImpl implements EventService{
 		return responseMessage;
 	}
 	
-	public LocalDate getEndDateOfEvent(int eventId) {
+	public LocalDate getEndDate(int eventId) {
 		List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
 		if(listSchedule.size() > 0) {
-			LocalDate endDate = listSchedule.get(listSchedule.size()-1).getDate();
-			return endDate;
+			return listSchedule.get(listSchedule.size()-1).getDate();
 		}
 		return null;
 	}
@@ -262,15 +271,20 @@ public class EventServiceImpl implements EventService{
 			List<Event> events = eventRepository.findBySemester(semester);
 			List<EventDto> eventDtos = new ArrayList<EventDto>();
 			for (Event event : events) {
-				LocalDate startDate = (LocalDate) getStartDateOfEvent(event.getId()).getData().get(0);
-				LocalDate endDate = getEndDateOfEvent(event.getId());
+				LocalDate startDate = getStartDate(event.getId());
 				EventDto eventDto = new EventDto();
-				if(LocalDate.now().isBefore(startDate)) {
+				if(startDate != null) {
+					LocalDate endDate = getEndDate(event.getId());
+					if(LocalDate.now().isBefore(startDate)) {
+						eventDto.setStatus("Chưa diễn ra");
+					}else if(LocalDate.now().isAfter(endDate)) {
+						eventDto.setStatus("Đã kết thúc");
+					}else {
+						eventDto.setStatus("Đang diễn ra");
+					}
+				}
+				else {
 					eventDto.setStatus("Chưa diễn ra");
-				}else if(LocalDate.now().isAfter(endDate)) {
-					eventDto.setStatus("Đã kết thúc");
-				}else {
-					eventDto.setStatus("Đang diễn ra");
 				}
 				eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
 				eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
@@ -291,4 +305,16 @@ public class EventServiceImpl implements EventService{
 		return responseMessage;
 	}
 	
+	public LocalDate getStartDate(int eventId) {
+		// TODO Auto-generated method stub
+		try {
+			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
+			if(listSchedule.size() > 0) {
+				return listSchedule.get(0).getDate();
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
 }
