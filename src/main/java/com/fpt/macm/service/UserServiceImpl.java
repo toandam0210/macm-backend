@@ -400,6 +400,12 @@ public class UserServiceImpl implements UserService {
 					userFromExcel.setCreatedOn(LocalDate.now());
 					userFromExcel.setCreatedBy("toandv");
 					userRepository.saveAll(usersFromExcel);
+					MemberSemester memberSemester = new MemberSemester();
+					memberSemester.setUser(userFromExcel);
+					memberSemester.setStatus(true);
+					Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+					memberSemester.setSemester(currentSemester.getName());
+					memberSemesterRepository.save(memberSemester);
 					responseMessage.setData(usersFromExcel);
 					responseMessage.setMessage(Constant.MSG_006);
 				} else {
