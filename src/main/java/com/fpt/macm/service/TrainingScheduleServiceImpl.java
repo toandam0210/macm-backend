@@ -79,6 +79,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 								trainingSessionDto.setExisted(false);
 							}
 							else {
+								trainingSessionDto.setTitle("Trùng với " + commonScheduleService.getCommonSessionByDate(startLocalDate).getTitle());
 								trainingSessionDto.setExisted(true);
 							}
 							listPreview.add(trainingSessionDto);
@@ -250,6 +251,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					trainingSchedule.setUpdatedOn(LocalDateTime.now());
 					listTraining.add(trainingSchedule);
 					CommonSchedule commonSchedule = new CommonSchedule();
+					commonSchedule.setTitle("Lịch tập");
 					commonSchedule.setDate(scheduleDto.getDate());
 					commonSchedule.setStartTime(scheduleDto.getStartTime());
 					commonSchedule.setFinishTime(scheduleDto.getFinishTime());
