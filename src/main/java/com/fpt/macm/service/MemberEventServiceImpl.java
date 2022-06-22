@@ -13,15 +13,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.dto.EventPaymentStatusReportDto;
 import com.fpt.macm.dto.MemberEventDto;
 import com.fpt.macm.dto.RoleEventDto;
 import com.fpt.macm.model.ClubFund;
 import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.Event;
+import com.fpt.macm.model.EventPaymentStatusReport;
 import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.RoleEvent;
 import com.fpt.macm.repository.ClubFundRepository;
+import com.fpt.macm.repository.EventPaymentStatusReportRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.utils.Utils;
@@ -31,10 +33,13 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 	@Autowired
 	MemberEventRepository memberEventRepository;
-	
+
 	@Autowired
 	ClubFundRepository clubFundRepository;
-	
+
+	@Autowired
+	EventPaymentStatusReportRepository eventPaymentStatusReportRepository;
+
 	@Autowired
 	EventRepository eventRepository;
 
@@ -92,7 +97,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 			if (pageResponse != null && pageResponse.hasContent()) {
 				membersEvent = pageResponse.getContent();
 			}
-			
+
 			for (MemberEvent memberEvent : membersEvent) {
 				MemberEventDto memberEventDto = new MemberEventDto();
 				memberEventDto.setId(memberEvent.getId());
@@ -148,7 +153,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEventDto.setPaymentStatus(memberEvent.getPaymentStatus());
 				membersEventDto.add(memberEventDto);
 			}
-			
+
 			responseMessage.setData(membersEventDto);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
@@ -236,28 +241,70 @@ public class MemberEventServiceImpl implements MemberEventService {
 		try {
 			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
 			MemberEvent memberEvent = memberEventOp.get();
-			if (!memberEvent.getPaymentStatus()) {
-				List<ClubFund> clubFunds = clubFundRepository.findAll();
-				ClubFund clubFund = clubFunds.get(0);
-				double fundAmount = clubFund.getFundAmount();
-				
-				Optional<Event> eventOp = eventRepository.findById(memberEvent.getEvent().getId());
-				Event event = eventOp.get();
-				double eventFee = event.getAmount_per_register();
-				
-				clubFund.setFundAmount(fundAmount + eventFee);
-				clubFundRepository.save(clubFund);
-				
-				memberEvent.setPaymentStatus(!memberEvent.getPaymentStatus());
-				memberEvent.setUpdatedBy("toandv");
-				memberEvent.setUpdatedOn(LocalDateTime.now());
-				memberEventRepository.save(memberEvent);
-				responseMessage.setData(Arrays.asList(memberEvent));
-				responseMessage.setMessage(Constant.MSG_062);
-			} else {
-				responseMessage.setMessage(Constant.MSG_079);
+
+			List<ClubFund> clubFunds = clubFundRepository.findAll();
+			ClubFund clubFund = clubFunds.get(0);
+			double fundAmount = clubFund.getFundAmount();
+
+			double eventFee = memberEvent.getEvent().getAmount_per_register();
+
+			clubFund.setFundAmount(fundAmount + eventFee);
+			clubFundRepository.save(clubFund);
+
+			EventPaymentStatusReport eventPaymentStatusReport = new EventPaymentStatusReport();
+			eventPaymentStatusReport.setEvent(memberEvent.getEvent());
+			eventPaymentStatusReport.setUser(memberEvent.getUser());
+			eventPaymentStatusReport.setPaymentStatus(!memberEvent.getPaymentStatus());
+			eventPaymentStatusReport.setFundChange(memberEvent.getPaymentStatus() ? -eventFee : eventFee);
+			eventPaymentStatusReport.setCreatedBy("toandv");
+			eventPaymentStatusReport.setCreatedOn(LocalDateTime.now());
+			eventPaymentStatusReportRepository.save(eventPaymentStatusReport);
+
+			memberEvent.setPaymentStatus(!memberEvent.getPaymentStatus());
+			memberEvent.setUpdatedBy("toandv");
+			memberEvent.setUpdatedOn(LocalDateTime.now());
+			memberEventRepository.save(memberEvent);
+			responseMessage.setData(Arrays.asList(memberEvent));
+			responseMessage.setMessage(Constant.MSG_062);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getReportPaymentStatusByEventId(int eventId, int pageNo, int pageSize, String sortBy) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<EventPaymentStatusReport> pageResponse = eventPaymentStatusReportRepository.findByEventId(eventId,
+					paging);
+			List<EventPaymentStatusReport> eventPaymentStatusReports = new ArrayList<EventPaymentStatusReport>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				eventPaymentStatusReports = pageResponse.getContent();
 			}
-			
+
+			if (!eventPaymentStatusReports.isEmpty()) {
+				List<EventPaymentStatusReportDto> eventPaymentStatusReportsDto = new ArrayList<EventPaymentStatusReportDto>();
+				for (EventPaymentStatusReport eventPaymentStatusReport : eventPaymentStatusReports) {
+					EventPaymentStatusReportDto eventPaymentStatusReportDto = new EventPaymentStatusReportDto();
+					eventPaymentStatusReportDto.setId(eventPaymentStatusReport.getId());
+					eventPaymentStatusReportDto.setEventId(eventPaymentStatusReport.getEvent().getId());
+					eventPaymentStatusReportDto.setUserName(eventPaymentStatusReport.getUser().getName());
+					eventPaymentStatusReportDto.setUserStudentId(eventPaymentStatusReport.getUser().getStudentId());
+					eventPaymentStatusReportDto.setPaymentStatus(eventPaymentStatusReport.isPaymentStatus());
+					eventPaymentStatusReportDto.setFundChange(eventPaymentStatusReport.getFundChange());
+					eventPaymentStatusReportDto.setCreatedBy(eventPaymentStatusReport.getCreatedBy());
+					eventPaymentStatusReportDto.setCreatedOn(eventPaymentStatusReport.getCreatedOn());
+					eventPaymentStatusReportsDto.add(eventPaymentStatusReportDto);
+				}
+				responseMessage.setData(eventPaymentStatusReportsDto);
+				responseMessage.setMessage("Lấy báo cáo thay đổi trạng thái đóng tiền của sự kiện thành công");
+			} else {
+				responseMessage.setMessage("Không có dữ liệu");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

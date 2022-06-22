@@ -69,4 +69,12 @@ public class MemberEventController {
 		return new ResponseEntity<ResponseMessage>(memberEventService.updateMemberEventPaymentStatus(memberEventId),
 				HttpStatus.OK);
 	}
+
+	@GetMapping("treasurer/getreportpaymentstatus/{eventId}")
+	ResponseEntity<ResponseMessage> getReportPaymentStatus(@PathVariable(name = "eventId") int eventId,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(
+				memberEventService.getReportPaymentStatusByEventId(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
+	}
 }
