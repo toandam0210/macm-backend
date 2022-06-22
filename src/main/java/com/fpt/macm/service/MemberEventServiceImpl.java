@@ -301,9 +301,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 					eventPaymentStatusReportsDto.add(eventPaymentStatusReportDto);
 				}
 				responseMessage.setData(eventPaymentStatusReportsDto);
-				responseMessage.setMessage("Lấy báo cáo thay đổi trạng thái đóng tiền của sự kiện thành công");
+				responseMessage.setMessage(Constant.MSG_079);
 			} else {
-				responseMessage.setMessage("Không có dữ liệu");
+				responseMessage.setMessage(Constant.MSG_086);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
