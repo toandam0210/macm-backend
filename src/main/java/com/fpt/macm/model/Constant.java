@@ -128,11 +128,12 @@ public class Constant {
 	public static final String MSG_076 = "Chấp nhận yêu cầu mua cơ sở vật chất thành công";
 	public static final String MSG_077 = "Số dư quỹ không đủ";
 	public static final String MSG_078 = "Từ chối yêu cầu mua cơ sở vật chất thành công";
-	public static final String MSG_079 = "Không thể chỉnh sửa vì người dùng đã đóng tiền";
+	public static final String MSG_079 = "Lấy báo cáo thay đổi trạng thái đóng tiền của sự kiện thành công";
 	public static final String MSG_080 = "Không thành công. Chỉ có thể thêm lịch trong kỳ hiện tại";
 	public static final String MSG_081 = "Không thành công. Ngày bắt đầu không thể lớn hơn ngày kết thúc";
 	public static final String MSG_082 = "Lịch tập theo kỳ ";
 	public static final String MSG_083 = "Lịch sự kiện theo kỳ ";
 	public static final String MSG_084 = "Cập nhật điểm danh cho sự kiện thành công";
 	public static final String MSG_085 = "Hôm nay không có sự kiện";
+	public static final String MSG_086 = "Không có dữ liệu";
 }
