@@ -122,8 +122,8 @@ public class UserController {
 	
 	@GetMapping("/viceheadclub/member/search")
 	ResponseEntity<ResponseMessage> searchByMutipleField(@RequestBody List<UserDto> userDtos,@RequestParam(required = false) String name,@RequestParam(required = false) String studentId,@RequestParam(required = false) String email,@RequestParam(required = false) String gender,
-			@RequestParam(required = false) Integer generation,@RequestParam(required = false) Integer roleId,@RequestParam(required = false) String isActive,@RequestParam(required = false) Integer month,@RequestParam(required = false) Integer year) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.searchByMultipleField(userDtos, name, studentId, email, gender, generation, roleId, isActive, month, year), HttpStatus.OK);
+			@RequestParam(required = false) Integer generation,@RequestParam(required = false) Integer roleId,@RequestParam(required = false) String isActive,@RequestParam(required = false) String dateFrom,@RequestParam(required = false) String dateTo) {
+		return new ResponseEntity<ResponseMessage>(userSerivce.searchByMultipleField(userDtos, name, studentId, email, gender, generation, roleId, isActive, dateFrom, dateTo), HttpStatus.OK);
 	}
 
 }

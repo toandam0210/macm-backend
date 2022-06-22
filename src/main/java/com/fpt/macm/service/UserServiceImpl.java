@@ -564,10 +564,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseMessage searchByMultipleField(List<UserDto> userDtos,String name, String studentId, String email, String gender,
-			Integer generation, Integer roleId, String isActive, Integer month, Integer year) {
+			Integer generation, Integer roleId, String isActive, String dateFrom, String dateTo) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<UserDto> userDtoResponse = userDtos;
+			LocalDate dateFromlc = LocalDate.parse(dateFrom);
+			LocalDate dateTolc = LocalDate.parse(dateTo);
 				for(int i = 0; i<userDtos.size();i++) {
 				if(name != null && !userDtos.get(i).getName().toLowerCase().contains(name.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
@@ -604,12 +606,12 @@ public class UserServiceImpl implements UserService {
 					i--;
 					continue;
 				}
-				if(month != null && userDtos.get(i).getDateOfBirth().getMonthValue() != month) {
+				if(dateFrom != null && userDtos.get(i).getDateOfBirth().isBefore(dateFromlc)) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if(year != null && userDtos.get(i).getDateOfBirth().getYear() != year) {
+				if(dateTo != null && userDtos.get(i).getDateOfBirth().isAfter(dateTolc)) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
