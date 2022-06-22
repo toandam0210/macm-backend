@@ -1,6 +1,7 @@
 package com.fpt.macm.service;
 
 import java.io.ByteArrayInputStream;
+import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,4 +25,5 @@ public interface UserService {
 	ResponseMessage getAllUser();
 	ResponseMessage getMembersBySemester(String semester);
 	ResponseMessage getAdminBySemester(String semester);
+	ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email, String gender, Integer generation, Integer roleId, String isActive, Integer month, Integer year);
 }

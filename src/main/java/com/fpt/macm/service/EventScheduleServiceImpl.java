@@ -77,6 +77,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 								eventSessionDto.setExisted(false);
 							}
 							else {
+								eventSessionDto.setTitle("Trùng với " + commonScheduleService.getCommonSessionByDate(startLocalDate).getTitle());
 								eventSessionDto.setExisted(true);
 							}
 							listPreview.add(eventSessionDto);
