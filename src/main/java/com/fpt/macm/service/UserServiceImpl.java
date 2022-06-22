@@ -561,4 +561,67 @@ public class UserServiceImpl implements UserService {
 		userDto.setRoleName(Utils.convertRoleFromDbToExcel(user.getRole()));
 		return userDto;
 	}
+
+	@Override
+	public ResponseMessage searchByMultipleField(List<UserDto> userDtos,String name, String studentId, String email, String gender,
+			Integer generation, Integer roleId, String isActive, Integer month, Integer year) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<UserDto> userDtoResponse = userDtos;
+				for(int i = 0; i<userDtos.size();i++) {
+				if(name != null && !userDtos.get(i).getName().toLowerCase().contains(name.toLowerCase())) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if(studentId != null && !userDtos.get(i).getStudentId().toLowerCase().contains(studentId.toLowerCase())) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if(email != null && !userDtos.get(i).getEmail().toLowerCase().contains(email.toLowerCase())) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if(gender != null && !userDtos.get(i).isGender().toString().toLowerCase().equals(gender.toLowerCase())) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if(generation != null && userDtos.get(i).getGeneration() != generation) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if(roleId != null && userDtos.get(i).getRoleId() != roleId) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if(isActive != null && !userDtos.get(i).isActive().toString().toLowerCase().equals(isActive.toLowerCase())) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if(month != null && userDtos.get(i).getDateOfBirth().getMonthValue() != month) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if(year != null && userDtos.get(i).getDateOfBirth().getYear() != year) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				responseMessage.setData(userDtoResponse);
+				responseMessage.setMessage(Constant.MSG_001);
+				responseMessage.setTotalResult(userDtoResponse.size());
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }

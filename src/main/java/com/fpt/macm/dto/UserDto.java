@@ -8,11 +8,11 @@ public class UserDto {
 	private String email;
 	private String currentAddress;
 	private int roleId;
-	private boolean gender;
+	private Boolean gender;
 	private LocalDate dateOfBirth;
 	private String image;
 	private String phone;
-	private boolean isActive;
+	private Boolean isActive;
 	private String name;
 	private int generation;
 	private String roleName;
@@ -41,10 +41,10 @@ public class UserDto {
 	public void setRoleId(int roleId) {
 		this.roleId = roleId;
 	}
-	public boolean isGender() {
+	public Boolean isGender() {
 		return gender;
 	}
-	public void setGender(boolean gender) {
+	public void setGender(Boolean gender) {
 		this.gender = gender;
 	}
 	public LocalDate getDateOfBirth() {
@@ -65,10 +65,10 @@ public class UserDto {
 	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	public boolean isActive() {
+	public Boolean isActive() {
 		return isActive;
 	}
-	public void setActive(boolean isActive) {
+	public void setActive(Boolean isActive) {
 		this.isActive = isActive;
 	}
 	public String getName() {
