@@ -46,11 +46,11 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 						attendanceEvent.setUpdatedBy("toandv");
 						attendanceEvent.setUpdatedOn(LocalDateTime.now());
 						attendanceEventRepository.save(attendanceEvent);
-						responseMessage.setMessage(Constant.MSG_084);
-					} else {
-						responseMessage.setMessage(Constant.MSG_085);
 					}
 				}
+				responseMessage.setMessage(Constant.MSG_084);
+			} else {
+				responseMessage.setMessage(Constant.MSG_085);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
