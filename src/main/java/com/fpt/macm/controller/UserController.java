@@ -120,7 +120,7 @@ public class UserController {
 		return new ResponseEntity<ResponseMessage>(userSerivce.getAdminBySemester(semester), HttpStatus.OK);
 	}
 	
-	@GetMapping("/viceheadclub/member/search")
+	@PostMapping("/viceheadclub/member/search")
 	ResponseEntity<ResponseMessage> searchByMutipleField(@RequestBody List<UserDto> userDtos,@RequestParam(required = false) String name,@RequestParam(required = false) String studentId,@RequestParam(required = false) String email,@RequestParam(required = false) String gender,
 			@RequestParam(required = false) Integer generation,@RequestParam(required = false) Integer roleId,@RequestParam(required = false) String isActive,@RequestParam(required = false) String dateFrom,@RequestParam(required = false) String dateTo) {
 		return new ResponseEntity<ResponseMessage>(userSerivce.searchByMultipleField(userDtos, name, studentId, email, gender, generation, roleId, isActive, dateFrom, dateTo), HttpStatus.OK);
