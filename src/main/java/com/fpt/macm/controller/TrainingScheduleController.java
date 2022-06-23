@@ -1,5 +1,6 @@
 package com.fpt.macm.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,5 +61,10 @@ public class TrainingScheduleController {
 	@GetMapping("/gettrainingschedulebysemester/{semesterId}")
 	ResponseEntity<ResponseMessage> getTrainingScheduleBySemester(@PathVariable(name = "semesterId") int semesterId){
 			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getTraningScheduleBySemester(semesterId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/gettrainingsesionbydate")
+	ResponseEntity<ResponseMessage> getTrainingSessionByDate(@RequestParam LocalDate date) {
+			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getTrainingSessionByDate(date), HttpStatus.OK);
 	}
 }

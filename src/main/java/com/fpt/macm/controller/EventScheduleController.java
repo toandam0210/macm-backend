@@ -1,5 +1,6 @@
 package com.fpt.macm.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +45,8 @@ public class EventScheduleController {
 	
 	@PostMapping("/headculture/createpreview")
 	ResponseEntity<ResponseMessage> createPreviewEventSchedule(@RequestParam String eventName, @RequestParam String startDate, 
-			@RequestParam String finishDate, @RequestParam String startTime, @RequestParam String finishTime) {
-		return new ResponseEntity<ResponseMessage>(eventScheduleService.createPreviewEventSchedule(eventName, startDate, finishDate, startTime, finishTime), HttpStatus.OK);
+			@RequestParam String finishDate, @RequestParam String startTime, @RequestParam String finishTime, @RequestParam Boolean IsContinuous) {
+		return new ResponseEntity<ResponseMessage>(eventScheduleService.createPreviewEventSchedule(eventName, startDate, finishDate, startTime, finishTime, IsContinuous), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headculture/addnewschedule/{eventId}")
@@ -64,4 +65,8 @@ public class EventScheduleController {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.deleteEventSession(eventscheduleId), HttpStatus.OK);
 	}
 	
+	@GetMapping("/geteventsesionbydate")
+	ResponseEntity<ResponseMessage> getEventSessionByDate(@RequestParam LocalDate date) {
+			return new ResponseEntity<ResponseMessage>(eventScheduleService.getEventSessionByDate(date), HttpStatus.OK);
+	}
 }
