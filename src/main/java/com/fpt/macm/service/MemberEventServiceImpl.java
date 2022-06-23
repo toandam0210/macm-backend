@@ -248,7 +248,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 			double eventFee = memberEvent.getEvent().getAmount_per_register();
 
-			clubFund.setFundAmount(memberEvent.getPaymentStatus() ? (fundAmount - eventFee) : (fundAmount + eventFee));
+			double fundBalance = memberEvent.getPaymentStatus() ? (fundAmount - eventFee) : (fundAmount + eventFee);
+			
+			clubFund.setFundAmount(fundBalance);
 			clubFundRepository.save(clubFund);
 
 			EventPaymentStatusReport eventPaymentStatusReport = new EventPaymentStatusReport();
@@ -256,6 +258,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 			eventPaymentStatusReport.setUser(memberEvent.getUser());
 			eventPaymentStatusReport.setPaymentStatus(!memberEvent.getPaymentStatus());
 			eventPaymentStatusReport.setFundChange(memberEvent.getPaymentStatus() ? -eventFee : eventFee);
+			eventPaymentStatusReport.setFundBalance(fundBalance);
 			eventPaymentStatusReport.setCreatedBy("toandv");
 			eventPaymentStatusReport.setCreatedOn(LocalDateTime.now());
 			eventPaymentStatusReportRepository.save(eventPaymentStatusReport);
@@ -296,6 +299,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 					eventPaymentStatusReportDto.setUserStudentId(eventPaymentStatusReport.getUser().getStudentId());
 					eventPaymentStatusReportDto.setPaymentStatus(eventPaymentStatusReport.isPaymentStatus());
 					eventPaymentStatusReportDto.setFundChange(eventPaymentStatusReport.getFundChange());
+					eventPaymentStatusReportDto.setFundBalance(eventPaymentStatusReport.getFundBalance());
 					eventPaymentStatusReportDto.setCreatedBy(eventPaymentStatusReport.getCreatedBy());
 					eventPaymentStatusReportDto.setCreatedOn(eventPaymentStatusReport.getCreatedOn());
 					eventPaymentStatusReportsDto.add(eventPaymentStatusReportDto);

@@ -29,9 +29,12 @@ public class MembershipPaymentStatusReport {
 
 	@Column
 	private boolean paymentStatus;
-	
+
 	@Column
 	private double fundChange;
+
+	@Column
+	private double fundBalance;
 
 	@Column
 	private String createdBy;
@@ -93,6 +96,14 @@ public class MembershipPaymentStatusReport {
 
 	public void setFundChange(double fundChange) {
 		this.fundChange = fundChange;
+	}
+
+	public double getFundBalance() {
+		return fundBalance;
+	}
+
+	public void setFundBalance(double fundBalance) {
+		this.fundBalance = fundBalance;
 	}
 
 }
