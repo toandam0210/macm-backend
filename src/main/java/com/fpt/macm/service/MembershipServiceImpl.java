@@ -84,9 +84,9 @@ public class MembershipServiceImpl implements MembershipService {
 			double fundAmount = clubFund.getFundAmount();
 
 			double membershipFee = membershipStatus.getMembershipInfo().getAmount();
-
-			clubFund.setFundAmount(
-					membershipStatus.isStatus() ? (fundAmount - membershipFee) : (fundAmount + membershipFee));
+			
+			double fundBalance = membershipStatus.isStatus() ? (fundAmount - membershipFee) : (fundAmount + membershipFee);
+			clubFund.setFundAmount(fundBalance);
 			clubFundRepository.save(clubFund);
 
 			MembershipPaymentStatusReport membershipPaymentStatusReport = new MembershipPaymentStatusReport();
@@ -94,6 +94,7 @@ public class MembershipServiceImpl implements MembershipService {
 			membershipPaymentStatusReport.setUser(membershipStatus.getUser());
 			membershipPaymentStatusReport.setPaymentStatus(!membershipStatus.isStatus());
 			membershipPaymentStatusReport.setFundChange(membershipStatus.isStatus() ? -membershipFee : membershipFee);
+			membershipPaymentStatusReport.setFundBalance(fundBalance);
 			membershipPaymentStatusReport.setCreatedBy("toandv");
 			membershipPaymentStatusReport.setCreatedOn(LocalDateTime.now());
 			membershipPaymentStatusReportRepository.save(membershipPaymentStatusReport);
@@ -163,11 +164,14 @@ public class MembershipServiceImpl implements MembershipService {
 				for (MembershipPaymentStatusReport membershipPaymentStatusReport : membershipPaymentStatusReports) {
 					MembershipPaymentStatusReportDto membershipPaymentStatusReportDto = new MembershipPaymentStatusReportDto();
 					membershipPaymentStatusReportDto.setId(membershipPaymentStatusReport.getId());
-					membershipPaymentStatusReportDto.setSemester(membershipPaymentStatusReport.getMembershipInfo().getSemester());
+					membershipPaymentStatusReportDto
+							.setSemester(membershipPaymentStatusReport.getMembershipInfo().getSemester());
 					membershipPaymentStatusReportDto.setUserName(membershipPaymentStatusReport.getUser().getName());
-					membershipPaymentStatusReportDto.setUserStudentId(membershipPaymentStatusReport.getUser().getStudentId());
+					membershipPaymentStatusReportDto
+							.setUserStudentId(membershipPaymentStatusReport.getUser().getStudentId());
 					membershipPaymentStatusReportDto.setPaymentStatus(membershipPaymentStatusReport.isPaymentStatus());
 					membershipPaymentStatusReportDto.setFundChange(membershipPaymentStatusReport.getFundChange());
+					membershipPaymentStatusReportDto.setFundBalance(membershipPaymentStatusReport.getFundBalance());
 					membershipPaymentStatusReportDto.setCreatedBy(membershipPaymentStatusReport.getCreatedBy());
 					membershipPaymentStatusReportDto.setCreatedOn(membershipPaymentStatusReport.getCreatedOn());
 					membershipPaymentStatusReportsDto.add(membershipPaymentStatusReportDto);

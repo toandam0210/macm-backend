@@ -29,6 +29,9 @@ public class EventPaymentStatusReport {
 
 	@Column
 	private double fundChange;
+	
+	@Column
+	private double fundBalance;
 
 	@Column
 	private boolean paymentStatus;
@@ -93,6 +96,14 @@ public class EventPaymentStatusReport {
 
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
+	}
+
+	public double getFundBalance() {
+		return fundBalance;
+	}
+
+	public void setFundBalance(double fundBalance) {
+		this.fundBalance = fundBalance;
 	}
 
 }

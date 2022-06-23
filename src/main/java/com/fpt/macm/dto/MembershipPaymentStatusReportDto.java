@@ -10,6 +10,7 @@ public class MembershipPaymentStatusReportDto {
 	private String userStudentId;
 	private boolean paymentStatus;
 	private double fundChange;
+	private double fundBalance;
 	private String createdBy;
 	private LocalDateTime createdOn;
 
@@ -75,6 +76,14 @@ public class MembershipPaymentStatusReportDto {
 
 	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
+	}
+
+	public double getFundBalance() {
+		return fundBalance;
+	}
+
+	public void setFundBalance(double fundBalance) {
+		this.fundBalance = fundBalance;
 	}
 
 }

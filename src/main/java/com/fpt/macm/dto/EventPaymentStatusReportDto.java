@@ -9,6 +9,7 @@ public class EventPaymentStatusReportDto {
 	private String userName;
 	private String userStudentId;
 	private double fundChange;
+	private double fundBalance;
 	private boolean paymentStatus;
 	private String createdBy;
 	private LocalDateTime createdOn;
@@ -75,6 +76,14 @@ public class EventPaymentStatusReportDto {
 
 	public void setPaymentStatus(boolean paymentStatus) {
 		this.paymentStatus = paymentStatus;
+	}
+
+	public double getFundBalance() {
+		return fundBalance;
+	}
+
+	public void setFundBalance(double fundBalance) {
+		this.fundBalance = fundBalance;
 	}
 
 }
