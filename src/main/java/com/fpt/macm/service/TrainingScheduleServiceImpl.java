@@ -213,11 +213,12 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 	}
 
 	@Override
-	public ResponseMessage getTrainingSessionByDate(LocalDate date) {
+	public ResponseMessage getTrainingSessionByDate(String date) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<TrainingSchedule> getTrainingSessionOp = trainingScheduleRepository.findByDate(date);
+			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
+			Optional<TrainingSchedule> getTrainingSessionOp = trainingScheduleRepository.findByDate(getDate);
 			TrainingSchedule getTrainingSession = getTrainingSessionOp.get();
 			if(getTrainingSession != null) {
 				responseMessage.setData(Arrays.asList(getTrainingSession));
@@ -289,5 +290,23 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
+	}
+
+	@Override
+	public TrainingSchedule getTrainingSessionByDate(LocalDate date) {
+		// TODO Auto-generated method stub
+		try {
+			Optional<TrainingSchedule> getTrainingSessionOp = trainingScheduleRepository.findByDate(date);
+			TrainingSchedule getTrainingSession = getTrainingSessionOp.get();
+			if(getTrainingSession != null) {
+				return getTrainingSession;
+			}
+			else {
+				return null;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
 	}
 }
