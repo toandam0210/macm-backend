@@ -1,6 +1,5 @@
 package com.fpt.macm.controller;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,7 +63,7 @@ public class TrainingScheduleController {
 	}
 	
 	@GetMapping("/gettrainingsesionbydate")
-	ResponseEntity<ResponseMessage> getTrainingSessionByDate(@RequestParam LocalDate date) {
+	ResponseEntity<ResponseMessage> getTrainingSessionByDate(@RequestParam String date) {
 			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getTrainingSessionByDate(date), HttpStatus.OK);
 	}
 }

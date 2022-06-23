@@ -165,7 +165,7 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 2 0 * * *")
 	public void addListAttendanceStatus() {
-		TrainingSchedule trainingSchedule = (TrainingSchedule) trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now()).getData().get(0);
+		TrainingSchedule trainingSchedule = trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now());
 		if (trainingSchedule != null) {
 			List<User> users = (List<User>) userRepository.findAll();
 			for (User user : users) {

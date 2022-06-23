@@ -16,5 +16,6 @@ public interface EventScheduleService {
 	ResponseMessage getListEventScheduleByEvent(int eventId);
 	ResponseMessage updateEventSessionTime(int eventScheduleId, CommonSchedule updateCommonSession);
 	ResponseMessage deleteEventSession(int eventScheduleId);
-	ResponseMessage getEventSessionByDate(LocalDate date);
+	ResponseMessage getEventSessionByDate(String date);
+	EventSchedule getEventSessionByDate(LocalDate date);
 }

@@ -297,11 +297,12 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	}
 	
 	@Override
-	public ResponseMessage getEventSessionByDate(LocalDate date) {
+	public ResponseMessage getEventSessionByDate(String date) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<EventSchedule> getEventSessionOp = eventScheduleRepository.findByDate(date);
+			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
+			Optional<EventSchedule> getEventSessionOp = eventScheduleRepository.findByDate(getDate);
 			EventSchedule getEventSession = getEventSessionOp.get();
 			if(getEventSession != null) {
 				responseMessage.setData(Arrays.asList(getEventSession));
@@ -314,6 +315,24 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
+	}
+
+	@Override
+	public EventSchedule getEventSessionByDate(LocalDate date) {
+		// TODO Auto-generated method stub
+		try {
+			Optional<EventSchedule> getEventSessionOp = eventScheduleRepository.findByDate(date);
+			EventSchedule getEventSession = getEventSessionOp.get();
+			if(getEventSession != null) {
+				return getEventSession;
+			}
+			else {
+				return null;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
 	}
 
 }

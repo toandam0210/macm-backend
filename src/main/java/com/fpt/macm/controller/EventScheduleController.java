@@ -1,6 +1,5 @@
 package com.fpt.macm.controller;
 
-import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,8 +64,8 @@ public class EventScheduleController {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.deleteEventSession(eventscheduleId), HttpStatus.OK);
 	}
 	
-	@GetMapping("/geteventsesionbydate")
-	ResponseEntity<ResponseMessage> getEventSessionByDate(@RequestParam LocalDate date) {
+	@GetMapping("/geteventsessionbydate")
+	ResponseEntity<ResponseMessage> getEventSessionByDate(@RequestParam String date) {
 			return new ResponseEntity<ResponseMessage>(eventScheduleService.getEventSessionByDate(date), HttpStatus.OK);
 	}
 }

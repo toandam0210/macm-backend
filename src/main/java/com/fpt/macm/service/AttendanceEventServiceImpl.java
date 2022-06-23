@@ -33,8 +33,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			EventSchedule eventSchedule = (EventSchedule) eventScheduleServiceImpl
-					.getEventSessionByDate(LocalDate.now()).getData().get(0);
+			EventSchedule eventSchedule = eventScheduleServiceImpl.getEventSessionByDate(LocalDate.now());
 			if (eventSchedule != null) {
 				Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
 				MemberEvent memberEvent = memberEventOp.get();
