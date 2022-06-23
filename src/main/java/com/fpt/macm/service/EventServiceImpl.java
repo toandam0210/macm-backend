@@ -73,7 +73,7 @@ public class EventServiceImpl implements EventService{
 		try {
 			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(id);
 			if(listSchedule.size() > 0 && listSchedule.get(0).getDate().compareTo(LocalDate.now()) <= 0) {
-				responseMessage.setMessage(Constant.MSG_065);
+				responseMessage.setMessage(Constant.MSG_069);
 			}
 			else {
 				Optional<Event> eventOp = eventRepository.findById(id);
@@ -109,9 +109,8 @@ public class EventServiceImpl implements EventService{
 			else {
 				Optional<Event> eventOp = eventRepository.findById(id);
 				Event event = eventOp.get();
-				List<MemberEvent> listMember = memberEventRepository.findByEventId(event.getId());
 				eventScheduleRepository.deleteAll(listSchedule);
-				memberEventRepository.deleteAll(listMember);
+				memberEventRepository.deleteAll(memberEventRepository.findByEventId(event.getId()));
 				eventRepository.delete(event);
 				responseMessage.setData(Arrays.asList(event));
 				responseMessage.setMessage(Constant.MSG_054);

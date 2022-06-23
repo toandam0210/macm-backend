@@ -14,12 +14,15 @@ import org.springframework.stereotype.Service;
 import com.fpt.macm.dto.ScheduleDto;
 import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.Constant;
+import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
+import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
+import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -27,6 +30,9 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 
 	@Autowired
 	EventScheduleRepository eventScheduleRepository;
+	
+	@Autowired
+	MemberEventRepository memberEventRepository;
 	
 	@Autowired
 	EventRepository eventRepository;
@@ -41,7 +47,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	SemesterService semesterService;
 	
 	@Override
-	public ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime) {
+	public ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime, Boolean IsContinuous) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -66,13 +72,28 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 				} 
 				else {
 					List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
-					while(startLocalDate.compareTo(finishLocalDate) <= 0) {
-						if(startLocalDate.compareTo(LocalDate.now()) > 0) {
+					LocalDate currentLocalDate = startLocalDate;
+					while(currentLocalDate.compareTo(finishLocalDate) <= 0) {
+						if(currentLocalDate.compareTo(LocalDate.now()) > 0) {
 							ScheduleDto eventSessionDto = new ScheduleDto();
 							eventSessionDto.setDate(startLocalDate);
 							eventSessionDto.setTitle(eventName);
-							eventSessionDto.setStartTime(startLocalTime);
-							eventSessionDto.setFinishTime(finishLocalTime);
+							if(IsContinuous) {
+								if(currentLocalDate.compareTo(startLocalDate) == 0) {
+									eventSessionDto.setStartTime(LocalTime.MIN);
+								} else {
+									eventSessionDto.setStartTime(startLocalTime);
+								}
+								if(currentLocalDate.compareTo(startLocalDate) == 0) {
+									eventSessionDto.setFinishTime(LocalTime.MAX);
+								} else {
+									eventSessionDto.setFinishTime(finishLocalTime);
+								}
+							}
+							else {
+								eventSessionDto.setStartTime(startLocalTime);
+								eventSessionDto.setFinishTime(finishLocalTime);
+							}
 							if(commonScheduleService.getCommonSessionByDate(startLocalDate) == null) {
 								eventSessionDto.setExisted(false);
 							}
@@ -85,6 +106,11 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 						startLocalDate = startLocalDate.plusDays(1);
 					}
 					if(listPreview.isEmpty()) {
+						Event getEvent = eventRepository.findByExactName(eventName).get();
+						if(getListEventScheduleByEvent(getEvent.getId()).getData() == null) {
+							memberEventRepository.deleteAll(memberEventRepository.findByEventId(getEvent.getId()));
+							eventRepository.delete(getEvent);
+						}
 						responseMessage.setMessage(Constant.MSG_040);
 					} 
 					else {
