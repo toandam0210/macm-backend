@@ -16,26 +16,41 @@ import com.fpt.macm.service.MembershipService;
 @RestController
 @RequestMapping("/api/admin")
 public class MembershipController {
-	
+
 	@Autowired
 	MembershipService membershipService;
-	
+
 	@GetMapping("/treasure/membership/{membershipInfoId}")
-	ResponseEntity<ResponseMessage> getListMembershipStatus(@PathVariable(name = "membershipInfoId") int membershipInfoId) {
-		return new ResponseEntity<ResponseMessage>(membershipService.getListMemberPayMembershipBySemester(membershipInfoId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getListMembershipStatus(
+			@PathVariable(name = "membershipInfoId") int membershipInfoId) {
+		return new ResponseEntity<ResponseMessage>(
+				membershipService.getListMemberPayMembershipBySemester(membershipInfoId), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/treasure/membership/update/{id}")
 	ResponseEntity<ResponseMessage> updateMembershipStatus(@PathVariable(name = "id") int id) {
-		return new ResponseEntity<ResponseMessage>(membershipService.updateStatusPaymenMembershipById(id), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(membershipService.updateStatusPaymenMembershipById(id),
+				HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/treasure/membership/membershipinfo/{semester}")
-	ResponseEntity<ResponseMessage> updateMembershipInfo(@RequestParam double amount ,@PathVariable(name = "semester") String semester) {
-		return new ResponseEntity<ResponseMessage>(membershipService.updateMembershipBySemester(amount, semester), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateMembershipInfo(@RequestParam double amount,
+			@PathVariable(name = "semester") String semester) {
+		return new ResponseEntity<ResponseMessage>(membershipService.updateMembershipBySemester(amount, semester),
+				HttpStatus.OK);
 	}
+
 	@GetMapping("/treasure/membership/membershipinfo/{semester}")
 	ResponseEntity<ResponseMessage> updateMembershipInfo(@PathVariable(name = "semester") String semester) {
-		return new ResponseEntity<ResponseMessage>(membershipService.getMembershipInfoBySemester(semester), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(membershipService.getMembershipInfoBySemester(semester),
+				HttpStatus.OK);
+	}
+
+	@GetMapping("/treasure/membership/getreportmembershippaymentstatus/{membershipInfoId}")
+	ResponseEntity<ResponseMessage> getReportMembershipPaymentStatus(
+			@PathVariable(name = "membershipInfoId") int membershipInfoId, @RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(
+				membershipService.getReportMembershipPaymentStatus(membershipInfoId, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 }
