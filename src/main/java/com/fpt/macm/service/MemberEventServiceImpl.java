@@ -248,7 +248,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 			double eventFee = memberEvent.getEvent().getAmount_per_register();
 
-			clubFund.setFundAmount(fundAmount + eventFee);
+			clubFund.setFundAmount(memberEvent.getPaymentStatus() ? (fundAmount - eventFee) : (fundAmount + eventFee));
 			clubFundRepository.save(clubFund);
 
 			EventPaymentStatusReport eventPaymentStatusReport = new EventPaymentStatusReport();

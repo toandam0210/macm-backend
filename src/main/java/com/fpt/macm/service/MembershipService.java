@@ -7,4 +7,5 @@ public interface MembershipService {
 	ResponseMessage updateStatusPaymenMembershipById(int id);
 	ResponseMessage updateMembershipBySemester(double amount, String semester);
 	ResponseMessage getMembershipInfoBySemester(String semester);
+	ResponseMessage getReportMembershipPaymentStatus(int membershipInfoId, int pageNo, int pageSize, String sortBy);
 }
