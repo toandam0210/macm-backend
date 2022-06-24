@@ -1,37 +1,29 @@
 package com.fpt.macm.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "tournament_schedule")
-public class TournamentSchedule {
+@Table(name = "exhibition_type")
+public class ExhibitionType {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "tournamentId")
-	private Tournament tournament;
+	@Column
+	private String name;
 	
 	@Column
-	private LocalDate date;
+	private int numberMale;
 	
 	@Column
-	private LocalTime startTime;
-	
-	@Column
-	private LocalTime finishTime;
+	private int numberFemale;
 	
 	@Column
 	private String createdBy;
@@ -53,36 +45,28 @@ public class TournamentSchedule {
 		this.id = id;
 	}
 
-	public Tournament getTournament() {
-		return tournament;
+	public String getName() {
+		return name;
 	}
 
-	public void setTournament(Tournament tournament) {
-		this.tournament = tournament;
+	public void setName(String name) {
+		this.name = name;
 	}
 
-	public LocalDate getDate() {
-		return date;
+	public int getNumberMale() {
+		return numberMale;
 	}
 
-	public void setDate(LocalDate date) {
-		this.date = date;
+	public void setNumberMale(int numberMale) {
+		this.numberMale = numberMale;
 	}
 
-	public LocalTime getStartTime() {
-		return startTime;
+	public int getNumberFemale() {
+		return numberFemale;
 	}
 
-	public void setStartTime(LocalTime startTime) {
-		this.startTime = startTime;
-	}
-
-	public LocalTime getFinishTime() {
-		return finishTime;
-	}
-
-	public void setFinishTime(LocalTime finishTime) {
-		this.finishTime = finishTime;
+	public void setNumberFemale(int numberFemale) {
+		this.numberFemale = numberFemale;
 	}
 
 	public String getCreatedBy() {

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.fpt.macm.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.Tournament;
 
 public interface TournamentService {
 
@@ -11,4 +12,6 @@ public interface TournamentService {
 
 	ResponseMessage updateTournamentOrganizingCommitteeRole(
 			List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto);
+
+	ResponseMessage createTournament(Tournament tournament);
 }

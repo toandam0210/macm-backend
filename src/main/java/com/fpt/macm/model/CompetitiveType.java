@@ -1,37 +1,29 @@
 package com.fpt.macm.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "tournament_schedule")
-public class TournamentSchedule {
+@Table(name = "competitive_type")
+public class CompetitiveType {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "tournamentId")
-	private Tournament tournament;
+	@Column
+	private double weightMin;
 	
 	@Column
-	private LocalDate date;
+	private double weightMax;
 	
 	@Column
-	private LocalTime startTime;
-	
-	@Column
-	private LocalTime finishTime;
+	private boolean gender;
 	
 	@Column
 	private String createdBy;
@@ -53,36 +45,28 @@ public class TournamentSchedule {
 		this.id = id;
 	}
 
-	public Tournament getTournament() {
-		return tournament;
+	public double getWeightMin() {
+		return weightMin;
 	}
 
-	public void setTournament(Tournament tournament) {
-		this.tournament = tournament;
+	public void setWeightMin(double weightMin) {
+		this.weightMin = weightMin;
 	}
 
-	public LocalDate getDate() {
-		return date;
+	public double getWeightMax() {
+		return weightMax;
 	}
 
-	public void setDate(LocalDate date) {
-		this.date = date;
+	public void setWeightMax(double weightMax) {
+		this.weightMax = weightMax;
 	}
 
-	public LocalTime getStartTime() {
-		return startTime;
+	public boolean isGender() {
+		return gender;
 	}
 
-	public void setStartTime(LocalTime startTime) {
-		this.startTime = startTime;
-	}
-
-	public LocalTime getFinishTime() {
-		return finishTime;
-	}
-
-	public void setFinishTime(LocalTime finishTime) {
-		this.finishTime = finishTime;
+	public void setGender(boolean gender) {
+		this.gender = gender;
 	}
 
 	public String getCreatedBy() {
@@ -116,6 +100,7 @@ public class TournamentSchedule {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
+	
 	
 	
 }

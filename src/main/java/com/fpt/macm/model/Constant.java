@@ -142,10 +142,13 @@ public class Constant {
 	public static final String MSG_090 = "Lấy quỹ của CLB thành công";
 	public static final String MSG_091 = "Nạp tiền vào quỹ của CLB thành công";
 	public static final String MSG_092 = "Rút tiền từ quỹ của CLB thành công";
-	public static final String MSG_093 = "Không thể tạo lịch sự kiện vì trùng với sự kiện ";
+	public static final String MSG_093 = "Không thể tạo lịch vì trùng với sự kiện ";
 	public static final String MSG_094 = "Không được để trống lý do";
 	public static final String MSG_095 = "Lấy báo cáo thu - chi thành công";
 	public static final String MSG_096 = "Số dư quỹ không đủ để rút";
 	public static final String MSG_097 = "Lấy danh sách ban tổ chức giải đấu thành công";
 	public static final String MSG_098 = "Cập nhật vai trò danh sách ban tổ chức giải đấu thành công";
+	public static final String MSG_099 = "Tạo giải đấu thành công";
+	public static final String MSG_100 = "Thêm lịch giải đấu thành công";
+	public static final String MSG_101 = "Phải có ít nhất 1 người tham gia";
 }
