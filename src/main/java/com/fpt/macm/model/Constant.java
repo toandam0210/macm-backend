@@ -137,5 +137,7 @@ public class Constant {
 	public static final String MSG_087 = "Lấy báo cáo thay đổi trạng thái đóng tiền của membership thành công";
 	public static final String MSG_088 = "Lấy tất cả vai trò trong sự kiện thành công";
 	public static final String MSG_089 = "Lấy danh sách thành viên trong sự kiện để cập nhật vai trò thành công";
-
+	public static final String MSG_090 = "Lấy quỹ của CLB thành công";
+	public static final String MSG_091 = "Nạp tiền vào quỹ của CLB thành công";
+	public static final String MSG_092 = "Rút tiền từ quỹ của CLB thành công";
 }
