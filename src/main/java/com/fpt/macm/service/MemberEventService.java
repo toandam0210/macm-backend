@@ -7,12 +7,11 @@ import com.fpt.macm.model.ResponseMessage;
 
 public interface MemberEventService {
 
-	ResponseMessage getAllUserOfEventByEventId(int eventId, int pageNo, int pageSize, String sortBy);
-	ResponseMessage getAllOrganizingCommitteeOfEventByEventId(int eventId, int pageNo, int pageSize, String sortBy);
-	ResponseMessage getAllMemberOfEventByEventId(int eventId, int pageNo, int pageSize, String sortBy);
-	ResponseMessage updateUserRoleInEvent(List<MemberEventDto> membersEventDto);
-	ResponseMessage getAllUserCancelJoinEvent(int eventId, int pageNo, int pageSize, String sortBy);
+	ResponseMessage updateListMemberEventRole(List<MemberEventDto> membersEventDto);
+	ResponseMessage getAllMemberCancelJoinEvent(int eventId, int pageNo, int pageSize, String sortBy);
 	ResponseMessage updateMemberEventPaymentStatus(int memberEventId);
 	ResponseMessage getReportPaymentStatusByEventId(int eventId, int pageNo, int pageSize, String sortBy);
+	ResponseMessage getAllMemberJoinEventByRoleEventId(int eventId, int filterIndex, int pageNo, int pageSize, String sortBy);
+	ResponseMessage getAllEventRole();
 	
 }
