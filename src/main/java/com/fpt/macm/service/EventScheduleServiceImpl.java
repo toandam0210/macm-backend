@@ -16,7 +16,6 @@ import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
-import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
 import com.fpt.macm.repository.CommonScheduleRepository;
@@ -72,22 +71,21 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 				} 
 				else {
 					List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
-					LocalDate currentLocalDate = startLocalDate;
-					while(currentLocalDate.compareTo(finishLocalDate) <= 0) {
+					for(LocalDate currentLocalDate = startLocalDate; currentLocalDate.compareTo(finishLocalDate) <= 0; currentLocalDate = currentLocalDate.plusDays(1)) {
 						if(currentLocalDate.compareTo(LocalDate.now()) > 0) {
 							ScheduleDto eventSessionDto = new ScheduleDto();
 							eventSessionDto.setDate(startLocalDate);
 							eventSessionDto.setTitle(eventName);
 							if(IsContinuous) {
 								if(currentLocalDate.compareTo(startLocalDate) == 0) {
-									eventSessionDto.setStartTime(LocalTime.MIN);
-								} else {
 									eventSessionDto.setStartTime(startLocalTime);
-								}
-								if(currentLocalDate.compareTo(startLocalDate) == 0) {
-									eventSessionDto.setFinishTime(LocalTime.MAX);
 								} else {
+									eventSessionDto.setStartTime(LocalTime.MIN);
+								}
+								if(currentLocalDate.compareTo(finishLocalDate) == 0) {
 									eventSessionDto.setFinishTime(finishLocalTime);
+								} else {
+									eventSessionDto.setFinishTime(LocalTime.MAX);
 								}
 							}
 							else {
@@ -102,8 +100,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 								eventSessionDto.setExisted(true);
 							}
 							listPreview.add(eventSessionDto);
-						} 
-						startLocalDate = startLocalDate.plusDays(1);
+						}
 					}
 					if(listPreview.isEmpty()) {
 						Event getEvent = eventRepository.findByExactName(eventName).get();
