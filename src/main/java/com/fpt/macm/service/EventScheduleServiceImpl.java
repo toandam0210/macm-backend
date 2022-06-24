@@ -46,7 +46,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	SemesterService semesterService;
 	
 	@Override
-	public ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime, Boolean IsContinuous) {
+	public ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -54,49 +54,43 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 			LocalDate finishLocalDate = Utils.ConvertStringToLocalDate(finishDate);
 			LocalTime startLocalTime = LocalTime.parse(startTime);
 			LocalTime finishLocalTime = LocalTime.parse(finishTime);
-			
+		
 			if(startLocalDate.compareTo(finishLocalDate) > 0) {
 				responseMessage.setMessage(Constant.MSG_081);
 			}
 			else if(startLocalTime.compareTo(finishLocalTime) >= 0) {
 				responseMessage.setMessage(Constant.MSG_038);
 			}
-			else if(finishLocalDate.compareTo(LocalDate.now()) < 0) {
+			else if(startLocalDate.compareTo(LocalDate.now()) <= 0) {
 				responseMessage.setMessage(Constant.MSG_065);
 			}
 			else {
 				Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 				if(finishLocalDate.compareTo(currentSemester.getEndDate()) > 0) {
 					responseMessage.setMessage(Constant.MSG_080);
-				} 
+				}
 				else {
 					List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
 					for(LocalDate currentLocalDate = startLocalDate; currentLocalDate.compareTo(finishLocalDate) <= 0; currentLocalDate = currentLocalDate.plusDays(1)) {
 						if(currentLocalDate.compareTo(LocalDate.now()) > 0) {
 							ScheduleDto eventSessionDto = new ScheduleDto();
-							eventSessionDto.setDate(startLocalDate);
+							eventSessionDto.setDate(currentLocalDate);
 							eventSessionDto.setTitle(eventName);
-							if(IsContinuous) {
-								if(currentLocalDate.compareTo(startLocalDate) == 0) {
-									eventSessionDto.setStartTime(startLocalTime);
-								} else {
-									eventSessionDto.setStartTime(LocalTime.MIN);
-								}
-								if(currentLocalDate.compareTo(finishLocalDate) == 0) {
-									eventSessionDto.setFinishTime(finishLocalTime);
-								} else {
-									eventSessionDto.setFinishTime(LocalTime.MAX);
-								}
-							}
-							else {
+							if(currentLocalDate.compareTo(startLocalDate) == 0) {
 								eventSessionDto.setStartTime(startLocalTime);
-								eventSessionDto.setFinishTime(finishLocalTime);
+							} else {
+								eventSessionDto.setStartTime(LocalTime.MIN);
 							}
-							if(commonScheduleService.getCommonSessionByDate(startLocalDate) == null) {
+							if(currentLocalDate.compareTo(finishLocalDate) == 0) {
+								eventSessionDto.setFinishTime(finishLocalTime);
+							} else {
+								eventSessionDto.setFinishTime(LocalTime.MAX);
+							}
+							if(commonScheduleService.getCommonSessionByDate(currentLocalDate) == null) {
 								eventSessionDto.setExisted(false);
 							}
 							else {
-								eventSessionDto.setTitle("Trùng với " + commonScheduleService.getCommonSessionByDate(startLocalDate).getTitle());
+								eventSessionDto.setTitle("Trùng với " + commonScheduleService.getCommonSessionByDate(currentLocalDate).getTitle());
 								eventSessionDto.setExisted(true);
 							}
 							listPreview.add(eventSessionDto);
@@ -123,12 +117,15 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	}
 
 	@Override
-	public ResponseMessage createEventSchedule(int eventId, List<ScheduleDto> listPreview) {
+	public ResponseMessage createEventSchedule(int eventId, List<ScheduleDto> listPreview, Boolean isOverwritten) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<EventSchedule> listEventSchedule = new ArrayList<EventSchedule>();
 			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
+			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
+			Boolean isInterrupted = false;
+			String title = "";
 			for (ScheduleDto scheduleDto : listPreview) {
 				if(!scheduleDto.getExisted()) {
 					EventSchedule eventSchedule = new EventSchedule();
@@ -150,14 +147,51 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 					commonSession.setUpdatedOn(LocalDateTime.now());
 					listCommon.add(commonSession);
 				}
+				else {
+					if(isOverwritten) {
+						if(scheduleDto.getTitle().toString().equals("Trùng với Lịch tập")) {
+							EventSchedule eventSchedule = new EventSchedule();
+							eventSchedule.setEvent(eventRepository.findById(eventId).get());
+							eventSchedule.setDate(scheduleDto.getDate());
+							eventSchedule.setStartTime(scheduleDto.getStartTime());
+							eventSchedule.setFinishTime(scheduleDto.getFinishTime());
+							eventSchedule.setCreatedBy("LinhLHN");
+							eventSchedule.setCreatedOn(LocalDateTime.now());
+							eventSchedule.setUpdatedBy("LinhLHN");
+							eventSchedule.setUpdatedOn(LocalDateTime.now());
+							listEventSchedule.add(eventSchedule);
+							CommonSchedule commonSession = new CommonSchedule();
+							commonSession.setTitle(eventSchedule.getEvent().getName());
+							commonSession.setDate(scheduleDto.getDate());
+							commonSession.setStartTime(scheduleDto.getStartTime());
+							commonSession.setFinishTime(scheduleDto.getFinishTime());
+							commonSession.setCreatedOn(LocalDateTime.now());
+							commonSession.setUpdatedOn(LocalDateTime.now());
+							listCommon.add(commonSession);
+							CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(scheduleDto.getDate());
+							listCommonOverwritten.add(getCommonSession);
+						}
+						else {
+							isInterrupted = true;
+							title = scheduleDto.getTitle();
+							break;
+						}
+					}
+				}
 			}
-			if(listEventSchedule.isEmpty()) {
-				responseMessage.setMessage(Constant.MSG_040);
-			} else {
-				eventScheduleRepository.saveAll(listEventSchedule);
-				commonScheduleRepository.saveAll(listCommon);
-				responseMessage.setData(listEventSchedule);
-				responseMessage.setMessage(Constant.MSG_066);
+			if(isInterrupted) {
+				responseMessage.setMessage(Constant.MSG_093 + title);
+			}
+			else {
+				if(listEventSchedule.isEmpty()) {
+					responseMessage.setMessage(Constant.MSG_040);
+				} else {
+					eventScheduleRepository.saveAll(listEventSchedule);
+					commonScheduleRepository.deleteAll(listCommonOverwritten);
+					commonScheduleRepository.saveAll(listCommon);
+					responseMessage.setData(listEventSchedule);
+					responseMessage.setMessage(Constant.MSG_066);
+				}
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

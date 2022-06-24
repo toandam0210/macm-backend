@@ -213,9 +213,6 @@ public class Utils {
 		case Constant.ROLE_EVENT_MEMBER:
 			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
 			break;
-		case Constant.ROLE_EVENT_COLLABORATOR:
-			roleEventDto.setName(Constant.ROLE_EVENT_COLLABORATOR_VN);
-			break;
 		case Constant.ROLE_EVENT_MEMBER_COMMUNICATION:
 			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_COMMUNICATION_VN);
 			break;
