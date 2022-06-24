@@ -222,6 +222,9 @@ public class Utils {
 		case Constant.ROLE_EVENT_MEMBER_LOGISTIC:
 			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_LOGISTIC_VN);
 			break;
+		case Constant.ROLE_EVENT_MEMBER_TAKE_CARE:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_TAKE_CARE_VN);
+			break;
 		default:
 			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
 			break;
