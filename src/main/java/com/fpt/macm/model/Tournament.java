@@ -1,12 +1,16 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -15,22 +19,22 @@ public class Tournament {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@Column
 	private String name;
-	
+
 	@Column
 	private String description;
-	
+
 	@Column
 	private int maxQuantityComitee;
-	
+
 	@Column
 	private double amount_per_register;
-	
+
 	@Column
 	private String semester;
-	
+
 	@Column
 	private String createdBy;
 
@@ -42,6 +46,14 @@ public class Tournament {
 
 	@Column
 	private LocalDateTime updatedOn;
+
+	@OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+	@JoinColumn(name = "tournament_id")
+	private Set<CompetitiveType> competitiveTypes;
+	
+	@OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+	@JoinColumn(name = "tournament_id")
+	private Set<ExhibitionType> exhibitionTypes;
 
 	public int getId() {
 		return id;
@@ -122,6 +134,21 @@ public class Tournament {
 	public void setSemester(String semester) {
 		this.semester = semester;
 	}
-	
-	
+
+	public Set<CompetitiveType> getCompetitiveTypes() {
+		return competitiveTypes;
+	}
+
+	public void setCompetitiveTypes(Set<CompetitiveType> competitiveTypes) {
+		this.competitiveTypes = competitiveTypes;
+	}
+
+	public Set<ExhibitionType> getExhibitionTypes() {
+		return exhibitionTypes;
+	}
+
+	public void setExhibitionTypes(Set<ExhibitionType> exhibitionTypes) {
+		this.exhibitionTypes = exhibitionTypes;
+	}
+
 }

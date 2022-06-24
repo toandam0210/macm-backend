@@ -1,5 +1,8 @@
 package com.fpt.macm.service;
 
-public interface TournamentService {
+import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.Tournament;
 
+public interface TournamentService {
+	ResponseMessage createTournament(Tournament tournament);
 }
