@@ -140,4 +140,5 @@ public class Constant {
 	public static final String MSG_090 = "Lấy quỹ của CLB thành công";
 	public static final String MSG_091 = "Nạp tiền vào quỹ của CLB thành công";
 	public static final String MSG_092 = "Rút tiền từ quỹ của CLB thành công";
+	public static final String MSG_093 = "Không thể tạo lịch sự kiện vì trùng với sự kiện ";
 }

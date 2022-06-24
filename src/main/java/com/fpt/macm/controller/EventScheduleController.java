@@ -44,14 +44,14 @@ public class EventScheduleController {
 	
 	@PostMapping("/headculture/createpreview")
 	ResponseEntity<ResponseMessage> createPreviewEventSchedule(@RequestParam String eventName, @RequestParam String startDate, 
-			@RequestParam String finishDate, @RequestParam String startTime, @RequestParam String finishTime, @RequestParam Boolean IsContinuous) {
-		return new ResponseEntity<ResponseMessage>(eventScheduleService.createPreviewEventSchedule(eventName, startDate, finishDate, startTime, finishTime, IsContinuous), HttpStatus.OK);
+			@RequestParam String finishDate, @RequestParam String startTime, @RequestParam String finishTime) {
+		return new ResponseEntity<ResponseMessage>(eventScheduleService.createPreviewEventSchedule(eventName, startDate, finishDate, startTime, finishTime), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headculture/addnewschedule/{eventId}")
 	ResponseEntity<ResponseMessage> createTrainingSchedule(@PathVariable(name = "eventId") int eventId, 
-			@RequestBody List<ScheduleDto> listPreview) {
-		return new ResponseEntity<ResponseMessage>(eventScheduleService.createEventSchedule(eventId, listPreview), HttpStatus.OK);
+			@RequestBody List<ScheduleDto> listPreview, @RequestParam Boolean isOverwritten) {
+		return new ResponseEntity<ResponseMessage>(eventScheduleService.createEventSchedule(eventId, listPreview, isOverwritten), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headculture/updatesession/{eventScheduleId}")
