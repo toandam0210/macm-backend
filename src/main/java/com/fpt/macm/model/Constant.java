@@ -99,9 +99,7 @@ public class Constant {
 	public static final String ROLE_COLLABORATOR_TECHNIQUE = "ROLE_CollaboratorTechnique";
 	public static final String ROLE_COLLABORATOR_TECHNIQUE_VN = "CTV ban chuyên môn";
 	public static final String ROLE_EVENT_MEMBER = "ROLE_Member";
-	public static final String ROLE_EVENT_MEMBER_VN = "Thành viên";
-	public static final String ROLE_EVENT_COLLABORATOR = "ROLE_Collaborator";
-	public static final String ROLE_EVENT_COLLABORATOR_VN = "Cộng tác viên";
+	public static final String ROLE_EVENT_MEMBER_VN = "Thành viên tham gia";
 	public static final String ROLE_EVENT_MEMBER_COMMUNICATION = "ROLE_MemberCommunication";
 	public static final String ROLE_EVENT_MEMBER_COMMUNICATION_VN = "Thành viên ban truyền thông";
 	public static final String ROLE_EVENT_MEMBER_LOGISTIC = "ROLE_MemberLogistic";
