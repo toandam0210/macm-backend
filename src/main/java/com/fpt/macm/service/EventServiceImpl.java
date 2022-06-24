@@ -18,7 +18,6 @@ import com.fpt.macm.dto.EventDto;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
-import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
 import com.fpt.macm.repository.EventRepository;
