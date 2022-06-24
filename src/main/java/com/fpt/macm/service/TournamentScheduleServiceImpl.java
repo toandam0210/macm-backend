@@ -181,7 +181,7 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 					commonScheduleRepository.deleteAll(listCommonOverwritten);
 					commonScheduleRepository.saveAll(listCommon);
 					responseMessage.setData(listTournamentSchedule);
-					responseMessage.setMessage(Constant.MSG_098);
+					responseMessage.setMessage(Constant.MSG_100);
 					responseMessage.setTotalResult(listTournamentSchedule.size());
 				}
 			}
