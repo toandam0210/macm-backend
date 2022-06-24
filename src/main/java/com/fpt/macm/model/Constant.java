@@ -106,6 +106,8 @@ public class Constant {
 	public static final String ROLE_EVENT_MEMBER_LOGISTIC_VN = "Thành viên ban hậu cần";
 	public static final String ROLE_EVENT_MEMBER_CULTURE = "ROLE_MemberCulture";
 	public static final String ROLE_EVENT_MEMBER_CULTURE_VN = "Thành viên ban văn hóa";
+	public static final String ROLE_EVENT_MEMBER_TAKE_CARE = "ROLE_MemberTakeCare";
+	public static final String ROLE_EVENT_MEMBER_TAKE_CARE_VN = "Thành viên ban chăm sóc";
 	public static final String MSG_062 = "Cập nhật trạng thái đóng tiền tham gia sự kiện của người dùng thành công";
 	public static final String MSG_063 = "Danh sách sự kiện: ";
 	public static final String MSG_064 = "Không thể xóa, sự kiện đã bắt đầu";
@@ -144,4 +146,5 @@ public class Constant {
 	public static final String MSG_094 = "Không được để trống lý do";
 	public static final String MSG_095 = "Lấy báo cáo thu - chi thành công";
 	public static final String MSG_096 = "Số dư quỹ không đủ để rút";
+	public static final String MSG_097 = "Lấy danh sách ban tổ chức giải đấu thành công";
 }
