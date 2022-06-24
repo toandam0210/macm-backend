@@ -266,7 +266,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 		try {
 			List<RoleEvent> rolesEvent = roleEventRepository.findAll();
 			responseMessage.setData(rolesEvent);
-			responseMessage.setMessage("Lấy tất cả vai trò trong sự kiện thành công");
+			responseMessage.setMessage(Constant.MSG_088);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

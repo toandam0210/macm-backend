@@ -135,4 +135,5 @@ public class Constant {
 	public static final String MSG_085 = "Hôm nay không có sự kiện";
 	public static final String MSG_086 = "Không có dữ liệu";
 	public static final String MSG_087 = "Lấy báo cáo thay đổi trạng thái đóng tiền của membership thành công";
+	public static final String MSG_088 = "Lấy tất cả vai trò trong sự kiện thành công";
 }
