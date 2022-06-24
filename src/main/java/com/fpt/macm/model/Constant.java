@@ -99,9 +99,7 @@ public class Constant {
 	public static final String ROLE_COLLABORATOR_TECHNIQUE = "ROLE_CollaboratorTechnique";
 	public static final String ROLE_COLLABORATOR_TECHNIQUE_VN = "CTV ban chuyên môn";
 	public static final String ROLE_EVENT_MEMBER = "ROLE_Member";
-	public static final String ROLE_EVENT_MEMBER_VN = "Thành viên";
-	public static final String ROLE_EVENT_COLLABORATOR = "ROLE_Collaborator";
-	public static final String ROLE_EVENT_COLLABORATOR_VN = "Cộng tác viên";
+	public static final String ROLE_EVENT_MEMBER_VN = "Thành viên tham gia";
 	public static final String ROLE_EVENT_MEMBER_COMMUNICATION = "ROLE_MemberCommunication";
 	public static final String ROLE_EVENT_MEMBER_COMMUNICATION_VN = "Thành viên ban truyền thông";
 	public static final String ROLE_EVENT_MEMBER_LOGISTIC = "ROLE_MemberLogistic";
@@ -137,5 +135,10 @@ public class Constant {
 	public static final String MSG_085 = "Hôm nay không có sự kiện";
 	public static final String MSG_086 = "Không có dữ liệu";
 	public static final String MSG_087 = "Lấy báo cáo thay đổi trạng thái đóng tiền của membership thành công";
+	public static final String MSG_088 = "Lấy tất cả vai trò trong sự kiện thành công";
+	public static final String MSG_089 = "Lấy danh sách thành viên trong sự kiện để cập nhật vai trò thành công";
+	public static final String MSG_090 = "Lấy quỹ của CLB thành công";
+	public static final String MSG_091 = "Nạp tiền vào quỹ của CLB thành công";
+	public static final String MSG_092 = "Rút tiền từ quỹ của CLB thành công";
 	public static final String MSG_093 = "Không thể tạo lịch sự kiện vì trùng với sự kiện ";
 }

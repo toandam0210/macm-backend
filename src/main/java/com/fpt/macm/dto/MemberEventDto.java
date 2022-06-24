@@ -8,6 +8,7 @@ public class MemberEventDto {
 	private String userStudentId;
 	private boolean attendanceStatus;
 	private RoleEventDto roleEventDto;
+	private String roleInClub;
 	private boolean paymentStatus;
 
 	public int getId() {
@@ -64,6 +65,14 @@ public class MemberEventDto {
 
 	public void setPaymentStatus(boolean paymentStatus) {
 		this.paymentStatus = paymentStatus;
+	}
+
+	public String getRoleInClub() {
+		return roleInClub;
+	}
+
+	public void setRoleInClub(String roleInClub) {
+		this.roleInClub = roleInClub;
 	}
 
 }
