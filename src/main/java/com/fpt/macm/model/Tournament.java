@@ -29,6 +29,9 @@ public class Tournament {
 	private double amount_per_register;
 	
 	@Column
+	private String semester;
+	
+	@Column
 	private String createdBy;
 
 	@Column
@@ -110,6 +113,14 @@ public class Tournament {
 
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
+	}
+
+	public String getSemester() {
+		return semester;
+	}
+
+	public void setSemester(String semester) {
+		this.semester = semester;
 	}
 	
 	
