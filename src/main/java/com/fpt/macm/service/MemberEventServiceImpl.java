@@ -102,6 +102,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				roleEventDto.setName(memberEvent.getRoleEvent().getName());
 				memberEventDto.setRoleEventDto(roleEventDto);
 				Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), memberEventDto.getRoleEventDto());
+				memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 				memberEventDto.setPaymentStatus(memberEvent.getPaymentStatus());
 				membersEventDto.add(memberEventDto);
 			}
@@ -267,6 +268,40 @@ public class MemberEventServiceImpl implements MemberEventService {
 			List<RoleEvent> rolesEvent = roleEventRepository.findAll();
 			responseMessage.setData(rolesEvent);
 			responseMessage.setMessage(Constant.MSG_088);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getListMemberEventToUpdateRole(int eventId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventId(eventId);
+			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
+			for (MemberEvent memberEvent : membersEvent) {
+				if (memberEvent.getAttendanceStatus() && memberEvent.getUser().isActive()) {
+					MemberEventDto memberEventDto = new MemberEventDto();
+					memberEventDto.setId(memberEvent.getId());
+					memberEventDto.setUserName(memberEvent.getUser().getName());
+					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
+					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
+					memberEventDto.setAttendanceStatus(memberEvent.getAttendanceStatus());
+					RoleEventDto roleEventDto = new RoleEventDto();
+					roleEventDto.setId(memberEvent.getRoleEvent().getId());
+					roleEventDto.setName(memberEvent.getRoleEvent().getName());
+					memberEventDto.setRoleEventDto(roleEventDto);
+					Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), memberEventDto.getRoleEventDto());
+					memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
+					memberEventDto.setPaymentStatus(memberEvent.getPaymentStatus());
+					membersEventDto.add(memberEventDto);
+				}
+			}
+			responseMessage.setData(membersEventDto);
+			responseMessage.setMessage(Constant.MSG_089);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
