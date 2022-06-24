@@ -266,7 +266,15 @@ public class MemberEventServiceImpl implements MemberEventService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<RoleEvent> rolesEvent = roleEventRepository.findAll();
-			responseMessage.setData(rolesEvent);
+			List<RoleEventDto> rolesEventDto = new ArrayList<RoleEventDto>();
+			for (RoleEvent roleEvent : rolesEvent) {
+				RoleEventDto roleEventDto = new RoleEventDto();
+				roleEventDto.setId(roleEvent.getId());
+				roleEventDto.setName(roleEvent.getName());
+				Utils.convertNameOfEventRole(roleEvent, roleEventDto);
+				rolesEventDto.add(roleEventDto);
+			}
+			responseMessage.setData(rolesEventDto);
 			responseMessage.setMessage(Constant.MSG_088);
 		} catch (Exception e) {
 			// TODO: handle exception

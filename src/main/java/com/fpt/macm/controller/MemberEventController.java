@@ -66,4 +66,9 @@ public class MemberEventController {
 	ResponseEntity<ResponseMessage> getListMemberEventToUpdateRole(@PathVariable(name = "eventId") int eventId){
 		return new ResponseEntity<ResponseMessage>(memberEventService.getListMemberEventToUpdateRole(eventId), HttpStatus.OK);
 	}
+	
+	@GetMapping("/headculture/getallroleevent")
+	ResponseEntity<ResponseMessage> getAllRoleEvent(){
+		return new ResponseEntity<ResponseMessage>(memberEventService.getAllEventRole(), HttpStatus.OK);
+	}
 }
