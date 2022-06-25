@@ -48,7 +48,6 @@ public class FacilityServiceImpl implements FacilityService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			if (!isExistFacilityToCreate(facility)) {
-				facility.setQuantityUsable(0);
 				facility.setQuantityBroken(0);
 				facility.setCreatedBy("toandv");
 				facility.setCreatedOn(LocalDateTime.now());
