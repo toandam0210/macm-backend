@@ -245,4 +245,20 @@ public class TournamentServiceImpl implements TournamentService {
 		return exhibitionType;
 	}
 
+	@Override
+	public ResponseMessage deleteTournamentById(int id) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(id);
+			if(tournamentOp.isPresent()) {
+				Tournament tournament = tournamentOp.get();
+				tournamentRepository.save(tournament);
+				responseMessage.setMessage("Xóa giải đấu thành công");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }

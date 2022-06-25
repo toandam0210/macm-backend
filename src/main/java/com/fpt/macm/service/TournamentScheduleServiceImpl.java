@@ -14,7 +14,6 @@ import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
-import com.fpt.macm.model.Tournament;
 import com.fpt.macm.model.TournamentSchedule;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.TournamentRepository;
@@ -79,16 +78,7 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 							listPreview.add(tournamentScheduleDto);
 						}
 					}
-					if (listPreview.isEmpty()) {
-						Tournament getTournament = tournamentRepository.findByExactName(tournamentName).get();
-						if (getListTournamentScheduleByTournament(getTournament.getId()).getData() == null) {
-							// memberEventRepository.deleteAll(memberEventRepository.findByEventId(getEvent.getId()));
-							tournamentRepository.delete(getTournament);
-						}
-						responseMessage.setMessage(Constant.MSG_040);
-					} else {
 						responseMessage.setData(listPreview);
-					}
 				}
 			}
 		} catch (Exception e) {

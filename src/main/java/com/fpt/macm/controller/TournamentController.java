@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +44,11 @@ public class TournamentController {
 	@PutMapping("/headclub/update/{tournamentId}")
 	ResponseEntity<ResponseMessage> updateTournament(@PathVariable(name = "tournamentId") int tournamentId,  @RequestBody TournamentDto tournamentDto){
 		return new ResponseEntity<ResponseMessage>(tournamentService.updateTournament(tournamentId,tournamentDto), HttpStatus.OK);
+	}
+	
+	@DeleteMapping("/headclub/delete/{tournamentId}")
+	ResponseEntity<ResponseMessage> delete(@PathVariable(name = "tournamentId") int tournamentId){
+		return new ResponseEntity<ResponseMessage>(tournamentService.deleteTournamentById(tournamentId), HttpStatus.OK);
 	}
 	
 }
