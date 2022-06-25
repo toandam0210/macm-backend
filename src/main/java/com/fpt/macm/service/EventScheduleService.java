@@ -10,7 +10,7 @@ import com.fpt.macm.model.ResponseMessage;
 
 public interface EventScheduleService {
 	ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime);
-	ResponseMessage createEventSchedule(int eventId, List<ScheduleDto> listPreview, Boolean isContinuous);
+	ResponseMessage createEventSchedule(int eventId, List<ScheduleDto> listPreview, Boolean isOverwritten);
 	ResponseMessage createEventSession(int eventId, EventSchedule eventSchedule);
 	ResponseMessage getListEventSchedule();
 	ResponseMessage getListEventScheduleByEvent(int eventId);
@@ -18,4 +18,6 @@ public interface EventScheduleService {
 	ResponseMessage deleteEventSession(int eventScheduleId);
 	ResponseMessage getEventSessionByDate(String date);
 	EventSchedule getEventSessionByDate(LocalDate date);
+	ResponseMessage updatePreviewEventSchedule(int eventId, String startDate, String finishDate, String startTime, String finishTime);
+	ResponseMessage updateEventSchedule(int eventId, List<ScheduleDto> listPreview, Boolean isOverwritten);
 }

@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.fpt.macm.dto.ScheduleDto;
 import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
@@ -58,7 +57,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 			if(startLocalDate.compareTo(finishLocalDate) > 0) {
 				responseMessage.setMessage(Constant.MSG_081);
 			}
-			else if(startLocalTime.compareTo(finishLocalTime) >= 0) {
+			else if(startLocalDate.compareTo(finishLocalDate) == 0 && startLocalTime.compareTo(finishLocalTime) >= 0) {
 				responseMessage.setMessage(Constant.MSG_038);
 			}
 			else if(startLocalDate.compareTo(LocalDate.now()) <= 0) {
@@ -96,17 +95,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 							listPreview.add(eventSessionDto);
 						}
 					}
-					if(listPreview.isEmpty()) {
-						Event getEvent = eventRepository.findByExactName(eventName).get();
-						if(getListEventScheduleByEvent(getEvent.getId()).getData() == null) {
-							memberEventRepository.deleteAll(memberEventRepository.findByEventId(getEvent.getId()));
-							eventRepository.delete(getEvent);
-						}
-						responseMessage.setMessage(Constant.MSG_040);
-					} 
-					else {
-						responseMessage.setData(listPreview);
-					}
+					responseMessage.setData(listPreview);
 				}
 			}
 		} catch (Exception e) {
@@ -148,34 +137,32 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 					listCommon.add(commonSession);
 				}
 				else {
-					if(isOverwritten) {
-						if(scheduleDto.getTitle().toString().equals("Trùng với Lịch tập")) {
-							EventSchedule eventSchedule = new EventSchedule();
-							eventSchedule.setEvent(eventRepository.findById(eventId).get());
-							eventSchedule.setDate(scheduleDto.getDate());
-							eventSchedule.setStartTime(scheduleDto.getStartTime());
-							eventSchedule.setFinishTime(scheduleDto.getFinishTime());
-							eventSchedule.setCreatedBy("LinhLHN");
-							eventSchedule.setCreatedOn(LocalDateTime.now());
-							eventSchedule.setUpdatedBy("LinhLHN");
-							eventSchedule.setUpdatedOn(LocalDateTime.now());
-							listEventSchedule.add(eventSchedule);
-							CommonSchedule commonSession = new CommonSchedule();
-							commonSession.setTitle(eventSchedule.getEvent().getName());
-							commonSession.setDate(scheduleDto.getDate());
-							commonSession.setStartTime(scheduleDto.getStartTime());
-							commonSession.setFinishTime(scheduleDto.getFinishTime());
-							commonSession.setCreatedOn(LocalDateTime.now());
-							commonSession.setUpdatedOn(LocalDateTime.now());
-							listCommon.add(commonSession);
-							CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(scheduleDto.getDate());
-							listCommonOverwritten.add(getCommonSession);
-						}
-						else {
-							isInterrupted = true;
-							title = scheduleDto.getTitle();
-							break;
-						}
+					if(isOverwritten && scheduleDto.getTitle().toString().equals("Trùng với Lịch tập")) {
+						EventSchedule eventSchedule = new EventSchedule();
+						eventSchedule.setEvent(eventRepository.findById(eventId).get());
+						eventSchedule.setDate(scheduleDto.getDate());
+						eventSchedule.setStartTime(scheduleDto.getStartTime());
+						eventSchedule.setFinishTime(scheduleDto.getFinishTime());
+						eventSchedule.setCreatedBy("LinhLHN");
+						eventSchedule.setCreatedOn(LocalDateTime.now());
+						eventSchedule.setUpdatedBy("LinhLHN");
+						eventSchedule.setUpdatedOn(LocalDateTime.now());
+						listEventSchedule.add(eventSchedule);
+						CommonSchedule commonSession = new CommonSchedule();
+						commonSession.setTitle(eventSchedule.getEvent().getName());
+						commonSession.setDate(scheduleDto.getDate());
+						commonSession.setStartTime(scheduleDto.getStartTime());
+						commonSession.setFinishTime(scheduleDto.getFinishTime());
+						commonSession.setCreatedOn(LocalDateTime.now());
+						commonSession.setUpdatedOn(LocalDateTime.now());
+						listCommon.add(commonSession);
+						CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(scheduleDto.getDate());
+						listCommonOverwritten.add(getCommonSession);
+					}
+					else {
+						isInterrupted = true;
+						title = scheduleDto.getTitle();
+						break;
 					}
 				}
 			}
@@ -364,6 +351,163 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 			// TODO: handle exception
 			return null;
 		}
+	}
+
+	@Override
+	public ResponseMessage updatePreviewEventSchedule(int eventId, String startDate, String finishDate,
+			String startTime, String finishTime) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			LocalDate startLocalDate = Utils.ConvertStringToLocalDate(startDate);
+			LocalDate finishLocalDate = Utils.ConvertStringToLocalDate(finishDate);
+			LocalTime startLocalTime = LocalTime.parse(startTime);
+			LocalTime finishLocalTime = LocalTime.parse(finishTime);
+		
+			if(startLocalDate.compareTo(finishLocalDate) > 0) {
+				responseMessage.setMessage(Constant.MSG_081);
+			}
+			else if(startLocalDate.compareTo(finishLocalDate) == 0 && startLocalTime.compareTo(finishLocalTime) >= 0) {
+				responseMessage.setMessage(Constant.MSG_038);
+			}
+			else if(startLocalDate.compareTo(LocalDate.now()) <= 0) {
+				responseMessage.setMessage(Constant.MSG_065);
+			}
+			else {
+				Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+				if(finishLocalDate.compareTo(currentSemester.getEndDate()) > 0) {
+					responseMessage.setMessage(Constant.MSG_080);
+				}
+				else {
+					List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
+					for(LocalDate currentLocalDate = startLocalDate; currentLocalDate.compareTo(finishLocalDate) <= 0; currentLocalDate = currentLocalDate.plusDays(1)) {
+						if(currentLocalDate.compareTo(LocalDate.now()) > 0) {
+							ScheduleDto eventSessionDto = new ScheduleDto();
+							eventSessionDto.setDate(currentLocalDate);
+							String title = eventRepository.findById(eventId).get().getName();
+							eventSessionDto.setTitle(title);
+							if(currentLocalDate.compareTo(startLocalDate) == 0) {
+								eventSessionDto.setStartTime(startLocalTime);
+							} else {
+								eventSessionDto.setStartTime(LocalTime.MIN);
+							}
+							if(currentLocalDate.compareTo(finishLocalDate) == 0) {
+								eventSessionDto.setFinishTime(finishLocalTime);
+							} else {
+								eventSessionDto.setFinishTime(LocalTime.MAX);
+							}
+							CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(currentLocalDate);
+							if(getCommonSession ==  null) {
+								eventSessionDto.setExisted(false);
+							}
+							else {
+								if(getCommonSession.getTitle().equals(title)) {
+									eventSessionDto.setExisted(false);
+								}
+								else {
+									eventSessionDto.setTitle("Trùng với " + getCommonSession.getTitle());
+									eventSessionDto.setExisted(true);
+								}
+							}
+							listPreview.add(eventSessionDto);
+						}
+					}
+					responseMessage.setData(listPreview);
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateEventSchedule(int eventId, List<ScheduleDto> listPreview, Boolean isOverwritten) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<EventSchedule> listEventSchedule = new ArrayList<EventSchedule>();
+			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
+			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
+			Boolean isInterrupted = false;
+			String title = "";
+			for (ScheduleDto scheduleDto : listPreview) {
+				if(!scheduleDto.getExisted()) {
+					EventSchedule eventSchedule = new EventSchedule();
+					eventSchedule.setEvent(eventRepository.findById(eventId).get());
+					eventSchedule.setDate(scheduleDto.getDate());
+					eventSchedule.setStartTime(scheduleDto.getStartTime());
+					eventSchedule.setFinishTime(scheduleDto.getFinishTime());
+					eventSchedule.setCreatedBy("LinhLHN");
+					eventSchedule.setCreatedOn(LocalDateTime.now());
+					eventSchedule.setUpdatedBy("LinhLHN");
+					eventSchedule.setUpdatedOn(LocalDateTime.now());
+					listEventSchedule.add(eventSchedule);
+					CommonSchedule commonSession = new CommonSchedule();
+					commonSession.setTitle(eventSchedule.getEvent().getName());
+					commonSession.setDate(scheduleDto.getDate());
+					commonSession.setStartTime(scheduleDto.getStartTime());
+					commonSession.setFinishTime(scheduleDto.getFinishTime());
+					commonSession.setCreatedOn(LocalDateTime.now());
+					commonSession.setUpdatedOn(LocalDateTime.now());
+					listCommon.add(commonSession);
+				}
+				else {
+					if(isOverwritten && scheduleDto.getTitle().toString().equals("Trùng với Lịch tập")) {
+						EventSchedule eventSchedule = new EventSchedule();
+						eventSchedule.setEvent(eventRepository.findById(eventId).get());
+						eventSchedule.setDate(scheduleDto.getDate());
+						eventSchedule.setStartTime(scheduleDto.getStartTime());
+						eventSchedule.setFinishTime(scheduleDto.getFinishTime());
+						eventSchedule.setCreatedBy("LinhLHN");
+						eventSchedule.setCreatedOn(LocalDateTime.now());
+						eventSchedule.setUpdatedBy("LinhLHN");
+						eventSchedule.setUpdatedOn(LocalDateTime.now());
+						listEventSchedule.add(eventSchedule);
+						CommonSchedule commonSession = new CommonSchedule();
+						commonSession.setTitle(eventSchedule.getEvent().getName());
+						commonSession.setDate(scheduleDto.getDate());
+						commonSession.setStartTime(scheduleDto.getStartTime());
+						commonSession.setFinishTime(scheduleDto.getFinishTime());
+						commonSession.setCreatedOn(LocalDateTime.now());
+						commonSession.setUpdatedOn(LocalDateTime.now());
+						listCommon.add(commonSession);
+						CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(scheduleDto.getDate());
+						listCommonOverwritten.add(getCommonSession);
+					}
+					else {
+						isInterrupted = true;
+						title = scheduleDto.getTitle();
+						break;
+					}
+				}
+			}
+			if(isInterrupted) {
+				responseMessage.setMessage(Constant.MSG_093 + title);
+			}
+			else {
+				if(listEventSchedule.isEmpty()) {
+					responseMessage.setMessage(Constant.MSG_040);
+				} else {
+					List<EventSchedule> oldSchedule = eventScheduleRepository.findByEventId(eventId);
+					for (EventSchedule getEventSession : oldSchedule) {
+						CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(getEventSession.getDate());
+						eventScheduleRepository.delete(getEventSession);
+						commonScheduleRepository.delete(getCommonSession);
+					}
+					eventScheduleRepository.saveAll(listEventSchedule);
+					commonScheduleRepository.deleteAll(listCommonOverwritten);
+					commonScheduleRepository.saveAll(listCommon);
+					responseMessage.setData(listEventSchedule);
+					responseMessage.setMessage(Constant.MSG_102);
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 
 }
