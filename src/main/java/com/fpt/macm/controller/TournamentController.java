@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.macm.dto.TournamentDto;
 import com.fpt.macm.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Tournament;
@@ -37,6 +38,11 @@ public class TournamentController {
 	@PutMapping("/headclub/updatetournamentorganizingcommitteerole")
 	ResponseEntity<ResponseMessage> updateTournamentOrganizingCommitteeRole(@RequestBody List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto){
 		return new ResponseEntity<ResponseMessage>(tournamentService.updateTournamentOrganizingCommitteeRole(tournamentOrganizingCommitteesDto), HttpStatus.OK);
+	}
+	
+	@PutMapping("/headclub/update/{tournamentId}")
+	ResponseEntity<ResponseMessage> updateTournament(@PathVariable(name = "tournamentId") int tournamentId,  @RequestBody TournamentDto tournamentDto){
+		return new ResponseEntity<ResponseMessage>(tournamentService.updateTournament(tournamentId,tournamentDto), HttpStatus.OK);
 	}
 	
 }
