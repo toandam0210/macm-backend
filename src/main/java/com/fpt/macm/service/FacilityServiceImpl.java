@@ -190,12 +190,19 @@ public class FacilityServiceImpl implements FacilityService {
 	}
 
 	@Override
-	public ResponseMessage getAllFacility(int pageNo, int pageSize, String sortBy) {
+	public ResponseMessage getAllFacilityByFacilityCategoryId(int facilityCategoryId, int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<Facility> pageResponse = facilityRepository.findAll(paging);
+			Page<Facility> pageResponse;
+			if (facilityCategoryId == 0) {
+				pageResponse = facilityRepository.findAll(paging);
+			}
+			else {
+				pageResponse = facilityRepository.findByFacilityCategoryId(facilityCategoryId, paging);
+			}
+			
 			List<Facility> facilities = new ArrayList<Facility>();
 			List<FacilityDto> facilitiesDto = new ArrayList<FacilityDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
@@ -248,13 +255,19 @@ public class FacilityServiceImpl implements FacilityService {
 	}
 
 	@Override
-	public ResponseMessage createRequestToBuyFacility(FacilityRequest facilityRequest) {
+	public ResponseMessage createRequestToBuyFacility(FacilityRequestDto facilityRequestDto) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			FacilityRequest facilityRequest = new FacilityRequest();
+			Facility facility = new Facility();
+			facility.setId(facilityRequestDto.getFacilityId());
+			facilityRequest.setFacility(facility);
+			facilityRequest.setQuantity(facilityRequestDto.getQuantity());
+			facilityRequest.setUnitPrice(facilityRequestDto.getUnitPrice());
+			facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_PENDING);
 			facilityRequest.setCreatedBy("toandv");
 			facilityRequest.setCreatedOn(LocalDateTime.now());
-			facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_PENDING);
 			facilityRequestRepository.save(facilityRequest);
 			responseMessage.setData(Arrays.asList(facilityRequest));
 			responseMessage.setMessage(Constant.MSG_031);
@@ -273,13 +286,7 @@ public class FacilityServiceImpl implements FacilityService {
 			List<FacilityRequest> facilityRequests = (List<FacilityRequest>) facilityRequestRepository.findAll();
 			List<FacilityRequestDto> facilityRequestsDto = new ArrayList<FacilityRequestDto>();
 			for (FacilityRequest facilityRequest : facilityRequests) {
-				FacilityRequestDto facilityRequestDto = new FacilityRequestDto();
-				facilityRequestDto.setId(facilityRequest.getId());
-				facilityRequestDto.setFacilityName(facilityRequest.getFacility().getName());
-				facilityRequestDto.setFacilityCategory(facilityRequest.getFacility().getFacilityCategory().getName());
-				facilityRequestDto.setQuantity(facilityRequest.getQuantity());
-				facilityRequestDto.setUnitPrice(facilityRequest.getUnitPrice());
-				facilityRequestDto.setStatus(facilityRequest.getStatus());
+				FacilityRequestDto facilityRequestDto = convertFacilityRequestToFacilityRequestDto(facilityRequest);
 				facilityRequestsDto.add(facilityRequestDto);
 			}
 			responseMessage.setData(facilityRequestsDto);
@@ -289,6 +296,21 @@ public class FacilityServiceImpl implements FacilityService {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
+	}
+	
+	private FacilityRequestDto convertFacilityRequestToFacilityRequestDto(FacilityRequest facilityRequest) {
+		FacilityRequestDto facilityRequestDto = new FacilityRequestDto();
+		facilityRequestDto.setId(facilityRequest.getId());
+		facilityRequestDto.setFacilityId(facilityRequest.getFacility().getId());
+		facilityRequestDto.setFacilityName(facilityRequest.getFacility().getName());
+		facilityRequestDto.setFacilityCategoryId(facilityRequest.getFacility().getFacilityCategory().getId());
+		facilityRequestDto.setFacilityCategory(facilityRequest.getFacility().getFacilityCategory().getName());
+		facilityRequestDto.setQuantity(facilityRequest.getQuantity());
+		facilityRequestDto.setUnitPrice(facilityRequest.getUnitPrice());
+		facilityRequestDto.setStatus(facilityRequest.getStatus());
+		facilityRequestDto.setCreatedBy(facilityRequest.getCreatedBy());
+		facilityRequestDto.setCreatedOn(facilityRequest.getCreatedOn());
+		return facilityRequestDto;
 	}
 
 	@Override
@@ -304,19 +326,20 @@ public class FacilityServiceImpl implements FacilityService {
 			FacilityRequest facilityRequest = facilityRequestOp.get();
 			double totalAmount = facilityRequest.getQuantity() * facilityRequest.getUnitPrice();
 
-			if (fundAmount >= totalAmount) {
-				clubFund.setFundAmount(fundAmount - totalAmount);
-				clubFundRepository.save(clubFund);
+			if (facilityRequest.getStatus().equals(Constant.FACILITY_REQUEST_STATUS_PENDING)) {
+				if (fundAmount >= totalAmount) {
+					clubFund.setFundAmount(fundAmount - totalAmount);
+					clubFundRepository.save(clubFund);
 
-				facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_APPROVED);
-				facilityRequestRepository.save(facilityRequest);
+					facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_APPROVED);
+					facilityRequestRepository.save(facilityRequest);
 
-				responseMessage.setData(Arrays.asList(facilityRequest));
-				responseMessage.setMessage(Constant.MSG_076);
-			} else {
-				responseMessage.setMessage(Constant.MSG_077);
+					responseMessage.setData(Arrays.asList(facilityRequest));
+					responseMessage.setMessage(Constant.MSG_076);
+				} else {
+					responseMessage.setMessage(Constant.MSG_077);
+				}
 			}
-
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -331,10 +354,12 @@ public class FacilityServiceImpl implements FacilityService {
 		try {
 			Optional<FacilityRequest> facilityRequestOp = facilityRequestRepository.findById(facilityRequestId);
 			FacilityRequest facilityRequest = facilityRequestOp.get();
-			facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_DECLINED);
-			facilityRequestRepository.save(facilityRequest);
-			responseMessage.setData(Arrays.asList(facilityRequest));
-			responseMessage.setMessage(Constant.MSG_078);
+			if (facilityRequest.getStatus().equals(Constant.FACILITY_REQUEST_STATUS_PENDING)) {
+				facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_DECLINED);
+				facilityRequestRepository.save(facilityRequest);
+				responseMessage.setData(Arrays.asList(facilityRequest));
+				responseMessage.setMessage(Constant.MSG_078);
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

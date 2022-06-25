@@ -1,7 +1,7 @@
 package com.fpt.macm.service;
 
+import com.fpt.macm.dto.FacilityRequestDto;
 import com.fpt.macm.model.Facility;
-import com.fpt.macm.model.FacilityRequest;
 import com.fpt.macm.model.ResponseMessage;
 
 public interface FacilityService {
@@ -10,11 +10,11 @@ public interface FacilityService {
 
 	ResponseMessage updateFacilityById(int facilityId, Facility facility);
 
-	ResponseMessage getAllFacility(int pageNo, int pageSize, String sortBy);
+	ResponseMessage getAllFacilityByFacilityCategoryId(int facilityCategoryId, int pageNo, int pageSize, String sortBy);
 
 	ResponseMessage getAllReport();
 
-	ResponseMessage createRequestToBuyFacility(FacilityRequest facilityRequest);
+	ResponseMessage createRequestToBuyFacility(FacilityRequestDto facilityRequestDto);
 
 	ResponseMessage getAllRequestToBuyFacility(int pageNo, int pageSize, String sortBy);
 
