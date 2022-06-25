@@ -3,14 +3,19 @@ package com.fpt.macm.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.dto.CompetitiveTypeDto;
+import com.fpt.macm.dto.ExhibitionTypeDto;
 import com.fpt.macm.dto.RoleEventDto;
+import com.fpt.macm.dto.TournamentDto;
 import com.fpt.macm.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.CompetitiveType;
 import com.fpt.macm.model.Constant;
@@ -20,6 +25,8 @@ import com.fpt.macm.model.RoleEvent;
 import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.Tournament;
 import com.fpt.macm.model.TournamentOrganizingCommittee;
+import com.fpt.macm.repository.CompetitiveTypeRepository;
+import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.utils.Utils;
@@ -35,6 +42,12 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
+
+	@Autowired
+	CompetitiveTypeRepository competitiveTypeRepository;
+
+	@Autowired
+	ExhibitionTypeRepository exhibitionTypeRepository;
 
 	@Override
 	public ResponseMessage createTournament(Tournament tournament) {
@@ -141,6 +154,95 @@ public class TournamentServiceImpl implements TournamentService {
 		tournamentOrganizingCommitteeDto.setUpdatedBy(tournamentOrganizingCommittee.getUpdatedBy());
 		tournamentOrganizingCommitteeDto.setUpdatedOn(tournamentOrganizingCommittee.getUpdatedOn());
 		return tournamentOrganizingCommitteeDto;
+	}
+
+	@Override
+	public ResponseMessage updateTournament(int id, TournamentDto tournamentDto) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(id);
+			if (tournamentOp.isPresent()) {
+				Tournament tournament = tournamentOp.get();
+				tournament.setName(tournamentDto.getName());
+				tournament.setMaxQuantityComitee(tournamentDto.getMaxQuantityComitee());
+				tournament.setAmount_per_register(tournamentDto.getAmount_per_register());
+				tournament.setDescription(tournamentDto.getDescription());
+				Set<CompetitiveTypeDto> competitiveTypeDtos = tournamentDto.getCompetitiveTypesDto();
+				Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+				Set<ExhibitionTypeDto> exhibitionTypeDtos = tournamentDto.getExhibitionTypesDto();
+				Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+				Set<CompetitiveTypeDto> competitiveTypeDtosRemove = new HashSet<CompetitiveTypeDto>();
+				Set<ExhibitionTypeDto> exhibitionTypeDtosRemove = new HashSet<ExhibitionTypeDto>();
+				competitiveTypes.removeIf(
+						a -> !competitiveTypeDtos.stream().anyMatch(b -> Objects.equals(a.getId(), b.getId())));
+				for (CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
+					for (CompetitiveType competitiveType : competitiveTypes) {
+						if (competitiveTypeDto.getId() == competitiveType.getId()) {
+							competitiveType = convertCompetitiveTypeDto(competitiveTypeDto);
+							competitiveType.setUpdatedBy("toandv");
+							competitiveType.setUpdatedOn(LocalDateTime.now());
+							competitiveTypeRepository.save(competitiveType);
+							competitiveTypeDtosRemove.add(competitiveTypeDto);
+						}
+					}
+				}
+				competitiveTypeDtos.removeAll(competitiveTypeDtosRemove);
+				for (CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
+					CompetitiveType competitiveType = convertCompetitiveTypeDto(competitiveTypeDto);
+					competitiveType.setUpdatedBy("toandv");
+					competitiveType.setUpdatedOn(LocalDateTime.now());
+					competitiveTypes.add(competitiveType);
+				}
+				
+				exhibitionTypes.removeIf(
+						a -> !exhibitionTypeDtos.stream().anyMatch(b -> Objects.equals(a.getId(), b.getId())));
+				for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
+					for (ExhibitionType exhibitionType : exhibitionTypes) {
+						if (exhibitionTypeDto.getId() == exhibitionType.getId()) {
+							exhibitionType = convertExhibitionTypeDto(exhibitionTypeDto);
+							exhibitionType.setUpdatedBy("toandv");
+							exhibitionType.setUpdatedOn(LocalDateTime.now());
+							exhibitionTypeRepository.save(exhibitionType);
+							exhibitionTypeDtosRemove.add(exhibitionTypeDto);
+						}
+					}
+				}
+				exhibitionTypeDtos.removeAll(exhibitionTypeDtosRemove);
+				for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
+					ExhibitionType exhibitionType = convertExhibitionTypeDto(exhibitionTypeDto);
+					exhibitionType.setUpdatedBy("toandv");
+					exhibitionType.setUpdatedOn(LocalDateTime.now());
+					exhibitionTypes.add(exhibitionType);
+				}
+				tournament.setCompetitiveTypes(competitiveTypes);
+				tournament.setExhibitionTypes(exhibitionTypes);
+				tournamentRepository.save(tournament);
+				responseMessage.setData(Arrays.asList(tournament));
+				responseMessage.setCode(200);
+				responseMessage.setMessage(Constant.MSG_101);
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	private CompetitiveType convertCompetitiveTypeDto(CompetitiveTypeDto competitiveTypeDto) {
+		CompetitiveType competitiveType = new CompetitiveType();
+		competitiveType.setId(competitiveTypeDto.getId());
+		competitiveType.setWeightMin(competitiveTypeDto.getWeightMin());
+		competitiveType.setWeightMax(competitiveTypeDto.getWeightMax());
+		competitiveType.setGender(competitiveTypeDto.isGender());
+		return competitiveType;
+	}
+
+	private ExhibitionType convertExhibitionTypeDto(ExhibitionTypeDto exhibitionTypeDto) {
+		ExhibitionType exhibitionType = new ExhibitionType();
+		exhibitionType.setId(exhibitionTypeDto.getId());
+		exhibitionType.setName(exhibitionTypeDto.getName());
+		exhibitionType.setNumberFemale(exhibitionTypeDto.getNumberFemale());
+		exhibitionType.setNumberMale(exhibitionTypeDto.getNumberMale());
+		return exhibitionType;
 	}
 
 }

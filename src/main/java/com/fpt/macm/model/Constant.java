@@ -150,5 +150,5 @@ public class Constant {
 	public static final String MSG_098 = "Cập nhật vai trò danh sách ban tổ chức giải đấu thành công";
 	public static final String MSG_099 = "Tạo giải đấu thành công";
 	public static final String MSG_100 = "Thêm lịch giải đấu thành công";
-	public static final String MSG_101 = "Phải có ít nhất 1 người tham gia";
+	public static final String MSG_101 = "Cập nhật thông tin giải đấu thành công";
 }
