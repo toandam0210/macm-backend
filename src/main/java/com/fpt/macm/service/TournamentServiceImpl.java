@@ -252,8 +252,24 @@ public class TournamentServiceImpl implements TournamentService {
 			Optional<Tournament> tournamentOp = tournamentRepository.findById(id);
 			if(tournamentOp.isPresent()) {
 				Tournament tournament = tournamentOp.get();
-				tournamentRepository.save(tournament);
-				responseMessage.setMessage("Xóa giải đấu thành công");
+				tournamentRepository.delete(tournament);
+				responseMessage.setMessage(Constant.MSG_102);
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getTournamentById(int id) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(id);
+			if(tournamentOp.isPresent()) {
+				Tournament tournament = tournamentOp.get();
+				responseMessage.setData(Arrays.asList(tournament));
+				responseMessage.setMessage(Constant.MSG_103);
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());

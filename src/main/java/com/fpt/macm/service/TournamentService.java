@@ -19,4 +19,6 @@ public interface TournamentService {
 	ResponseMessage updateTournament(int id, TournamentDto tournamentDto);
 	
 	ResponseMessage deleteTournamentById(int id);
+	
+	ResponseMessage getTournamentById(int id);
 }
