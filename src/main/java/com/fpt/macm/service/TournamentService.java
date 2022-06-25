@@ -21,4 +21,6 @@ public interface TournamentService {
 	ResponseMessage deleteTournamentById(int id);
 	
 	ResponseMessage getTournamentById(int id);
+	
+	ResponseMessage getAllTournamentBySemester(String semester);
 }
