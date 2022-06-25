@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.macm.dto.FacilityDto;
 import com.fpt.macm.dto.FacilityRequestDto;
 import com.fpt.macm.model.Facility;
 import com.fpt.macm.model.ResponseMessage;
@@ -25,8 +26,8 @@ public class FacilityController {
 	FacilityService facilityService;
 
 	@PostMapping("/headtechnique/createnewfacility")
-	ResponseEntity<ResponseMessage> createNewFacility(@RequestBody Facility facility) {
-		return new ResponseEntity<ResponseMessage>(facilityService.createNewFacility(facility), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> createNewFacility(@RequestBody FacilityDto facilityDto) {
+		return new ResponseEntity<ResponseMessage>(facilityService.createNewFacility(facilityDto), HttpStatus.OK);
 	}
 
 	@PutMapping("/headtechnique/updatefacilitybyid/{facilityId}")

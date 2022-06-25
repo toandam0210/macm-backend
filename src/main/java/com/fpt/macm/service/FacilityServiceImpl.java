@@ -19,6 +19,7 @@ import com.fpt.macm.dto.FacilityRequestDto;
 import com.fpt.macm.model.ClubFund;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Facility;
+import com.fpt.macm.model.FacilityCategory;
 import com.fpt.macm.model.FacilityReport;
 import com.fpt.macm.model.FacilityRequest;
 import com.fpt.macm.model.ResponseMessage;
@@ -43,16 +44,30 @@ public class FacilityServiceImpl implements FacilityService {
 	ClubFundRepository clubFundRepository;
 
 	@Override
-	public ResponseMessage createNewFacility(Facility facility) {
+	public ResponseMessage createNewFacility(FacilityDto facilityDto) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			Facility facility = convertFacilityDto(facilityDto);
 			if (!isExistFacilityToCreate(facility)) {
 				facility.setQuantityBroken(0);
 				facility.setCreatedBy("toandv");
 				facility.setCreatedOn(LocalDateTime.now());
+
 				facilityRepository.save(facility);
-				responseMessage.setData(Arrays.asList(facility));
+
+				if (facility.getQuantityUsable() > 0) {
+					Optional<Facility> facilityOp = facilityRepository.findFacilityByFacilityNameAndFacilityCategoryId(
+							facilityDto.getFacilityName(), facilityDto.getFacilityCategoryId());
+					FacilityReport facilityReport = new FacilityReport();
+					facilityReport.setFacility(facilityOp.get());
+					facilityReport.setDescription(Constant.FACILITY_STATUS_001 + " " + facility.getQuantityUsable());
+					facilityReport.setCreatedBy("toandv");
+					facilityReport.setCreatedOn(LocalDateTime.now());
+					facilityReportRepository.save(facilityReport);
+				}
+
+				responseMessage.setData(Arrays.asList(facilityDto));
 				responseMessage.setMessage(Constant.MSG_029);
 			} else {
 				responseMessage.setMessage(Constant.MSG_030);
@@ -62,6 +77,19 @@ public class FacilityServiceImpl implements FacilityService {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
+	}
+
+	private Facility convertFacilityDto(FacilityDto facilityDto) {
+		Facility facility = new Facility();
+		facility.setId(facilityDto.getFacilityId());
+		facility.setName(facilityDto.getFacilityName());
+		facility.setQuantityUsable(facilityDto.getQuantityUsable());
+		facility.setQuantityBroken(facilityDto.getQuantityBroken());
+		FacilityCategory facilityCategory = new FacilityCategory();
+		facilityCategory.setId(facilityDto.getFacilityCategoryId());
+		facilityCategory.setName(facilityDto.getFacilityCategoryName());
+		facility.setFacilityCategory(facilityCategory);
+		return facility;
 	}
 
 	private boolean isExistFacilityToCreate(Facility newFacility) {
@@ -189,19 +217,19 @@ public class FacilityServiceImpl implements FacilityService {
 	}
 
 	@Override
-	public ResponseMessage getAllFacilityByFacilityCategoryId(int facilityCategoryId, int pageNo, int pageSize, String sortBy) {
+	public ResponseMessage getAllFacilityByFacilityCategoryId(int facilityCategoryId, int pageNo, int pageSize,
+			String sortBy) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
 			Page<Facility> pageResponse;
 			if (facilityCategoryId == 0) {
 				pageResponse = facilityRepository.findAll(paging);
-			}
-			else {
+			} else {
 				pageResponse = facilityRepository.findByFacilityCategoryId(facilityCategoryId, paging);
 			}
-			
+
 			List<Facility> facilities = new ArrayList<Facility>();
 			List<FacilityDto> facilitiesDto = new ArrayList<FacilityDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
@@ -211,6 +239,7 @@ public class FacilityServiceImpl implements FacilityService {
 				FacilityDto facilityDto = new FacilityDto();
 				facilityDto.setFacilityId(facility.getId());
 				facilityDto.setFacilityName(facility.getName());
+				facilityDto.setFacilityCategoryId(facility.getFacilityCategory().getId());
 				facilityDto.setFacilityCategoryName(facility.getFacilityCategory().getName());
 				facilityDto.setQuantityUsable(facility.getQuantityUsable());
 				facilityDto.setQuantityBroken(facility.getQuantityBroken());
@@ -296,7 +325,7 @@ public class FacilityServiceImpl implements FacilityService {
 		}
 		return responseMessage;
 	}
-	
+
 	private FacilityRequestDto convertFacilityRequestToFacilityRequestDto(FacilityRequest facilityRequest) {
 		FacilityRequestDto facilityRequestDto = new FacilityRequestDto();
 		facilityRequestDto.setId(facilityRequest.getId());

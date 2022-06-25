@@ -4,6 +4,7 @@ public class FacilityDto {
 
 	private int facilityId;
 	private String facilityName;
+	private int facilityCategoryId;
 	private String facilityCategoryName;
 	private int quantityUsable;
 	private int quantityBroken;
@@ -46,6 +47,14 @@ public class FacilityDto {
 
 	public void setQuantityBroken(int quantityBroken) {
 		this.quantityBroken = quantityBroken;
+	}
+
+	public int getFacilityCategoryId() {
+		return facilityCategoryId;
+	}
+
+	public void setFacilityCategoryId(int facilityCategoryId) {
+		this.facilityCategoryId = facilityCategoryId;
 	}
 
 }

@@ -1,12 +1,13 @@
 package com.fpt.macm.service;
 
+import com.fpt.macm.dto.FacilityDto;
 import com.fpt.macm.dto.FacilityRequestDto;
 import com.fpt.macm.model.Facility;
 import com.fpt.macm.model.ResponseMessage;
 
 public interface FacilityService {
 
-	ResponseMessage createNewFacility(Facility facility);
+	ResponseMessage createNewFacility(FacilityDto facilityDto);
 
 	ResponseMessage updateFacilityById(int facilityId, Facility facility);
 
