@@ -151,8 +151,17 @@ public class Constant {
 	public static final String MSG_099 = "Tạo giải đấu thành công";
 	public static final String MSG_100 = "Thêm lịch giải đấu thành công";
 	public static final String MSG_101 = "Cập nhật thông tin giải đấu thành công";
-	public static final String MSG_102 = "Chỉnh sửa lịch sự kiện thành công";
-	public static final String MSG_103 = "Lấy lịch trong ngày thành công";
-	public static final String MSG_104 = "Không có lịch trong ngày này";
-	public static final String MSG_105 = "Lấy lịch thành công";
+	public static final String MSG_102 = "Xóa giải đấu thành công";
+	public static final String MSG_103 = "Lấy thông tin giải đấu thành công";
+	public static final String MSG_104 = "Không thành công, đã có lịch trong ngày này";
+	public static final String MSG_105 = "Không thành công, không thể thêm lịch vào quá khứ";
+	public static final String MSG_106 = "Thêm lịch giải đấu thành công";
+	public static final String MSG_107 = "Cập nhật ngày giải đấu thành công";
+	public static final String MSG_108 = "Không thành công. Không thể cập nhật ngày giải đấu trong quá khứ";
+	public static final String MSG_109 = "Xóa thành công";
+	public static final String MSG_110 = "Chỉnh sửa lịch sự kiện thành công";
+	public static final String MSG_111 = "Lấy lịch trong ngày thành công";
+	public static final String MSG_112 = "Không có lịch trong ngày này";
+	public static final String MSG_113 = "Lấy lịch thành công";
+
 }

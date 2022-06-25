@@ -4,7 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +16,6 @@ import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
-import com.fpt.macm.model.Tournament;
 import com.fpt.macm.model.TournamentSchedule;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.TournamentRepository;
@@ -79,16 +80,7 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 							listPreview.add(tournamentScheduleDto);
 						}
 					}
-					if (listPreview.isEmpty()) {
-						Tournament getTournament = tournamentRepository.findByExactName(tournamentName).get();
-						if (getListTournamentScheduleByTournament(getTournament.getId()).getData() == null) {
-							// memberEventRepository.deleteAll(memberEventRepository.findByEventId(getEvent.getId()));
-							tournamentRepository.delete(getTournament);
-						}
-						responseMessage.setMessage(Constant.MSG_040);
-					} else {
 						responseMessage.setData(listPreview);
-					}
 				}
 			}
 		} catch (Exception e) {
@@ -186,6 +178,99 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 				}
 			}
 		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage createTournamentSesstion(int tournamentId, TournamentSchedule tournamentSchedule) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			if(tournamentSchedule.getStartTime().compareTo(tournamentSchedule.getFinishTime()) >= 0) {
+				responseMessage.setMessage(Constant.MSG_038);
+			} else {
+				if(tournamentSchedule.getDate().compareTo(LocalDate.now()) > 0) {
+					if (commonScheduleService.getCommonSessionByDate(tournamentSchedule.getDate()) == null) {
+						tournamentSchedule.setTournament(tournamentRepository.findById(tournamentId).get());
+						tournamentSchedule.setCreatedBy("LinhLHN");
+						tournamentSchedule.setCreatedOn(LocalDateTime.now());
+						tournamentSchedule.setUpdatedBy("LinhLHN");
+						tournamentSchedule.setUpdatedOn(LocalDateTime.now());
+						tournamentScheduleRepository.save(tournamentSchedule);
+						responseMessage.setData(Arrays.asList(tournamentSchedule));
+						responseMessage.setMessage(Constant.MSG_106);
+						CommonSchedule commonSession = new CommonSchedule();
+						commonSession.setTitle(tournamentSchedule.getTournament().getName());
+						commonSession.setDate(tournamentSchedule.getDate());
+						commonSession.setStartTime(tournamentSchedule.getStartTime());
+						commonSession.setFinishTime(tournamentSchedule.getFinishTime());
+						commonSession.setCreatedOn(LocalDateTime.now());
+						commonSession.setUpdatedOn(LocalDateTime.now());
+						commonScheduleRepository.save(commonSession);
+					}
+					else {
+						responseMessage.setMessage(Constant.MSG_104);
+					}
+				}
+				else {
+					responseMessage.setMessage(Constant.MSG_105);
+				}
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateTournamentSession(int tournamentSessionId, TournamentSchedule tournamentSchedule) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<TournamentSchedule> currentSession = tournamentScheduleRepository.findById(tournamentSessionId);
+			TournamentSchedule getTournamentSession = currentSession.get();
+			if(getTournamentSession.getDate().compareTo(LocalDate.now()) > 0) {
+				getTournamentSession.setStartTime(tournamentSchedule.getStartTime());
+				getTournamentSession.setFinishTime(tournamentSchedule.getFinishTime());
+				getTournamentSession.setUpdatedBy("LinhLHN");
+				getTournamentSession.setUpdatedOn(LocalDateTime.now());
+				tournamentScheduleRepository.save(getTournamentSession);
+				responseMessage.setData(Arrays.asList(getTournamentSession));
+				responseMessage.setMessage(Constant.MSG_107);
+				CommonSchedule commonSession = commonScheduleService.getCommonSessionByDate(getTournamentSession.getDate());
+				commonSession.setStartTime(tournamentSchedule.getStartTime());
+				commonSession.setFinishTime(tournamentSchedule.getFinishTime());
+				commonSession.setUpdatedOn(LocalDateTime.now());
+				commonScheduleRepository.save(commonSession);
+			}
+			else {
+				responseMessage.setMessage(Constant.MSG_108);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage deleteTournamentSession(int tournamentSessionId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<TournamentSchedule> currentSession = tournamentScheduleRepository.findById(tournamentSessionId);
+			TournamentSchedule getTournamentSession = currentSession.get();
+			if(getTournamentSession.getDate().compareTo(LocalDate.now()) > 0) {
+				tournamentScheduleRepository.delete(getTournamentSession);
+				responseMessage.setData(Arrays.asList(getTournamentSession));
+				responseMessage.setMessage(Constant.MSG_109);
+				CommonSchedule commonSession = commonScheduleService.getCommonSessionByDate(getTournamentSession.getDate());
+				commonScheduleRepository.delete(commonSession);
+			}
+			else {
+				responseMessage.setMessage(Constant.MSG_108);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
