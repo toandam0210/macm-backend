@@ -26,29 +26,36 @@ import com.fpt.macm.service.TournamentService;
 public class TournamentController {
 	@Autowired
 	TournamentService tournamentService;
-	
+
 	@PostMapping("/headclub/createtournament")
 	ResponseEntity<ResponseMessage> createTournament(@RequestBody Tournament tournament) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.createTournament(tournament), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headclub/getalltournamentorganizingcommittee/{tournamentId}")
-	ResponseEntity<ResponseMessage> getAllTournamentOrganizingCommittee(@PathVariable(name = "tournamentId") int tournamentId){
-		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentOrganizingCommitteeByTournamentId(tournamentId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllTournamentOrganizingCommittee(
+			@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllTournamentOrganizingCommitteeByTournamentId(tournamentId), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/updatetournamentorganizingcommitteerole")
-	ResponseEntity<ResponseMessage> updateTournamentOrganizingCommitteeRole(@RequestBody List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto){
-		return new ResponseEntity<ResponseMessage>(tournamentService.updateTournamentOrganizingCommitteeRole(tournamentOrganizingCommitteesDto), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateTournamentOrganizingCommitteeRole(
+			@RequestBody List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.updateTournamentOrganizingCommitteeRole(tournamentOrganizingCommitteesDto),
+				HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/update/{tournamentId}")
-	ResponseEntity<ResponseMessage> updateTournament(@PathVariable(name = "tournamentId") int tournamentId,  @RequestBody TournamentDto tournamentDto){
-		return new ResponseEntity<ResponseMessage>(tournamentService.updateTournament(tournamentId,tournamentDto), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateTournament(@PathVariable(name = "tournamentId") int tournamentId,
+			@RequestBody TournamentDto tournamentDto) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.updateTournament(tournamentId, tournamentDto),
+				HttpStatus.OK);
 	}
-	
+
 	@DeleteMapping("/headclub/delete/{tournamentId}")
-	ResponseEntity<ResponseMessage> delete(@PathVariable(name = "tournamentId") int tournamentId){
+	ResponseEntity<ResponseMessage> delete(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.deleteTournamentById(tournamentId), HttpStatus.OK);
 	}
 	
@@ -62,4 +69,18 @@ public class TournamentController {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentBySemester(semester), HttpStatus.OK);
 	}
 	
+	@GetMapping("/headclub/getallcompetitiveplayer/{tournamentId}")
+	ResponseEntity<ResponseMessage> getAllCompetitivePlayer(@PathVariable(name = "tournamentId") int tournamentId,
+			@RequestParam(defaultValue = "0") double weightMin, @RequestParam(defaultValue = "0") double weightMax) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllCompetitivePlayer(tournamentId, weightMin, weightMax), HttpStatus.OK);
+	}
+
+	@GetMapping("/headclub/getallexhibitionteam/{tournamentId}")
+	ResponseEntity<ResponseMessage> getAllExhibitionTeam(@PathVariable(name = "tournamentId") int tournamentId,
+			@RequestParam(defaultValue = "0") int exhibitionType) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllExhibitionTeam(tournamentId, exhibitionType), HttpStatus.OK);
+	}
+
 }

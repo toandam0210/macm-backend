@@ -9,6 +9,7 @@ public class TournamentOrganizingCommitteeDto {
 	private String userStudentId;
 	private RoleEventDto roleTournamentDto;
 	private String registerStatus;
+	private boolean paymentStatus;
 	private String createdBy;
 	private LocalDateTime createdOn;
 	private String updatedBy;
@@ -84,6 +85,14 @@ public class TournamentOrganizingCommitteeDto {
 
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
+	}
+
+	public boolean isPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(boolean paymentStatus) {
+		this.paymentStatus = paymentStatus;
 	}
 
 }

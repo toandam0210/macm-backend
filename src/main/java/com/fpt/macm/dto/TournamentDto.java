@@ -3,6 +3,8 @@ package com.fpt.macm.dto;
 import java.time.LocalDate;
 import java.util.Set;
 
+import com.fpt.macm.model.TournamentPlayer;
+
 public class TournamentDto {
 	private int id;
 
@@ -15,12 +17,14 @@ public class TournamentDto {
 	private double amount_per_register;
 
 	private Set<CompetitiveTypeDto> competitiveTypesDto;
-	
+
 	private Set<ExhibitionTypeDto> exhibitionTypesDto;
-	
+
 	private String status;
-	
+
 	private LocalDate startDate;
+
+	private Set<TournamentPlayer> tournamentPlayers;
 
 	public int getId() {
 		return id;
@@ -93,6 +97,13 @@ public class TournamentDto {
 	public void setStartDate(LocalDate startDate) {
 		this.startDate = startDate;
 	}
-	
-	
+
+	public Set<TournamentPlayer> getTournamentPlayers() {
+		return tournamentPlayers;
+	}
+
+	public void setTournamentPlayers(Set<TournamentPlayer> tournamentPlayers) {
+		this.tournamentPlayers = tournamentPlayers;
+	}
+
 }

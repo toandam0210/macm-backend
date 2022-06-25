@@ -1,37 +1,24 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "exhibition_type")
-public class ExhibitionType {
+@Table(name = "exhibition_player")
+public class ExhibitionPlayer {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "exhibition_type_id")
-	private Set<ExhibitionTeam> exhibitionTeams;
-
+	
 	@Column
-	private String name;
-
-	@Column
-	private int numberMale;
-
-	@Column
-	private int numberFemale;
+	private boolean roleInTeam;
 
 	@Column
 	private String createdBy;
@@ -53,28 +40,12 @@ public class ExhibitionType {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public boolean isRoleInTeam() {
+		return roleInTeam;
 	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public int getNumberMale() {
-		return numberMale;
-	}
-
-	public void setNumberMale(int numberMale) {
-		this.numberMale = numberMale;
-	}
-
-	public int getNumberFemale() {
-		return numberFemale;
-	}
-
-	public void setNumberFemale(int numberFemale) {
-		this.numberFemale = numberFemale;
+	public void setRoleInTeam(boolean roleInTeam) {
+		this.roleInTeam = roleInTeam;
 	}
 
 	public String getCreatedBy() {
@@ -107,14 +78,6 @@ public class ExhibitionType {
 
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
-	}
-
-	public Set<ExhibitionTeam> getExhibitionTeams() {
-		return exhibitionTeams;
-	}
-
-	public void setExhibitionTeams(Set<ExhibitionTeam> exhibitionTeams) {
-		this.exhibitionTeams = exhibitionTeams;
 	}
 
 }

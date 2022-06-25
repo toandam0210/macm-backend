@@ -1,41 +1,32 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "tournament_organizing_committee")
-public class TournamentOrganizingCommittee {
+@Table(name = "exhibition_team")
+public class ExhibitionTeam {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "tournamentId")
-	private Tournament tournament;
-
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "userId")
-	private User user;
-
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "role_in_tournament")
-	private RoleEvent roleEvent;
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "exhibition_team_id")
+	private Set<ExhibitionPlayer> exhibitionPlayers;
 
 	@Column
-	private String registerStatus;
-
-	@Column
-	private boolean paymentStatus;
+	private String teamName;
 
 	@Column
 	private String createdBy;
@@ -57,36 +48,20 @@ public class TournamentOrganizingCommittee {
 		this.id = id;
 	}
 
-	public Tournament getTournament() {
-		return tournament;
+	public Set<ExhibitionPlayer> getExhibitionPlayers() {
+		return exhibitionPlayers;
 	}
 
-	public void setTournament(Tournament tournament) {
-		this.tournament = tournament;
+	public void setExhibitionPlayers(Set<ExhibitionPlayer> exhibitionPlayers) {
+		this.exhibitionPlayers = exhibitionPlayers;
 	}
 
-	public User getUser() {
-		return user;
+	public String getTeamName() {
+		return teamName;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
-	}
-
-	public RoleEvent getRoleEvent() {
-		return roleEvent;
-	}
-
-	public void setRoleEvent(RoleEvent roleEvent) {
-		this.roleEvent = roleEvent;
-	}
-
-	public String getRegisterStatus() {
-		return registerStatus;
-	}
-
-	public void setRegisterStatus(String registerStatus) {
-		this.registerStatus = registerStatus;
+	public void setTeamName(String teamName) {
+		this.teamName = teamName;
 	}
 
 	public String getCreatedBy() {
@@ -119,14 +94,6 @@ public class TournamentOrganizingCommittee {
 
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
-	}
-
-	public boolean isPaymentStatus() {
-		return paymentStatus;
-	}
-
-	public void setPaymentStatus(boolean paymentStatus) {
-		this.paymentStatus = paymentStatus;
 	}
 
 }
