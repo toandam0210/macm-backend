@@ -10,6 +10,6 @@ import com.fpt.macm.model.TournamentSchedule;
 
 @Repository
 public interface TournamentScheduleRepository extends JpaRepository<TournamentSchedule, Integer> {
-	@Query(value = "select * from tournament_schedule where event_id = ?1 order by date", nativeQuery = true)
+	@Query(value = "select * from tournament_schedule where tournament_id = ?1",nativeQuery = true)
 	List<TournamentSchedule> findByTournamentId(int tournamentId);
 }

@@ -49,7 +49,7 @@ public class EventScheduleController {
 	}
 	
 	@PostMapping("/headculture/addnewschedule/{eventId}")
-	ResponseEntity<ResponseMessage> createTrainingSchedule(@PathVariable(name = "eventId") int eventId, 
+	ResponseEntity<ResponseMessage> createEventSchedule(@PathVariable(name = "eventId") int eventId, 
 			@RequestBody List<ScheduleDto> listPreview, @RequestParam Boolean isOverwritten) {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.createEventSchedule(eventId, listPreview, isOverwritten), HttpStatus.OK);
 	}
@@ -67,5 +67,17 @@ public class EventScheduleController {
 	@GetMapping("/geteventsessionbydate")
 	ResponseEntity<ResponseMessage> getEventSessionByDate(@RequestParam String date) {
 			return new ResponseEntity<ResponseMessage>(eventScheduleService.getEventSessionByDate(date), HttpStatus.OK);
+	}
+	
+	@PostMapping("/headculture/updatepreview/{eventId}")
+	ResponseEntity<ResponseMessage> updatePreviewEventSchedule(@PathVariable(name = "eventId") int eventId, @RequestParam String startDate, 
+			@RequestParam String finishDate, @RequestParam String startTime, @RequestParam String finishTime) {
+		return new ResponseEntity<ResponseMessage>(eventScheduleService.updatePreviewEventSchedule(eventId, startDate, finishDate, startTime, finishTime), HttpStatus.OK);
+	}
+	
+	@PostMapping("/headculture/updateschedule/{eventId}")
+	ResponseEntity<ResponseMessage> updateEventSchedule(@PathVariable(name = "eventId") int eventId, 
+			@RequestBody List<ScheduleDto> listPreview, @RequestParam Boolean isOverwritten) {
+		return new ResponseEntity<ResponseMessage>(eventScheduleService.updateEventSchedule(eventId, listPreview, isOverwritten), HttpStatus.OK);
 	}
 }

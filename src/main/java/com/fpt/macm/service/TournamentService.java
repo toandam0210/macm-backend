@@ -15,12 +15,16 @@ public interface TournamentService {
 			List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto);
 
 	ResponseMessage createTournament(Tournament tournament);
-	
+
 	ResponseMessage updateTournament(int id, TournamentDto tournamentDto);
-	
+
 	ResponseMessage deleteTournamentById(int id);
-	
+
+	ResponseMessage getTournamentById(int id);
+
+	ResponseMessage getAllTournamentBySemester(String semester);
+
 	ResponseMessage getAllCompetitivePlayer(int tournamentId, double weightMin, double weightMax);
-	
+
 	ResponseMessage getAllExhibitionTeam(int tournamentId, int exhibitionTypeId);
 }

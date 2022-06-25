@@ -1,10 +1,10 @@
 package com.fpt.macm.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -33,14 +33,17 @@ import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.Tournament;
 import com.fpt.macm.model.TournamentOrganizingCommittee;
 import com.fpt.macm.model.TournamentPlayer;
+import com.fpt.macm.model.TournamentSchedule;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
+import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
+import com.fpt.macm.repository.TournamentScheduleRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -60,6 +63,12 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ExhibitionTypeRepository exhibitionTypeRepository;
+
+	@Autowired
+	SemesterRepository semesterRepository;
+
+	@Autowired
+	TournamentScheduleRepository tournamentScheduleRepository;
 
 	@Autowired
 	TournamentPlayerRepository tournamentPlayerRepository;
@@ -277,13 +286,121 @@ public class TournamentServiceImpl implements TournamentService {
 			Optional<Tournament> tournamentOp = tournamentRepository.findById(id);
 			if (tournamentOp.isPresent()) {
 				Tournament tournament = tournamentOp.get();
-				tournamentRepository.save(tournament);
-				responseMessage.setMessage("Xóa giải đấu thành công");
+				tournamentRepository.delete(tournament);
+				responseMessage.setMessage(Constant.MSG_102);
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
+	}
+
+	public ResponseMessage getTournamentById(int id) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(id);
+			if (tournamentOp.isPresent()) {
+				Tournament tournament = tournamentOp.get();
+				responseMessage.setData(Arrays.asList(tournament));
+				responseMessage.setMessage(Constant.MSG_103);
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllTournamentBySemester(String semester) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			if (semester == "") {
+				semester = semesterRepository.findTop3Semester().get(0).getName();
+			}
+			List<Tournament> tournaments = tournamentRepository.findBySemester(semester);
+			List<TournamentDto> tournamentDtos = new ArrayList<TournamentDto>();
+			for (Tournament tournament : tournaments) {
+				LocalDate startDate = getStartDate(tournament.getId());
+				TournamentDto tournamentDto = new TournamentDto();
+				if (startDate != null) {
+					LocalDate endDate = getEndDate(tournament.getId());
+					if (LocalDate.now().isBefore(startDate)) {
+						tournamentDto.setStatus("Chưa diễn ra");
+					} else if (LocalDate.now().isAfter(endDate)) {
+						tournamentDto.setStatus("Đã kết thúc");
+					} else {
+						tournamentDto.setStatus("Đang diễn ra");
+					}
+				} else {
+					tournamentDto.setStatus("Chưa diễn ra");
+				}
+				Set<CompetitiveTypeDto> competitiveTypeDtos = new HashSet<CompetitiveTypeDto>();
+				Set<ExhibitionTypeDto> exhibitionTypeDtos = new HashSet<ExhibitionTypeDto>();
+				for (CompetitiveType competitiveType : tournament.getCompetitiveTypes()) {
+					CompetitiveTypeDto competitiveTypeDto = convertCompetitiveTypeToDto(competitiveType);
+					competitiveTypeDtos.add(competitiveTypeDto);
+				}
+				for (ExhibitionType exhibitionType : tournament.getExhibitionTypes()) {
+					ExhibitionTypeDto exhibitionTypeDto = convertExhibitionToDto(exhibitionType);
+					exhibitionTypeDtos.add(exhibitionTypeDto);
+				}
+				tournamentDto.setCompetitiveTypesDto(competitiveTypeDtos);
+				tournamentDto.setExhibitionTypesDto(exhibitionTypeDtos);
+				tournamentDto.setAmount_per_register(tournament.getAmount_per_register());
+				tournamentDto.setMaxQuantityComitee(tournament.getMaxQuantityComitee());
+				tournamentDto.setStartDate(startDate);
+				tournamentDto.setName(tournament.getName());
+				tournamentDto.setId(tournament.getId());
+				tournamentDtos.add(tournamentDto);
+
+			}
+			responseMessage.setData(tournamentDtos);
+			responseMessage.setMessage("Lấy danh sách giải đấu thành công" + semester);
+			responseMessage.setTotalResult(tournamentDtos.size());
+
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	public LocalDate getStartDate(int tournamentId) {
+		// TODO Auto-generated method stub
+		try {
+			List<TournamentSchedule> listSchedule = tournamentScheduleRepository.findByTournamentId(tournamentId);
+			if (listSchedule.size() > 0) {
+				return listSchedule.get(0).getDate();
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+
+	public LocalDate getEndDate(int tournamentId) {
+		List<TournamentSchedule> listSchedule = tournamentScheduleRepository.findByTournamentId(tournamentId);
+		if (listSchedule.size() > 0) {
+			return listSchedule.get(listSchedule.size() - 1).getDate();
+		}
+		return null;
+	}
+
+	public CompetitiveTypeDto convertCompetitiveTypeToDto(CompetitiveType competitiveType) {
+		CompetitiveTypeDto competitiveTypeDto = new CompetitiveTypeDto();
+		competitiveTypeDto.setId(competitiveType.getId());
+		competitiveTypeDto.setGender(competitiveType.isGender());
+		competitiveTypeDto.setWeightMin(competitiveType.getWeightMin());
+		competitiveTypeDto.setWeightMax(competitiveType.getWeightMax());
+		return competitiveTypeDto;
+	}
+
+	public ExhibitionTypeDto convertExhibitionToDto(ExhibitionType exhibitionType) {
+		ExhibitionTypeDto exhibitionTypeDto = new ExhibitionTypeDto();
+		exhibitionTypeDto.setId(exhibitionType.getId());
+		exhibitionTypeDto.setName(exhibitionType.getName());
+		exhibitionTypeDto.setNumberFemale(exhibitionType.getNumberFemale());
+		exhibitionTypeDto.setNumberMale(exhibitionType.getNumberMale());
+		return exhibitionTypeDto;
 	}
 
 	@Override

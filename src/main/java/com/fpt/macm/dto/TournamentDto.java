@@ -1,5 +1,6 @@
 package com.fpt.macm.dto;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 import com.fpt.macm.model.TournamentPlayer;
@@ -18,6 +19,10 @@ public class TournamentDto {
 	private Set<CompetitiveTypeDto> competitiveTypesDto;
 
 	private Set<ExhibitionTypeDto> exhibitionTypesDto;
+
+	private String status;
+
+	private LocalDate startDate;
 
 	private Set<TournamentPlayer> tournamentPlayers;
 
@@ -75,6 +80,22 @@ public class TournamentDto {
 
 	public void setExhibitionTypesDto(Set<ExhibitionTypeDto> exhibitionTypesDto) {
 		this.exhibitionTypesDto = exhibitionTypesDto;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public LocalDate getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(LocalDate startDate) {
+		this.startDate = startDate;
 	}
 
 	public Set<TournamentPlayer> getTournamentPlayers() {
