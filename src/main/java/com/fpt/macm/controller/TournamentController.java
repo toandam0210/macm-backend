@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.dto.TournamentDto;
@@ -54,6 +55,11 @@ public class TournamentController {
 	@GetMapping("/headclub/tournament/{tournamentId}")
 	ResponseEntity<ResponseMessage> getTournamentById(@PathVariable(name = "tournamentId") int tournamentId){
 		return new ResponseEntity<ResponseMessage>(tournamentService.getTournamentById(tournamentId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/headclub/tournament/getall")
+	ResponseEntity<ResponseMessage> getAllTournamentBySemester(@RequestParam String semester){
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentBySemester(semester), HttpStatus.OK);
 	}
 	
 }

@@ -1,5 +1,6 @@
 package com.fpt.macm.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,4 +13,7 @@ import com.fpt.macm.model.Tournament;
 public interface TournamentRepository extends JpaRepository<Tournament, Integer>{
 	@Query(value = "select * from tournament where name like ?1", nativeQuery = true)
 	Optional<Tournament> findByExactName(String name);
+	
+	@Query(value = "select * from tournament where semester like ?1", nativeQuery = true)
+	List<Tournament> findBySemester(String semester);
 }
