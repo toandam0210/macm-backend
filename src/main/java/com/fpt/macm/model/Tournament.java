@@ -47,13 +47,17 @@ public class Tournament {
 	@Column
 	private LocalDateTime updatedOn;
 
-	@OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "tournament_id")
 	private Set<CompetitiveType> competitiveTypes;
-	
-	@OneToMany(cascade = CascadeType.ALL,orphanRemoval = true)
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "tournament_id")
 	private Set<ExhibitionType> exhibitionTypes;
+
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "tournament_id")
+	private Set<TournamentPlayer> tournamentPlayers;
 
 	public int getId() {
 		return id;
@@ -149,6 +153,14 @@ public class Tournament {
 
 	public void setExhibitionTypes(Set<ExhibitionType> exhibitionTypes) {
 		this.exhibitionTypes = exhibitionTypes;
+	}
+
+	public Set<TournamentPlayer> getTournamentPlayers() {
+		return tournamentPlayers;
+	}
+
+	public void setTournamentPlayers(Set<TournamentPlayer> tournamentPlayers) {
+		this.tournamentPlayers = tournamentPlayers;
 	}
 
 }

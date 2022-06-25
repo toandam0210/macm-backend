@@ -19,4 +19,8 @@ public interface TournamentService {
 	ResponseMessage updateTournament(int id, TournamentDto tournamentDto);
 	
 	ResponseMessage deleteTournamentById(int id);
+	
+	ResponseMessage getAllCompetitivePlayer(int tournamentId, double weightMin, double weightMax);
+	
+	ResponseMessage getAllExhibitionTeam(int tournamentId, int exhibitionTypeId);
 }

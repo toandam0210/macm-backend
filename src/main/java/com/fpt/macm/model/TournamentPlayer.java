@@ -1,7 +1,9 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,30 +11,20 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "tournament_organizing_committee")
-public class TournamentOrganizingCommittee {
+@Table(name = "tournament_player")
+public class TournamentPlayer {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "tournamentId")
-	private Tournament tournament;
-
-	@ManyToOne(optional = false)
 	@JoinColumn(name = "userId")
 	private User user;
-
-	@ManyToOne(optional = false)
-	@JoinColumn(name = "role_in_tournament")
-	private RoleEvent roleEvent;
-
-	@Column
-	private String registerStatus;
 
 	@Column
 	private boolean paymentStatus;
@@ -48,6 +40,10 @@ public class TournamentOrganizingCommittee {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "player_id")
+	private Set<ExhibitionPlayer> exhibitionPlayers;
 
 	public int getId() {
 		return id;
@@ -55,14 +51,6 @@ public class TournamentOrganizingCommittee {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public Tournament getTournament() {
-		return tournament;
-	}
-
-	public void setTournament(Tournament tournament) {
-		this.tournament = tournament;
 	}
 
 	public User getUser() {
@@ -73,20 +61,12 @@ public class TournamentOrganizingCommittee {
 		this.user = user;
 	}
 
-	public RoleEvent getRoleEvent() {
-		return roleEvent;
+	public boolean isPaymentStatus() {
+		return paymentStatus;
 	}
 
-	public void setRoleEvent(RoleEvent roleEvent) {
-		this.roleEvent = roleEvent;
-	}
-
-	public String getRegisterStatus() {
-		return registerStatus;
-	}
-
-	public void setRegisterStatus(String registerStatus) {
-		this.registerStatus = registerStatus;
+	public void setPaymentStatus(boolean paymentStatus) {
+		this.paymentStatus = paymentStatus;
 	}
 
 	public String getCreatedBy() {
@@ -121,12 +101,12 @@ public class TournamentOrganizingCommittee {
 		this.updatedOn = updatedOn;
 	}
 
-	public boolean isPaymentStatus() {
-		return paymentStatus;
+	public Set<ExhibitionPlayer> getExhibitionPlayers() {
+		return exhibitionPlayers;
 	}
 
-	public void setPaymentStatus(boolean paymentStatus) {
-		this.paymentStatus = paymentStatus;
+	public void setExhibitionPlayers(Set<ExhibitionPlayer> exhibitionPlayers) {
+		this.exhibitionPlayers = exhibitionPlayers;
 	}
 
 }

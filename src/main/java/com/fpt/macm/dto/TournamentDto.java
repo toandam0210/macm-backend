@@ -2,6 +2,8 @@ package com.fpt.macm.dto;
 
 import java.util.Set;
 
+import com.fpt.macm.model.TournamentPlayer;
+
 public class TournamentDto {
 	private int id;
 
@@ -14,8 +16,10 @@ public class TournamentDto {
 	private double amount_per_register;
 
 	private Set<CompetitiveTypeDto> competitiveTypesDto;
-	
+
 	private Set<ExhibitionTypeDto> exhibitionTypesDto;
+
+	private Set<TournamentPlayer> tournamentPlayers;
 
 	public int getId() {
 		return id;
@@ -72,6 +76,13 @@ public class TournamentDto {
 	public void setExhibitionTypesDto(Set<ExhibitionTypeDto> exhibitionTypesDto) {
 		this.exhibitionTypesDto = exhibitionTypesDto;
 	}
-	
-	
+
+	public Set<TournamentPlayer> getTournamentPlayers() {
+		return tournamentPlayers;
+	}
+
+	public void setTournamentPlayers(Set<TournamentPlayer> tournamentPlayers) {
+		this.tournamentPlayers = tournamentPlayers;
+	}
+
 }
