@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.ResponseMessage;
@@ -26,5 +27,9 @@ public class AttendanceStatusController {
 	@GetMapping("/checkattendance/{trainingScheduleId}")
 	ResponseEntity<ResponseMessage> checkAttendanceByStudentId(@PathVariable(name = "trainingScheduleId") int trainingScheduleId) {
 		return new ResponseEntity<ResponseMessage>(attendanceStatusService.checkAttendanceStatusByTrainingSchedule(trainingScheduleId), HttpStatus.OK);
+	}
+	@GetMapping("/checkattendance/report")
+	ResponseEntity<ResponseMessage> attendanceReportBySemester(@RequestParam String semester) {
+		return new ResponseEntity<ResponseMessage>(attendanceStatusService.attendanceTrainingReport(semester), HttpStatus.OK);
 	}
 }
