@@ -99,6 +99,17 @@ public class FacilityServiceImpl implements FacilityService {
 		facility.setFacilityCategory(facilityCategory);
 		return facility;
 	}
+	
+	private FacilityDto convertFacility(Facility facility) {
+		FacilityDto facilityDto = new FacilityDto();
+		facilityDto.setFacilityId(facility.getId());
+		facilityDto.setFacilityName(facility.getName());
+		facilityDto.setFacilityCategoryId(facility.getFacilityCategory().getId());
+		facilityDto.setFacilityCategoryName(facility.getFacilityCategory().getName());
+		facilityDto.setQuantityUsable(facility.getQuantityUsable());
+		facilityDto.setQuantityBroken(facility.getQuantityBroken());
+		return facilityDto;
+	}
 
 	private boolean isExistFacilityToCreate(Facility newFacility) {
 		List<Facility> oldFacilities = (List<Facility>) facilityRepository.findAll();
@@ -112,10 +123,12 @@ public class FacilityServiceImpl implements FacilityService {
 	}
 
 	@Override
-	public ResponseMessage updateFacilityById(int facilityId, Facility facility) {
+	public ResponseMessage updateFacilityById(int facilityId, FacilityDto facilityDto) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			Facility facility = convertFacilityDto(facilityDto);
+			
 			Optional<Facility> facilityOp = facilityRepository.findById(facilityId);
 			Facility oldFacility = facilityOp.get();
 
@@ -133,7 +146,13 @@ public class FacilityServiceImpl implements FacilityService {
 						oldFacility.setUpdatedBy("toandv");
 						oldFacility.setUpdatedOn(LocalDateTime.now());
 						facilityRepository.save(oldFacility);
-						responseMessage.setData(Arrays.asList(oldFacility));
+						
+						FacilityDto updatedFacilityDto = convertFacility(oldFacility);
+						Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository.findById(updatedFacilityDto.getFacilityCategoryId());
+						FacilityCategory facilityCategory = facilityCategoryOp.get();
+						updatedFacilityDto.setFacilityCategoryName(facilityCategory.getName());
+						
+						responseMessage.setData(Arrays.asList(updatedFacilityDto));
 						responseMessage.setMessage(Constant.MSG_032);
 					} else {
 						responseMessage.setMessage(Constant.MSG_046);
@@ -142,7 +161,13 @@ public class FacilityServiceImpl implements FacilityService {
 					oldFacility.setUpdatedBy("toandv");
 					oldFacility.setUpdatedOn(LocalDateTime.now());
 					facilityRepository.save(oldFacility);
-					responseMessage.setData(Arrays.asList(oldFacility));
+					
+					FacilityDto updatedFacilityDto = convertFacility(oldFacility);
+					Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository.findById(updatedFacilityDto.getFacilityCategoryId());
+					FacilityCategory facilityCategory = facilityCategoryOp.get();
+					updatedFacilityDto.setFacilityCategoryName(facilityCategory.getName());
+					
+					responseMessage.setData(Arrays.asList(updatedFacilityDto));
 					responseMessage.setMessage(Constant.MSG_032);
 				}
 
