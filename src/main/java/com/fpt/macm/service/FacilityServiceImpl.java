@@ -60,9 +60,11 @@ public class FacilityServiceImpl implements FacilityService {
 
 				facilityRepository.save(facility);
 
+				Optional<Facility> facilityOp = facilityRepository.findFacilityByFacilityNameAndFacilityCategoryId(
+						facilityDto.getFacilityName(), facilityDto.getFacilityCategoryId());
+				
 				if (facility.getQuantityUsable() > 0) {
-					Optional<Facility> facilityOp = facilityRepository.findFacilityByFacilityNameAndFacilityCategoryId(
-							facilityDto.getFacilityName(), facilityDto.getFacilityCategoryId());
+					
 					FacilityReport facilityReport = new FacilityReport();
 					facilityReport.setFacility(facilityOp.get());
 					facilityReport.setDescription(Constant.FACILITY_STATUS_001 + " " + facility.getQuantityUsable());
@@ -74,6 +76,7 @@ public class FacilityServiceImpl implements FacilityService {
 				Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository.findById(facilityDto.getFacilityCategoryId());
 				FacilityCategory facilityCategory = facilityCategoryOp.get();
 				facilityDto.setFacilityCategoryName(facilityCategory.getName());
+				facilityDto.setFacilityId(facilityOp.get().getId());
 				
 				responseMessage.setData(Arrays.asList(facilityDto));
 				responseMessage.setMessage(Constant.MSG_029);
