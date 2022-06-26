@@ -20,7 +20,7 @@ public class ExhibitionType {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
 	@JoinColumn(name = "exhibition_type_id")
 	private Set<ExhibitionTeam> exhibitionTeams;
 
