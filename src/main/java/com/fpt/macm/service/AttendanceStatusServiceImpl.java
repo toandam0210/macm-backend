@@ -3,20 +3,27 @@ package com.fpt.macm.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.AttendanceStatusDto;
+import com.fpt.macm.dto.AttendanceTrainingReportDto;
 import com.fpt.macm.model.AttendanceStatus;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.AttendanceStatusRepository;
+import com.fpt.macm.repository.SemesterRepository;
+import com.fpt.macm.repository.TrainingScheduleRepository;
 import com.fpt.macm.repository.UserRepository;
+import com.fpt.macm.utils.Utils;
 
 @Service
 public class AttendanceStatusServiceImpl implements AttendanceStatusService {
@@ -28,6 +35,12 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 
 	@Autowired
 	UserRepository userRepository;
+
+	@Autowired
+	SemesterRepository semesterRepository;
+
+	@Autowired
+	TrainingScheduleRepository trainingScheduleRepository;
 
 	@Override
 	public ResponseMessage takeAttendanceByStudentId(String studentId) {
@@ -61,7 +74,8 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	public ResponseMessage checkAttendanceStatusByTrainingSchedule(int trainingScheduleId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<AttendanceStatus> attendancesStatus = attendanceStatusRepository.findByTrainingScheduleId(trainingScheduleId);
+			List<AttendanceStatus> attendancesStatus = attendanceStatusRepository
+					.findByTrainingScheduleId(trainingScheduleId);
 			List<AttendanceStatusDto> attendanceStatusDtos = new ArrayList<AttendanceStatusDto>();
 			int attend = 0;
 			for (AttendanceStatus attendanceStatus : attendancesStatus) {
@@ -69,7 +83,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				attendanceStatusDto.setName(attendanceStatus.getUser().getName());
 				attendanceStatusDto.setStudentId(attendanceStatus.getUser().getStudentId());
 				attendanceStatusDto.setStatus(attendanceStatus.isStatus());
-				if(attendanceStatus.isStatus()) {
+				if (attendanceStatus.isStatus()) {
 					attend++;
 				}
 				attendanceStatusDto.setDate(attendanceStatus.getTrainingSchedule().getDate());
@@ -80,6 +94,57 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			responseMessage.setTotalActive(attend);
 			responseMessage.setTotalDeactive(attendanceStatusDtos.size() - attend);
 			responseMessage.setTotalResult(attendanceStatusDtos.size());
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage attendanceTrainingReport(String semesterName) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Semester> semesterOp = semesterRepository.findByName(semesterName);
+			List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository.findAll();
+			List<AttendanceTrainingReportDto> attendanceTrainingReportsDto = new ArrayList<AttendanceTrainingReportDto>();
+			if (semesterOp.isPresent()) {
+				Semester semester = semesterOp.get();
+				List<User> users = new ArrayList<User>();
+				List<TrainingSchedule> trainingSchedulesBySemester = trainingScheduleRepository
+						.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
+				for (TrainingSchedule trainingSchedule : trainingSchedulesBySemester) {
+					for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
+						if (trainingSchedule.getId() == attendanceStatus.getTrainingSchedule().getId()) {
+							User user = userRepository.findById(attendanceStatus.getUser().getId()).get();
+							users.add(user);
+						}
+					}
+				}
+				Set<User> usersAttendance = new HashSet<User>();
+				usersAttendance.addAll(users);
+				for (User user : usersAttendance) {
+					int totalAbsent = 0;
+					int totalAttend = 0;
+					AttendanceTrainingReportDto attendanceTrainingReportDto = new AttendanceTrainingReportDto();
+					attendanceTrainingReportDto.setStudentId(user.getStudentId());
+					attendanceTrainingReportDto.setStudentName(user.getName());
+					attendanceTrainingReportDto.setRoleName(Utils.convertRoleFromDbToExcel(user.getRole()));
+					for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
+						if (attendanceStatus.getUser().getId() == user.getId() && attendanceStatus.isStatus()) {
+							totalAttend++;
+						}
+						if (attendanceStatus.getUser().getId() == user.getId() && !attendanceStatus.isStatus()) {
+							totalAbsent++;
+						}
+					}
+					attendanceTrainingReportDto.setTotalAttend(totalAttend);
+					attendanceTrainingReportDto.setTotalAbsent(totalAbsent);
+					attendanceTrainingReportsDto.add(attendanceTrainingReportDto);
+				}
+				responseMessage.setData(attendanceTrainingReportsDto);
+				responseMessage.setMessage(Constant.MSG_001);
+				responseMessage.setTotalResult(attendanceTrainingReportsDto.size());
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
