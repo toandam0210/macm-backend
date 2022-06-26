@@ -25,6 +25,8 @@ public class TournamentDto {
 	private LocalDate startDate;
 
 	private Set<TournamentPlayer> tournamentPlayers;
+	
+	private double totalAmount;
 
 	public int getId() {
 		return id;
@@ -105,5 +107,15 @@ public class TournamentDto {
 	public void setTournamentPlayers(Set<TournamentPlayer> tournamentPlayers) {
 		this.tournamentPlayers = tournamentPlayers;
 	}
+
+	public double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+	
+	
 
 }

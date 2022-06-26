@@ -58,6 +58,9 @@ public class Tournament {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "tournament_id")
 	private Set<TournamentPlayer> tournamentPlayers;
+	
+	@Column
+	private double totalAmount;
 
 	public int getId() {
 		return id;
@@ -162,5 +165,15 @@ public class Tournament {
 	public void setTournamentPlayers(Set<TournamentPlayer> tournamentPlayers) {
 		this.tournamentPlayers = tournamentPlayers;
 	}
+
+	public double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public void setTotalAmount(double totalAmount) {
+		this.totalAmount = totalAmount;
+	}
+	
+	
 
 }

@@ -201,6 +201,7 @@ public class TournamentServiceImpl implements TournamentService {
 				tournament.setMaxQuantityComitee(tournamentDto.getMaxQuantityComitee());
 				tournament.setAmount_per_register(tournamentDto.getAmount_per_register());
 				tournament.setDescription(tournamentDto.getDescription());
+				tournament.setTotalAmount(tournamentDto.getTotalAmount());
 				Set<CompetitiveTypeDto> competitiveTypeDtos = tournamentDto.getCompetitiveTypesDto();
 				Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 				Set<ExhibitionTypeDto> exhibitionTypeDtos = tournamentDto.getExhibitionTypesDto();
@@ -349,6 +350,7 @@ public class TournamentServiceImpl implements TournamentService {
 				tournamentDto.setAmount_per_register(tournament.getAmount_per_register());
 				tournamentDto.setMaxQuantityComitee(tournament.getMaxQuantityComitee());
 				tournamentDto.setStartDate(startDate);
+				tournamentDto.setTotalAmount(tournament.getTotalAmount());
 				tournamentDto.setName(tournament.getName());
 				tournamentDto.setId(tournament.getId());
 				tournamentDtos.add(tournamentDto);
