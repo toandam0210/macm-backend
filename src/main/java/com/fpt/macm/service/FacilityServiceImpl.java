@@ -60,12 +60,15 @@ public class FacilityServiceImpl implements FacilityService {
 
 				facilityRepository.save(facility);
 
+				Optional<Facility> facilityOp = facilityRepository.findFacilityByFacilityNameAndFacilityCategoryId(
+						facilityDto.getFacilityName(), facilityDto.getFacilityCategoryId());
+				
 				if (facility.getQuantityUsable() > 0) {
-					Optional<Facility> facilityOp = facilityRepository.findFacilityByFacilityNameAndFacilityCategoryId(
-							facilityDto.getFacilityName(), facilityDto.getFacilityCategoryId());
+					
 					FacilityReport facilityReport = new FacilityReport();
 					facilityReport.setFacility(facilityOp.get());
 					facilityReport.setDescription(Constant.FACILITY_STATUS_001 + " " + facility.getQuantityUsable());
+					facilityReport.setAdd(true);
 					facilityReport.setCreatedBy("toandv");
 					facilityReport.setCreatedOn(LocalDateTime.now());
 					facilityReportRepository.save(facilityReport);
@@ -74,6 +77,7 @@ public class FacilityServiceImpl implements FacilityService {
 				Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository.findById(facilityDto.getFacilityCategoryId());
 				FacilityCategory facilityCategory = facilityCategoryOp.get();
 				facilityDto.setFacilityCategoryName(facilityCategory.getName());
+				facilityDto.setFacilityId(facilityOp.get().getId());
 				
 				responseMessage.setData(Arrays.asList(facilityDto));
 				responseMessage.setMessage(Constant.MSG_029);
@@ -208,6 +212,8 @@ public class FacilityServiceImpl implements FacilityService {
 	}
 
 	private void createFacilityReport(Facility oldFacility, Facility newFacility) {
+		FacilityReport facilityReport = new FacilityReport();
+		
 		int newQuantityUsable = newFacility.getQuantityUsable();
 		int oldQuantityUsable = oldFacility.getQuantityUsable();
 		int newQuantityBroken = newFacility.getQuantityBroken();
@@ -219,27 +225,33 @@ public class FacilityServiceImpl implements FacilityService {
 		int quantityBrokenDifference = newQuantityBroken - oldQuantityBroken;
 
 		if (quantityUsableDifference > 0) {
+			facilityReport.setAdd(true);
 			description += Constant.FACILITY_STATUS_001 + " " + quantityUsableDifference;
 		} else if (quantityUsableDifference == 0) {
 			if (quantityBrokenDifference < 0) {
+				facilityReport.setAdd(false);
 				description += Constant.FACILITY_STATUS_002 + " " + (-quantityBrokenDifference);
 			}
 		} else {
 			if (quantityBrokenDifference == 0) {
+				facilityReport.setAdd(false);
 				description += Constant.FACILITY_STATUS_002 + " " + (-quantityUsableDifference);
 			} else if (quantityBrokenDifference == -quantityUsableDifference) {
+				facilityReport.setAdd(false);
 				description += Constant.FACILITY_STATUS_003 + " " + (quantityBrokenDifference);
 			} else if (quantityBrokenDifference > 0 && quantityBrokenDifference < -quantityUsableDifference) {
+				facilityReport.setAdd(false);
 				description += Constant.FACILITY_STATUS_003 + " " + (quantityBrokenDifference) + " và "
 						+ Constant.FACILITY_STATUS_002 + " " + (-quantityUsableDifference - quantityBrokenDifference);
 			} else if (quantityBrokenDifference < 0) {
+				facilityReport.setAdd(false);
 				description += Constant.FACILITY_STATUS_002 + " "
 						+ (-quantityUsableDifference + -quantityBrokenDifference);
 			}
 		}
 
 		if (description != "") {
-			FacilityReport facilityReport = new FacilityReport();
+			
 			facilityReport.setFacility(oldFacility);
 			facilityReport.setDescription(description);
 			facilityReport.setCreatedBy("toandv");
@@ -302,6 +314,7 @@ public class FacilityServiceImpl implements FacilityService {
 				FacilityReportDto facilityReportDto = new FacilityReportDto();
 				String description = facilityReport.getDescription() + " " + facilityReport.getFacility().getName();
 				facilityReportDto.setDescription(description);
+				facilityReportDto.setAdd(facilityReport.isAdd());
 				facilityReportDto.setCreatedOn(facilityReport.getCreatedOn());
 
 				facilityReportsDto.add(facilityReportDto);

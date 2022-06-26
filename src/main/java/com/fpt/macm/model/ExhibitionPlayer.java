@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -16,7 +18,11 @@ public class ExhibitionPlayer {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "player_id")
+	private TournamentPlayer tournamentPlayer;
+
 	@Column
 	private boolean roleInTeam;
 
@@ -78,6 +84,14 @@ public class ExhibitionPlayer {
 
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
+	}
+
+	public TournamentPlayer getTournamentPlayer() {
+		return tournamentPlayer;
+	}
+
+	public void setTournamentPlayer(TournamentPlayer tournamentPlayer) {
+		this.tournamentPlayer = tournamentPlayer;
 	}
 
 }

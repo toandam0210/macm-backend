@@ -6,6 +6,7 @@ public class FacilityReportDto {
 
 	private LocalDateTime createdOn;
 	private String description;
+	private boolean isAdd;
 
 	public LocalDateTime getCreatedOn() {
 		return createdOn;
@@ -21,6 +22,14 @@ public class FacilityReportDto {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public boolean isAdd() {
+		return isAdd;
+	}
+
+	public void setAdd(boolean isAdd) {
+		this.isAdd = isAdd;
 	}
 
 }
