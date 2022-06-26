@@ -26,6 +26,9 @@ public class FacilityReport {
 	private String description;
 
 	@Column
+	private boolean isAdd;
+
+	@Column
 	private String createdBy;
 
 	@Column
@@ -69,6 +72,14 @@ public class FacilityReport {
 
 	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
+	}
+
+	public boolean isAdd() {
+		return isAdd;
+	}
+
+	public void setAdd(boolean isAdd) {
+		this.isAdd = isAdd;
 	}
 
 }
