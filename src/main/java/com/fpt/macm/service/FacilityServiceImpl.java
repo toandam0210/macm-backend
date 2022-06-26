@@ -40,7 +40,7 @@ public class FacilityServiceImpl implements FacilityService {
 
 	@Autowired
 	FacilityRequestRepository facilityRequestRepository;
-	
+
 	@Autowired
 	FacilityCategoryRepository facilityCategoryRepository;
 
@@ -62,9 +62,9 @@ public class FacilityServiceImpl implements FacilityService {
 
 				Optional<Facility> facilityOp = facilityRepository.findFacilityByFacilityNameAndFacilityCategoryId(
 						facilityDto.getFacilityName(), facilityDto.getFacilityCategoryId());
-				
+
 				if (facility.getQuantityUsable() > 0) {
-					
+
 					FacilityReport facilityReport = new FacilityReport();
 					facilityReport.setFacility(facilityOp.get());
 					facilityReport.setDescription(Constant.FACILITY_STATUS_001 + " " + facility.getQuantityUsable());
@@ -73,12 +73,13 @@ public class FacilityServiceImpl implements FacilityService {
 					facilityReport.setCreatedOn(LocalDateTime.now());
 					facilityReportRepository.save(facilityReport);
 				}
-				
-				Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository.findById(facilityDto.getFacilityCategoryId());
+
+				Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository
+						.findById(facilityDto.getFacilityCategoryId());
 				FacilityCategory facilityCategory = facilityCategoryOp.get();
 				facilityDto.setFacilityCategoryName(facilityCategory.getName());
 				facilityDto.setFacilityId(facilityOp.get().getId());
-				
+
 				responseMessage.setData(Arrays.asList(facilityDto));
 				responseMessage.setMessage(Constant.MSG_029);
 			} else {
@@ -103,7 +104,7 @@ public class FacilityServiceImpl implements FacilityService {
 		facility.setFacilityCategory(facilityCategory);
 		return facility;
 	}
-	
+
 	private FacilityDto convertFacility(Facility facility) {
 		FacilityDto facilityDto = new FacilityDto();
 		facilityDto.setFacilityId(facility.getId());
@@ -132,7 +133,7 @@ public class FacilityServiceImpl implements FacilityService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Facility facility = convertFacilityDto(facilityDto);
-			
+
 			Optional<Facility> facilityOp = facilityRepository.findById(facilityId);
 			Facility oldFacility = facilityOp.get();
 
@@ -150,12 +151,13 @@ public class FacilityServiceImpl implements FacilityService {
 						oldFacility.setUpdatedBy("toandv");
 						oldFacility.setUpdatedOn(LocalDateTime.now());
 						facilityRepository.save(oldFacility);
-						
+
 						FacilityDto updatedFacilityDto = convertFacility(oldFacility);
-						Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository.findById(updatedFacilityDto.getFacilityCategoryId());
+						Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository
+								.findById(updatedFacilityDto.getFacilityCategoryId());
 						FacilityCategory facilityCategory = facilityCategoryOp.get();
 						updatedFacilityDto.setFacilityCategoryName(facilityCategory.getName());
-						
+
 						responseMessage.setData(Arrays.asList(updatedFacilityDto));
 						responseMessage.setMessage(Constant.MSG_032);
 					} else {
@@ -165,12 +167,13 @@ public class FacilityServiceImpl implements FacilityService {
 					oldFacility.setUpdatedBy("toandv");
 					oldFacility.setUpdatedOn(LocalDateTime.now());
 					facilityRepository.save(oldFacility);
-					
+
 					FacilityDto updatedFacilityDto = convertFacility(oldFacility);
-					Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository.findById(updatedFacilityDto.getFacilityCategoryId());
+					Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository
+							.findById(updatedFacilityDto.getFacilityCategoryId());
 					FacilityCategory facilityCategory = facilityCategoryOp.get();
 					updatedFacilityDto.setFacilityCategoryName(facilityCategory.getName());
-					
+
 					responseMessage.setData(Arrays.asList(updatedFacilityDto));
 					responseMessage.setMessage(Constant.MSG_032);
 				}
@@ -213,7 +216,7 @@ public class FacilityServiceImpl implements FacilityService {
 
 	private void createFacilityReport(Facility oldFacility, Facility newFacility) {
 		FacilityReport facilityReport = new FacilityReport();
-		
+
 		int newQuantityUsable = newFacility.getQuantityUsable();
 		int oldQuantityUsable = oldFacility.getQuantityUsable();
 		int newQuantityBroken = newFacility.getQuantityBroken();
@@ -251,7 +254,7 @@ public class FacilityServiceImpl implements FacilityService {
 		}
 
 		if (description != "") {
-			
+
 			facilityReport.setFacility(oldFacility);
 			facilityReport.setDescription(description);
 			facilityReport.setCreatedBy("toandv");
@@ -303,22 +306,45 @@ public class FacilityServiceImpl implements FacilityService {
 	}
 
 	@Override
-	public ResponseMessage getAllReport() {
+	public ResponseMessage getAllReport(int filterIndex) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<FacilityReportDto> facilityReportsDto = new ArrayList<FacilityReportDto>();
+			List<FacilityReport> facilityReports = (List<FacilityReport>) facilityReportRepository
+					.findAll(Sort.by(Sort.Direction.DESC, "createdOn"));
 
-			List<FacilityReport> facilityReports = (List<FacilityReport>) facilityReportRepository.findAll();
-			for (FacilityReport facilityReport : facilityReports) {
-				FacilityReportDto facilityReportDto = new FacilityReportDto();
-				String description = facilityReport.getDescription() + " " + facilityReport.getFacility().getName();
-				facilityReportDto.setDescription(description);
-				facilityReportDto.setAdd(facilityReport.isAdd());
-				facilityReportDto.setCreatedOn(facilityReport.getCreatedOn());
-
-				facilityReportsDto.add(facilityReportDto);
+			switch (filterIndex) {
+			case 0:
+				for (FacilityReport facilityReport : facilityReports) {
+					FacilityReportDto facilityReportDto = convertFacilityReport(facilityReport);
+					facilityReportsDto.add(facilityReportDto);
+				}
+				break;
+			case 1:
+				for (FacilityReport facilityReport : facilityReports) {
+					if (facilityReport.isAdd()) {
+						FacilityReportDto facilityReportDto = convertFacilityReport(facilityReport);
+						facilityReportsDto.add(facilityReportDto);
+					}
+				}
+				break;
+			case 2:
+				for (FacilityReport facilityReport : facilityReports) {
+					if (!facilityReport.isAdd()) {
+						FacilityReportDto facilityReportDto = convertFacilityReport(facilityReport);
+						facilityReportsDto.add(facilityReportDto);
+					}
+				}
+				break;
+			default:
+				for (FacilityReport facilityReport : facilityReports) {
+					FacilityReportDto facilityReportDto = convertFacilityReport(facilityReport);
+					facilityReportsDto.add(facilityReportDto);
+				}
+				break;
 			}
+
 			responseMessage.setData(facilityReportsDto);
 			responseMessage.setMessage(Constant.MSG_034);
 		} catch (Exception e) {
@@ -326,6 +352,15 @@ public class FacilityServiceImpl implements FacilityService {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
+	}
+
+	private FacilityReportDto convertFacilityReport(FacilityReport facilityReport) {
+		FacilityReportDto facilityReportDto = new FacilityReportDto();
+		String description = facilityReport.getDescription() + " " + facilityReport.getFacility().getName();
+		facilityReportDto.setDescription(description);
+		facilityReportDto.setAdd(facilityReport.isAdd());
+		facilityReportDto.setCreatedOn(facilityReport.getCreatedOn());
+		return facilityReportDto;
 	}
 
 	@Override

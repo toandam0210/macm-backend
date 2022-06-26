@@ -12,7 +12,7 @@ public interface FacilityService {
 
 	ResponseMessage getAllFacilityByFacilityCategoryId(int facilityCategoryId, int pageNo, int pageSize, String sortBy);
 
-	ResponseMessage getAllReport();
+	ResponseMessage getAllReport(int filterIndex);
 
 	ResponseMessage createRequestToBuyFacility(FacilityRequestDto facilityRequestDto);
 

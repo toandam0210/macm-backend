@@ -47,8 +47,8 @@ public class FacilityController {
 	}
 
 	@GetMapping("/headtechnique/getfacilityreport")
-	ResponseEntity<ResponseMessage> getFacilityReport() {
-		return new ResponseEntity<ResponseMessage>(facilityService.getAllReport(), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getFacilityReport(@RequestParam(defaultValue = "0") int filterIndex) {
+		return new ResponseEntity<ResponseMessage>(facilityService.getAllReport(filterIndex), HttpStatus.OK);
 	}
 
 	@PostMapping("/headtechnique/createrequesttobuyfacility")
