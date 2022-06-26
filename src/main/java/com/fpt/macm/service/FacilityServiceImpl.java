@@ -24,6 +24,7 @@ import com.fpt.macm.model.FacilityReport;
 import com.fpt.macm.model.FacilityRequest;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.repository.ClubFundRepository;
+import com.fpt.macm.repository.FacilityCategoryRepository;
 import com.fpt.macm.repository.FacilityReportRepository;
 import com.fpt.macm.repository.FacilityRepository;
 import com.fpt.macm.repository.FacilityRequestRepository;
@@ -39,6 +40,9 @@ public class FacilityServiceImpl implements FacilityService {
 
 	@Autowired
 	FacilityRequestRepository facilityRequestRepository;
+	
+	@Autowired
+	FacilityCategoryRepository facilityCategoryRepository;
 
 	@Autowired
 	ClubFundRepository clubFundRepository;
@@ -66,7 +70,11 @@ public class FacilityServiceImpl implements FacilityService {
 					facilityReport.setCreatedOn(LocalDateTime.now());
 					facilityReportRepository.save(facilityReport);
 				}
-
+				
+				Optional<FacilityCategory> facilityCategoryOp = facilityCategoryRepository.findById(facilityDto.getFacilityCategoryId());
+				FacilityCategory facilityCategory = facilityCategoryOp.get();
+				facilityDto.setFacilityCategoryName(facilityCategory.getName());
+				
 				responseMessage.setData(Arrays.asList(facilityDto));
 				responseMessage.setMessage(Constant.MSG_029);
 			} else {
