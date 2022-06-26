@@ -166,4 +166,5 @@ public class Constant {
 	public static final String MSG_114 = "Lấy danh sách người chơi nội dung đối kháng thành công";
 	public static final String MSG_115 = "Lấy danh sách người chơi nội dung biểu diễn thành công";
 	public static final String MSG_116 = "Lấy vai trò ban tổ chức giải đấu thành công";
+	public static final String MSG_117 = "Lấy tất cả loại thi đấu biểu diễn thành công";
 }
