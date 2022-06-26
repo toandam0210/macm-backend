@@ -7,5 +7,5 @@ import com.fpt.macm.model.ExhibitionPlayer;
 
 @Repository
 public interface ExhibitionPlayerRepository extends JpaRepository<ExhibitionPlayer, Integer>{
-
+	
 }

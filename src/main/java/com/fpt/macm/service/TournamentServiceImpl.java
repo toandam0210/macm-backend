@@ -434,7 +434,7 @@ public class TournamentServiceImpl implements TournamentService {
 			}
 
 			responseMessage.setData(competitivePlayersDto);
-			responseMessage.setMessage("Lấy danh sách người chơi nội dung đối kháng thành công");
+			responseMessage.setMessage("Constant.MSG_114");
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -456,35 +456,46 @@ public class TournamentServiceImpl implements TournamentService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-//			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
-//			Tournament tournament = tournamentOp.get();
-//			List<ExhibitionTeamDto> exhibitionTeamsDto = new ArrayList<ExhibitionTeamDto>();
-//			Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
-//			for (ExhibitionType exhibitionType : exhibitionTypes) {
-//				Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
-//				for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
-//					exhibitionTeamsDto.add(convertToExhibitionTeamDto(exhibitionTeam));
-//				}
-//			}
-//
-//			for (ExhibitionTeamDto exhibitionTeamDto : exhibitionTeamsDto) {
-//				Set<ExhibitionPlayerDto> exhibitionPlayersDto = exhibitionTeamDto.getExhibitionPlayersDto();
-//				List<ExhibitionPlayerDto> listexhibitionPlayer = new ArrayList<>(exhibitionPlayersDto);
-//				Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
-//				List<TournamentPlayer> listTournamentPlayer = new ArrayList<>(tournamentPlayers);
-//				
-//				for(int i = 0; i < listexhibitionPlayer.size(); i++) {
-//					listexhibitionPlayer.get(i).setPlayerName(listTournamentPlayer.get(i).getUser().getName());
-//					listexhibitionPlayer.get(i).setPlayerStudentId(listTournamentPlayer.get(i).getUser().getStudentId());
-//					listexhibitionPlayer.get(i).setPlayerGender(listTournamentPlayer.get(i).getUser().isGender());
-//				}
-//				
-//				exhibitionPlayersDto = new HashSet<>(listexhibitionPlayer);
-//
-//			}
-//
-//			responseMessage.setData(exhibitionTeamsDto);
-//			responseMessage.setMessage("Lấy danh sách người chơi tham gia biểu diễn thành công");
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			Tournament tournament = tournamentOp.get();
+			List<ExhibitionTeamDto> exhibitionTeamsDto = new ArrayList<ExhibitionTeamDto>();
+			Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+			for (ExhibitionType exhibitionType : exhibitionTypes) {
+				if (exhibitionTypeId == 0) {
+					// fiter all
+					Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
+					for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
+						exhibitionTeamsDto.add(convertToExhibitionTeamDto(exhibitionTeam));
+					}
+				} else {
+					// filter theo hạng mục thi đấu
+					if (exhibitionType.getId() == exhibitionTypeId) {
+						Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
+						for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
+							exhibitionTeamsDto.add(convertToExhibitionTeamDto(exhibitionTeam));
+						}
+						break;
+					}
+				}
+			}
+
+			for (ExhibitionTeamDto exhibitionTeamDto : exhibitionTeamsDto) {
+				Set<ExhibitionPlayerDto> exhibitionPlayersDto = exhibitionTeamDto.getExhibitionPlayersDto();
+				for (ExhibitionPlayerDto exhibitionPlayerDto : exhibitionPlayersDto) {
+					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+						if (tournamentPlayer.getId() == exhibitionPlayerDto.getPlayerId()) {
+							exhibitionPlayerDto.setPlayerName(tournamentPlayer.getUser().getName());
+							exhibitionPlayerDto.setPlayerStudentId(tournamentPlayer.getUser().getStudentId());
+							exhibitionPlayerDto.setPlayerGender(tournamentPlayer.getUser().isGender());
+							break;
+						}
+					}
+				}
+			}
+
+			responseMessage.setData(exhibitionTeamsDto);
+			responseMessage.setMessage(Constant.MSG_115);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -508,6 +519,7 @@ public class TournamentServiceImpl implements TournamentService {
 	private ExhibitionPlayerDto convertToExhibitionPlayerDto(ExhibitionPlayer exhibitionPlayer) {
 		ExhibitionPlayerDto exhibitionPlayerDto = new ExhibitionPlayerDto();
 		exhibitionPlayerDto.setId(exhibitionPlayer.getId());
+		exhibitionPlayerDto.setPlayerId(exhibitionPlayer.getTournamentPlayer().getId());
 		exhibitionPlayerDto.setRoleInTeam(exhibitionPlayer.isRoleInTeam());
 		return exhibitionPlayerDto;
 	}

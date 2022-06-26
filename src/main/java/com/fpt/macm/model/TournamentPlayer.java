@@ -1,9 +1,7 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,7 +9,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -40,10 +37,6 @@ public class TournamentPlayer {
 
 	@Column
 	private LocalDateTime updatedOn;
-	
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-	@JoinColumn(name = "player_id")
-	private Set<ExhibitionPlayer> exhibitionPlayers;
 
 	public int getId() {
 		return id;
@@ -99,14 +92,6 @@ public class TournamentPlayer {
 
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
-	}
-
-	public Set<ExhibitionPlayer> getExhibitionPlayers() {
-		return exhibitionPlayers;
-	}
-
-	public void setExhibitionPlayers(Set<ExhibitionPlayer> exhibitionPlayers) {
-		this.exhibitionPlayers = exhibitionPlayers;
 	}
 
 }
