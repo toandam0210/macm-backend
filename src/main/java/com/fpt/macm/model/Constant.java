@@ -163,5 +163,6 @@ public class Constant {
 	public static final String MSG_111 = "Lấy lịch trong ngày thành công";
 	public static final String MSG_112 = "Không có lịch trong ngày này";
 	public static final String MSG_113 = "Lấy lịch thành công";
-
+	public static final String MSG_114 = "Lấy danh sách người chơi nội dung đối kháng thành công";
+	public static final String MSG_115 = "Lấy danh sách người chơi nội dung biểu diễn thành công";
 }

@@ -4,6 +4,7 @@ public class ExhibitionPlayerDto {
 
 	private int id;
 	private boolean roleInTeam;
+	private int playerId;
 	private String playerName;
 	private String playerStudentId;
 	private boolean playerGender;
@@ -14,6 +15,14 @@ public class ExhibitionPlayerDto {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public int getPlayerId() {
+		return playerId;
+	}
+
+	public void setPlayerId(int playerId) {
+		this.playerId = playerId;
 	}
 
 	public boolean isRoleInTeam() {
