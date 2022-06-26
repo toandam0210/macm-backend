@@ -39,6 +39,7 @@ import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
+import com.fpt.macm.repository.RoleEventRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
@@ -81,6 +82,9 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ExhibitionTeamRepository exhibitionTeamRepository;
+	
+	@Autowired
+	RoleEventRepository roleEventRepository;
 
 	@Override
 	public ResponseMessage createTournament(Tournament tournament) {
@@ -522,6 +526,29 @@ public class TournamentServiceImpl implements TournamentService {
 		exhibitionPlayerDto.setPlayerId(exhibitionPlayer.getTournamentPlayer().getId());
 		exhibitionPlayerDto.setRoleInTeam(exhibitionPlayer.isRoleInTeam());
 		return exhibitionPlayerDto;
+	}
+
+	@Override
+	public ResponseMessage getAllOrganizingCommitteeRole() {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<RoleEvent> rolesEvent = roleEventRepository.findAllOrganizingCommitteeRole();
+			List<RoleEventDto> rolesEventDto = new ArrayList<RoleEventDto>();
+			for (RoleEvent roleEvent : rolesEvent) {
+				RoleEventDto roleEventDto = new RoleEventDto();
+				roleEventDto.setId(roleEvent.getId());
+				roleEventDto.setName(roleEvent.getName());
+				Utils.convertNameOfEventRole(roleEvent, roleEventDto);
+				rolesEventDto.add(roleEventDto);
+			}
+			responseMessage.setData(rolesEventDto);
+			responseMessage.setMessage(Constant.MSG_116);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 
 }

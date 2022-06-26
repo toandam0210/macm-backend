@@ -58,17 +58,18 @@ public class TournamentController {
 	ResponseEntity<ResponseMessage> delete(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.deleteTournamentById(tournamentId), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headclub/tournament/{tournamentId}")
-	ResponseEntity<ResponseMessage> getTournamentById(@PathVariable(name = "tournamentId") int tournamentId){
+	ResponseEntity<ResponseMessage> getTournamentById(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getTournamentById(tournamentId), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headclub/tournament/getall")
-	ResponseEntity<ResponseMessage> getAllTournamentBySemester(@RequestParam String semester){
-		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentBySemester(semester), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllTournamentBySemester(@RequestParam String semester) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentBySemester(semester),
+				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headclub/getallcompetitiveplayer/{tournamentId}")
 	ResponseEntity<ResponseMessage> getAllCompetitivePlayer(@PathVariable(name = "tournamentId") int tournamentId,
 			@RequestParam(defaultValue = "0") double weightMin, @RequestParam(defaultValue = "0") double weightMax) {
@@ -79,8 +80,13 @@ public class TournamentController {
 	@GetMapping("/headclub/getallexhibitionteam/{tournamentId}")
 	ResponseEntity<ResponseMessage> getAllExhibitionTeam(@PathVariable(name = "tournamentId") int tournamentId,
 			@RequestParam(defaultValue = "0") int exhibitionType) {
-		return new ResponseEntity<ResponseMessage>(
-				tournamentService.getAllExhibitionTeam(tournamentId, exhibitionType), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllExhibitionTeam(tournamentId, exhibitionType),
+				HttpStatus.OK);
+	}
+
+	@GetMapping("/headclub/getallorganizingcommitteerole")
+	ResponseEntity<ResponseMessage> getAllOrginizingCommitteeRole() {
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllOrganizingCommitteeRole(), HttpStatus.OK);
 	}
 
 }
