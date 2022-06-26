@@ -82,7 +82,7 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ExhibitionTeamRepository exhibitionTeamRepository;
-	
+
 	@Autowired
 	RoleEventRepository roleEventRepository;
 
@@ -544,6 +544,32 @@ public class TournamentServiceImpl implements TournamentService {
 			}
 			responseMessage.setData(rolesEventDto);
 			responseMessage.setMessage(Constant.MSG_116);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllExhibitionType(int tournamentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			Tournament tournament = tournamentOp.get();
+			Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+			List<ExhibitionTypeDto> exhibitionTypesDto = new ArrayList<ExhibitionTypeDto>();
+			for (ExhibitionType exhibitionType : exhibitionTypes) {
+				ExhibitionTypeDto exhibitionTypeDto = new ExhibitionTypeDto();
+				exhibitionTypeDto.setId(exhibitionType.getId());
+				exhibitionTypeDto.setName(exhibitionType.getName());
+				exhibitionTypeDto.setNumberFemale(exhibitionType.getNumberFemale());
+				exhibitionTypeDto.setNumberMale(exhibitionType.getNumberMale());
+				exhibitionTypesDto.add(exhibitionTypeDto);
+			}
+			responseMessage.setData(exhibitionTypesDto);
+			responseMessage.setMessage(Constant.MSG_117);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

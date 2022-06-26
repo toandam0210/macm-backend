@@ -29,4 +29,6 @@ public interface TournamentService {
 	ResponseMessage getAllExhibitionTeam(int tournamentId, int exhibitionTypeId);
 	
 	ResponseMessage getAllOrganizingCommitteeRole();
+	
+	ResponseMessage getAllExhibitionType(int tournamentId);
 }

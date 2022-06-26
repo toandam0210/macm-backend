@@ -89,4 +89,9 @@ public class TournamentController {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllOrganizingCommitteeRole(), HttpStatus.OK);
 	}
 
+	@GetMapping("/headclub/getallexhibitiontype/{tournamentId}")
+	ResponseEntity<ResponseMessage> getAllExhibitionType(@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllExhibitionType(tournamentId), HttpStatus.OK);
+	}
+	
 }
