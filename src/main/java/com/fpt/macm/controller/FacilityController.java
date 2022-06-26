@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.dto.FacilityDto;
 import com.fpt.macm.dto.FacilityRequestDto;
-import com.fpt.macm.model.Facility;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.service.FacilityService;
 
@@ -32,8 +31,8 @@ public class FacilityController {
 
 	@PutMapping("/headtechnique/updatefacilitybyid/{facilityId}")
 	ResponseEntity<ResponseMessage> updateFacilityById(@PathVariable(name = "facilityId") int facilityId,
-			@RequestBody Facility facility) {
-		return new ResponseEntity<ResponseMessage>(facilityService.updateFacilityById(facilityId, facility),
+			@RequestBody FacilityDto facilityDto) {
+		return new ResponseEntity<ResponseMessage>(facilityService.updateFacilityById(facilityId, facilityDto),
 				HttpStatus.OK);
 	}
 
