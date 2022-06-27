@@ -490,14 +490,14 @@ public class TournamentServiceImpl implements TournamentService {
 					// fiter all
 					Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
 					for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
-						exhibitionTeamsDto.add(convertToExhibitionTeamDto(exhibitionTeam));
+						exhibitionTeamsDto.add(convertToExhibitionTeamDto(exhibitionTeam, exhibitionType.getName()));
 					}
 				} else {
 					// filter theo hạng mục thi đấu
 					if (exhibitionType.getId() == exhibitionTypeId) {
 						Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
 						for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
-							exhibitionTeamsDto.add(convertToExhibitionTeamDto(exhibitionTeam));
+							exhibitionTeamsDto.add(convertToExhibitionTeamDto(exhibitionTeam, exhibitionType.getName()));
 						}
 						break;
 					}
@@ -528,7 +528,7 @@ public class TournamentServiceImpl implements TournamentService {
 		return responseMessage;
 	}
 
-	private ExhibitionTeamDto convertToExhibitionTeamDto(ExhibitionTeam exhibitionTeam) {
+	private ExhibitionTeamDto convertToExhibitionTeamDto(ExhibitionTeam exhibitionTeam, String exhibitionTypeName) {
 		ExhibitionTeamDto exhibitionTeamDto = new ExhibitionTeamDto();
 		exhibitionTeamDto.setId(exhibitionTeam.getId());
 		exhibitionTeamDto.setTeamName(exhibitionTeam.getTeamName());
@@ -538,6 +538,7 @@ public class TournamentServiceImpl implements TournamentService {
 			exhibitionPlayersDto.add(convertToExhibitionPlayerDto(exhibitionPlayer));
 		}
 		exhibitionTeamDto.setExhibitionPlayersDto(exhibitionPlayersDto);
+		exhibitionTeamDto.setExhibitionTypeName(exhibitionTypeName);
 		return exhibitionTeamDto;
 	}
 
