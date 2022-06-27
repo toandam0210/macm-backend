@@ -94,4 +94,13 @@ public class TournamentController {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllExhibitionType(tournamentId), HttpStatus.OK);
 	}
 	
+	@PutMapping("/headclub/acceptrequesttojoinorganizingcommittee/{organizingCommitteeId}")
+	ResponseEntity<ResponseMessage> acceptRequestToJoinOrganizingCommittee(@PathVariable(name = "organizingCommitteeId") int organizingCommitteeId){
+		return new ResponseEntity<ResponseMessage>(tournamentService.acceptRequestOrganizingCommittee(organizingCommitteeId), HttpStatus.OK);
+	}
+	
+	@PutMapping("/headclub/declinerequesttojoinorganizingcommittee/{organizingCommitteeId}")
+	ResponseEntity<ResponseMessage> declineRequestToJoinOrganizingCommittee(@PathVariable(name = "organizingCommitteeId") int organizingCommitteeId){
+		return new ResponseEntity<ResponseMessage>(tournamentService.declineRequestOrganizingCommittee(organizingCommitteeId), HttpStatus.OK);
+	}
 }
