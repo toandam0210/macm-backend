@@ -569,23 +569,23 @@ public class UserServiceImpl implements UserService {
 		try {
 			List<UserDto> userDtoResponse = userDtos;
 			for (int i = 0; i < userDtos.size(); i++) {
-				if (name != null && !userDtos.get(i).getName().toLowerCase().contains(name.toLowerCase())) {
+				if (!name.equals("") && name != null && !userDtos.get(i).getName().toLowerCase().contains(name.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if (studentId != null
+				if (!studentId.equals("") && studentId != null
 						&& !userDtos.get(i).getStudentId().toLowerCase().contains(studentId.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if (email != null && !userDtos.get(i).getEmail().toLowerCase().contains(email.toLowerCase())) {
+				if (!email.equals("") && email != null && !userDtos.get(i).getEmail().toLowerCase().contains(email.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if (gender != null
+				if (!gender.equals("") && gender != null
 						&& !userDtos.get(i).isGender().toString().toLowerCase().equals(gender.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
@@ -601,18 +601,18 @@ public class UserServiceImpl implements UserService {
 					i--;
 					continue;
 				}
-				if (isActive != null
+				if (!isActive.equals("") && isActive != null
 						&& !userDtos.get(i).isActive().toString().toLowerCase().equals(isActive.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if (dateFrom != null && userDtos.get(i).getDateOfBirth().isBefore(LocalDate.parse(dateFrom))) {
+				if (!dateFrom.equals("") && dateFrom != null && userDtos.get(i).getDateOfBirth().isBefore(LocalDate.parse(dateFrom))) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if (dateTo != null && userDtos.get(i).getDateOfBirth().isAfter(LocalDate.parse(dateTo))) {
+				if (!dateTo.equals("") && dateTo != null && userDtos.get(i).getDateOfBirth().isAfter(LocalDate.parse(dateTo))) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
