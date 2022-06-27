@@ -436,9 +436,20 @@ public class TournamentServiceImpl implements TournamentService {
 					}
 				}
 			}
+			
+			Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+			for (CompetitivePlayerDto competitivePlayerDto : competitivePlayersDto) {
+				for (CompetitiveType competitiveType : competitiveTypes) {
+					if (competitivePlayerDto.getWeight() >= competitiveType.getWeightMin() && competitivePlayerDto.getWeight()<=competitiveType.getWeightMax()) {
+						competitivePlayerDto.setWeightMax(competitiveType.getWeightMax());
+						competitivePlayerDto.setWeightMin(competitiveType.getWeightMin());
+						break;
+					}
+				}
+			}
 
 			responseMessage.setData(competitivePlayersDto);
-			responseMessage.setMessage("Constant.MSG_114");
+			responseMessage.setMessage(Constant.MSG_114);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
