@@ -392,7 +392,7 @@ public class FacilityServiceImpl implements FacilityService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<FacilityRequest> facilityRequests = (List<FacilityRequest>) facilityRequestRepository.findAll();
+			List<FacilityRequest> facilityRequests = (List<FacilityRequest>) facilityRequestRepository.findAll(Sort.by(Sort.Direction.DESC, "createdOn"));
 			List<FacilityRequestDto> facilityRequestsDto = new ArrayList<FacilityRequestDto>();
 			for (FacilityRequest facilityRequest : facilityRequests) {
 				FacilityRequestDto facilityRequestDto = convertFacilityRequestToFacilityRequestDto(facilityRequest);
