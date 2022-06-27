@@ -121,15 +121,23 @@ public class TournamentServiceImpl implements TournamentService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			Tournament tournament = tournamentOp.get();
 			List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
 					.findByTournamentId(tournamentId);
 			List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
+			int totalAccept = 0;
 			for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
 				TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertTournamentOrganizingCommitteeToTournamentOrganizingCommitteeDto(
 						tournamentOrganizingCommittee);
 				tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
+				if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
+					totalAccept++;
+				}
 			}
 			responseMessage.setData(tournamentOrganizingCommitteesDto);
+			responseMessage.setTotalActive(totalAccept);
+			responseMessage.setTotalResult(tournament.getMaxQuantityComitee());
 			responseMessage.setMessage(Constant.MSG_097);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -436,11 +444,12 @@ public class TournamentServiceImpl implements TournamentService {
 					}
 				}
 			}
-			
+
 			Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 			for (CompetitivePlayerDto competitivePlayerDto : competitivePlayersDto) {
 				for (CompetitiveType competitiveType : competitiveTypes) {
-					if (competitivePlayerDto.getWeight() >= competitiveType.getWeightMin() && competitivePlayerDto.getWeight()<=competitiveType.getWeightMax()) {
+					if (competitivePlayerDto.getWeight() >= competitiveType.getWeightMin()
+							&& competitivePlayerDto.getWeight() <= competitiveType.getWeightMax()) {
 						competitivePlayerDto.setWeightMax(competitiveType.getWeightMax());
 						competitivePlayerDto.setWeightMin(competitiveType.getWeightMin());
 						break;
@@ -581,6 +590,77 @@ public class TournamentServiceImpl implements TournamentService {
 			}
 			responseMessage.setData(exhibitionTypesDto);
 			responseMessage.setMessage(Constant.MSG_117);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage acceptRequestOrganizingCommittee(int tournamentOrganizingCommitteeId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+
+			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
+					.findById(tournamentOrganizingCommitteeId);
+			TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+
+			Optional<Tournament> tournamentOp = tournamentRepository
+					.findById(tournamentOrganizingCommittee.getTournament().getId());
+			Tournament tournament = tournamentOp.get();
+
+			List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+					.findByTournamentId(tournamentOrganizingCommittee.getTournament().getId());
+			int totalAccept = 0;
+			for (TournamentOrganizingCommittee tournamentOrganizingCommittee2 : tournamentOrganizingCommittees) {
+				if (tournamentOrganizingCommittee2.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
+					totalAccept++;
+				}
+			}
+
+			if (totalAccept < tournament.getMaxQuantityComitee()) {
+				if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+					tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+					tournamentOrganizingCommittee.setUpdatedBy("toandv");
+					tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
+					tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
+					TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertTournamentOrganizingCommitteeToTournamentOrganizingCommitteeDto(
+							tournamentOrganizingCommittee);
+
+					responseMessage.setData(Arrays.asList(tournamentOrganizingCommitteeDto));
+					responseMessage.setMessage(Constant.MSG_118);
+				}
+			}
+			else {
+				responseMessage.setMessage(Constant.MSG_120);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage declineRequestOrganizingCommittee(int tournamentOrganizingCommitteeId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
+					.findById(tournamentOrganizingCommitteeId);
+			TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+			if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+				tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
+				tournamentOrganizingCommittee.setUpdatedBy("toandv");
+				tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
+				tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
+				TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertTournamentOrganizingCommitteeToTournamentOrganizingCommitteeDto(
+						tournamentOrganizingCommittee);
+				responseMessage.setData(Arrays.asList(tournamentOrganizingCommitteeDto));
+				responseMessage.setMessage(Constant.MSG_119);
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

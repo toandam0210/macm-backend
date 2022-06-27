@@ -374,7 +374,7 @@ public class FacilityServiceImpl implements FacilityService {
 			facilityRequest.setFacility(facility);
 			facilityRequest.setQuantity(facilityRequestDto.getQuantity());
 			facilityRequest.setUnitPrice(facilityRequestDto.getUnitPrice());
-			facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_PENDING);
+			facilityRequest.setStatus(Constant.REQUEST_STATUS_PENDING);
 			facilityRequest.setCreatedBy("toandv");
 			facilityRequest.setCreatedOn(LocalDateTime.now());
 			facilityRequestRepository.save(facilityRequest);
@@ -435,12 +435,12 @@ public class FacilityServiceImpl implements FacilityService {
 			FacilityRequest facilityRequest = facilityRequestOp.get();
 			double totalAmount = facilityRequest.getQuantity() * facilityRequest.getUnitPrice();
 
-			if (facilityRequest.getStatus().equals(Constant.FACILITY_REQUEST_STATUS_PENDING)) {
+			if (facilityRequest.getStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
 				if (fundAmount >= totalAmount) {
 					clubFund.setFundAmount(fundAmount - totalAmount);
 					clubFundRepository.save(clubFund);
 
-					facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_APPROVED);
+					facilityRequest.setStatus(Constant.REQUEST_STATUS_APPROVED);
 					facilityRequestRepository.save(facilityRequest);
 
 					responseMessage.setData(Arrays.asList(facilityRequest));
@@ -463,8 +463,8 @@ public class FacilityServiceImpl implements FacilityService {
 		try {
 			Optional<FacilityRequest> facilityRequestOp = facilityRequestRepository.findById(facilityRequestId);
 			FacilityRequest facilityRequest = facilityRequestOp.get();
-			if (facilityRequest.getStatus().equals(Constant.FACILITY_REQUEST_STATUS_PENDING)) {
-				facilityRequest.setStatus(Constant.FACILITY_REQUEST_STATUS_DECLINED);
+			if (facilityRequest.getStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+				facilityRequest.setStatus(Constant.REQUEST_STATUS_DECLINED);
 				facilityRequestRepository.save(facilityRequest);
 				responseMessage.setData(Arrays.asList(facilityRequest));
 				responseMessage.setMessage(Constant.MSG_078);

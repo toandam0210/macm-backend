@@ -31,4 +31,8 @@ public interface TournamentService {
 	ResponseMessage getAllOrganizingCommitteeRole();
 	
 	ResponseMessage getAllExhibitionType(int tournamentId);
+	
+	ResponseMessage acceptRequestOrganizingCommittee(int tournamentOrganizingCommitteeId);
+	
+	ResponseMessage declineRequestOrganizingCommittee(int tournamentOrganizingCommitteeId);
 }
