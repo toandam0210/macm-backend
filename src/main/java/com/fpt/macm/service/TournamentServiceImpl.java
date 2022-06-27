@@ -470,6 +470,7 @@ public class TournamentServiceImpl implements TournamentService {
 		CompetitivePlayerDto competitivePlayerDto = new CompetitivePlayerDto();
 		competitivePlayerDto.setId(competitivePlayer.getId());
 		competitivePlayerDto.setPlayerName(competitivePlayer.getTournamentPlayer().getUser().getName());
+		competitivePlayerDto.setPlayerStudentId(competitivePlayer.getTournamentPlayer().getUser().getStudentId());
 		competitivePlayerDto.setPlayerGender(competitivePlayer.getTournamentPlayer().getUser().isGender());
 		competitivePlayerDto.setWeight(competitivePlayer.getWeight());
 		return competitivePlayerDto;
