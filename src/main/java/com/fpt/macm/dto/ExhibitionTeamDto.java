@@ -7,6 +7,7 @@ public class ExhibitionTeamDto {
 	private int id;
 	private String teamName;
 	private Set<ExhibitionPlayerDto> exhibitionPlayersDto;
+	private String exhibitionTypeName;
 
 	public int getId() {
 		return id;
@@ -30,6 +31,14 @@ public class ExhibitionTeamDto {
 
 	public void setExhibitionPlayersDto(Set<ExhibitionPlayerDto> exhibitionPlayersDto) {
 		this.exhibitionPlayersDto = exhibitionPlayersDto;
+	}
+
+	public String getExhibitionTypeName() {
+		return exhibitionTypeName;
+	}
+
+	public void setExhibitionTypeName(String exhibitionTypeName) {
+		this.exhibitionTypeName = exhibitionTypeName;
 	}
 
 }
