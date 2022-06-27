@@ -7,6 +7,8 @@ public class CompetitivePlayerDto {
 	private boolean playerGender;
 	private String playerStudentId;
 	private double weight;
+	private double weightMin;
+	private double weightMax;
 
 	public int getId() {
 		return id;
@@ -46,6 +48,22 @@ public class CompetitivePlayerDto {
 
 	public void setWeight(double weight) {
 		this.weight = weight;
+	}
+
+	public double getWeightMin() {
+		return weightMin;
+	}
+
+	public void setWeightMin(double weightMin) {
+		this.weightMin = weightMin;
+	}
+
+	public double getWeightMax() {
+		return weightMax;
+	}
+
+	public void setWeightMax(double weightMax) {
+		this.weightMax = weightMax;
 	}
 
 }
