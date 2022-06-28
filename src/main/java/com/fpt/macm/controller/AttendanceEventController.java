@@ -24,8 +24,8 @@ public class AttendanceEventController {
 		return new ResponseEntity<ResponseMessage>(attendanceEventService.takeAttendanceByMemberEventId(memberEventId), HttpStatus.OK);
 	}
 	
-	@GetMapping("/checkattendance/{eventScheduleId}")
-	ResponseEntity<ResponseMessage> checkAttendanceByEventScheduleId(@PathVariable(name = "eventScheduleId") int eventScheduleId) {
-		return new ResponseEntity<ResponseMessage>(attendanceEventService.checkAttendanceStatusByEventSchedule(eventScheduleId), HttpStatus.OK);
+	@GetMapping("/checkattendance/{eventId}")
+	ResponseEntity<ResponseMessage> checkAttendanceByEventId(@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(attendanceEventService.checkAttendanceStatusByEventId(eventId), HttpStatus.OK);
 	}
 }

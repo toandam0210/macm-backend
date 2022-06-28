@@ -14,6 +14,7 @@ import com.fpt.macm.model.AdminSemester;
 import com.fpt.macm.model.AttendanceEvent;
 import com.fpt.macm.model.AttendanceStatus;
 import com.fpt.macm.model.CollaboratorReport;
+import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.MemberSemester;
@@ -34,6 +35,7 @@ import com.fpt.macm.repository.MembershipStatusRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.service.EventScheduleServiceImpl;
+import com.fpt.macm.service.EventService;
 import com.fpt.macm.service.SemesterService;
 import com.fpt.macm.service.TrainingScheduleServiceImpl;
 
@@ -42,7 +44,7 @@ public class TaskSchedule {
 
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	MemberEventRepository memberEventRepository;
 
@@ -54,15 +56,18 @@ public class TaskSchedule {
 
 	@Autowired
 	AttendanceStatusRepository attendanceStatusRepository;
-	
+
 	@Autowired
 	AttendanceEventRepository attendanceEventRepository;
 
 	@Autowired
 	TrainingScheduleServiceImpl trainingScheduleServiceImpl;
-	
+
 	@Autowired
 	EventScheduleServiceImpl eventScheduleServiceImpl;
+
+	@Autowired
+	EventService eventService;
 
 	@Autowired
 	MembershipStatusRepository membershipStatusRepository;
@@ -197,24 +202,26 @@ public class TaskSchedule {
 			}
 		}
 	}
-	
+
 	@Scheduled(cron = "1 2 0 * * *")
 	public void addListMemberEventAttendanceStatus() {
 		EventSchedule eventSchedule = eventScheduleServiceImpl.getEventSessionByDate(LocalDate.now());
 		if (eventSchedule != null) {
-			logger.info("ko null");
-			List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository.findByEventId(eventSchedule.getEvent().getId());
-			logger.info(membersEvent.toString());
-			for (MemberEvent memberEvent : membersEvent) {
-				if (memberEvent.getAttendanceStatus()) {
-					AttendanceEvent attendanceEvent = new AttendanceEvent();
-					attendanceEvent.setMemberEvent(memberEvent);
-					attendanceEvent.setEventSchedule(eventSchedule);
-					attendanceEvent.setCreatedOn(LocalDateTime.now());
-					attendanceEvent.setCreatedBy("toandv");
-					attendanceEvent.setStatus(false);
-					attendanceEventRepository.save(attendanceEvent);
-					logger.info("atten oke");
+			Event event = eventSchedule.getEvent();
+			LocalDate startDate = (LocalDate) eventService.getStartDateOfEvent(event.getId()).getData().get(0);
+			if (startDate.compareTo(LocalDate.now()) == 0) {
+				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository.findByEventId(event.getId());
+				for (MemberEvent memberEvent : membersEvent) {
+					if (memberEvent.getAttendanceStatus()) {
+						AttendanceEvent attendanceEvent = new AttendanceEvent();
+						attendanceEvent.setMemberEvent(memberEvent);
+						attendanceEvent.setEvent(event);
+						attendanceEvent.setCreatedOn(LocalDateTime.now());
+						attendanceEvent.setCreatedBy("toandv");
+						attendanceEvent.setStatus(false);
+						attendanceEventRepository.save(attendanceEvent);
+						logger.info("atten oke");
+					}
 				}
 			}
 		}
