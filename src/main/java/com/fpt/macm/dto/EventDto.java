@@ -2,7 +2,7 @@ package com.fpt.macm.dto;
 
 import java.time.LocalDate;
 
-public class EventDto {
+public class EventDto implements Comparable<EventDto>{
 	private int id;
 	private String status;
 	private String name;
@@ -74,6 +74,12 @@ public class EventDto {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	@Override
+	public int compareTo(EventDto o) {
+		// TODO Auto-generated method stub
+		return this.getStartDate().compareTo(o.getStartDate()) * -1;
 	}
 	
 	
