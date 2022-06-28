@@ -39,4 +39,12 @@ public interface TournamentService {
 	ResponseMessage getAllTournamentPlayerPaymentStatus(int tournamentId);
 	
 	ResponseMessage getAllTournamentOrganizingCommitteePaymentStatus(int tournamentId);
+	
+	ResponseMessage updateTournamentOrganizingCommitteePaymentStatus(int tournamentOrganizingCommitteeId);
+	
+	ResponseMessage getAllTournamentOrganizingCommitteePaymentStatusReport(int tournamentId);
+	
+	ResponseMessage updateTournamentPlayerPaymentStatus(int tournamentPlayerId);
+	
+	ResponseMessage getAllTournamentPlayerPaymentStatusReport(int tournamentId);
 }

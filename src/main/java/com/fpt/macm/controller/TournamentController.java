@@ -108,17 +108,46 @@ public class TournamentController {
 				tournamentService.declineRequestOrganizingCommittee(organizingCommitteeId), HttpStatus.OK);
 	}
 
-	@GetMapping("/headclub/getalltournamentplayerpaymentstatus/{tournamentId}")
+	@GetMapping("/treasurer/getalltournamentplayerpaymentstatus/{tournamentId}")
 	ResponseEntity<ResponseMessage> getAllTournamentPlayerPaymentStatus(
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentPlayerPaymentStatus(tournamentId),
 				HttpStatus.OK);
 	}
 
-	@GetMapping("/headclub/getalltournamentorganizingcommitteepaymentstatus/{tournamentId}")
+	@GetMapping("/treasurer/getalltournamentorganizingcommitteepaymentstatus/{tournamentId}")
 	ResponseEntity<ResponseMessage> getAllTournamentOrganizingCommitteePaymentStatus(
 			@PathVariable(name = "tournamentId") int tournamentId) {
-		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentOrganizingCommitteePaymentStatus(tournamentId),
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllTournamentOrganizingCommitteePaymentStatus(tournamentId), HttpStatus.OK);
+	}
+
+	@PutMapping("/treasurer/updatetournamentorganizingcommitteepaymentstatus/{tournamentOrganizingCommitteeId}")
+	ResponseEntity<ResponseMessage> updateTournamentOrganizingCommitteePaymentStatus(
+			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.updateTournamentOrganizingCommitteePaymentStatus(tournamentOrganizingCommitteeId),
 				HttpStatus.OK);
+	}
+
+	@GetMapping("/treasurer/getalltournamentorganizingcommitteepaymentstatusreport/{tournamentId}")
+	ResponseEntity<ResponseMessage> getAllTournamentOrganizingCommitteePaymentStatusReport(
+			@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllTournamentOrganizingCommitteePaymentStatusReport(tournamentId), HttpStatus.OK);
+	}
+
+	@PutMapping("/treasurer/updatetournamentplayerpaymentstatus/{tournamentPlayerId}")
+	ResponseEntity<ResponseMessage> updateTournamentPlayerPaymentStatus(
+			@PathVariable(name = "tournamentPlayerId") int tournamentPlayerId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.updateTournamentPlayerPaymentStatus(tournamentPlayerId), HttpStatus.OK);
+	}
+
+	@GetMapping("/treasurer/getalltournamentplayerpaymentstatusreport/{tournamentId}")
+	ResponseEntity<ResponseMessage> getAllTournamentPlayerPaymentStatusReport(
+			@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllTournamentPlayerPaymentStatusReport(tournamentId), HttpStatus.OK);
 	}
 }

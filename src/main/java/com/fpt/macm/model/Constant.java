@@ -172,4 +172,8 @@ public class Constant {
 	public static final String MSG_120 = "Đã đủ người trong ban tổ chức";
 	public static final String MSG_121 = "Lấy danh sách đóng tiền của người chơi thành công";
 	public static final String MSG_122 = "Lấy danh sách đóng tiền của thành viên ban tổ chức giải đấu thành công";
+	public static final String MSG_123 = "Cập nhật trạng thái đóng tiền của thành viên ban tổ chức giải đấu thành công";
+	public static final String MSG_124 = "Lấy báo cáo thay đổi trạng thái đóng tiền của thành viên ban tổ chức giải đấu thành công";
+	public static final String MSG_125 = "Cập nhật trạng thái đóng tiền của thành viên tham gia giải đấu thành công";
+	public static final String MSG_126 = "Lấy báo cáo thay đổi trạng thái đóng tiền của thành viên tham gia giải đấu thành công";
 }
