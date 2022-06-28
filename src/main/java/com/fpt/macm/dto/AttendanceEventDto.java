@@ -3,10 +3,20 @@ package com.fpt.macm.dto;
 import java.time.LocalDate;
 
 public class AttendanceEventDto {
+
+	private String eventName;
 	private String name;
 	private String studentId;
 	private boolean status;
 	private LocalDate date;
+
+	public String getEventName() {
+		return eventName;
+	}
+
+	public void setEventName(String eventName) {
+		this.eventName = eventName;
+	}
 
 	public String getName() {
 		return name;

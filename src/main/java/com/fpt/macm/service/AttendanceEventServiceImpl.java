@@ -12,10 +12,12 @@ import org.springframework.stereotype.Service;
 import com.fpt.macm.dto.AttendanceEventDto;
 import com.fpt.macm.model.AttendanceEvent;
 import com.fpt.macm.model.Constant;
+import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.repository.AttendanceEventRepository;
+import com.fpt.macm.repository.EventScheduleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 
 @Service
@@ -30,52 +32,57 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 	@Autowired
 	MemberEventRepository memberEventRepository;
 
+	@Autowired
+	EventScheduleRepository eventScheduleRepository;
+
 	@Override
 	public ResponseMessage takeAttendanceByMemberEventId(int memberEventId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			EventSchedule eventSchedule = eventScheduleServiceImpl.getEventSessionByDate(LocalDate.now());
-			if (eventSchedule != null) {
-				Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
-				MemberEvent memberEvent = memberEventOp.get();
-				List<AttendanceEvent> attendancesEvent = attendanceEventRepository
-						.findByEventScheduleId(eventSchedule.getId());
-				for (AttendanceEvent attendanceEvent : attendancesEvent) {
-					if (attendanceEvent.getMemberEvent().getId() == memberEvent.getId()) {
-						attendanceEvent.setStatus(!attendanceEvent.getStatus());
-						attendanceEvent.setUpdatedBy("toandv");
-						attendanceEvent.setUpdatedOn(LocalDateTime.now());
-						attendanceEventRepository.save(attendanceEvent);
-					}
-				}
-				responseMessage.setMessage(Constant.MSG_084);
-			} else {
-				responseMessage.setMessage(Constant.MSG_085);
-			}
+			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
+			MemberEvent memberEvent = memberEventOp.get();
+			Event event = memberEvent.getEvent();
+			AttendanceEvent attendanceEvent = attendanceEventRepository
+					.findByEventIdAndMemberEventId(event.getId(), memberEventId).get();
+
+			attendanceEvent.setStatus(!attendanceEvent.getStatus());
+			attendanceEvent.setUpdatedBy("toandv");
+			attendanceEvent.setUpdatedOn(LocalDateTime.now());
+			attendanceEventRepository.save(attendanceEvent);
+
+			responseMessage.setMessage(Constant.MSG_084);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
-	public ResponseMessage checkAttendanceStatusByEventSchedule(int eventScheduleId) {
+	public ResponseMessage checkAttendanceStatusByEventId(int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<AttendanceEvent> attendancesEvent = attendanceEventRepository.findByEventScheduleId(eventScheduleId);
+			List<AttendanceEvent> attendancesEvent = attendanceEventRepository.findByEventId(eventId);
 			List<AttendanceEventDto> attendanceEventDtos = new ArrayList<AttendanceEventDto>();
+
+			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
+			LocalDate startDate = LocalDate.now();
+			if (listSchedule.size() > 0) {
+				startDate = listSchedule.get(0).getDate();
+			}
+
 			int attend = 0;
 			for (AttendanceEvent attendanceEvent : attendancesEvent) {
 				AttendanceEventDto attendanceEventDto = new AttendanceEventDto();
+				attendanceEventDto.setEventName(attendanceEvent.getEvent().getName());
 				attendanceEventDto.setName(attendanceEvent.getMemberEvent().getUser().getName());
 				attendanceEventDto.setStudentId(attendanceEvent.getMemberEvent().getUser().getStudentId());
 				attendanceEventDto.setStatus(attendanceEvent.getStatus());
-				if(attendanceEvent.getStatus()) {
+				if (attendanceEvent.getStatus()) {
 					attend++;
 				}
-				attendanceEventDto.setDate(attendanceEvent.getEventSchedule().getDate());
+				attendanceEventDto.setDate(startDate);
 				attendanceEventDtos.add(attendanceEventDto);
 			}
 			responseMessage.setData(attendanceEventDtos);
