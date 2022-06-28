@@ -21,7 +21,10 @@ import com.fpt.macm.dto.ExhibitionTypeDto;
 import com.fpt.macm.dto.RoleEventDto;
 import com.fpt.macm.dto.TournamentDto;
 import com.fpt.macm.dto.TournamentOrganizingCommitteeDto;
+import com.fpt.macm.dto.TournamentOrganizingCommitteePaymentStatusReportDto;
 import com.fpt.macm.dto.TournamentPlayerDto;
+import com.fpt.macm.dto.TournamentPlayerPaymentStatusReportDto;
+import com.fpt.macm.model.ClubFund;
 import com.fpt.macm.model.CompetitivePlayer;
 import com.fpt.macm.model.CompetitiveType;
 import com.fpt.macm.model.Constant;
@@ -33,8 +36,11 @@ import com.fpt.macm.model.RoleEvent;
 import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.Tournament;
 import com.fpt.macm.model.TournamentOrganizingCommittee;
+import com.fpt.macm.model.TournamentOrganizingCommitteePaymentStatusReport;
 import com.fpt.macm.model.TournamentPlayer;
+import com.fpt.macm.model.TournamentPlayerPaymentStatusReport;
 import com.fpt.macm.model.TournamentSchedule;
+import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
@@ -42,7 +48,9 @@ import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.RoleEventRepository;
 import com.fpt.macm.repository.SemesterRepository;
+import com.fpt.macm.repository.TournamentOrganizingCommitteePaymentStatusReportRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
+import com.fpt.macm.repository.TournamentPlayerPaymentStatusReportRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
@@ -86,6 +94,15 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	RoleEventRepository roleEventRepository;
+
+	@Autowired
+	ClubFundRepository clubFundRepository;
+
+	@Autowired
+	TournamentOrganizingCommitteePaymentStatusReportRepository tournamentOrganizingCommitteePaymentStatusReportRepository;
+
+	@Autowired
+	TournamentPlayerPaymentStatusReportRepository tournamentPlayerPaymentStatusReportRepository;
 
 	@Override
 	public ResponseMessage createTournament(Tournament tournament) {
@@ -719,6 +736,188 @@ public class TournamentServiceImpl implements TournamentService {
 			}
 			responseMessage.setData(tournamentOrganizingCommitteesDto);
 			responseMessage.setMessage(Constant.MSG_122);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateTournamentOrganizingCommitteePaymentStatus(int tournamentOrganizingCommitteeId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
+					.findById(tournamentOrganizingCommitteeId);
+			TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+
+			Tournament tournament = tournamentRepository.findById(tournamentOrganizingCommittee.getTournament().getId())
+					.get();
+
+			List<ClubFund> clubFunds = clubFundRepository.findAll();
+			ClubFund clubFund = clubFunds.get(0);
+			double fundAmount = clubFund.getFundAmount();
+
+			double tournamentFee = tournament.getAmount_per_register();
+
+			double fundBalance = tournamentOrganizingCommittee.isPaymentStatus() ? (fundAmount - tournamentFee)
+					: (fundAmount + tournamentFee);
+
+			clubFund.setFundAmount(fundBalance);
+			clubFundRepository.save(clubFund);
+
+			TournamentOrganizingCommitteePaymentStatusReport tournamentOrganizingCommitteePaymentStatusReport = new TournamentOrganizingCommitteePaymentStatusReport();
+			tournamentOrganizingCommitteePaymentStatusReport
+					.setTournament(tournamentOrganizingCommittee.getTournament());
+			tournamentOrganizingCommitteePaymentStatusReport.setUser(tournamentOrganizingCommittee.getUser());
+			tournamentOrganizingCommitteePaymentStatusReport
+					.setPaymentStatus(!tournamentOrganizingCommittee.isPaymentStatus());
+			tournamentOrganizingCommitteePaymentStatusReport
+					.setFundChange(tournamentOrganizingCommittee.isPaymentStatus() ? -tournamentFee : tournamentFee);
+			tournamentOrganizingCommitteePaymentStatusReport.setFundBalance(fundBalance);
+			tournamentOrganizingCommitteePaymentStatusReport.setCreatedBy("toandv");
+			tournamentOrganizingCommitteePaymentStatusReport.setCreatedOn(LocalDateTime.now());
+			tournamentOrganizingCommitteePaymentStatusReportRepository
+					.save(tournamentOrganizingCommitteePaymentStatusReport);
+
+			tournamentOrganizingCommittee.setPaymentStatus(!tournamentOrganizingCommittee.isPaymentStatus());
+			tournamentOrganizingCommittee.setUpdatedBy("toandv");
+			tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
+			tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
+
+			TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertTournamentOrganizingCommitteeToTournamentOrganizingCommitteeDto(
+					tournamentOrganizingCommittee);
+
+			responseMessage.setData(Arrays.asList(tournamentOrganizingCommitteeDto));
+			responseMessage.setMessage(Constant.MSG_123);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllTournamentOrganizingCommitteePaymentStatusReport(int tournamentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<TournamentOrganizingCommitteePaymentStatusReport> tournamentOrganizingCommitteePaymentStatusReports = tournamentOrganizingCommitteePaymentStatusReportRepository
+					.findByTournamentId(tournamentId);
+			List<TournamentOrganizingCommitteePaymentStatusReportDto> tournamentOrganizingCommitteePaymentStatusReportsDto = new ArrayList<TournamentOrganizingCommitteePaymentStatusReportDto>();
+			for (TournamentOrganizingCommitteePaymentStatusReport tournamentOrganizingCommitteePaymentStatusReport : tournamentOrganizingCommitteePaymentStatusReports) {
+				TournamentOrganizingCommitteePaymentStatusReportDto tournamentOrganizingCommitteePaymentStatusReportDto = new TournamentOrganizingCommitteePaymentStatusReportDto();
+				tournamentOrganizingCommitteePaymentStatusReportDto
+						.setId(tournamentOrganizingCommitteePaymentStatusReport.getId());
+				tournamentOrganizingCommitteePaymentStatusReportDto
+						.setTournamentId(tournamentOrganizingCommitteePaymentStatusReport.getTournament().getId());
+				tournamentOrganizingCommitteePaymentStatusReportDto
+						.setUserName(tournamentOrganizingCommitteePaymentStatusReport.getUser().getName());
+				tournamentOrganizingCommitteePaymentStatusReportDto
+						.setUserStudentId(tournamentOrganizingCommitteePaymentStatusReport.getUser().getStudentId());
+				tournamentOrganizingCommitteePaymentStatusReportDto
+						.setPaymentStatus(tournamentOrganizingCommitteePaymentStatusReport.isPaymentStatus());
+				tournamentOrganizingCommitteePaymentStatusReportDto
+						.setFundChange(tournamentOrganizingCommitteePaymentStatusReport.getFundChange());
+				tournamentOrganizingCommitteePaymentStatusReportDto
+						.setFundBalance(tournamentOrganizingCommitteePaymentStatusReport.getFundBalance());
+				tournamentOrganizingCommitteePaymentStatusReportDto
+						.setCreatedBy(tournamentOrganizingCommitteePaymentStatusReport.getCreatedBy());
+				tournamentOrganizingCommitteePaymentStatusReportDto
+						.setCreatedOn(tournamentOrganizingCommitteePaymentStatusReport.getCreatedOn());
+				tournamentOrganizingCommitteePaymentStatusReportsDto
+						.add(tournamentOrganizingCommitteePaymentStatusReportDto);
+			}
+
+			responseMessage.setData(tournamentOrganizingCommitteePaymentStatusReportsDto);
+			responseMessage.setMessage(Constant.MSG_124);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateTournamentPlayerPaymentStatus(int tournamentPlayerId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.findById(tournamentPlayerId);
+			TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
+
+			Tournament tournament = tournamentRepository.findByTournamentPlayers(tournamentPlayer).get();
+
+			List<ClubFund> clubFunds = clubFundRepository.findAll();
+			ClubFund clubFund = clubFunds.get(0);
+			double fundAmount = clubFund.getFundAmount();
+
+			double tournamentFee = tournament.getAmount_per_register();
+
+			double fundBalance = tournamentPlayer.isPaymentStatus() ? (fundAmount - tournamentFee)
+					: (fundAmount + tournamentFee);
+
+			clubFund.setFundAmount(fundBalance);
+			clubFundRepository.save(clubFund);
+
+			TournamentPlayerPaymentStatusReport tournamentPlayerPaymentStatusReport = new TournamentPlayerPaymentStatusReport();
+			tournamentPlayerPaymentStatusReport.setTournament(tournament);
+			tournamentPlayerPaymentStatusReport.setUser(tournamentPlayer.getUser());
+			tournamentPlayerPaymentStatusReport.setPaymentStatus(!tournamentPlayer.isPaymentStatus());
+			tournamentPlayerPaymentStatusReport
+					.setFundChange(tournamentPlayer.isPaymentStatus() ? -tournamentFee : tournamentFee);
+			tournamentPlayerPaymentStatusReport.setFundBalance(fundBalance);
+			tournamentPlayerPaymentStatusReport.setCreatedBy("toandv");
+			tournamentPlayerPaymentStatusReport.setCreatedOn(LocalDateTime.now());
+			tournamentPlayerPaymentStatusReportRepository.save(tournamentPlayerPaymentStatusReport);
+
+			tournamentPlayer.setPaymentStatus(!tournamentPlayer.isPaymentStatus());
+			tournamentPlayer.setUpdatedBy("toandv");
+			tournamentPlayer.setUpdatedOn(LocalDateTime.now());
+			tournamentPlayerRepository.save(tournamentPlayer);
+
+			TournamentPlayerDto tournamentPlayerDto = convertTournamentPlayer(tournamentPlayer);
+
+			responseMessage.setData(Arrays.asList(tournamentPlayerDto));
+			responseMessage.setMessage(Constant.MSG_125);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllTournamentPlayerPaymentStatusReport(int tournamentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<TournamentPlayerPaymentStatusReport> tournamentPlayerPaymentStatusReports = tournamentPlayerPaymentStatusReportRepository
+					.findByTournamentId(tournamentId);
+			List<TournamentPlayerPaymentStatusReportDto> tournamentPlayerPaymentStatusReportsDto = new ArrayList<TournamentPlayerPaymentStatusReportDto>();
+			for (TournamentPlayerPaymentStatusReport tournamentPlayerPaymentStatusReport : tournamentPlayerPaymentStatusReports) {
+				TournamentPlayerPaymentStatusReportDto tournamentPlayerPaymentStatusReportDto = new TournamentPlayerPaymentStatusReportDto();
+				tournamentPlayerPaymentStatusReportDto.setId(tournamentPlayerPaymentStatusReport.getId());
+				tournamentPlayerPaymentStatusReportDto
+						.setTournamentId(tournamentPlayerPaymentStatusReport.getTournament().getId());
+				tournamentPlayerPaymentStatusReportDto
+						.setUserName(tournamentPlayerPaymentStatusReport.getUser().getName());
+				tournamentPlayerPaymentStatusReportDto
+						.setUserStudentId(tournamentPlayerPaymentStatusReport.getUser().getStudentId());
+				tournamentPlayerPaymentStatusReportDto
+						.setPaymentStatus(tournamentPlayerPaymentStatusReport.isPaymentStatus());
+				tournamentPlayerPaymentStatusReportDto
+						.setFundChange(tournamentPlayerPaymentStatusReport.getFundChange());
+				tournamentPlayerPaymentStatusReportDto
+						.setFundBalance(tournamentPlayerPaymentStatusReport.getFundBalance());
+				tournamentPlayerPaymentStatusReportDto.setCreatedBy(tournamentPlayerPaymentStatusReport.getCreatedBy());
+				tournamentPlayerPaymentStatusReportDto.setCreatedOn(tournamentPlayerPaymentStatusReport.getCreatedOn());
+				tournamentPlayerPaymentStatusReportsDto.add(tournamentPlayerPaymentStatusReportDto);
+			}
+
+			responseMessage.setData(tournamentPlayerPaymentStatusReportsDto);
+			responseMessage.setMessage(Constant.MSG_126);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
