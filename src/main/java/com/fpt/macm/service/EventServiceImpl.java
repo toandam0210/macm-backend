@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,11 +16,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.EventDto;
+import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
+import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
@@ -35,6 +38,9 @@ public class EventServiceImpl implements EventService{
 	EventScheduleRepository eventScheduleRepository;
 	
 	@Autowired
+	CommonScheduleRepository commonScheduleRepository;
+	
+	@Autowired
 	MemberEventRepository memberEventRepository;
 	
 	@Autowired
@@ -42,6 +48,9 @@ public class EventServiceImpl implements EventService{
 	
 	@Autowired
 	EventScheduleService eventScheduleService;
+	
+	@Autowired
+	CommonScheduleService commonScheduleService;
 	
 	@Autowired
 	SemesterService semesterService;
@@ -106,6 +115,10 @@ public class EventServiceImpl implements EventService{
 				responseMessage.setMessage(Constant.MSG_064);
 			}
 			else {
+				for (EventSchedule eventSchedule : listSchedule) {
+					CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(eventSchedule.getDate());
+					commonScheduleRepository.delete(getCommonSession);
+				}
 				Optional<Event> eventOp = eventRepository.findById(id);
 				Event event = eventOp.get();
 				eventScheduleRepository.deleteAll(listSchedule);
@@ -291,8 +304,8 @@ public class EventServiceImpl implements EventService{
 				eventDto.setName(event.getName());
 				eventDto.setId(event.getId());
 				eventDtos.add(eventDto);
-				
 			}
+			Collections.sort(eventDtos);
 			responseMessage.setData(eventDtos);
 			responseMessage.setMessage("Lấy danh sách event thành công" + semester);
 			responseMessage.setTotalResult(eventDtos.size());
