@@ -93,14 +93,32 @@ public class TournamentController {
 	ResponseEntity<ResponseMessage> getAllExhibitionType(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllExhibitionType(tournamentId), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/acceptrequesttojoinorganizingcommittee/{organizingCommitteeId}")
-	ResponseEntity<ResponseMessage> acceptRequestToJoinOrganizingCommittee(@PathVariable(name = "organizingCommitteeId") int organizingCommitteeId){
-		return new ResponseEntity<ResponseMessage>(tournamentService.acceptRequestOrganizingCommittee(organizingCommitteeId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> acceptRequestToJoinOrganizingCommittee(
+			@PathVariable(name = "organizingCommitteeId") int organizingCommitteeId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.acceptRequestOrganizingCommittee(organizingCommitteeId), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/declinerequesttojoinorganizingcommittee/{organizingCommitteeId}")
-	ResponseEntity<ResponseMessage> declineRequestToJoinOrganizingCommittee(@PathVariable(name = "organizingCommitteeId") int organizingCommitteeId){
-		return new ResponseEntity<ResponseMessage>(tournamentService.declineRequestOrganizingCommittee(organizingCommitteeId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> declineRequestToJoinOrganizingCommittee(
+			@PathVariable(name = "organizingCommitteeId") int organizingCommitteeId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.declineRequestOrganizingCommittee(organizingCommitteeId), HttpStatus.OK);
+	}
+
+	@GetMapping("/headclub/getalltournamentplayerpaymentstatus/{tournamentId}")
+	ResponseEntity<ResponseMessage> getAllTournamentPlayerPaymentStatus(
+			@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentPlayerPaymentStatus(tournamentId),
+				HttpStatus.OK);
+	}
+
+	@GetMapping("/headclub/getalltournamentorganizingcommitteepaymentstatus/{tournamentId}")
+	ResponseEntity<ResponseMessage> getAllTournamentOrganizingCommitteePaymentStatus(
+			@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentOrganizingCommitteePaymentStatus(tournamentId),
+				HttpStatus.OK);
 	}
 }

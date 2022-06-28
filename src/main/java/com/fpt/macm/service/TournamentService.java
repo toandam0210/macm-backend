@@ -35,4 +35,8 @@ public interface TournamentService {
 	ResponseMessage acceptRequestOrganizingCommittee(int tournamentOrganizingCommitteeId);
 	
 	ResponseMessage declineRequestOrganizingCommittee(int tournamentOrganizingCommitteeId);
+	
+	ResponseMessage getAllTournamentPlayerPaymentStatus(int tournamentId);
+	
+	ResponseMessage getAllTournamentOrganizingCommitteePaymentStatus(int tournamentId);
 }

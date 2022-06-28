@@ -21,6 +21,7 @@ import com.fpt.macm.dto.ExhibitionTypeDto;
 import com.fpt.macm.dto.RoleEventDto;
 import com.fpt.macm.dto.TournamentDto;
 import com.fpt.macm.dto.TournamentOrganizingCommitteeDto;
+import com.fpt.macm.dto.TournamentPlayerDto;
 import com.fpt.macm.model.CompetitivePlayer;
 import com.fpt.macm.model.CompetitiveType;
 import com.fpt.macm.model.Constant;
@@ -497,7 +498,8 @@ public class TournamentServiceImpl implements TournamentService {
 					if (exhibitionType.getId() == exhibitionTypeId) {
 						Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
 						for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
-							exhibitionTeamsDto.add(convertToExhibitionTeamDto(exhibitionTeam, exhibitionType.getName()));
+							exhibitionTeamsDto
+									.add(convertToExhibitionTeamDto(exhibitionTeam, exhibitionType.getName()));
 						}
 						break;
 					}
@@ -634,8 +636,7 @@ public class TournamentServiceImpl implements TournamentService {
 					responseMessage.setData(Arrays.asList(tournamentOrganizingCommitteeDto));
 					responseMessage.setMessage(Constant.MSG_118);
 				}
-			}
-			else {
+			} else {
 				responseMessage.setMessage(Constant.MSG_120);
 			}
 		} catch (Exception e) {
@@ -663,6 +664,61 @@ public class TournamentServiceImpl implements TournamentService {
 				responseMessage.setData(Arrays.asList(tournamentOrganizingCommitteeDto));
 				responseMessage.setMessage(Constant.MSG_119);
 			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllTournamentPlayerPaymentStatus(int tournamentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			Tournament tournament = tournamentOp.get();
+			Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+			List<TournamentPlayerDto> tournamentPlayersDto = new ArrayList<TournamentPlayerDto>();
+			for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+				TournamentPlayerDto tournamentPlayerDto = convertTournamentPlayer(tournamentPlayer);
+				tournamentPlayersDto.add(tournamentPlayerDto);
+			}
+			responseMessage.setData(tournamentPlayersDto);
+			responseMessage.setMessage(Constant.MSG_121);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	private TournamentPlayerDto convertTournamentPlayer(TournamentPlayer tournamentPlayer) {
+		TournamentPlayerDto tournamentPlayerDto = new TournamentPlayerDto();
+		tournamentPlayerDto.setId(tournamentPlayer.getId());
+		tournamentPlayerDto.setUserName(tournamentPlayer.getUser().getName());
+		tournamentPlayerDto.setUserStudentId(tournamentPlayer.getUser().getStudentId());
+		tournamentPlayerDto.setPaymentStatus(tournamentPlayer.isPaymentStatus());
+		return tournamentPlayerDto;
+	}
+
+	@Override
+	public ResponseMessage getAllTournamentOrganizingCommitteePaymentStatus(int tournamentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+					.findByTournamentId(tournamentId);
+			List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
+			for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+				if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
+					TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertTournamentOrganizingCommitteeToTournamentOrganizingCommitteeDto(
+							tournamentOrganizingCommittee);
+					tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
+				}
+			}
+			responseMessage.setData(tournamentOrganizingCommitteesDto);
+			responseMessage.setMessage(Constant.MSG_122);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

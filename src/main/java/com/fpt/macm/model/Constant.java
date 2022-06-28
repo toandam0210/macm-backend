@@ -170,4 +170,6 @@ public class Constant {
 	public static final String MSG_118 = "Chấp nhận yêu cầu tham gia ban tổ chức giải đấu thành công";
 	public static final String MSG_119 = "Từ chối yêu cầu tham gia ban tổ chức giải đấu thành công";
 	public static final String MSG_120 = "Đã đủ người trong ban tổ chức";
+	public static final String MSG_121 = "Lấy danh sách đóng tiền của người chơi thành công";
+	public static final String MSG_122 = "Lấy danh sách đóng tiền của thành viên ban tổ chức giải đấu thành công";
 }
