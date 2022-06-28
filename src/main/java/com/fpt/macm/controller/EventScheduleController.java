@@ -80,4 +80,9 @@ public class EventScheduleController {
 			@RequestBody List<ScheduleDto> listPreview, @RequestParam Boolean isOverwritten) {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.updateEventSchedule(eventId, listPreview, isOverwritten), HttpStatus.OK);
 	}
+	
+	@GetMapping("/headculture/getperiodtimeofevent/{eventId}")
+	ResponseEntity<ResponseMessage> getPeriodTimeOfEvent(@PathVariable(name = "eventId") int eventId){
+			return new ResponseEntity<ResponseMessage>(eventScheduleService.getPeriodTimeOfEvent(eventId), HttpStatus.OK);
+	}
 }

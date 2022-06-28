@@ -510,4 +510,24 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 		return responseMessage;
 	}
 
+	@Override
+	public ResponseMessage getPeriodTimeOfEvent(int eventId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<EventSchedule> getEventSchedules = eventScheduleRepository.findByEventId(eventId);
+			String [] result = new String [4];
+			result[0] = getEventSchedules.get(0).getDate().toString();
+			result[1] = getEventSchedules.get(getEventSchedules.size() - 1).getDate().toString();
+			result[2] = getEventSchedules.get(0).getStartTime().toString();
+			result[3] = getEventSchedules.get(getEventSchedules.size() - 1).getFinishTime().toString();
+			responseMessage.setData(Arrays.asList(result));
+			responseMessage.setMessage("Lấy thông tin thời gian sự kiện thành công");
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }
