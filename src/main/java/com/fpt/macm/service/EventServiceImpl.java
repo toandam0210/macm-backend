@@ -94,6 +94,13 @@ public class EventServiceImpl implements EventService{
 				getEvent.setDescription(event.getDescription());
 				getEvent.setUpdatedBy("LinhLHN");
 				getEvent.setUpdatedOn(LocalDateTime.now());
+				List<EventSchedule> getEventSchedules = (List<EventSchedule>) eventScheduleService.getListEventScheduleByEvent(id).getData();
+				for (EventSchedule eventSchedule : getEventSchedules) {
+					CommonSchedule getCommonSchedule = commonScheduleService.getCommonSessionByDate(eventSchedule.getDate());
+					getCommonSchedule.setTitle(event.getName());
+					getCommonSchedule.setUpdatedOn(LocalDateTime.now());
+					commonScheduleRepository.save(getCommonSchedule);
+				}
 				eventRepository.save(getEvent);
 				responseMessage.setData(Arrays.asList(getEvent));
 				responseMessage.setMessage(Constant.MSG_053);
