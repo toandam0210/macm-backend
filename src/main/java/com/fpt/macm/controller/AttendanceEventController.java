@@ -3,6 +3,7 @@ package com.fpt.macm.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,4 +24,8 @@ public class AttendanceEventController {
 		return new ResponseEntity<ResponseMessage>(attendanceEventService.takeAttendanceByMemberEventId(memberEventId), HttpStatus.OK);
 	}
 	
+	@GetMapping("/checkattendance/{eventScheduleId}")
+	ResponseEntity<ResponseMessage> checkAttendanceByEventScheduleId(@PathVariable(name = "eventScheduleId") int eventScheduleId) {
+		return new ResponseEntity<ResponseMessage>(attendanceEventService.checkAttendanceStatusByEventSchedule(eventScheduleId), HttpStatus.OK);
+	}
 }

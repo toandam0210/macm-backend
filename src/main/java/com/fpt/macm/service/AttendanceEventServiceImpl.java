@@ -2,12 +2,14 @@ package com.fpt.macm.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.dto.AttendanceEventDto;
 import com.fpt.macm.model.AttendanceEvent;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.EventSchedule;
@@ -53,6 +55,35 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
+	@Override
+	public ResponseMessage checkAttendanceStatusByEventSchedule(int eventScheduleId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<AttendanceEvent> attendancesEvent = attendanceEventRepository.findByEventScheduleId(eventScheduleId);
+			List<AttendanceEventDto> attendanceEventDtos = new ArrayList<AttendanceEventDto>();
+			int attend = 0;
+			for (AttendanceEvent attendanceEvent : attendancesEvent) {
+				AttendanceEventDto attendanceEventDto = new AttendanceEventDto();
+				attendanceEventDto.setName(attendanceEvent.getMemberEvent().getUser().getName());
+				attendanceEventDto.setStudentId(attendanceEvent.getMemberEvent().getUser().getStudentId());
+				attendanceEventDto.setStatus(attendanceEvent.getStatus());
+				if(attendanceEvent.getStatus()) {
+					attend++;
+				}
+				attendanceEventDto.setDate(attendanceEvent.getEventSchedule().getDate());
+				attendanceEventDtos.add(attendanceEventDto);
+			}
+			responseMessage.setData(attendanceEventDtos);
+			responseMessage.setMessage(Constant.MSG_057);
+			responseMessage.setTotalActive(attend);
+			responseMessage.setTotalDeactive(attendanceEventDtos.size() - attend);
+			responseMessage.setTotalResult(attendanceEventDtos.size());
+		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
