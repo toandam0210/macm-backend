@@ -61,6 +61,8 @@ public class EventServiceImpl implements EventService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+			event.setAmountPerRegisterActual(0);
+			event.setTotalAmountActual(0);
 			event.setCreatedBy("LinhLHN");
 			event.setCreatedOn(LocalDateTime.now());
 			event.setSemester(semester.getName());
