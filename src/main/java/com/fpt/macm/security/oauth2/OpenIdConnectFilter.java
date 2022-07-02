@@ -73,6 +73,7 @@ public class OpenIdConnectFilter extends AbstractAuthenticationProcessingFilter 
 		try {
 			final String idToken = accessToken.getAdditionalInformation().get("id_token").toString();
 			String kid = JwtHelper.headers(idToken).get("kid");
+			
 			final Jwt tokenDecoded = JwtHelper.decodeAndVerify(idToken, verifier(kid));
 			final Map<String, String> authInfo = new ObjectMapper().readValue(tokenDecoded.getClaims(), Map.class);
 			verifyClaims(authInfo);

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.security.payload.UserLoginResponse;
 import com.fpt.macm.service.UserService;
 
 @RestController
@@ -18,7 +18,7 @@ public class LoginController {
 	UserService userService;
 	
 	@GetMapping("/login")
-	ResponseEntity<ResponseMessage> getUserLogin(){
-		return new ResponseEntity<ResponseMessage>(userService.userLogin(), HttpStatus.OK);
+	ResponseEntity<UserLoginResponse> getUserLogin(){
+		return new ResponseEntity<UserLoginResponse>(userService.userLogin(), HttpStatus.OK);
 	}
 }

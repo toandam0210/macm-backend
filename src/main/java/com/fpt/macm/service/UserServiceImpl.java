@@ -32,6 +32,7 @@ import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.RoleRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.UserRepository;
+import com.fpt.macm.security.payload.UserLoginResponse;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -54,7 +55,7 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	SemesterService semesterService;
-
+	
 	@Override
 	public ResponseMessage getUserByStudentId(String studentId) {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -370,13 +371,17 @@ public class UserServiceImpl implements UserService {
 		return responseMessage;
 	}
 	@Override
-	public ResponseMessage userLogin() {
-		ResponseMessage responseMessage = new ResponseMessage();
-		String username = SecurityContextHolder.getContext().getAuthentication().getName();
-		User user = userRepository.findByEmail(username).get();
-		responseMessage.setData(Arrays.asList(user));
-		responseMessage.setMessage("Login successful");
-		return responseMessage;
+	public UserLoginResponse userLogin() {
+			String username = SecurityContextHolder.getContext().getAuthentication().getName();
+			User user = userRepository.findByEmail(username).get();
+			UserLoginResponse userLoginResponse = new UserLoginResponse();
+			userLoginResponse.setName(user.getName());
+			userLoginResponse.setStudentId(user.getStudentId());
+			userLoginResponse.setRoleId(user.getRole().getId());
+			userLoginResponse.setRoleName(user.getRole().getName());
+			userLoginResponse.setEmail(user.getEmail());
+		
+		return userLoginResponse;
 	}
 	@Override
 	public ResponseMessage addUsersFromExcel(MultipartFile file) {
