@@ -384,7 +384,7 @@ public class EventServiceImpl implements EventService{
 	
 	public List<EventDto> pageableEvent(List<EventDto> currentList, int pageNo, int pageSize) {
 		List<EventDto> result = new ArrayList<EventDto>();
-		for(int i = pageNo * pageSize; i < (pageNo + 1) * pageSize; i++) {
+		for(int i = pageNo * pageSize; i < (pageNo + 1) * pageSize && i < currentList.size(); i++) {
 			result.add(currentList.get(i));
 		}
 		return result;
