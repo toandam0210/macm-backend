@@ -14,7 +14,7 @@ public class TournamentDto {
 
 	private int maxQuantityComitee;
 
-	private double amount_per_register;
+	private double feeOrganizingCommiteePay;
 
 	private Set<CompetitiveTypeDto> competitiveTypesDto;
 
@@ -27,6 +27,8 @@ public class TournamentDto {
 	private Set<TournamentPlayer> tournamentPlayers;
 	
 	private double totalAmount;
+	
+	private double feePlayerPay;
 
 	public int getId() {
 		return id;
@@ -58,14 +60,6 @@ public class TournamentDto {
 
 	public void setMaxQuantityComitee(int maxQuantityComitee) {
 		this.maxQuantityComitee = maxQuantityComitee;
-	}
-
-	public double getAmount_per_register() {
-		return amount_per_register;
-	}
-
-	public void setAmount_per_register(double amount_per_register) {
-		this.amount_per_register = amount_per_register;
 	}
 
 	public Set<CompetitiveTypeDto> getCompetitiveTypesDto() {
@@ -114,6 +108,22 @@ public class TournamentDto {
 
 	public void setTotalAmount(double totalAmount) {
 		this.totalAmount = totalAmount;
+	}
+
+	public double getFeeOrganizingCommiteePay() {
+		return feeOrganizingCommiteePay;
+	}
+
+	public void setFeeOrganizingCommiteePay(double feeOrganizingCommiteePay) {
+		this.feeOrganizingCommiteePay = feeOrganizingCommiteePay;
+	}
+
+	public double getFeePlayerPay() {
+		return feePlayerPay;
+	}
+
+	public void setFeePlayerPay(double feePlayerPay) {
+		this.feePlayerPay = feePlayerPay;
 	}
 	
 	
