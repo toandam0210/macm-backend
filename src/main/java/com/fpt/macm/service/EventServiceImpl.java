@@ -75,13 +75,13 @@ public class EventServiceImpl implements EventService{
 	}
 
 	@Override
-	public ResponseMessage updateEvent(int id, Event event) {
+	public ResponseMessage updateBeforeEvent(int id, Event event) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(id);
 			if(listSchedule.size() > 0 && listSchedule.get(0).getDate().compareTo(LocalDate.now()) <= 0) {
-				responseMessage.setMessage(Constant.MSG_069);
+				responseMessage.setMessage(Constant.MSG_127);
 			}
 			else {
 				Optional<Event> eventOp = eventRepository.findById(id);
@@ -89,9 +89,6 @@ public class EventServiceImpl implements EventService{
 				getEvent.setName(event.getName());
 				getEvent.setDescription(event.getDescription());
 				getEvent.setMaxQuantityComitee(event.getMaxQuantityComitee());
-				getEvent.setTotalAmount(event.getTotalAmount());
-				getEvent.setAmount_per_register(event.getAmount_per_register());
-				getEvent.setDescription(event.getDescription());
 				getEvent.setUpdatedBy("LinhLHN");
 				getEvent.setUpdatedOn(LocalDateTime.now());
 				List<EventSchedule> getEventSchedules = eventScheduleService.listEventScheduleByEvent(id);
@@ -160,22 +157,27 @@ public class EventServiceImpl implements EventService{
 					LocalDate endDate = getEndDate(event.getId());
 					if(LocalDate.now().isBefore(startDate)) {
 						eventDto.setStatus("Chưa diễn ra");
+						eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+						eventDto.setTotalAmount(event.getTotalAmountEstimated());
 					}else if(LocalDate.now().isAfter(endDate)) {
 						eventDto.setStatus("Đã kết thúc");
+						eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterActual());
+						eventDto.setTotalAmount(event.getTotalAmountActual());
 					}else {
 						eventDto.setStatus("Đang diễn ra");
+						eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+						eventDto.setTotalAmount(event.getTotalAmountEstimated());
 					}
 				} else {
 					eventDto.setStatus("Chưa diễn ra");
 				}
-				eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
 				eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
-				eventDto.setTotalAmount(event.getTotalAmount());
+				eventDto.setAmountFromClub(event.getAmountFromClub());
 				eventDto.setStartDate(startDate);
 				eventDto.setName(event.getName());
 				eventDto.setId(event.getId());
+				eventDto.setDescription(event.getDescription());
 				eventDtos.add(eventDto);
-				
 			}
 			responseMessage.setData(eventDtos);
 			responseMessage.setPageNo(pageNo);
@@ -229,19 +231,24 @@ public class EventServiceImpl implements EventService{
 						EventDto eventDto = new EventDto();
 						if(LocalDate.now().isBefore(startDateEvent)) {
 							eventDto.setStatus("Chưa diễn ra");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+							eventDto.setTotalAmount(event.getTotalAmountEstimated());
 						}else if(LocalDate.now().isAfter(endDate)) {
 							eventDto.setStatus("Đã kết thúc");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterActual());
+							eventDto.setTotalAmount(event.getTotalAmountActual());
 						}else {
 							eventDto.setStatus("Đang diễn ra");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+							eventDto.setTotalAmount(event.getTotalAmountEstimated());
 						}
-						eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
 						eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
-						eventDto.setTotalAmount(event.getTotalAmount());
+						eventDto.setAmountFromClub(event.getAmountFromClub());
 						eventDto.setStartDate(startDate);
 						eventDto.setName(event.getName());
 						eventDto.setId(event.getId());
+						eventDto.setDescription(event.getDescription());
 						eventDtos.add(eventDto);
-						
 					}
 					responseMessage.setData(eventDtos);
 					responseMessage.setMessage(Constant.MSG_063);
@@ -296,17 +303,23 @@ public class EventServiceImpl implements EventService{
 						LocalDate endDate = getEndDate(event.getId());
 						if(LocalDate.now().isBefore(startDate)) {
 							eventDto.setStatus("Chưa diễn ra");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+							eventDto.setTotalAmount(event.getTotalAmountEstimated());
 						}else if(LocalDate.now().isAfter(endDate)) {
 							eventDto.setStatus("Đã kết thúc");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterActual());
+							eventDto.setTotalAmount(event.getTotalAmountActual());
 						}else {
 							eventDto.setStatus("Đang diễn ra");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+							eventDto.setTotalAmount(event.getTotalAmountEstimated());
 						}
-						eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
 						eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
-						eventDto.setTotalAmount(event.getTotalAmount());
+						eventDto.setAmountFromClub(event.getAmountFromClub());
 						eventDto.setStartDate(startDate);
 						eventDto.setName(event.getName());
 						eventDto.setId(event.getId());
+						eventDto.setDescription(event.getDescription());
 						eventDtos.add(eventDto);
 					}
 				}
@@ -333,5 +346,33 @@ public class EventServiceImpl implements EventService{
 			// TODO: handle exception
 		}
 		return null;
+	}
+
+	@Override
+	public ResponseMessage updateAfterEvent(int id, Event event) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(id);
+			if(listSchedule.size() > 0 && listSchedule.get(listSchedule.size() - 1).getDate().compareTo(LocalDate.now()) > 0) {
+				responseMessage.setMessage(Constant.MSG_128);
+			}
+			else {
+				Optional<Event> eventOp = eventRepository.findById(id);
+				Event getEvent = eventOp.get();
+				getEvent.setTotalAmountActual(event.getTotalAmountActual());
+				getEvent.setAmountFromClub(event.getAmountFromClub());
+				getEvent.setAmountPerRegisterActual(event.getAmountPerRegisterActual());
+				getEvent.setUpdatedBy("LinhLHN");
+				getEvent.setUpdatedOn(LocalDateTime.now());
+				eventRepository.save(getEvent);
+				responseMessage.setData(Arrays.asList(getEvent));
+				responseMessage.setMessage(Constant.MSG_129);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 }

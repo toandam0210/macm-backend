@@ -38,20 +38,61 @@ public class Event {
 	private LocalDateTime updatedOn;
 	
 	@Column
-	private double totalAmount;
+	private double totalAmountEstimated;
 	
 	@Column
-	private double amount_per_register;
+	private double totalAmountActual;
+	
+	@Column
+	private double amountFromClub;
+	
+	@Column
+	private double amountPerRegisterEstimated;
+	
+	@Column
+	private double amountPerRegisterActual;
 	
 	@Column
 	private String semester;
 
-	public double getAmount_per_register() {
-		return amount_per_register;
+	public double getAmountFromClub() {
+		return amountFromClub;
 	}
 
-	public void setAmount_per_register(double amount_per_register) {
-		this.amount_per_register = amount_per_register;
+	public void setAmountFromClub(double amountFromClub) {
+		this.amountFromClub = amountFromClub;
+	}
+
+	public double getTotalAmountEstimated() {
+		return totalAmountEstimated;
+	}
+
+	public void setTotalAmountEstimated(double totalAmountEstimated) {
+		this.totalAmountEstimated = totalAmountEstimated;
+	}
+
+	public double getTotalAmountActual() {
+		return totalAmountActual;
+	}
+
+	public void setTotalAmountActual(double totalAmountActual) {
+		this.totalAmountActual = totalAmountActual;
+	}
+
+	public double getAmountPerRegisterEstimated() {
+		return amountPerRegisterEstimated;
+	}
+
+	public void setAmountPerRegisterEstimated(double amountPerRegisterEstimated) {
+		this.amountPerRegisterEstimated = amountPerRegisterEstimated;
+	}
+
+	public double getAmountPerRegisterActual() {
+		return amountPerRegisterActual;
+	}
+
+	public void setAmountPerRegisterActual(double amountPerRegisterActual) {
+		this.amountPerRegisterActual = amountPerRegisterActual;
 	}
 
 	public int getId() {
@@ -118,14 +159,6 @@ public class Event {
 		this.updatedOn = updatedOn;
 	}
 
-	public double getTotalAmount() {
-		return totalAmount;
-	}
-
-	public void setTotalAmount(double totalAmount) {
-		this.totalAmount = totalAmount;
-	}
-
 	public String getSemester() {
 		return semester;
 	}
@@ -133,8 +166,5 @@ public class Event {
 	public void setSemester(String semester) {
 		this.semester = semester;
 	}
-	
-	
-	
 	
 }

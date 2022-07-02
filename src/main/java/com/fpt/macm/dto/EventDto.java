@@ -9,6 +9,7 @@ public class EventDto implements Comparable<EventDto>{
 	private int maxQuantityComitee;
 	private double amountPerMemberRegister;
 	private double totalAmount;
+	private double amountFromClub;
 	private LocalDate startDate;
 	private String description;
 
@@ -34,6 +35,14 @@ public class EventDto implements Comparable<EventDto>{
 
 	public void setAmountPerMemberRegister(double amountPerMemberRegister) {
 		this.amountPerMemberRegister = amountPerMemberRegister;
+	}
+
+	public double getAmountFromClub() {
+		return amountFromClub;
+	}
+
+	public void setAmountFromClub(double amountFromClub) {
+		this.amountFromClub = amountFromClub;
 	}
 
 	public LocalDate getStartDate() {

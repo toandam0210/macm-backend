@@ -36,9 +36,9 @@ public class EventController {
 		return new ResponseEntity<ResponseMessage>(eventService.getEventsByName(name, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 	
-	@PutMapping("/headculture/updateevent/{eventId}")
-	ResponseEntity<ResponseMessage> updateEvent(@PathVariable(name = "eventId") int id, @RequestBody Event event) {
-		return new ResponseEntity<ResponseMessage>(eventService.updateEvent(id, event), HttpStatus.OK);
+	@PutMapping("/headculture/updatebeforeevent/{eventId}")
+	ResponseEntity<ResponseMessage> updateBeforeEvent(@PathVariable(name = "eventId") int id, @RequestBody Event event) {
+		return new ResponseEntity<ResponseMessage>(eventService.updateBeforeEvent(id, event), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headculture/deleteevent/{eventId}")
@@ -61,4 +61,8 @@ public class EventController {
 		return new ResponseEntity<ResponseMessage>(eventService.getEventsBySemester(semester, month), HttpStatus.OK);
 	}
 	
+	@PutMapping("/headculture/updateafterevent/{eventId}")
+	ResponseEntity<ResponseMessage> updateAfterEvent(@PathVariable(name = "eventId") int id, @RequestBody Event event) {
+		return new ResponseEntity<ResponseMessage>(eventService.updateAfterEvent(id, event), HttpStatus.OK);
+	}
 }
