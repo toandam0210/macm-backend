@@ -530,4 +530,15 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 		return responseMessage;
 	}
 
+	@Override
+	public List<EventSchedule> listEventScheduleByEvent(int eventId) {
+		// TODO Auto-generated method stub
+		try {
+			return eventScheduleRepository.findByEventId(eventId);
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+	}
+
 }
