@@ -1,19 +1,13 @@
 package com.fpt.macm.service;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,23 +16,23 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.supercsv.io.CsvBeanWriter;
-import org.supercsv.io.ICsvBeanWriter;
-import org.supercsv.prefs.CsvPreference;
 
 import com.fpt.macm.dto.UserDto;
-import com.fpt.macm.dto.UserToCsvDto;
+import com.fpt.macm.helper.ExcelHelper;
+import com.fpt.macm.model.AdminSemester;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ERole;
+import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
+import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.User;
+import com.fpt.macm.repository.AdminSemesterRepository;
+import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.RoleRepository;
+import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
-import com.univocity.parsers.common.record.Record;
-import com.univocity.parsers.csv.CsvParser;
-import com.univocity.parsers.csv.CsvParserSettings;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -49,12 +43,25 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	RoleRepository roleRepository;
 
+	@Autowired
+	MemberSemesterRepository memberSemesterRepository;
+
+	@Autowired
+	AdminSemesterRepository adminSemesterRepository;
+
+	@Autowired
+	SemesterRepository semesterRepository;
+
+	@Autowired
+	SemesterService semesterService;
+
 	@Override
 	public ResponseMessage getUserByStudentId(String studentId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
 			User user = userOp.get();
+			Utils.convertNameOfRole(user.getRole());
 			responseMessage.setData(Arrays.asList(user));
 			responseMessage.setMessage(Constant.MSG_001);
 		} catch (Exception e) {
@@ -70,12 +77,18 @@ public class UserServiceImpl implements UserService {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.findAdminForViceHeadClubByRoleId(paging);
 			List<User> admins = new ArrayList<User>();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				admins = pageResponse.getContent();
 			}
+			for (User admin : admins) {
+				UserDto userDto = convertUserToUserDto(admin);
+				usersDto.add(userDto);
+			}
 			responseMessage.setMessage(Constant.MSG_001);
-			responseMessage.setData(admins);
+			responseMessage.setData(usersDto);
 			responseMessage.setPageNo(pageNo);
+			responseMessage.setTotalResult(usersDto.size());
 			responseMessage.setPageSize(pageSize);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -93,12 +106,18 @@ public class UserServiceImpl implements UserService {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.findAdminForHeadClubByRoleId(paging);
 			List<User> admins = new ArrayList<User>();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				admins = pageResponse.getContent();
 			}
+			for (User admin : admins) {
+				UserDto userDto = convertUserToUserDto(admin);
+				usersDto.add(userDto);
+			}
 			responseMessage.setMessage(Constant.MSG_001);
-			responseMessage.setData(admins);
+			responseMessage.setData(usersDto);
 			responseMessage.setPageNo(pageNo);
+			responseMessage.setTotalResult(usersDto.size());
 			responseMessage.setPageSize(pageSize);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -114,22 +133,50 @@ public class UserServiceImpl implements UserService {
 		try {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
 			User user = userOp.get();
-			user.setStudentId(userDto.getStudentId());
+			List<User> users = (List<User>) userRepository.findAll();
+			users.remove(user);
+			boolean checkDuplicateEmail = false;
+			boolean checkDuplicateStudentId = false;
 			Role currentUserRole = user.getRole();
 			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
 			if (currentUserRole.getName().equals(ERole.ROLE_HeadClub.name())
 					&& !roleOptional.get().getName().equals(currentUserRole.getName())) {
 				responseMessage.setMessage(Constant.MSG_035);
 			} else {
-				user.setRole(roleOptional.get());
-				user.setEmail(userDto.getEmail());
-				user.setPhone(userDto.getPhoneNumber());
-				user.setCurrentAddress(userDto.getCurrentAddress());
-				user.setUpdatedBy("toandv");
-				user.setUpdatedOn(LocalDateTime.now());
-				userRepository.save(user);
-				responseMessage.setData(Arrays.asList(user));
-				responseMessage.setMessage(Constant.MSG_005);
+				for (User currentUser : users) {
+					if (currentUser.getStudentId().equals(userDto.getStudentId())) {
+						checkDuplicateStudentId = true;
+					}
+					if (currentUser.getEmail().equals(userDto.getEmail())) {
+						checkDuplicateEmail = true;
+					}
+				}
+				if (!checkDuplicateEmail && !checkDuplicateStudentId) {
+					user.setRole(roleOptional.get());
+					user.setName(userDto.getName());
+					user.setEmail(userDto.getEmail());
+					user.setPhone(userDto.getPhone());
+					user.setCurrentAddress(userDto.getCurrentAddress());
+					user.setDateOfBirth(userDto.getDateOfBirth());
+					user.setGender(userDto.isGender());
+					user.setStudentId(userDto.getStudentId());
+					user.setUpdatedBy("toandv");
+					user.setUpdatedOn(LocalDateTime.now());
+					user.setGeneration(userDto.getGeneration());
+					userRepository.save(user);
+					responseMessage.setData(Arrays.asList(user));
+					responseMessage.setMessage(Constant.MSG_005);
+				} else {
+					String messageError = "";
+					if (checkDuplicateStudentId) {
+						messageError += Constant.MSG_048 + userDto.getStudentId() + Constant.MSG_050;
+					}
+					if (checkDuplicateEmail) {
+						messageError += Constant.MSG_049 + userDto.getEmail() + Constant.MSG_050;
+					}
+					responseMessage.setMessage(messageError);
+					responseMessage.setCode(400);
+				}
 			}
 
 		} catch (Exception e) {
@@ -139,60 +186,25 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage addListMemberAndCollaboratorFromFileCsv(MultipartFile file) throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		List<User> users = new ArrayList<User>();
-		InputStream inputStream = file.getInputStream();
-		CsvParserSettings setting = new CsvParserSettings();
-		setting.setHeaderExtractionEnabled(true);
-		CsvParser parser = new CsvParser(setting);
-		List<Record> parseAllRecords = parser.parseAllRecords(inputStream);
-		for (Record record : parseAllRecords) {
-			User user = new User();
-			user.setStudentId(record.getString("student_id"));
-			user.setName(record.getString("name"));
-			DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			user.setDateOfBirth(LocalDate.parse(record.getString("date_of_birth"), f));
-			user.setPhone(record.getString("phone"));
-			user.setEmail(record.getString("email"));
-			user.setGender(Boolean.parseBoolean(record.getString("gender")));
-			user.setImage(record.getString("image"));
-			user.setActive(Boolean.parseBoolean(record.getString("is_active")));
-			List<String> roles = Arrays.asList(Constant.ROLES);
-			for (int i = 0; i < roles.size(); i++) {
-				Role role = new Role();
-				if (record.getString("role").equals(roles.get(i))) {
-					role.setId(i + 1);
-					user.setRole(role);
-				}
-			}
-			user.setCurrentAddress(record.getString("current_address"));
-			user.setCreatedBy("toandv");
-			user.setCreatedOn(LocalDate.now());
-			users.add(user);
-		}
-		userRepository.saveAll(users);
-		responseMessage.setData(users);
-		responseMessage.setTotalResult(users.size());
-		responseMessage.setMessage(Constant.MSG_006);
-		return responseMessage;
-
-	}
-
-	@Override
 	public ResponseMessage getAllMemberAndCollaborator(int pageNo, int pageSize, String sortBy) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.findMemberAndCollaboratorByRoleId(paging);
 			List<User> users = new ArrayList<User>();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				users = pageResponse.getContent();
 			}
+			for (User user : users) {
+				UserDto userDto = convertUserToUserDto(user);
+				usersDto.add(userDto);
+			}
 			responseMessage.setMessage(Constant.MSG_001);
-			responseMessage.setData(users);
+			responseMessage.setData(usersDto);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
+			responseMessage.setTotalResult(usersDto.size());
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -205,25 +217,57 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage addAnMemberOrCollaborator(UserDto userDto) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			User user = new User();
-			user.setStudentId(userDto.getStudentId());
-			user.setName(userDto.getName());
-			user.setGender(userDto.isGender());
-			user.setDateOfBirth(userDto.getDateOfBirth());
-			user.setEmail(userDto.getEmail());
-			user.setImage(userDto.getImage());
-			user.setPhone(userDto.getPhone());
-			user.setCurrentAddress(userDto.getCurrentAddress());
-			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
-			if (roleOptional.isPresent()) {
-				user.setRole(roleOptional.get());
+			List<User> users = (List<User>) userRepository.findAll();
+			boolean checkDuplicateEmail = false;
+			boolean checkDuplicateStudentId = false;
+			for (User user : users) {
+				if (user.getStudentId().equals(userDto.getStudentId())) {
+					checkDuplicateStudentId = true;
+				}
+				if (user.getEmail().equals(userDto.getEmail())) {
+					checkDuplicateEmail = true;
+				}
 			}
-			user.setActive(true);
-			user.setCreatedBy("toandv");
-			user.setCreatedOn(LocalDate.now());
-			userRepository.save(user);
-			responseMessage.setData(Arrays.asList(user));
-			responseMessage.setMessage(Constant.MSG_007);
+			if (!checkDuplicateEmail && !checkDuplicateStudentId) {
+				User user = new User();
+				user.setStudentId(userDto.getStudentId());
+				user.setName(userDto.getName());
+				user.setGender(userDto.isGender());
+				user.setDateOfBirth(userDto.getDateOfBirth());
+				user.setEmail(userDto.getEmail());
+				user.setImage(userDto.getImage());
+				user.setPhone(userDto.getPhone());
+				user.setCurrentAddress(userDto.getCurrentAddress());
+				user.setGeneration(userDto.getGeneration());
+				Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
+				if (roleOptional.isPresent()) {
+					user.setRole(roleOptional.get());
+				}
+				user.setActive(true);
+				user.setCreatedBy("toandv");
+				user.setCreatedOn(LocalDate.now());
+				userRepository.save(user);
+				if (userDto.getRoleId() > 9 && userDto.getRoleId() < 13) {
+					MemberSemester memberSemester = new MemberSemester();
+					memberSemester.setUser(user);
+					memberSemester.setStatus(true);
+					Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+					memberSemester.setSemester(semester.getName());
+					memberSemesterRepository.save(memberSemester);
+				}
+				responseMessage.setData(Arrays.asList(user));
+				responseMessage.setMessage(Constant.MSG_007);
+			} else {
+				String messageError = "";
+				if (checkDuplicateStudentId) {
+					messageError += Constant.MSG_048 + userDto.getStudentId() + Constant.MSG_050;
+				}
+				if (checkDuplicateEmail) {
+					messageError += Constant.MSG_049 + userDto.getEmail() + Constant.MSG_050;
+				}
+				responseMessage.setMessage(messageError);
+				responseMessage.setCode(400);
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
@@ -232,7 +276,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage deleteAdmin(String studentId) {
+	public ResponseMessage deleteAdmin(String studentId, String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<User> userOp = userRepository.findByStudentId(studentId);
@@ -253,7 +297,15 @@ public class UserServiceImpl implements UserService {
 				user.setRole(role);
 			}
 
+			AdminSemester adminSemester = adminSemesterRepository.findByUserId(user.getId(), semester).get();
+			adminSemesterRepository.delete(adminSemester);
 			userRepository.save(user);
+			MemberSemester memberSemester = new MemberSemester();
+			memberSemester.setUser(user);
+			memberSemester.setStatus(true);
+			Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+			memberSemester.setSemester(currentSemester.getName());
+			memberSemesterRepository.save(memberSemester);
 			responseMessage.setData(Arrays.asList(user));
 			responseMessage.setMessage(Constant.MSG_004);
 
@@ -264,17 +316,20 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public ResponseMessage updateStatusForUser(String studentId) {
+	public ResponseMessage updateStatusForUser(String studentId, String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			User user = new User();
 			Optional<User> userOptional = userRepository.findByStudentId(studentId);
-			if(userOptional.isPresent()) {
-				 user = userOptional.get();
-				if(user.isActive()) {
-					user.setActive(false);
-				}else {
-					user.setActive(true);
+			if (userOptional.isPresent()) {
+				user = userOptional.get();
+				user.setActive(!user.isActive());
+				Optional<MemberSemester> memberSemesterOp = memberSemesterRepository
+						.findByUserIdAndSemester(user.getId(), semester);
+				if (memberSemesterOp.isPresent()) {
+					MemberSemester memberSemester = memberSemesterOp.get();
+					memberSemester.setStatus(!memberSemester.isStatus());
+					memberSemesterRepository.save(memberSemester);
 				}
 				userRepository.save(user);
 			}
@@ -288,46 +343,25 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void export(HttpServletResponse response) throws IOException {
-		response.setContentType("text/csv; charset=UTF-8");
-		DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-		String currentDateTime = dateFormatter.format(new Date());
-		String headerKey = "Content-Disposition";
-		String headerValue = "attachment; filename=users_" + currentDateTime + ".csv";
-		response.setHeader(headerKey, headerValue);
-		response.setCharacterEncoding("UTF-8");
-		ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(), CsvPreference.STANDARD_PREFERENCE);
-		String[] csvHeader = { "student_id", "name", "date_of_birth", "phone", "email", "gender", "image", "is_active",
-				"role", "current_address" };
-		String[] nameMapping = { "studentId", "name", "dateOfBirth", "phone", "email", "gender", "image", "isActive",
-				"role", "currentAddress" };
-		csvWriter.writeHeader(csvHeader);
-		List<User> users = (List<User>) userRepository.findAll();
-		List<UserToCsvDto> userToCsvDtos = new ArrayList<UserToCsvDto>();
-		for (User user : users) {
-			UserToCsvDto userToCsvDto = Utils.convertUserToUserCsv(user);
-			userToCsvDtos.add(userToCsvDto);
-		}
-		for (UserToCsvDto userToCsvDto : userToCsvDtos) {
-			csvWriter.write(userToCsvDto, nameMapping);
-		}
-		csvWriter.close();
-	}
-
-	@Override
 	public ResponseMessage searchUserByStudentIdOrName(String inputSearch, int pageNo, int pageSize, String sortBy) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
 			Page<User> pageResponse = userRepository.searchByStudentIdOrName(inputSearch, paging);
 			List<User> users = new ArrayList<User>();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
 				users = pageResponse.getContent();
 			}
+			for (User user : users) {
+				UserDto userDto = convertUserToUserDto(user);
+				usersDto.add(userDto);
+			}
 			responseMessage.setMessage(Constant.MSG_001);
-			responseMessage.setData(users);
+			responseMessage.setData(usersDto);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
+			responseMessage.setTotalResult(usersDto.size());
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -335,7 +369,6 @@ public class UserServiceImpl implements UserService {
 
 		return responseMessage;
 	}
-
 	@Override
 	public ResponseMessage userLogin() {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -343,6 +376,254 @@ public class UserServiceImpl implements UserService {
 		User user = userRepository.findByEmail(username).get();
 		responseMessage.setData(Arrays.asList(user));
 		responseMessage.setMessage("Login successful");
+		return responseMessage;
+	}
+	@Override
+	public ResponseMessage addUsersFromExcel(MultipartFile file) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<User> usersFromExcel = ExcelHelper.excelToUsers(file.getInputStream());
+			List<User> users = (List<User>) userRepository.findAll();
+			boolean checkDuplicateEmail = false;
+			boolean checkDuplicateStudentId = false;
+			String messageError = "";
+			for (User userFromExcel : usersFromExcel) {
+				for (User user : users) {
+					if (userFromExcel.getStudentId().equals(user.getStudentId())) {
+						checkDuplicateStudentId = true;
+					}
+					if (userFromExcel.getEmail().equals(user.getEmail())) {
+						checkDuplicateEmail = true;
+					}
+				}
+				if (!checkDuplicateEmail && !checkDuplicateStudentId) {
+					userFromExcel.setCreatedOn(LocalDate.now());
+					userFromExcel.setCreatedBy("toandv");
+					userRepository.saveAll(usersFromExcel);
+					MemberSemester memberSemester = new MemberSemester();
+					memberSemester.setUser(userFromExcel);
+					memberSemester.setStatus(true);
+					Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+					memberSemester.setSemester(currentSemester.getName());
+					memberSemesterRepository.save(memberSemester);
+					responseMessage.setData(usersFromExcel);
+					responseMessage.setMessage(Constant.MSG_006);
+				} else {
+					if (checkDuplicateStudentId) {
+						messageError += Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
+					}
+					if (checkDuplicateEmail) {
+						messageError += Constant.MSG_049 + userFromExcel.getEmail() + Constant.MSG_050;
+					}
+				}
+				responseMessage.setMessage(messageError);
+				responseMessage.setCode(400);
+			}
+
+			return responseMessage;
+		} catch (IOException e) {
+			throw new RuntimeException("fail to store excel data: " + e.getMessage());
+		}
+	}
+
+	public ByteArrayInputStream exportUsersToExcel() {
+		List<User> users = (List<User>) userRepository.findAll();
+		ByteArrayInputStream in = ExcelHelper.usersToExcel(users);
+		return in;
+	}
+
+	@Override
+	public ResponseMessage findAllMember(int pageNo, int pageSize, String sortBy) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Pageable paging = PageRequest.of(pageNo, pageSize, Utils.sortUser(sortBy));
+			Page<User> pageResponse = userRepository.findMember(paging);
+			List<User> members = new ArrayList<User>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				members = pageResponse.getContent();
+			}
+			responseMessage.setMessage(Constant.MSG_001);
+			responseMessage.setData(members);
+			responseMessage.setPageNo(pageNo);
+			responseMessage.setPageSize(pageSize);
+
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllUser() {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<User> users = (List<User>) userRepository.findAll();
+			if (users.size() > 0) {
+				responseMessage.setData(users);
+				responseMessage.setTotalResult(users.size());
+				responseMessage.setMessage(Constant.MSG_001);
+			} else {
+				responseMessage.setMessage("Không có người dùng");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getMembersBySemester(String semester) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<MemberSemester> statusSemesters = memberSemesterRepository.findBySemester(semester);
+			Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+			List<User> collaborators = userRepository.findCollaborator();
+			List<UserDto> usersDto = new ArrayList<UserDto>();
+			int countDeactive = 0;
+			if (statusSemesters.size() > 0) {
+				if (collaborators.size() > 0) {
+					for (User collaborator : collaborators) {
+						if (semester.equals(currentSemester.getName())) {
+							UserDto collaboratorDto = convertUserToUserDto(collaborator);
+							usersDto.add(collaboratorDto);
+							if (!collaborator.isActive()) {
+								countDeactive++;
+							}
+						}
+					}
+				}
+				for (MemberSemester statusSemester : statusSemesters) {
+					Optional<User> userOp = userRepository.findByStudentId(statusSemester.getUser().getStudentId());
+					User user = userOp.get();
+					user.setActive(statusSemester.isStatus());
+					if (!user.isActive()) {
+						countDeactive++;
+					}
+					UserDto userDto = convertUserToUserDto(user);
+					usersDto.add(userDto);
+				}
+				responseMessage.setData(usersDto);
+				responseMessage.setMessage(Constant.MSG_001);
+				responseMessage.setTotalResult(usersDto.size());
+				responseMessage.setTotalDeactive(countDeactive);
+				responseMessage.setTotalActive(usersDto.size() - countDeactive);
+			} else {
+				responseMessage.setMessage("Không có dữ liệu");
+			}
+
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAdminBySemester(String semester) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<AdminSemester> statusSemesters = adminSemesterRepository.findBySemester(semester);
+			List<UserDto> usersDto = new ArrayList<UserDto>();
+			if (statusSemesters.size() > 0) {
+				for (AdminSemester statusSemester : statusSemesters) {
+					Optional<User> userOp = userRepository.findByStudentId(statusSemester.getUser().getStudentId());
+					User user = userOp.get();
+					user.setRole(statusSemester.getRole());
+					UserDto userDto = convertUserToUserDto(user);
+					usersDto.add(userDto);
+				}
+				responseMessage.setData(usersDto);
+				responseMessage.setMessage(Constant.MSG_001);
+				responseMessage.setTotalResult(usersDto.size());
+			} else {
+				responseMessage.setMessage("Không có dữ liệu");
+			}
+
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	private UserDto convertUserToUserDto(User user) {
+		UserDto userDto = new UserDto();
+		userDto.setId(user.getId());
+		userDto.setStudentId(user.getStudentId());
+		userDto.setEmail(user.getEmail());
+		userDto.setGender(user.isGender());
+		userDto.setGeneration(user.getGeneration());
+		userDto.setImage(user.getImage());
+		userDto.setName(user.getName());
+		userDto.setPhone(user.getPhone());
+		userDto.setActive(user.isActive());
+		userDto.setCurrentAddress(user.getCurrentAddress());
+		userDto.setDateOfBirth(user.getDateOfBirth());
+		userDto.setRoleId(user.getRole().getId());
+		userDto.setRoleName(Utils.convertRoleFromDbToExcel(user.getRole()));
+		return userDto;
+	}
+
+	@Override
+	public ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email,
+			String gender, Integer generation, Integer roleId, String isActive, String dateFrom, String dateTo) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<UserDto> userDtoResponse = userDtos;
+			for (int i = 0; i < userDtos.size(); i++) {
+				if (!name.equals("") && name != null && !userDtos.get(i).getName().toLowerCase().contains(name.toLowerCase())) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if (!studentId.equals("") && studentId != null
+						&& !userDtos.get(i).getStudentId().toLowerCase().contains(studentId.toLowerCase())) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if (!email.equals("") && email != null && !userDtos.get(i).getEmail().toLowerCase().contains(email.toLowerCase())) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if (!gender.equals("") && gender != null
+						&& !userDtos.get(i).isGender().toString().toLowerCase().equals(gender.toLowerCase())) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if (generation != null && userDtos.get(i).getGeneration() != generation) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if (roleId != null && userDtos.get(i).getRoleId() != roleId) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if (!isActive.equals("") && isActive != null
+						&& !userDtos.get(i).isActive().toString().toLowerCase().equals(isActive.toLowerCase())) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if (!dateFrom.equals("") && dateFrom != null && userDtos.get(i).getDateOfBirth().isBefore(LocalDate.parse(dateFrom))) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				if (!dateTo.equals("") && dateTo != null && userDtos.get(i).getDateOfBirth().isAfter(LocalDate.parse(dateTo))) {
+					userDtoResponse.remove(userDtos.get(i));
+					i--;
+					continue;
+				}
+				responseMessage.setData(userDtoResponse);
+				responseMessage.setMessage(Constant.MSG_001);
+				responseMessage.setTotalResult(userDtoResponse.size());
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
 		return responseMessage;
 	}
 }

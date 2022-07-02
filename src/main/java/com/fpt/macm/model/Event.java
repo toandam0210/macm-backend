@@ -1,17 +1,12 @@
 package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -23,12 +18,6 @@ public class Event {
 	
 	@Column
 	private String name;
-	
-	@Column
-	private LocalDateTime startTime;
-	
-	@Column
-	private LocalDateTime finishTime;
 	
 	@Column
 	private String description;
@@ -48,8 +37,22 @@ public class Event {
 	@Column
 	private LocalDateTime updatedOn;
 	
-	@OneToMany(mappedBy = "event", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<MemberEvent> membersEvent = new HashSet<MemberEvent>();
+	@Column
+	private double totalAmount;
+	
+	@Column
+	private double amount_per_register;
+	
+	@Column
+	private String semester;
+
+	public double getAmount_per_register() {
+		return amount_per_register;
+	}
+
+	public void setAmount_per_register(double amount_per_register) {
+		this.amount_per_register = amount_per_register;
+	}
 
 	public int getId() {
 		return id;
@@ -65,22 +68,6 @@ public class Event {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public LocalDateTime getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(LocalDateTime startTime) {
-		this.startTime = startTime;
-	}
-
-	public LocalDateTime getFinishTime() {
-		return finishTime;
-	}
-
-	public void setFinishTime(LocalDateTime finishTime) {
-		this.finishTime = finishTime;
 	}
 
 	public String getDescription() {
@@ -131,13 +118,23 @@ public class Event {
 		this.updatedOn = updatedOn;
 	}
 
-	public Set<MemberEvent> getMembersEvent() {
-		return membersEvent;
+	public double getTotalAmount() {
+		return totalAmount;
 	}
 
-	public void setMembersEvent(Set<MemberEvent> membersEvent) {
-		this.membersEvent = membersEvent;
+	public void setTotalAmount(double totalAmount) {
+		this.totalAmount = totalAmount;
 	}
+
+	public String getSemester() {
+		return semester;
+	}
+
+	public void setSemester(String semester) {
+		this.semester = semester;
+	}
+	
+	
 	
 	
 }

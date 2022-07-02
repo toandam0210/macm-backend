@@ -2,19 +2,14 @@ package com.fpt.macm.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
@@ -47,25 +42,13 @@ public class User {
 
 	@Column
 	private boolean isActive;
-	
+
 	@Column
 	private String currentAddress;
-	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<AttendanceStatus> attendanceStatus = new HashSet<AttendanceStatus>();
-	
+
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "roleId")
 	private Role role;
-	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<MemberEvent> membersEvent  = new HashSet<MemberEvent>();
-	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<EventFeeStatus>  eventFeeStatus  = new HashSet<EventFeeStatus>();
-	
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<MembershipStatus> membershipStatus   = new HashSet<MembershipStatus>();
 
 	@Column
 	private String createdBy;
@@ -78,6 +61,9 @@ public class User {
 
 	@Column
 	private LocalDateTime updatedOn;
+
+	@Column
+	private int generation;
 
 	public int getId() {
 		return id;
@@ -191,38 +177,6 @@ public class User {
 		this.updatedOn = updatedOn;
 	}
 
-	public Set<AttendanceStatus> getAttendanceStatus() {
-		return attendanceStatus;
-	}
-
-	public void setAttendanceStatus(Set<AttendanceStatus> attendanceStatus) {
-		this.attendanceStatus = attendanceStatus;
-	}
-
-	public Set<MemberEvent> getMembersEvent() {
-		return membersEvent;
-	}
-
-	public void setMembersEvent(Set<MemberEvent> membersEvent) {
-		this.membersEvent = membersEvent;
-	}
-
-	public Set<EventFeeStatus> getEventFeeStatus() {
-		return eventFeeStatus;
-	}
-
-	public void setEventFeeStatus(Set<EventFeeStatus> eventFeeStatus) {
-		this.eventFeeStatus = eventFeeStatus;
-	}
-
-	public Set<MembershipStatus> getMembershipStatus() {
-		return membershipStatus;
-	}
-
-	public void setMembershipStatus(Set<MembershipStatus> membershipStatus) {
-		this.membershipStatus = membershipStatus;
-	}
-
 	public String getCurrentAddress() {
 		return currentAddress;
 	}
@@ -230,10 +184,13 @@ public class User {
 	public void setCurrentAddress(String currentAddress) {
 		this.currentAddress = currentAddress;
 	}
-	
-	
-	
-	
-	
+
+	public int getGeneration() {
+		return generation;
+	}
+
+	public void setGeneration(int generation) {
+		this.generation = generation;
+	}
 
 }

@@ -30,7 +30,7 @@ public class FacilityRequest {
 	private double unitPrice;
 	
 	@Column
-	private boolean status;
+	private String status;
 	
 	@Column
 	private String createdBy;
@@ -70,11 +70,11 @@ public class FacilityRequest {
 		this.unitPrice = unitPrice;
 	}
 
-	public boolean isStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(boolean status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 

@@ -17,21 +17,25 @@ public class MemberEvent {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "eventId")
 	private Event event;
-	
+
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "userId")
 	private User user;
-	
+
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "role_in_event")
+	private RoleEvent roleEvent;
+
 	@Column
-	private String roleInEvent;
-	
+	private boolean attendanceStatus;
+
 	@Column
-	private String attendanceStatus;
-	
+	private boolean paymentStatus;
+
 	@Column
 	private String createdBy;
 
@@ -43,6 +47,7 @@ public class MemberEvent {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
 
 	public int getId() {
 		return id;
@@ -68,20 +73,24 @@ public class MemberEvent {
 		this.user = user;
 	}
 
-	public String getRoleInEvent() {
-		return roleInEvent;
+	public RoleEvent getRoleEvent() {
+		return roleEvent;
 	}
 
-	public void setRoleInEvent(String roleInEvent) {
-		this.roleInEvent = roleInEvent;
+	public void setRoleEvent(RoleEvent roleEvent) {
+		this.roleEvent = roleEvent;
 	}
 
-	public String getAttendanceStatus() {
+	public boolean getAttendanceStatus() {
 		return attendanceStatus;
 	}
 
-	public void setAttendanceStatus(String attendanceStatus) {
+	public void setAttendanceStatus(boolean attendanceStatus) {
 		this.attendanceStatus = attendanceStatus;
+	}
+
+	public boolean getPaymentStatus() {
+		return paymentStatus;
 	}
 
 	public String getCreatedBy() {
@@ -115,8 +124,15 @@ public class MemberEvent {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
+
+	public boolean isPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(boolean paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
 	
 	
-	
-	
+
 }

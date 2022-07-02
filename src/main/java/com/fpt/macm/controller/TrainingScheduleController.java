@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.macm.dto.ScheduleDto;
+import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.service.TrainingScheduleService;
@@ -25,8 +27,8 @@ public class TrainingScheduleController {
 	TrainingScheduleService trainingScheduleService;
 	
 	@GetMapping("/gettrainingschedule")
-	ResponseEntity<ResponseMessage> getTrainingScheduleByMonthAndYear(@RequestParam(name = "month") int month, @RequestParam(name = "year") int year){
-			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getListTrainingSchedule(month, year), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getTrainingSchedule(){
+			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getListTrainingSchedule(), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headtechnique/addnewsession")
@@ -34,19 +36,34 @@ public class TrainingScheduleController {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSession(trainingSchedule), HttpStatus.OK);
 	}
 	
+	@PostMapping("/headtechnique/createpreview")
+	ResponseEntity<ResponseMessage> createPreview(@RequestParam String startDate, @RequestParam String finishDate, 
+			@RequestBody List<String> dayOfWeek, @RequestParam String startTime, @RequestParam String finishTime) {
+		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createPreviewTrainingSchedule(startDate, finishDate, dayOfWeek, startTime, finishTime), HttpStatus.OK);
+	}
+	
 	@PostMapping("/headtechnique/addnewschedule")
-	ResponseEntity<ResponseMessage> createTrainingSchedule(@RequestParam(name = "startDate") String startDate, @RequestParam(name = "finishDate") String finishDate, 
-			@RequestBody List<String> dayOfWeek, @RequestParam(name = "startTime") String startTime, @RequestParam(name = "finishTime") String finishTime) {
-		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSchedule(startDate, finishDate, dayOfWeek, startTime, finishTime), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> createTrainingSchedule(@RequestBody List<ScheduleDto> listPreview) {
+		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSchedule(listPreview), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headtechnique/updatesession/{trainingId}")
-	ResponseEntity<ResponseMessage> updateTrainingSessionTime(@PathVariable(name = "trainingId") int trainingId, @RequestBody TrainingSchedule trainingSchedule) {
-		return new ResponseEntity<ResponseMessage>(trainingScheduleService.updateTrainingSessionTime(trainingId, trainingSchedule), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateTrainingSessionTime(@PathVariable(name = "trainingId") int trainingId, @RequestBody CommonSchedule commonSchedule) {
+		return new ResponseEntity<ResponseMessage>(trainingScheduleService.updateTrainingSessionTime(trainingId, commonSchedule), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headtechnique/deletesession/{trainingId}")
 	ResponseEntity<ResponseMessage> deleteTrainingSession(@PathVariable(name = "trainingId") int trainingId) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.deleteTrainingSession(trainingId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/gettrainingschedulebysemester/{semesterId}")
+	ResponseEntity<ResponseMessage> getTrainingScheduleBySemester(@PathVariable(name = "semesterId") int semesterId){
+			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getTraningScheduleBySemester(semesterId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/gettrainingsesionbydate")
+	ResponseEntity<ResponseMessage> getTrainingSessionByDate(@RequestParam String date) {
+			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getTrainingSessionByDate(date), HttpStatus.OK);
 	}
 }

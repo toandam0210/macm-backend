@@ -10,6 +10,9 @@ public class ResponseMessage {
 	private int pageSize;
 	private int pageNo;
 	private int totalResult;
+	private int totalPage;
+	private int totalActive;
+	private int totalDeactive;
 	public List<?> getData() {
 		return data;
 	}
@@ -45,6 +48,24 @@ public class ResponseMessage {
 	}
 	public void setTotalResult(int totalResult) {
 		this.totalResult = totalResult;
+	}
+	public int getTotalPage() {
+		return totalPage;
+	}
+	public void setTotalPage(int totalPage) {
+		this.totalPage = totalPage;
+	}
+	public int getTotalActive() {
+		return totalActive;
+	}
+	public void setTotalActive(int totalActive) {
+		this.totalActive = totalActive;
+	}
+	public int getTotalDeactive() {
+		return totalDeactive;
+	}
+	public void setTotalDeactive(int totalDeactive) {
+		this.totalDeactive = totalDeactive;
 	}
 	
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.ResponseMessage;
@@ -24,8 +25,9 @@ public class RuleController {
 	RuleService ruleService;
 	
 	@GetMapping("/getallrule")
-	ResponseEntity<ResponseMessage> getAllRule(){
-		return new ResponseEntity<ResponseMessage>(ruleService.getAllRule(), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllRule(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
+		return new ResponseEntity<ResponseMessage>(ruleService.getAllRule(pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 	
 	@PostMapping("/vicehead/addrule")

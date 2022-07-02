@@ -1,8 +1,7 @@
 package com.fpt.macm.service;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayInputStream;
+import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,12 +13,17 @@ public interface UserService {
 	ResponseMessage getAllAdminForViceHeadClub(int pageNo, int pageSize, String sortBy);
 	ResponseMessage getAllAdminForHeadClub(int pageNo, int pageSize, String sortBy);
 	ResponseMessage updateUser(String studentId, UserDto userDto);
-	ResponseMessage addListMemberAndCollaboratorFromFileCsv(MultipartFile file) throws Exception;
 	ResponseMessage getAllMemberAndCollaborator(int pageNo, int pageSize, String sortBy);
 	ResponseMessage addAnMemberOrCollaborator(UserDto userDto);
-	ResponseMessage deleteAdmin(String studentId);
-	ResponseMessage updateStatusForUser(String studentId);
-	void export(HttpServletResponse response)throws IOException;
+	ResponseMessage deleteAdmin(String studentId, String semester);
+	ResponseMessage updateStatusForUser(String studentId, String semester);
 	ResponseMessage searchUserByStudentIdOrName(String inputSearch,int pageNo, int pageSize, String sortBy);
 	ResponseMessage userLogin();
+	ResponseMessage addUsersFromExcel(MultipartFile file);
+	ByteArrayInputStream exportUsersToExcel();
+	ResponseMessage findAllMember(int pageNo, int pageSize, String sortBy);
+	ResponseMessage getAllUser();
+	ResponseMessage getMembersBySemester(String semester);
+	ResponseMessage getAdminBySemester(String semester);
+	ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email, String gender, Integer generation, Integer roleId, String isActive, String dateFrom, String dateTo);
 }
