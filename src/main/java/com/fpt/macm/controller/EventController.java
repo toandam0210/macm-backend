@@ -47,8 +47,9 @@ public class EventController {
 	}
 	
 	@GetMapping("/geteventsbydate")
-	ResponseEntity<ResponseMessage> getEventByDate(@RequestParam LocalDate startDate, @RequestParam LocalDate finishDate) {
-		return new ResponseEntity<ResponseMessage>(eventService.getEventsByDate(startDate, finishDate), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getEventByDate(@RequestParam LocalDate startDate, @RequestParam LocalDate finishDate,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(eventService.getEventsByDate(startDate, finishDate, pageNo, pageSize), HttpStatus.OK);
 	}
 	
 	@GetMapping("/headculture/getstartdate/{eventId}")
@@ -57,8 +58,9 @@ public class EventController {
 	}
 	
 	@GetMapping("/geteventsbysemester")
-	ResponseEntity<ResponseMessage> getEventBySemester(@RequestParam(defaultValue = "") String semester, @RequestParam(defaultValue = "0") int month) {
-		return new ResponseEntity<ResponseMessage>(eventService.getEventsBySemester(semester, month), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getEventBySemester(@RequestParam(defaultValue = "") String semester, @RequestParam(defaultValue = "0") int month, 
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(eventService.getEventsBySemester(semester, month, pageNo, pageSize), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headculture/updateafterevent/{eventId}")
