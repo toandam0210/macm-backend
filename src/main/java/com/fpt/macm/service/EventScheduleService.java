@@ -21,4 +21,5 @@ public interface EventScheduleService {
 	ResponseMessage updatePreviewEventSchedule(int eventId, String startDate, String finishDate, String startTime, String finishTime);
 	ResponseMessage updateEventSchedule(int eventId, List<ScheduleDto> listPreview, Boolean isOverwritten);
 	ResponseMessage getPeriodTimeOfEvent(int eventId);
+	List<EventSchedule> listEventScheduleByEvent(int eventId);
 }

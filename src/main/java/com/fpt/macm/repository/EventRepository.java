@@ -21,4 +21,5 @@ public interface EventRepository extends JpaRepository<Event, Integer>{
 	
 	@Query(value = "select * from event where name like ?1", nativeQuery = true)
 	Optional<Event> findByExactName(String name);
+	
 }

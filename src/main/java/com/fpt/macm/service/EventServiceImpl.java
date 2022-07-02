@@ -94,7 +94,7 @@ public class EventServiceImpl implements EventService{
 				getEvent.setDescription(event.getDescription());
 				getEvent.setUpdatedBy("LinhLHN");
 				getEvent.setUpdatedOn(LocalDateTime.now());
-				List<EventSchedule> getEventSchedules = (List<EventSchedule>) eventScheduleService.getListEventScheduleByEvent(id).getData();
+				List<EventSchedule> getEventSchedules = eventScheduleService.listEventScheduleByEvent(id);
 				for (EventSchedule eventSchedule : getEventSchedules) {
 					CommonSchedule getCommonSchedule = commonScheduleService.getCommonSessionByDate(eventSchedule.getDate());
 					getCommonSchedule.setTitle(event.getName());
@@ -279,7 +279,7 @@ public class EventServiceImpl implements EventService{
 	}
 
 	@Override
-	public ResponseMessage getEventsBySemester(String semester) {
+	public ResponseMessage getEventsBySemester(String semester, int month) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -290,27 +290,26 @@ public class EventServiceImpl implements EventService{
 			List<EventDto> eventDtos = new ArrayList<EventDto>();
 			for (Event event : events) {
 				LocalDate startDate = getStartDate(event.getId());
-				EventDto eventDto = new EventDto();
 				if(startDate != null) {
-					LocalDate endDate = getEndDate(event.getId());
-					if(LocalDate.now().isBefore(startDate)) {
-						eventDto.setStatus("Chưa diễn ra");
-					}else if(LocalDate.now().isAfter(endDate)) {
-						eventDto.setStatus("Đã kết thúc");
-					}else {
-						eventDto.setStatus("Đang diễn ra");
+					if(month == 0 || (month != 0 && getStartDate(event.getId()).getMonthValue() == month)) {
+						EventDto eventDto = new EventDto();
+						LocalDate endDate = getEndDate(event.getId());
+						if(LocalDate.now().isBefore(startDate)) {
+							eventDto.setStatus("Chưa diễn ra");
+						}else if(LocalDate.now().isAfter(endDate)) {
+							eventDto.setStatus("Đã kết thúc");
+						}else {
+							eventDto.setStatus("Đang diễn ra");
+						}
+						eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
+						eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
+						eventDto.setTotalAmount(event.getTotalAmount());
+						eventDto.setStartDate(startDate);
+						eventDto.setName(event.getName());
+						eventDto.setId(event.getId());
+						eventDtos.add(eventDto);
 					}
 				}
-				else {
-					eventDto.setStatus("Chưa diễn ra");
-				}
-				eventDto.setAmountPerMemberRegister(event.getAmount_per_register());
-				eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
-				eventDto.setTotalAmount(event.getTotalAmount());
-				eventDto.setStartDate(startDate);
-				eventDto.setName(event.getName());
-				eventDto.setId(event.getId());
-				eventDtos.add(eventDto);
 			}
 			Collections.sort(eventDtos);
 			responseMessage.setData(eventDtos);
