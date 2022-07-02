@@ -124,21 +124,18 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				usersAttendance.addAll(users);
 				for (User user : usersAttendance) {
 					int totalAbsent = 0;
-					int totalAttend = 0;
 					AttendanceTrainingReportDto attendanceTrainingReportDto = new AttendanceTrainingReportDto();
 					attendanceTrainingReportDto.setStudentId(user.getStudentId());
 					attendanceTrainingReportDto.setStudentName(user.getName());
 					attendanceTrainingReportDto.setRoleName(Utils.convertRoleFromDbToExcel(user.getRole()));
 					for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
-						if (attendanceStatus.getUser().getId() == user.getId() && attendanceStatus.isStatus()) {
-							totalAttend++;
-						}
 						if (attendanceStatus.getUser().getId() == user.getId() && !attendanceStatus.isStatus()) {
 							totalAbsent++;
 						}
 					}
-					attendanceTrainingReportDto.setTotalAttend(totalAttend);
-					attendanceTrainingReportDto.setTotalAbsent(totalAbsent);
+					attendanceTrainingReportDto.setTotalAbsent(totalAbsent + " buổi nghỉ trên tổng " + trainingSchedulesBySemester.size() + " buổi tập");
+					double percentAbsent = Math.ceil(((double)totalAbsent / (double)trainingSchedulesBySemester.size())*100) ;
+					attendanceTrainingReportDto.setPercentAbsent(percentAbsent);
 					attendanceTrainingReportsDto.add(attendanceTrainingReportDto);
 				}
 				responseMessage.setData(attendanceTrainingReportsDto);

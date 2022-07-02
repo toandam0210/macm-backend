@@ -4,8 +4,8 @@ public class AttendanceTrainingReportDto {
 	private String studentId;
 	private String studentName;
 	private String roleName;
-	private int totalAttend;
-	private int totalAbsent;
+	private String totalAbsent;
+	private double percentAbsent;
 	public String getStudentId() {
 		return studentId;
 	}
@@ -24,18 +24,16 @@ public class AttendanceTrainingReportDto {
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
 	}
-	public int getTotalAttend() {
-		return totalAttend;
-	}
-	public void setTotalAttend(int totalAttend) {
-		this.totalAttend = totalAttend;
-	}
-	public int getTotalAbsent() {
+	public String getTotalAbsent() {
 		return totalAbsent;
 	}
-	public void setTotalAbsent(int totalAbsent) {
+	public void setTotalAbsent(String totalAbsent) {
 		this.totalAbsent = totalAbsent;
 	}
-	
-	
+	public double getPercentAbsent() {
+		return percentAbsent;
+	}
+	public void setPercentAbsent(double percentAbsent) {
+		this.percentAbsent = percentAbsent;
+	}	
 }
