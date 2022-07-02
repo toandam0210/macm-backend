@@ -207,7 +207,7 @@ public class EventServiceImpl implements EventService{
 	}
 
 	@Override
-	public ResponseMessage getEventsByDate(LocalDate startDate, LocalDate finishDate) {
+	public ResponseMessage getEventsByDate(LocalDate startDate, LocalDate finishDate, int pageNo, int pageSize) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -252,8 +252,12 @@ public class EventServiceImpl implements EventService{
 						eventDto.setDescription(event.getDescription());
 						eventDtos.add(eventDto);
 					}
-					responseMessage.setData(eventDtos);
-					responseMessage.setMessage(Constant.MSG_063);
+					Collections.sort(eventDtos);
+					List<EventDto> getEventPageable = pageableEvent(eventDtos, pageNo, pageSize);
+					responseMessage.setData(getEventPageable);
+					responseMessage.setMessage(Constant.MSG_063 + 
+							" từ ngày " + startDate.getDayOfMonth() + "/" + startDate.getMonthValue() + "/" + startDate.getYear() +
+						    " đến ngày " + finishDate.getDayOfMonth() + "/" + finishDate.getMonthValue() + "/" + finishDate.getYear());
 				}
 			}
 		} catch (Exception e) {
@@ -288,7 +292,7 @@ public class EventServiceImpl implements EventService{
 	}
 
 	@Override
-	public ResponseMessage getEventsBySemester(String semester, int month) {
+	public ResponseMessage getEventsBySemester(String semester, int month, int pageNo, int pageSize) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -327,10 +331,10 @@ public class EventServiceImpl implements EventService{
 				}
 			}
 			Collections.sort(eventDtos);
-			responseMessage.setData(eventDtos);
-			responseMessage.setMessage("Lấy danh sách event thành công" + semester);
+			List<EventDto> getEventPageable = pageableEvent(eventDtos, pageNo, pageSize);
+			responseMessage.setData(getEventPageable);
+			responseMessage.setMessage(Constant.MSG_063 + " tháng " + month + " kỳ " + semester);
 			responseMessage.setTotalResult(eventDtos.size());
-
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
@@ -376,5 +380,13 @@ public class EventServiceImpl implements EventService{
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
+	}
+	
+	public List<EventDto> pageableEvent(List<EventDto> currentList, int pageNo, int pageSize) {
+		List<EventDto> result = new ArrayList<EventDto>();
+		for(int i = pageNo * pageSize; i < (pageNo + 1) * pageSize; i++) {
+			result.add(currentList.get(i));
+		}
+		return result;
 	}
 }
