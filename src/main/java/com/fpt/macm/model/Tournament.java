@@ -30,7 +30,7 @@ public class Tournament {
 	private int maxQuantityComitee;
 
 	@Column
-	private double amount_per_register;
+	private double feeOrganizingCommiteePay;
 
 	@Column
 	private String semester;
@@ -61,6 +61,9 @@ public class Tournament {
 	
 	@Column
 	private double totalAmount;
+	
+	@Column
+	private double feePlayerPay;
 
 	public int getId() {
 		return id;
@@ -92,14 +95,6 @@ public class Tournament {
 
 	public void setMaxQuantityComitee(int maxQuantityComitee) {
 		this.maxQuantityComitee = maxQuantityComitee;
-	}
-
-	public double getAmount_per_register() {
-		return amount_per_register;
-	}
-
-	public void setAmount_per_register(double amount_per_register) {
-		this.amount_per_register = amount_per_register;
 	}
 
 	public String getCreatedBy() {
@@ -172,6 +167,22 @@ public class Tournament {
 
 	public void setTotalAmount(double totalAmount) {
 		this.totalAmount = totalAmount;
+	}
+
+	public double getFeeOrganizingCommiteePay() {
+		return feeOrganizingCommiteePay;
+	}
+
+	public void setFeeOrganizingCommiteePay(double feeOrganizingCommiteePay) {
+		this.feeOrganizingCommiteePay = feeOrganizingCommiteePay;
+	}
+
+	public double getFeePlayerPay() {
+		return feePlayerPay;
+	}
+
+	public void setFeePlayerPay(double feePlayerPay) {
+		this.feePlayerPay = feePlayerPay;
 	}
 	
 	

@@ -229,9 +229,10 @@ public class TournamentServiceImpl implements TournamentService {
 				Tournament tournament = tournamentOp.get();
 				tournament.setName(tournamentDto.getName());
 				tournament.setMaxQuantityComitee(tournamentDto.getMaxQuantityComitee());
-				tournament.setAmount_per_register(tournamentDto.getAmount_per_register());
+				tournament.setFeeOrganizingCommiteePay(tournamentDto.getFeeOrganizingCommiteePay());
 				tournament.setDescription(tournamentDto.getDescription());
 				tournament.setTotalAmount(tournamentDto.getTotalAmount());
+				tournament.setFeePlayerPay(tournamentDto.getFeePlayerPay());
 				Set<CompetitiveTypeDto> competitiveTypeDtos = tournamentDto.getCompetitiveTypesDto();
 				Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 				Set<ExhibitionTypeDto> exhibitionTypeDtos = tournamentDto.getExhibitionTypesDto();
@@ -377,7 +378,8 @@ public class TournamentServiceImpl implements TournamentService {
 				}
 				tournamentDto.setCompetitiveTypesDto(competitiveTypeDtos);
 				tournamentDto.setExhibitionTypesDto(exhibitionTypeDtos);
-				tournamentDto.setAmount_per_register(tournament.getAmount_per_register());
+				tournamentDto.setFeeOrganizingCommiteePay(tournament.getFeeOrganizingCommiteePay());
+				tournamentDto.setFeePlayerPay(tournament.getFeePlayerPay());
 				tournamentDto.setMaxQuantityComitee(tournament.getMaxQuantityComitee());
 				tournamentDto.setStartDate(startDate);
 				tournamentDto.setTotalAmount(tournament.getTotalAmount());
@@ -759,7 +761,7 @@ public class TournamentServiceImpl implements TournamentService {
 			ClubFund clubFund = clubFunds.get(0);
 			double fundAmount = clubFund.getFundAmount();
 
-			double tournamentFee = tournament.getAmount_per_register();
+			double tournamentFee = tournament.getFeeOrganizingCommiteePay();
 
 			double fundBalance = tournamentOrganizingCommittee.isPaymentStatus() ? (fundAmount - tournamentFee)
 					: (fundAmount + tournamentFee);
@@ -853,7 +855,7 @@ public class TournamentServiceImpl implements TournamentService {
 			ClubFund clubFund = clubFunds.get(0);
 			double fundAmount = clubFund.getFundAmount();
 
-			double tournamentFee = tournament.getAmount_per_register();
+			double tournamentFee = tournament.getFeePlayerPay();
 
 			double fundBalance = tournamentPlayer.isPaymentStatus() ? (fundAmount - tournamentFee)
 					: (fundAmount + tournamentFee);
