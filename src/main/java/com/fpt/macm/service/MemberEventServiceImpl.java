@@ -148,16 +148,25 @@ public class MemberEventServiceImpl implements MemberEventService {
 			} else {
 				if (memberEvent.getPaymentValue() == 0) {
 					fundChange = amountPerRegisterActual;
-					fundBalance = fundAmount + amountPerRegisterActual;
+					fundBalance = fundAmount + fundChange;
 					memberEvent.setPaymentValue(amountPerRegisterActual);
-				} else if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
-					fundChange = amountPerRegisterActual - amountPerRegisterEstimate;
-					fundBalance = fundAmount + (amountPerRegisterActual - amountPerRegisterEstimate);
-					memberEvent.setPaymentValue(amountPerRegisterActual);
-				} else if (memberEvent.getPaymentValue() == amountPerRegisterActual) {
-					fundChange = -(amountPerRegisterActual - amountPerRegisterEstimate);
-					fundBalance = fundAmount - (amountPerRegisterActual - amountPerRegisterEstimate);
-					memberEvent.setPaymentValue(amountPerRegisterEstimate);
+				}else if (amountPerRegisterActual > amountPerRegisterEstimate) {
+					if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
+						fundChange = amountPerRegisterActual - amountPerRegisterEstimate;
+						fundBalance = fundAmount + fundChange;
+						memberEvent.setPaymentValue(amountPerRegisterActual);
+					}
+					else if (memberEvent.getPaymentValue() == amountPerRegisterActual) {
+						fundChange = -(amountPerRegisterActual - amountPerRegisterEstimate);
+						fundBalance = fundAmount - fundChange;
+						memberEvent.setPaymentValue(amountPerRegisterEstimate);
+					}
+				} else if (amountPerRegisterActual == amountPerRegisterEstimate) {
+					if (memberEvent.getPaymentValue() == amountPerRegisterActual) {
+						fundChange = -amountPerRegisterActual;
+						fundBalance = fundAmount - amountPerRegisterActual;
+						memberEvent.setPaymentValue(0);
+					}
 				}
 			}
 
