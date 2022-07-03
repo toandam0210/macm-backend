@@ -18,6 +18,7 @@ import com.fpt.macm.dto.MemberEventDto;
 import com.fpt.macm.dto.RoleEventDto;
 import com.fpt.macm.model.ClubFund;
 import com.fpt.macm.model.Constant;
+import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventPaymentStatusReport;
 import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
@@ -43,10 +44,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 	@Autowired
 	EventRepository eventRepository;
-	
+
 	@Autowired
 	RoleEventRepository roleEventRepository;
-
 
 	@Override
 	public ResponseMessage updateListMemberEventRole(List<MemberEventDto> membersEventDto) {
@@ -83,7 +83,8 @@ public class MemberEventServiceImpl implements MemberEventService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<MemberEvent> pageResponse = memberEventRepository.findAllMemberCancelJoinEventByEventId(eventId, paging);
+			Page<MemberEvent> pageResponse = memberEventRepository.findAllMemberCancelJoinEventByEventId(eventId,
+					paging);
 			List<MemberEvent> membersEvent = new ArrayList<MemberEvent>();
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
@@ -103,7 +104,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEventDto.setRoleEventDto(roleEventDto);
 				Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), memberEventDto.getRoleEventDto());
 				memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
-				memberEventDto.setPaymentStatus(memberEvent.getPaymentStatus());
+				memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
+				memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
+				memberEventDto.setAmountPerRegisterActual(memberEvent.getEvent().getAmountPerRegisterActual());
 				membersEventDto.add(memberEventDto);
 			}
 
@@ -126,28 +129,51 @@ public class MemberEventServiceImpl implements MemberEventService {
 			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
 			MemberEvent memberEvent = memberEventOp.get();
 
+			Event event = memberEvent.getEvent();
+			double amountPerRegisterEstimate = event.getAmountPerRegisterEstimated();
+			double amountPerRegisterActual = event.getAmountPerRegisterActual();
+
 			List<ClubFund> clubFunds = clubFundRepository.findAll();
 			ClubFund clubFund = clubFunds.get(0);
 			double fundAmount = clubFund.getFundAmount();
+			double fundBalance = 0;
+			double fundChange = 0;
 
-			double eventFee = memberEvent.getEvent().getAmountPerRegisterActual();
+			if (amountPerRegisterActual == 0) {
+				fundChange = memberEvent.getPaymentValue() != 0 ? -amountPerRegisterEstimate
+						: amountPerRegisterEstimate;
+				fundBalance = memberEvent.getPaymentValue() != 0 ? (fundAmount - amountPerRegisterEstimate)
+						: (fundAmount + amountPerRegisterEstimate);
+				memberEvent.setPaymentValue(memberEvent.getPaymentValue() != 0 ? 0 : amountPerRegisterEstimate);
+			} else {
+				if (memberEvent.getPaymentValue() == 0) {
+					fundChange = amountPerRegisterActual;
+					fundBalance = fundAmount + amountPerRegisterActual;
+					memberEvent.setPaymentValue(amountPerRegisterActual);
+				} else if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
+					fundChange = amountPerRegisterActual - amountPerRegisterEstimate;
+					fundBalance = fundAmount + (amountPerRegisterActual - amountPerRegisterEstimate);
+					memberEvent.setPaymentValue(amountPerRegisterActual);
+				} else if (memberEvent.getPaymentValue() == amountPerRegisterActual) {
+					fundChange = -(amountPerRegisterActual - amountPerRegisterEstimate);
+					fundBalance = fundAmount - (amountPerRegisterActual - amountPerRegisterEstimate);
+					memberEvent.setPaymentValue(amountPerRegisterEstimate);
+				}
+			}
 
-			double fundBalance = memberEvent.getPaymentStatus() ? (fundAmount - eventFee) : (fundAmount + eventFee);
-			
 			clubFund.setFundAmount(fundBalance);
 			clubFundRepository.save(clubFund);
-
+			
 			EventPaymentStatusReport eventPaymentStatusReport = new EventPaymentStatusReport();
 			eventPaymentStatusReport.setEvent(memberEvent.getEvent());
 			eventPaymentStatusReport.setUser(memberEvent.getUser());
-			eventPaymentStatusReport.setPaymentStatus(!memberEvent.getPaymentStatus());
-			eventPaymentStatusReport.setFundChange(memberEvent.getPaymentStatus() ? -eventFee : eventFee);
+			eventPaymentStatusReport.setPaymentValue(memberEvent.getPaymentValue());
+			eventPaymentStatusReport.setFundChange(fundChange);
 			eventPaymentStatusReport.setFundBalance(fundBalance);
 			eventPaymentStatusReport.setCreatedBy("toandv");
 			eventPaymentStatusReport.setCreatedOn(LocalDateTime.now());
 			eventPaymentStatusReportRepository.save(eventPaymentStatusReport);
 
-			memberEvent.setPaymentStatus(!memberEvent.getPaymentStatus());
 			memberEvent.setUpdatedBy("toandv");
 			memberEvent.setUpdatedOn(LocalDateTime.now());
 			memberEventRepository.save(memberEvent);
@@ -181,11 +207,13 @@ public class MemberEventServiceImpl implements MemberEventService {
 					eventPaymentStatusReportDto.setEventId(eventPaymentStatusReport.getEvent().getId());
 					eventPaymentStatusReportDto.setUserName(eventPaymentStatusReport.getUser().getName());
 					eventPaymentStatusReportDto.setUserStudentId(eventPaymentStatusReport.getUser().getStudentId());
-					eventPaymentStatusReportDto.setPaymentStatus(eventPaymentStatusReport.isPaymentStatus());
+					eventPaymentStatusReportDto.setPaymentValue(eventPaymentStatusReport.getPaymentValue());
 					eventPaymentStatusReportDto.setFundChange(eventPaymentStatusReport.getFundChange());
 					eventPaymentStatusReportDto.setFundBalance(eventPaymentStatusReport.getFundBalance());
 					eventPaymentStatusReportDto.setCreatedBy(eventPaymentStatusReport.getCreatedBy());
 					eventPaymentStatusReportDto.setCreatedOn(eventPaymentStatusReport.getCreatedOn());
+					eventPaymentStatusReportDto.setAmountPerRegisterEstimate(eventPaymentStatusReport.getEvent().getAmountPerRegisterEstimated());
+					eventPaymentStatusReportDto.setAmountPerRegisterActual(eventPaymentStatusReport.getEvent().getAmountPerRegisterActual());
 					eventPaymentStatusReportsDto.add(eventPaymentStatusReportDto);
 				}
 				responseMessage.setData(eventPaymentStatusReportsDto);
@@ -208,7 +236,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
 			Page<MemberEvent> pageResponse;
-			
+
 			switch (filterIndex) {
 			case 0:
 				// filter all
@@ -226,7 +254,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				pageResponse = memberEventRepository.findAllMemberEventByEventId(eventId, paging);
 				break;
 			}
-			
+
 			List<MemberEvent> membersEvent = new ArrayList<MemberEvent>();
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
@@ -246,7 +274,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEventDto.setRoleEventDto(roleEventDto);
 				Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), memberEventDto.getRoleEventDto());
 				memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
-				memberEventDto.setPaymentStatus(memberEvent.getPaymentStatus());
+				memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
+				memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
+				memberEventDto.setAmountPerRegisterActual(memberEvent.getEvent().getAmountPerRegisterActual());
 				membersEventDto.add(memberEventDto);
 			}
 
@@ -304,7 +334,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEventDto.setRoleEventDto(roleEventDto);
 					Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), memberEventDto.getRoleEventDto());
 					memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
-					memberEventDto.setPaymentStatus(memberEvent.getPaymentStatus());
+					memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
+					memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
+					memberEventDto.setAmountPerRegisterActual(memberEvent.getEvent().getAmountPerRegisterActual());
 					membersEventDto.add(memberEventDto);
 				}
 			}
