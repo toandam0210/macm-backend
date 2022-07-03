@@ -35,6 +35,9 @@ public class MemberEvent {
 
 	@Column
 	private double paymentValue;
+	
+	@Column
+	private boolean isPaidBeforeClosing;
 
 	@Column
 	private String createdBy;
@@ -126,6 +129,14 @@ public class MemberEvent {
 
 	public void setPaymentValue(double paymentValue) {
 		this.paymentValue = paymentValue;
+	}
+
+	public boolean isPaidBeforeClosing() {
+		return isPaidBeforeClosing;
+	}
+
+	public void setPaidBeforeClosing(boolean isPaidBeforeClosing) {
+		this.isPaidBeforeClosing = isPaidBeforeClosing;
 	}
 
 }

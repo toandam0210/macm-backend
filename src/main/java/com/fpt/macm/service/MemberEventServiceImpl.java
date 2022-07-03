@@ -145,21 +145,27 @@ public class MemberEventServiceImpl implements MemberEventService {
 				fundBalance = memberEvent.getPaymentValue() != 0 ? (fundAmount - amountPerRegisterEstimate)
 						: (fundAmount + amountPerRegisterEstimate);
 				memberEvent.setPaymentValue(memberEvent.getPaymentValue() != 0 ? 0 : amountPerRegisterEstimate);
+				memberEvent.setPaidBeforeClosing(true);
 			} else {
 				if (memberEvent.getPaymentValue() == 0) {
 					fundChange = amountPerRegisterActual;
 					fundBalance = fundAmount + fundChange;
 					memberEvent.setPaymentValue(amountPerRegisterActual);
-				}else if (amountPerRegisterActual > amountPerRegisterEstimate) {
+				} else if (amountPerRegisterActual > amountPerRegisterEstimate) {
 					if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
 						fundChange = amountPerRegisterActual - amountPerRegisterEstimate;
 						fundBalance = fundAmount + fundChange;
 						memberEvent.setPaymentValue(amountPerRegisterActual);
-					}
-					else if (memberEvent.getPaymentValue() == amountPerRegisterActual) {
-						fundChange = -(amountPerRegisterActual - amountPerRegisterEstimate);
-						fundBalance = fundAmount - fundChange;
-						memberEvent.setPaymentValue(amountPerRegisterEstimate);
+					} else if (memberEvent.getPaymentValue() == amountPerRegisterActual) {
+						if (memberEvent.isPaidBeforeClosing()) {
+							fundChange = -(amountPerRegisterActual - amountPerRegisterEstimate);
+							fundBalance = fundAmount - fundChange;
+							memberEvent.setPaymentValue(amountPerRegisterEstimate);
+						} else {
+							fundChange = -amountPerRegisterActual;
+							fundBalance = fundAmount - amountPerRegisterActual;
+							memberEvent.setPaymentValue(0);
+						}
 					}
 				} else if (amountPerRegisterActual == amountPerRegisterEstimate) {
 					if (memberEvent.getPaymentValue() == amountPerRegisterActual) {
@@ -172,7 +178,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 			clubFund.setFundAmount(fundBalance);
 			clubFundRepository.save(clubFund);
-			
+
 			EventPaymentStatusReport eventPaymentStatusReport = new EventPaymentStatusReport();
 			eventPaymentStatusReport.setEvent(memberEvent.getEvent());
 			eventPaymentStatusReport.setUser(memberEvent.getUser());
@@ -221,8 +227,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 					eventPaymentStatusReportDto.setFundBalance(eventPaymentStatusReport.getFundBalance());
 					eventPaymentStatusReportDto.setCreatedBy(eventPaymentStatusReport.getCreatedBy());
 					eventPaymentStatusReportDto.setCreatedOn(eventPaymentStatusReport.getCreatedOn());
-					eventPaymentStatusReportDto.setAmountPerRegisterEstimate(eventPaymentStatusReport.getEvent().getAmountPerRegisterEstimated());
-					eventPaymentStatusReportDto.setAmountPerRegisterActual(eventPaymentStatusReport.getEvent().getAmountPerRegisterActual());
+					eventPaymentStatusReportDto.setAmountPerRegisterEstimate(
+							eventPaymentStatusReport.getEvent().getAmountPerRegisterEstimated());
+					eventPaymentStatusReportDto.setAmountPerRegisterActual(
+							eventPaymentStatusReport.getEvent().getAmountPerRegisterActual());
 					eventPaymentStatusReportsDto.add(eventPaymentStatusReportDto);
 				}
 				responseMessage.setData(eventPaymentStatusReportsDto);
