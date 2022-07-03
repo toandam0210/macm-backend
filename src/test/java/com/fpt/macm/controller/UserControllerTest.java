@@ -51,26 +51,26 @@ public class UserControllerTest {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context).build();
 	}
 
-	private User createUser() {
-		User user = new User();
-		user.setStudentId("HE140855");
-		user.setId(1);
-		user.setName("Dam Van Toan");
-		user.setGender(true);
-		LocalDate localDate = LocalDate.of(2000, 02, 10);
-		user.setDateOfBirth(localDate);
-		user.setEmail("toandvhe140855@fpt.edu.vn");
-		user.setImage(null);
-		user.setPhone("0982102000");
-		user.setActive(true);
-		user.setCurrentAddress("Dom A");
-		Role role = new Role();
-		role.setId(1);
-		user.setRole(role);
-		user.setCreatedOn(LocalDate.now());
-		user.setCreatedBy("toandv");
-		return user;
-	}
+//	private User createUser() {
+//		User user = new User();
+//		user.setStudentId("HE140855");
+//		user.setId(1);
+//		user.setName("Dam Van Toan");
+//		user.setGender(true);
+//		LocalDate localDate = LocalDate.of(2000, 02, 10);
+//		user.setDateOfBirth(localDate);
+//		user.setEmail("toandvhe140855@fpt.edu.vn");
+//		user.setImage(null);
+//		user.setPhone("0982102000");
+//		user.setActive(true);
+//		user.setCurrentAddress("Dom A");
+//		Role role = new Role();
+//		role.setId(1);
+//		user.setRole(role);
+//		user.setCreatedOn(LocalDate.now());
+//		user.setCreatedBy("toandv");
+//		return user;
+//	}
 	
 	private UserDto createUserDto() {
 		UserDto user = new UserDto();
@@ -85,6 +85,7 @@ public class UserControllerTest {
 		user.setActive(true);
 		user.setCurrentAddress("Dom A");
 		user.setRoleId(1);
+		user.setGeneration(4);
 		return user;
 	}
 	@Test
@@ -111,7 +112,7 @@ public class UserControllerTest {
 
 		this.mockMvc.perform(get("/api/admin/hr/viceheadclub/getalladmin")).andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.data.size()").value(10));
+				.andExpect(jsonPath("$.data.size()").value(7));
 	}
 
 	
@@ -120,7 +121,7 @@ public class UserControllerTest {
 
 		this.mockMvc.perform(get("/api/admin/hr/headclub/getalladmin")).andExpect(status().isOk())
 				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.data.size()").value(10));
+				.andExpect(jsonPath("$.data.size()").value(8));
 	}
 	
 	@Test
@@ -138,7 +139,7 @@ public class UserControllerTest {
 	@Test
 	public void updateUserTestFailStudentId() throws Exception {
 		UserDto userDto = createUserDto();
-		userDto.setStudentId("HE141277");
+		userDto.setStudentId("HE140856");
 		this.mockMvc.perform(put("/api/admin/hr/updateuser/{studentId}", "HE140855")
 		.content(asJsonString(userDto))
 		.contentType(MediaType.APPLICATION_JSON))
@@ -223,7 +224,7 @@ public class UserControllerTest {
 	
 	@Test
 	public void deleteAdminTestSuccess() throws Exception {
-		this.mockMvc.perform(put("/api/admin/hr/deleteadmin/{studentId}", "HE140855")
+		this.mockMvc.perform(put("/api/admin/hr/deleteadmin/{studentId}", "HE140855").param("semester", "Summer2022")
 		.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())
 		.andExpect(content()
@@ -233,7 +234,7 @@ public class UserControllerTest {
 	
 	@Test
 	public void deleteAdminTestSuccess2() throws Exception {
-		this.mockMvc.perform(put("/api/admin/hr/deleteadmin/{studentId}", "HE141285")
+		this.mockMvc.perform(put("/api/admin/hr/deleteadmin/{studentId}", "HE140858").param("semester", "Summer2022")
 		.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())
 		.andExpect(content()
@@ -242,7 +243,7 @@ public class UserControllerTest {
 	}
 	@Test
 	public void deleteAdminTestSuccess3() throws Exception {
-		this.mockMvc.perform(put("/api/admin/hr/deleteadmin/{studentId}", "HE140859")
+		this.mockMvc.perform(put("/api/admin/hr/deleteadmin/{studentId}", "HE140859").param("semester", "Summer2022")
 		.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())
 		.andExpect(content()
@@ -251,7 +252,7 @@ public class UserControllerTest {
 	}
 	@Test
 	public void deleteAdminTestSuccess4() throws Exception {
-		this.mockMvc.perform(put("/api/admin/hr/deleteadmin/{studentId}", "HE141280")
+		this.mockMvc.perform(put("/api/admin/hr/deleteadmin/{studentId}", "HE140862").param("semester", "Summer2022")
 		.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())
 		.andExpect(content()
@@ -260,7 +261,7 @@ public class UserControllerTest {
 	}
 	@Test
 	public void deleteAdminTestSuccess5() throws Exception {
-		this.mockMvc.perform(put("/api/admin/hr/deleteadmin/{studentId}", "HE140863")
+		this.mockMvc.perform(put("/api/admin/hr/deleteadmin/{studentId}", "HE140863").param("semester", "Summer2022")
 		.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())
 		.andExpect(content()
@@ -271,7 +272,8 @@ public class UserControllerTest {
 	@Test
 	public void updateStatusForUserSuccess() throws Exception {
 		this.mockMvc.perform(put("/api/admin/hr/updatestatus")
-		.param("studentId", "HE140863"))
+		.param("studentId", "HE140863")
+		.param("semester", "Summer2022"))
 		.andExpect(status().isOk())
 		.andExpect(content()
 				.contentType(MediaType.APPLICATION_JSON))
@@ -280,7 +282,8 @@ public class UserControllerTest {
 	@Test
 	public void updateStatusForUserSuccess2() throws Exception {
 		this.mockMvc.perform(put("/api/admin/hr/updatestatus")
-		.param("studentId", "HE141280"))
+		.param("studentId", "HE141280")
+		.param("semester", "Summer2022"))
 		.andExpect(status().isOk())
 		.andExpect(content()
 				.contentType(MediaType.APPLICATION_JSON))
@@ -325,6 +328,19 @@ public class UserControllerTest {
 		.andExpect(jsonPath("$.data.size()").value(10));
 	}
 	
+	@Test
+	public void testGetAllUserSuccess() throws Exception{
+		this.mockMvc.perform(get("/api/admin/hr/viceheadclub/getallusers")).andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(19));
+	}
+	
+	@Test
+	public void testGetMembersBySemesterSuccess() throws Exception{
+		this.mockMvc.perform(get("/api/admin/hr/viceheadclub/getmembers/semester").param("semester", "Summer2022")).andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(3));
+	}
 	
 	public static String asJsonString(final Object obj) {
 	    try {
