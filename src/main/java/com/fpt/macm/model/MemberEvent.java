@@ -31,7 +31,7 @@ public class MemberEvent {
 	private RoleEvent roleEvent;
 
 	@Column
-	private boolean attendanceStatus;
+	private boolean registerStatus;
 
 	@Column
 	private double paymentValue;
@@ -80,12 +80,12 @@ public class MemberEvent {
 		this.roleEvent = roleEvent;
 	}
 
-	public boolean getAttendanceStatus() {
-		return attendanceStatus;
+	public boolean getRegisterStatus() {
+		return registerStatus;
 	}
 
-	public void setAttendanceStatus(boolean attendanceStatus) {
-		this.attendanceStatus = attendanceStatus;
+	public void setRegisterStatus(boolean registerStatus) {
+		this.registerStatus = registerStatus;
 	}
 
 	public String getCreatedBy() {
