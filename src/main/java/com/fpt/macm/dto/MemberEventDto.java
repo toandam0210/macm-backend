@@ -9,7 +9,9 @@ public class MemberEventDto {
 	private boolean attendanceStatus;
 	private RoleEventDto roleEventDto;
 	private String roleInClub;
-	private boolean paymentStatus;
+	private double paymentValue;
+	private double amountPerRegisterEstimate;
+	private double amountPerRegisterActual;
 
 	public int getId() {
 		return id;
@@ -59,20 +61,36 @@ public class MemberEventDto {
 		this.roleEventDto = roleEventDto;
 	}
 
-	public boolean isPaymentStatus() {
-		return paymentStatus;
-	}
-
-	public void setPaymentStatus(boolean paymentStatus) {
-		this.paymentStatus = paymentStatus;
-	}
-
 	public String getRoleInClub() {
 		return roleInClub;
 	}
 
 	public void setRoleInClub(String roleInClub) {
 		this.roleInClub = roleInClub;
+	}
+
+	public double getPaymentValue() {
+		return paymentValue;
+	}
+
+	public void setPaymentValue(double paymentValue) {
+		this.paymentValue = paymentValue;
+	}
+
+	public double getAmountPerRegisterEstimate() {
+		return amountPerRegisterEstimate;
+	}
+
+	public void setAmountPerRegisterEstimate(double amountPerRegisterEstimate) {
+		this.amountPerRegisterEstimate = amountPerRegisterEstimate;
+	}
+
+	public double getAmountPerRegisterActual() {
+		return amountPerRegisterActual;
+	}
+
+	public void setAmountPerRegisterActual(double amountPerRegisterActual) {
+		this.amountPerRegisterActual = amountPerRegisterActual;
 	}
 
 }

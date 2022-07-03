@@ -10,7 +10,9 @@ public class EventPaymentStatusReportDto {
 	private String userStudentId;
 	private double fundChange;
 	private double fundBalance;
-	private boolean paymentStatus;
+	private double paymentValue;
+	private double amountPerRegisterEstimate;
+	private double amountPerRegisterActual;
 	private String createdBy;
 	private LocalDateTime createdOn;
 
@@ -70,20 +72,36 @@ public class EventPaymentStatusReportDto {
 		this.createdOn = createdOn;
 	}
 
-	public boolean isPaymentStatus() {
-		return paymentStatus;
-	}
-
-	public void setPaymentStatus(boolean paymentStatus) {
-		this.paymentStatus = paymentStatus;
-	}
-
 	public double getFundBalance() {
 		return fundBalance;
 	}
 
 	public void setFundBalance(double fundBalance) {
 		this.fundBalance = fundBalance;
+	}
+
+	public double getPaymentValue() {
+		return paymentValue;
+	}
+
+	public void setPaymentValue(double paymentValue) {
+		this.paymentValue = paymentValue;
+	}
+
+	public double getAmountPerRegisterEstimate() {
+		return amountPerRegisterEstimate;
+	}
+
+	public void setAmountPerRegisterEstimate(double amountPerRegisterEstimate) {
+		this.amountPerRegisterEstimate = amountPerRegisterEstimate;
+	}
+
+	public double getAmountPerRegisterActual() {
+		return amountPerRegisterActual;
+	}
+
+	public void setAmountPerRegisterActual(double amountPerRegisterActual) {
+		this.amountPerRegisterActual = amountPerRegisterActual;
 	}
 
 }
