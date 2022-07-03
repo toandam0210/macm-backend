@@ -97,7 +97,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEventDto.setUserName(memberEvent.getUser().getName());
 				memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 				memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-				memberEventDto.setAttendanceStatus(memberEvent.getAttendanceStatus());
+				memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
 				RoleEventDto roleEventDto = new RoleEventDto();
 				roleEventDto.setId(memberEvent.getRoleEvent().getId());
 				roleEventDto.setName(memberEvent.getRoleEvent().getName());
@@ -267,7 +267,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEventDto.setUserName(memberEvent.getUser().getName());
 				memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 				memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-				memberEventDto.setAttendanceStatus(memberEvent.getAttendanceStatus());
+				memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
 				RoleEventDto roleEventDto = new RoleEventDto();
 				roleEventDto.setId(memberEvent.getRoleEvent().getId());
 				roleEventDto.setName(memberEvent.getRoleEvent().getName());
@@ -321,13 +321,13 @@ public class MemberEventServiceImpl implements MemberEventService {
 			List<MemberEvent> membersEvent = memberEventRepository.findByEventId(eventId);
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			for (MemberEvent memberEvent : membersEvent) {
-				if (memberEvent.getAttendanceStatus() && memberEvent.getUser().isActive()) {
+				if (memberEvent.getRegisterStatus() && memberEvent.getUser().isActive()) {
 					MemberEventDto memberEventDto = new MemberEventDto();
 					memberEventDto.setId(memberEvent.getId());
 					memberEventDto.setUserName(memberEvent.getUser().getName());
 					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-					memberEventDto.setAttendanceStatus(memberEvent.getAttendanceStatus());
+					memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
 					RoleEventDto roleEventDto = new RoleEventDto();
 					roleEventDto.setId(memberEvent.getRoleEvent().getId());
 					roleEventDto.setName(memberEvent.getRoleEvent().getName());

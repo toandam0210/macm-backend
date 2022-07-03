@@ -222,7 +222,7 @@ public class TaskSchedule {
 			if (startDate.compareTo(LocalDate.now()) == 0) {
 				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository.findByEventId(event.getId());
 				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.getAttendanceStatus()) {
+					if (memberEvent.getRegisterStatus()) {
 						AttendanceEvent attendanceEvent = new AttendanceEvent();
 						attendanceEvent.setMemberEvent(memberEvent);
 						attendanceEvent.setEvent(event);
