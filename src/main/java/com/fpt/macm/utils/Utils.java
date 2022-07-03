@@ -1,14 +1,25 @@
 package com.fpt.macm.utils;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.data.domain.Sort;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpt.macm.dto.RoleEventDto;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Role;
 import com.fpt.macm.model.RoleEvent;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 public class Utils {
 	public static final String SORT_BY_NAME_ASC = "SORT_BY_NAME_ASC";
@@ -229,5 +240,34 @@ public class Utils {
 			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
 			break;
 		}
+	}
+	
+	public static String generateQrCode(String data, int wid, int hei) {
+		StringBuilder result = new StringBuilder();
+		
+		if(!data.isEmpty()) {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			try {
+				QRCodeWriter writer = new QRCodeWriter();
+				BitMatrix bitMatrix = writer.encode(data, BarcodeFormat.QR_CODE, wid, hei);
+				BufferedImage bufferedImage =  MatrixToImageWriter.toBufferedImage(bitMatrix);
+				ImageIO.write(bufferedImage, "png", os);
+				result.append("data:image/png;base64,");
+				result.append(new String(Base64.getEncoder().encode(os.toByteArray())));
+			} catch (Exception e) {
+				 e.printStackTrace();
+			}
+		}
+		return result.toString();
+	}
+	
+	public static String prettyObject(Object object) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 }

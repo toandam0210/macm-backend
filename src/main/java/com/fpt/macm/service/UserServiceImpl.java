@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fpt.macm.dto.InforInQrCode;
 import com.fpt.macm.dto.UserDto;
 import com.fpt.macm.helper.ExcelHelper;
 import com.fpt.macm.model.AdminSemester;
@@ -53,6 +54,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	SemesterService semesterService;
+	
+	private static final int ORDER_QR_CODE_SIZE_WIDTH = 300;
+    private static final int ORDER_QR_CODE_SIZE_HEIGHT = 300;
 
 	@Override
 	public ResponseMessage getUserByStudentId(String studentId) {
@@ -569,7 +573,8 @@ public class UserServiceImpl implements UserService {
 		try {
 			List<UserDto> userDtoResponse = userDtos;
 			for (int i = 0; i < userDtos.size(); i++) {
-				if (!name.equals("") && name != null && !userDtos.get(i).getName().toLowerCase().contains(name.toLowerCase())) {
+				if (!name.equals("") && name != null
+						&& !userDtos.get(i).getName().toLowerCase().contains(name.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
@@ -580,7 +585,8 @@ public class UserServiceImpl implements UserService {
 					i--;
 					continue;
 				}
-				if (!email.equals("") && email != null && !userDtos.get(i).getEmail().toLowerCase().contains(email.toLowerCase())) {
+				if (!email.equals("") && email != null
+						&& !userDtos.get(i).getEmail().toLowerCase().contains(email.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
@@ -607,12 +613,14 @@ public class UserServiceImpl implements UserService {
 					i--;
 					continue;
 				}
-				if (!dateFrom.equals("") && dateFrom != null && userDtos.get(i).getDateOfBirth().isBefore(LocalDate.parse(dateFrom))) {
+				if (!dateFrom.equals("") && dateFrom != null
+						&& userDtos.get(i).getDateOfBirth().isBefore(LocalDate.parse(dateFrom))) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
 				}
-				if (!dateTo.equals("") && dateTo != null && userDtos.get(i).getDateOfBirth().isAfter(LocalDate.parse(dateTo))) {
+				if (!dateTo.equals("") && dateTo != null
+						&& userDtos.get(i).getDateOfBirth().isAfter(LocalDate.parse(dateTo))) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
@@ -626,4 +634,20 @@ public class UserServiceImpl implements UserService {
 		}
 		return responseMessage;
 	}
+
+	@Override
+	public ResponseMessage generateQrCode(InforInQrCode inforInQrCode) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			String prettyData = Utils.prettyObject(inforInQrCode);
+
+			String qrCode = Utils.generateQrCode(prettyData, ORDER_QR_CODE_SIZE_WIDTH, ORDER_QR_CODE_SIZE_HEIGHT);
+			responseMessage.setData(Arrays.asList(qrCode));
+			responseMessage.setMessage("Generate QR Code successful");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }

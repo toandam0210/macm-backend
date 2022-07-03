@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fpt.macm.dto.InforInQrCode;
 import com.fpt.macm.dto.UserDto;
 import com.fpt.macm.model.ResponseMessage;
 
@@ -26,4 +27,5 @@ public interface UserService {
 	ResponseMessage getMembersBySemester(String semester);
 	ResponseMessage getAdminBySemester(String semester);
 	ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email, String gender, Integer generation, Integer roleId, String isActive, String dateFrom, String dateTo);
+	ResponseMessage generateQrCode(InforInQrCode inforInQrCode);
 }
