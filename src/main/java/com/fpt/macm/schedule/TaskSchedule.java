@@ -14,12 +14,14 @@ import com.fpt.macm.model.AdminSemester;
 import com.fpt.macm.model.AttendanceEvent;
 import com.fpt.macm.model.AttendanceStatus;
 import com.fpt.macm.model.CollaboratorReport;
+import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.MembershipInfo;
 import com.fpt.macm.model.MembershipStatus;
+import com.fpt.macm.model.Notification;
 import com.fpt.macm.model.Role;
 import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.TrainingSchedule;
@@ -28,6 +30,7 @@ import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.AttendanceEventRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CollaboratorReportRepository;
+import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.MembershipShipInforRepository;
@@ -36,6 +39,7 @@ import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.service.EventScheduleServiceImpl;
 import com.fpt.macm.service.EventService;
+import com.fpt.macm.service.NotificationService;
 import com.fpt.macm.service.SemesterService;
 import com.fpt.macm.service.TrainingScheduleServiceImpl;
 
@@ -59,6 +63,9 @@ public class TaskSchedule {
 
 	@Autowired
 	AttendanceEventRepository attendanceEventRepository;
+	
+	@Autowired
+	EventRepository eventRepository;
 
 	@Autowired
 	TrainingScheduleServiceImpl trainingScheduleServiceImpl;
@@ -80,6 +87,9 @@ public class TaskSchedule {
 
 	@Autowired
 	MembershipShipInforRepository membershipShipInforRepository;
+	
+	@Autowired
+	NotificationService notificationService;
 
 	@Autowired
 	SemesterService semesterService;
@@ -277,6 +287,25 @@ public class TaskSchedule {
 			}
 			semester.setEndDate(endDate);
 			semesterRepository.save(semester);
+		}
+	}
+	
+	@Scheduled(cron = "1 0 0 * * *")
+	public void pushNotificationBeforeEvent() {
+		List<Event> listEvent = eventRepository.findAll();
+		for (Event event : listEvent) {
+			LocalDate getStartDate = eventService.getStartDate(event.getId());
+			if(LocalDate.now().plusDays(1).isEqual(getStartDate)) {
+				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository.findByEventId(event.getId());
+				String message = Constant.messageEvent(event);
+				Notification notification = new Notification();
+				notification.setMessage(message);
+				for (MemberEvent member : membersEvent) {
+					User user = member.getUser();
+					notificationService.sendNotificationToAnUser(user, notification);
+				}
+			}
+			break;
 		}
 	}
 }

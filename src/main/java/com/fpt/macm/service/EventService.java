@@ -15,4 +15,5 @@ public interface EventService {
 	ResponseMessage getStartDateOfEvent(int eventId);
 	ResponseMessage getEventsBySemester(String semester, int month, int pageNo, int pageSize);
 	ResponseMessage updateAfterEvent(int id, Event event);
+	LocalDate getStartDate(int eventId);
 }

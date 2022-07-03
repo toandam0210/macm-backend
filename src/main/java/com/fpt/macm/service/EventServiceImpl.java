@@ -341,6 +341,7 @@ public class EventServiceImpl implements EventService{
 		return responseMessage;
 	}
 	
+	@Override
 	public LocalDate getStartDate(int eventId) {
 		// TODO Auto-generated method stub
 		try {
