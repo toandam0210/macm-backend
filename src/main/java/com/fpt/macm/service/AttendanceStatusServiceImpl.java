@@ -43,7 +43,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	TrainingScheduleRepository trainingScheduleRepository;
 
 	@Override
-	public ResponseMessage takeAttendanceByStudentId(String studentId) {
+	public ResponseMessage takeAttendanceByStudentId(String studentId, int status) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			TrainingSchedule trainingSchedule = trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now());
@@ -54,7 +54,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 						.findByTrainingScheduleId(trainingSchedule.getId());
 				for (AttendanceStatus attendanceStatus : attendancesStatus) {
 					if (attendanceStatus.getUser().getId() == user.getId()) {
-						attendanceStatus.setStatus(!attendanceStatus.isStatus());
+						attendanceStatus.setStatus(status);
 						attendanceStatus.setUpdatedOn(LocalDateTime.now());
 						attendanceStatus.setUpdatedBy("toandv");
 						attendanceStatusRepository.save(attendanceStatus);
@@ -82,8 +82,8 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
 				attendanceStatusDto.setName(attendanceStatus.getUser().getName());
 				attendanceStatusDto.setStudentId(attendanceStatus.getUser().getStudentId());
-				attendanceStatusDto.setStatus(attendanceStatus.isStatus());
-				if (attendanceStatus.isStatus()) {
+				attendanceStatusDto.setStatus(attendanceStatus.getStatus());
+				if (attendanceStatus.getStatus() == 2) {
 					attend++;
 				}
 				attendanceStatusDto.setDate(attendanceStatus.getTrainingSchedule().getDate());
@@ -129,7 +129,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 					attendanceTrainingReportDto.setStudentName(user.getName());
 					attendanceTrainingReportDto.setRoleName(Utils.convertRoleFromDbToExcel(user.getRole()));
 					for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
-						if (attendanceStatus.getUser().getId() == user.getId() && !attendanceStatus.isStatus()) {
+						if (attendanceStatus.getUser().getId() == user.getId() && attendanceStatus.getStatus() == 1) {
 							totalAbsent++;
 						}
 					}

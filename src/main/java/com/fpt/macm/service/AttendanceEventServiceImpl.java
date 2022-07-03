@@ -36,7 +36,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 	EventScheduleRepository eventScheduleRepository;
 
 	@Override
-	public ResponseMessage takeAttendanceByMemberEventId(int memberEventId) {
+	public ResponseMessage takeAttendanceByMemberEventId(int memberEventId, int status) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -46,7 +46,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 			AttendanceEvent attendanceEvent = attendanceEventRepository
 					.findByEventIdAndMemberEventId(event.getId(), memberEventId).get();
 
-			attendanceEvent.setStatus(!attendanceEvent.getStatus());
+			attendanceEvent.setStatus(status);
 			attendanceEvent.setUpdatedBy("toandv");
 			attendanceEvent.setUpdatedOn(LocalDateTime.now());
 			attendanceEventRepository.save(attendanceEvent);
@@ -79,7 +79,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 				attendanceEventDto.setName(attendanceEvent.getMemberEvent().getUser().getName());
 				attendanceEventDto.setStudentId(attendanceEvent.getMemberEvent().getUser().getStudentId());
 				attendanceEventDto.setStatus(attendanceEvent.getStatus());
-				if (attendanceEvent.getStatus()) {
+				if (attendanceEvent.getStatus() == 2) {
 					attend++;
 				}
 				attendanceEventDto.setDate(startDate);

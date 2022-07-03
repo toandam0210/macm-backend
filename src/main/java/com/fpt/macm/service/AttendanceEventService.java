@@ -4,6 +4,6 @@ import com.fpt.macm.model.ResponseMessage;
 
 public interface AttendanceEventService {
 
-	ResponseMessage takeAttendanceByMemberEventId(int memberEventId);
+	ResponseMessage takeAttendanceByMemberEventId(int memberEventId, int status);
 	ResponseMessage checkAttendanceStatusByEventId(int eventId);
 }

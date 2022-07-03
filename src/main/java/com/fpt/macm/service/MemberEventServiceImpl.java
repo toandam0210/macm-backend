@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.EventPaymentStatusReportDto;
 import com.fpt.macm.dto.MemberEventDto;
+import com.fpt.macm.dto.MemberNotJoinEventDto;
 import com.fpt.macm.dto.RoleEventDto;
 import com.fpt.macm.model.ClubFund;
 import com.fpt.macm.model.Constant;
@@ -23,11 +24,13 @@ import com.fpt.macm.model.EventPaymentStatusReport;
 import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.RoleEvent;
+import com.fpt.macm.model.User;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.EventPaymentStatusReportRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.RoleEventRepository;
+import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -47,6 +50,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 	@Autowired
 	RoleEventRepository roleEventRepository;
+	
+	@Autowired
+	UserRepository userRepository;
 
 	@Override
 	public ResponseMessage updateListMemberEventRole(List<MemberEventDto> membersEventDto) {
@@ -97,7 +103,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEventDto.setUserName(memberEvent.getUser().getName());
 				memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 				memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-				memberEventDto.setAttendanceStatus(memberEvent.getAttendanceStatus());
+				memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
 				RoleEventDto roleEventDto = new RoleEventDto();
 				roleEventDto.setId(memberEvent.getRoleEvent().getId());
 				roleEventDto.setName(memberEvent.getRoleEvent().getName());
@@ -267,7 +273,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEventDto.setUserName(memberEvent.getUser().getName());
 				memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 				memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-				memberEventDto.setAttendanceStatus(memberEvent.getAttendanceStatus());
+				memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
 				RoleEventDto roleEventDto = new RoleEventDto();
 				roleEventDto.setId(memberEvent.getRoleEvent().getId());
 				roleEventDto.setName(memberEvent.getRoleEvent().getName());
@@ -321,13 +327,13 @@ public class MemberEventServiceImpl implements MemberEventService {
 			List<MemberEvent> membersEvent = memberEventRepository.findByEventId(eventId);
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			for (MemberEvent memberEvent : membersEvent) {
-				if (memberEvent.getAttendanceStatus() && memberEvent.getUser().isActive()) {
+				if (memberEvent.isRegisterStatus() && memberEvent.getUser().isActive()) {
 					MemberEventDto memberEventDto = new MemberEventDto();
 					memberEventDto.setId(memberEvent.getId());
 					memberEventDto.setUserName(memberEvent.getUser().getName());
 					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-					memberEventDto.setAttendanceStatus(memberEvent.getAttendanceStatus());
+					memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
 					RoleEventDto roleEventDto = new RoleEventDto();
 					roleEventDto.setId(memberEvent.getRoleEvent().getId());
 					roleEventDto.setName(memberEvent.getRoleEvent().getName());
@@ -349,4 +355,86 @@ public class MemberEventServiceImpl implements MemberEventService {
 		return responseMessage;
 	}
 
+	@Override
+	public ResponseMessage getListMemberNotJoinEvent(int eventId, int pageNo, int pageSize) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<User> listUser = (List<User>) userRepository.findAll();
+			List<MemberNotJoinEventDto> listNotJoin = new ArrayList<MemberNotJoinEventDto>();
+			for (User user : listUser) {
+				Optional<MemberEvent> getMemberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventId, user.getId());
+				if(getMemberEventOp != null) {
+					MemberEvent getMemberEvent = getMemberEventOp.get();
+					if(getMemberEvent.isRegisterStatus()) {
+						continue;
+					} else {
+						MemberNotJoinEventDto memberNotJoinEventDto = new MemberNotJoinEventDto();
+						memberNotJoinEventDto.setUserId(user.getId());
+						memberNotJoinEventDto.setUserName(user.getName());
+						memberNotJoinEventDto.setUserMail(user.getEmail());
+						memberNotJoinEventDto.setUserStudentId(user.getStudentId());
+						memberNotJoinEventDto.setRegisteredStatus(true);
+						memberNotJoinEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(user.getRole()));
+						listNotJoin.add(memberNotJoinEventDto);
+					}
+				}
+				else {
+					MemberNotJoinEventDto memberNotJoinEventDto = new MemberNotJoinEventDto();
+					memberNotJoinEventDto.setUserId(user.getId());
+					memberNotJoinEventDto.setUserName(user.getName());
+					memberNotJoinEventDto.setUserMail(user.getEmail());
+					memberNotJoinEventDto.setUserStudentId(user.getStudentId());
+					memberNotJoinEventDto.setRegisteredStatus(false);
+					memberNotJoinEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(user.getRole()));
+					listNotJoin.add(memberNotJoinEventDto);
+				}
+			}
+			List<MemberNotJoinEventDto> listNotJoinPageable = pageableMemberNotJoinEvent(listNotJoin, pageNo, pageSize);
+			responseMessage.setData(listNotJoinPageable);
+			responseMessage.setMessage("Danh sách chưa tham gia sự kiện");
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage addListMemberJoinEvent(int eventId, List<MemberNotJoinEventDto> listToJoin) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			for (MemberNotJoinEventDto memberNotJoinEventDto : listToJoin) {
+				if(memberNotJoinEventDto.getRoleEventDto() == null) {
+					continue;
+				}
+				else {
+					MemberEvent memberEvent = new MemberEvent();
+					memberEvent.setId(eventId);
+					memberEvent.setUser(userRepository.findById(memberNotJoinEventDto.getUserId()).get());
+					Optional<RoleEvent> roleEventOp = roleEventRepository.findMemberRole();
+					RoleEvent roleEvent = roleEventOp.get();
+					memberEvent.setRoleEvent(roleEvent);
+					memberEvent.setPaymentValue(0);
+					memberEvent.setRegisterStatus(true);
+					memberEvent.setCreatedBy("LinhLHN");
+					memberEvent.setCreatedOn(LocalDateTime.now());
+					memberEventRepository.save(memberEvent);
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	public List<MemberNotJoinEventDto> pageableMemberNotJoinEvent(List<MemberNotJoinEventDto> currentList, int pageNo, int pageSize) {
+		List<MemberNotJoinEventDto> result = new ArrayList<MemberNotJoinEventDto>();
+		for(int i = pageNo * pageSize; i < (pageNo + 1) * pageSize && i < currentList.size(); i++) {
+			result.add(currentList.get(i));
+		}
+		return result;
+	}
 }

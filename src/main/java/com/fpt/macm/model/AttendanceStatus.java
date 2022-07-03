@@ -28,7 +28,7 @@ public class AttendanceStatus {
 	private TrainingSchedule trainingSchedule;
 	
 	@Column
-	private boolean status;
+	private int status;
 	
 	@Column
 	private String createdBy;
@@ -66,11 +66,11 @@ public class AttendanceStatus {
 		this.trainingSchedule = trainingSchedule;
 	}
 
-	public boolean isStatus() {
+	public int getStatus() {
 		return status;
 	}
 
-	public void setStatus(boolean status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 

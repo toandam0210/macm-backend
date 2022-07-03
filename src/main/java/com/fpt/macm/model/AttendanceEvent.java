@@ -28,7 +28,7 @@ public class AttendanceEvent {
 	private MemberEvent memberEvent;
 
 	@Column
-	private boolean status;
+	private int status;
 
 	@Column
 	private String createdBy;
@@ -66,11 +66,11 @@ public class AttendanceEvent {
 		this.memberEvent = memberEvent;
 	}
 
-	public boolean getStatus() {
+	public int getStatus() {
 		return status;
 	}
 
-	public void setStatus(boolean status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 

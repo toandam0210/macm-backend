@@ -6,7 +6,7 @@ public class MemberEventDto {
 	private String userName;
 	private String userMail;
 	private String userStudentId;
-	private boolean attendanceStatus;
+	private boolean registerStatus;
 	private RoleEventDto roleEventDto;
 	private String roleInClub;
 	private double paymentValue;
@@ -45,16 +45,16 @@ public class MemberEventDto {
 		this.userStudentId = userStudentId;
 	}
 
-	public boolean isAttendanceStatus() {
-		return attendanceStatus;
-	}
-
-	public void setAttendanceStatus(boolean attendanceStatus) {
-		this.attendanceStatus = attendanceStatus;
-	}
-
 	public RoleEventDto getRoleEventDto() {
 		return roleEventDto;
+	}
+
+	public boolean isRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(boolean registerStatus) {
+		this.registerStatus = registerStatus;
 	}
 
 	public void setRoleEventDto(RoleEventDto roleEventDto) {
