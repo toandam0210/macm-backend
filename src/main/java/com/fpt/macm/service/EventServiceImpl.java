@@ -16,12 +16,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.EventDto;
+import com.fpt.macm.model.ClubFund;
 import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.Event;
 import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
+import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
@@ -47,6 +49,9 @@ public class EventServiceImpl implements EventService{
 	SemesterRepository semesterRepository;
 	
 	@Autowired
+	ClubFundRepository clubFundRepository;
+	
+	@Autowired
 	EventScheduleService eventScheduleService;
 	
 	@Autowired
@@ -54,6 +59,9 @@ public class EventServiceImpl implements EventService{
 	
 	@Autowired
 	SemesterService semesterService;
+	
+	@Autowired
+	MemberEventService memberEventService;
 	
 	@Override
 	public ResponseMessage createEvent(Event event) {
@@ -356,20 +364,48 @@ public class EventServiceImpl implements EventService{
 	}
 
 	@Override
-	public ResponseMessage updateAfterEvent(int id, Event event) {
+	public ResponseMessage updateAfterEvent(int eventId, double money, boolean isIncurred, boolean isUseClubFund) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(id);
+			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
 			if(listSchedule.size() > 0 && listSchedule.get(listSchedule.size() - 1).getDate().compareTo(LocalDate.now()) > 0) {
 				responseMessage.setMessage(Constant.MSG_128);
 			}
 			else {
-				Optional<Event> eventOp = eventRepository.findById(id);
+				Optional<Event> eventOp = eventRepository.findById(eventId);
 				Event getEvent = eventOp.get();
-				getEvent.setTotalAmountActual(event.getTotalAmountActual());
-				getEvent.setAmountFromClub(event.getAmountFromClub());
-				getEvent.setAmountPerRegisterActual(event.getAmountPerRegisterActual());
+				if(isIncurred) {
+					int countMemberEvent = memberEventRepository.findMemberEventByEventId(eventId).size();
+					double totalProceedsActual = countMemberEvent * getEvent.getAmountPerRegisterEstimated();
+					double totalAmountActual = totalProceedsActual + money + getEvent.getAmountFromClub();
+					getEvent.setTotalAmountActual(totalAmountActual);
+					if(isUseClubFund) {
+						getEvent.setAmountFromClub(getEvent.getAmountFromClub() + money);
+						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());
+						//trừ tiền từ clb
+						List<ClubFund> clubFunds = clubFundRepository.findAll();
+						ClubFund clubFund = clubFunds.get(0);
+						double fundAmount = clubFund.getFundAmount();
+						clubFund.setFundAmount(fundAmount - money);
+						clubFundRepository.save(clubFund);
+					}
+					else {
+						double amountPerMore = money/countMemberEvent;
+						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated() + amountPerMore);
+					}
+				}
+				else {
+					//cộng tiền vào clb
+					List<ClubFund> clubFunds = clubFundRepository.findAll();
+					ClubFund clubFund = clubFunds.get(0);
+					double fundAmount = clubFund.getFundAmount();
+					clubFund.setFundAmount(fundAmount + money);
+					clubFundRepository.save(clubFund);
+					getEvent.setAmountFromClub(getEvent.getAmountFromClub() - money >= 0 ? getEvent.getAmountFromClub() - money : 0);
+					getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());
+					getEvent.setTotalAmountActual(getEvent.getTotalAmountEstimated());
+				}
 				getEvent.setUpdatedBy("LinhLHN");
 				getEvent.setUpdatedOn(LocalDateTime.now());
 				eventRepository.save(getEvent);

@@ -64,7 +64,8 @@ public class EventController {
 	}
 	
 	@PutMapping("/headculture/updateafterevent/{eventId}")
-	ResponseEntity<ResponseMessage> updateAfterEvent(@PathVariable(name = "eventId") int id, @RequestBody Event event) {
-		return new ResponseEntity<ResponseMessage>(eventService.updateAfterEvent(id, event), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateAfterEvent(@PathVariable(name = "eventId") int id,
+			@RequestParam double money, @RequestParam(defaultValue = "true") boolean isIncurred, @RequestParam(defaultValue = "true") boolean isUseClubFund) {
+		return new ResponseEntity<ResponseMessage>(eventService.updateAfterEvent(id, money, isIncurred, isUseClubFund), HttpStatus.OK);
 	}
 }
