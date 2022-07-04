@@ -69,7 +69,7 @@ public class EventController {
 		return new ResponseEntity<ResponseMessage>(eventService.updateAfterEvent(id, money, isIncurred, isUseClubFund), HttpStatus.OK);
 	}
 	
-	@GetMapping("/geteventbyid")
+	@GetMapping("/geteventbyid/{eventId}")
 	ResponseEntity<ResponseMessage> getEventById(@PathVariable(name = "eventId") int id) {
 		return new ResponseEntity<ResponseMessage>(eventService.getEventById(id), HttpStatus.OK);
 	}
