@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.dto.MemberEventDto;
+import com.fpt.macm.dto.MemberNotJoinEventDto;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.service.MemberEventService;
 
@@ -70,5 +72,17 @@ public class MemberEventController {
 	@GetMapping("/headculture/getallroleevent")
 	ResponseEntity<ResponseMessage> getAllRoleEvent(){
 		return new ResponseEntity<ResponseMessage>(memberEventService.getAllEventRole(), HttpStatus.OK);
+	}
+	
+	@GetMapping("/headculture/getlistmembernotjoin/{eventId}")
+	ResponseEntity<ResponseMessage> getListMemberNotJoinEvent(@PathVariable(name = "eventId") int eventId, 
+			@RequestParam(defaultValue = "0") int pageNo,	@RequestParam(defaultValue = "10") int pageSize){
+		return new ResponseEntity<ResponseMessage>(memberEventService.getListMemberNotJoinEvent(eventId, pageNo, pageSize), HttpStatus.OK);
+	}
+	
+	@PostMapping("/headculture/addlistmemberjoin/{eventId}")
+	ResponseEntity<ResponseMessage> addListMemberJoinEvent(@PathVariable(name = "eventId") int eventId, 
+			@RequestBody List<MemberNotJoinEventDto> listToJoin){
+		return new ResponseEntity<ResponseMessage>(memberEventService.addListMemberJoinEvent(eventId, listToJoin), HttpStatus.OK);
 	}
 }
