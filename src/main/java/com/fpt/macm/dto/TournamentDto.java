@@ -29,6 +29,12 @@ public class TournamentDto {
 	private double totalAmount;
 	
 	private double feePlayerPay;
+	
+	private double totalAmountEstimate;
+	
+	private double totalAmountFromClubEstimate;
+	
+	private double totalAmountFromClubActual;
 
 	public int getId() {
 		return id;
@@ -124,6 +130,30 @@ public class TournamentDto {
 
 	public void setFeePlayerPay(double feePlayerPay) {
 		this.feePlayerPay = feePlayerPay;
+	}
+
+	public double getTotalAmountEstimate() {
+		return totalAmountEstimate;
+	}
+
+	public void setTotalAmountEstimate(double totalAmountEstimate) {
+		this.totalAmountEstimate = totalAmountEstimate;
+	}
+
+	public double getTotalAmountFromClubEstimate() {
+		return totalAmountFromClubEstimate;
+	}
+
+	public void setTotalAmountFromClubEstimate(double totalAmountFromClubEstimate) {
+		this.totalAmountFromClubEstimate = totalAmountFromClubEstimate;
+	}
+
+	public double getTotalAmountFromClubActual() {
+		return totalAmountFromClubActual;
+	}
+
+	public void setTotalAmountFromClubActual(double totalAmountFromClubActual) {
+		this.totalAmountFromClubActual = totalAmountFromClubActual;
 	}
 	
 	
