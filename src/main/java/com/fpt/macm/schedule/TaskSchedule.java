@@ -63,7 +63,7 @@ public class TaskSchedule {
 
 	@Autowired
 	AttendanceEventRepository attendanceEventRepository;
-	
+
 	@Autowired
 	EventRepository eventRepository;
 
@@ -87,7 +87,7 @@ public class TaskSchedule {
 
 	@Autowired
 	MembershipShipInforRepository membershipShipInforRepository;
-	
+
 	@Autowired
 	NotificationService notificationService;
 
@@ -289,13 +289,13 @@ public class TaskSchedule {
 			semesterRepository.save(semester);
 		}
 	}
-	
+
 	@Scheduled(cron = "1 0 0 * * *")
 	public void pushNotificationBeforeEvent() {
 		List<Event> listEvent = eventRepository.findAll();
 		for (Event event : listEvent) {
 			LocalDate getStartDate = eventService.getStartDate(event.getId());
-			if(LocalDate.now().plusDays(1).isEqual(getStartDate)) {
+			if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
 				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository.findByEventId(event.getId());
 				String message = Constant.messageEvent(event);
 				Notification notification = new Notification();
@@ -306,6 +306,21 @@ public class TaskSchedule {
 				}
 			}
 			break;
+		}
+	}
+
+	@Scheduled(cron = "1 59 23 * * *")
+	public void changeStatusAttendanceTraining() {
+		TrainingSchedule trainingSchedule = trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now());
+		if (trainingSchedule != null) {
+			List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
+					.findByTrainingScheduleId(trainingSchedule.getId());
+			for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
+				if (attendanceStatus.getStatus() == 2) {
+					attendanceStatus.setStatus(0);
+					attendanceStatusRepository.save(attendanceStatus);
+				}
+			}
 		}
 	}
 }
