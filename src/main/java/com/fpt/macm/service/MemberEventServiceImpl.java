@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.EventPaymentStatusReportDto;
 import com.fpt.macm.dto.MemberEventDto;
+import com.fpt.macm.dto.MemberNotJoinEventDto;
 import com.fpt.macm.dto.RoleEventDto;
 import com.fpt.macm.model.ClubFund;
 import com.fpt.macm.model.Constant;
@@ -23,11 +24,13 @@ import com.fpt.macm.model.EventPaymentStatusReport;
 import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.RoleEvent;
+import com.fpt.macm.model.User;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.EventPaymentStatusReportRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.RoleEventRepository;
+import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -47,6 +50,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 	@Autowired
 	RoleEventRepository roleEventRepository;
+	
+	@Autowired
+	UserRepository userRepository;
 
 	@Override
 	public ResponseMessage updateListMemberEventRole(List<MemberEventDto> membersEventDto) {
@@ -97,7 +103,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEventDto.setUserName(memberEvent.getUser().getName());
 				memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 				memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-				memberEventDto.setAttendanceStatus(memberEvent.getAttendanceStatus());
+				memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
 				RoleEventDto roleEventDto = new RoleEventDto();
 				roleEventDto.setId(memberEvent.getRoleEvent().getId());
 				roleEventDto.setName(memberEvent.getRoleEvent().getName());
@@ -145,25 +151,40 @@ public class MemberEventServiceImpl implements MemberEventService {
 				fundBalance = memberEvent.getPaymentValue() != 0 ? (fundAmount - amountPerRegisterEstimate)
 						: (fundAmount + amountPerRegisterEstimate);
 				memberEvent.setPaymentValue(memberEvent.getPaymentValue() != 0 ? 0 : amountPerRegisterEstimate);
+				memberEvent.setPaidBeforeClosing(true);
 			} else {
 				if (memberEvent.getPaymentValue() == 0) {
 					fundChange = amountPerRegisterActual;
-					fundBalance = fundAmount + amountPerRegisterActual;
+					fundBalance = fundAmount + fundChange;
 					memberEvent.setPaymentValue(amountPerRegisterActual);
-				} else if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
-					fundChange = amountPerRegisterActual - amountPerRegisterEstimate;
-					fundBalance = fundAmount + (amountPerRegisterActual - amountPerRegisterEstimate);
-					memberEvent.setPaymentValue(amountPerRegisterActual);
-				} else if (memberEvent.getPaymentValue() == amountPerRegisterActual) {
-					fundChange = -(amountPerRegisterActual - amountPerRegisterEstimate);
-					fundBalance = fundAmount - (amountPerRegisterActual - amountPerRegisterEstimate);
-					memberEvent.setPaymentValue(amountPerRegisterEstimate);
+				} else if (amountPerRegisterActual > amountPerRegisterEstimate) {
+					if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
+						fundChange = amountPerRegisterActual - amountPerRegisterEstimate;
+						fundBalance = fundAmount + fundChange;
+						memberEvent.setPaymentValue(amountPerRegisterActual);
+					} else if (memberEvent.getPaymentValue() == amountPerRegisterActual) {
+						if (memberEvent.isPaidBeforeClosing()) {
+							fundChange = -(amountPerRegisterActual - amountPerRegisterEstimate);
+							fundBalance = fundAmount - fundChange;
+							memberEvent.setPaymentValue(amountPerRegisterEstimate);
+						} else {
+							fundChange = -amountPerRegisterActual;
+							fundBalance = fundAmount - amountPerRegisterActual;
+							memberEvent.setPaymentValue(0);
+						}
+					}
+				} else if (amountPerRegisterActual == amountPerRegisterEstimate) {
+					if (memberEvent.getPaymentValue() == amountPerRegisterActual) {
+						fundChange = -amountPerRegisterActual;
+						fundBalance = fundAmount - amountPerRegisterActual;
+						memberEvent.setPaymentValue(0);
+					}
 				}
 			}
 
 			clubFund.setFundAmount(fundBalance);
 			clubFundRepository.save(clubFund);
-			
+
 			EventPaymentStatusReport eventPaymentStatusReport = new EventPaymentStatusReport();
 			eventPaymentStatusReport.setEvent(memberEvent.getEvent());
 			eventPaymentStatusReport.setUser(memberEvent.getUser());
@@ -212,8 +233,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 					eventPaymentStatusReportDto.setFundBalance(eventPaymentStatusReport.getFundBalance());
 					eventPaymentStatusReportDto.setCreatedBy(eventPaymentStatusReport.getCreatedBy());
 					eventPaymentStatusReportDto.setCreatedOn(eventPaymentStatusReport.getCreatedOn());
-					eventPaymentStatusReportDto.setAmountPerRegisterEstimate(eventPaymentStatusReport.getEvent().getAmountPerRegisterEstimated());
-					eventPaymentStatusReportDto.setAmountPerRegisterActual(eventPaymentStatusReport.getEvent().getAmountPerRegisterActual());
+					eventPaymentStatusReportDto.setAmountPerRegisterEstimate(
+							eventPaymentStatusReport.getEvent().getAmountPerRegisterEstimated());
+					eventPaymentStatusReportDto.setAmountPerRegisterActual(
+							eventPaymentStatusReport.getEvent().getAmountPerRegisterActual());
 					eventPaymentStatusReportsDto.add(eventPaymentStatusReportDto);
 				}
 				responseMessage.setData(eventPaymentStatusReportsDto);
@@ -267,7 +290,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEventDto.setUserName(memberEvent.getUser().getName());
 				memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 				memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-				memberEventDto.setAttendanceStatus(memberEvent.getAttendanceStatus());
+				memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
 				RoleEventDto roleEventDto = new RoleEventDto();
 				roleEventDto.setId(memberEvent.getRoleEvent().getId());
 				roleEventDto.setName(memberEvent.getRoleEvent().getName());
@@ -321,13 +344,13 @@ public class MemberEventServiceImpl implements MemberEventService {
 			List<MemberEvent> membersEvent = memberEventRepository.findByEventId(eventId);
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			for (MemberEvent memberEvent : membersEvent) {
-				if (memberEvent.getAttendanceStatus() && memberEvent.getUser().isActive()) {
+				if (memberEvent.isRegisterStatus() && memberEvent.getUser().isActive()) {
 					MemberEventDto memberEventDto = new MemberEventDto();
 					memberEventDto.setId(memberEvent.getId());
 					memberEventDto.setUserName(memberEvent.getUser().getName());
 					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-					memberEventDto.setAttendanceStatus(memberEvent.getAttendanceStatus());
+					memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
 					RoleEventDto roleEventDto = new RoleEventDto();
 					roleEventDto.setId(memberEvent.getRoleEvent().getId());
 					roleEventDto.setName(memberEvent.getRoleEvent().getName());
@@ -348,5 +371,107 @@ public class MemberEventServiceImpl implements MemberEventService {
 		}
 		return responseMessage;
 	}
+	
+	@Override
+	public ResponseMessage getListMemberNotJoinEvent(int eventId, int pageNo, int pageSize) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<User> listUser = (List<User>) userRepository.findAll();
+			List<MemberNotJoinEventDto> listNotJoin = new ArrayList<MemberNotJoinEventDto>();
+			for (User user : listUser) {
+				Optional<MemberEvent> getMemberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventId, user.getId());
+				if(getMemberEventOp.isPresent()) {
+					MemberEvent getMemberEvent = getMemberEventOp.get();
+					if(getMemberEvent.isRegisterStatus()) {
+						continue;
+					} else {
+						MemberNotJoinEventDto memberNotJoinEventDto = new MemberNotJoinEventDto();
+						memberNotJoinEventDto.setUserId(user.getId());
+						memberNotJoinEventDto.setUserName(user.getName());
+						memberNotJoinEventDto.setUserMail(user.getEmail());
+						memberNotJoinEventDto.setUserStudentId(user.getStudentId());
+						memberNotJoinEventDto.setRegisteredStatus(true);
+						memberNotJoinEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(user.getRole()));
+						listNotJoin.add(memberNotJoinEventDto);
+					}
+				}
+				else {
+					MemberNotJoinEventDto memberNotJoinEventDto = new MemberNotJoinEventDto();
+					memberNotJoinEventDto.setUserId(user.getId());
+					memberNotJoinEventDto.setUserName(user.getName());
+					memberNotJoinEventDto.setUserMail(user.getEmail());
+					memberNotJoinEventDto.setUserStudentId(user.getStudentId());
+					memberNotJoinEventDto.setRegisteredStatus(false);
+					memberNotJoinEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(user.getRole()));
+					listNotJoin.add(memberNotJoinEventDto);
+				}
+			}
+			List<MemberNotJoinEventDto> listNotJoinPageable = pageableMemberNotJoinEvent(listNotJoin, pageNo, pageSize);
+			responseMessage.setData(listNotJoinPageable);
+			responseMessage.setMessage("Danh sách chưa tham gia sự kiện" + listNotJoinPageable.size());
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
 
+	@Override
+	public ResponseMessage addListMemberJoinEvent(int eventId, List<MemberNotJoinEventDto> listToJoin) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<MemberEvent> listJoinEvent = new ArrayList<MemberEvent>();
+			for (MemberNotJoinEventDto memberNotJoinEventDto : listToJoin) {
+				if(memberNotJoinEventDto.isRegisteredStatus()) {
+					MemberEvent memberEvent = memberEventRepository.findMemberEventByEventAndUser(eventId, memberNotJoinEventDto.getUserId()).get();
+					Optional<RoleEvent> roleEventOp = roleEventRepository.findMemberRole();
+					RoleEvent roleEvent = roleEventOp.get();
+					memberEvent.setRoleEvent(roleEvent);
+					memberEvent.setPaymentValue(0);
+					memberEvent.setRegisterStatus(true);
+					memberEvent.setPaidBeforeClosing(false);
+					memberEvent.setCreatedBy("LinhLHN");
+					memberEvent.setCreatedOn(LocalDateTime.now());
+					memberEventRepository.save(memberEvent);
+					listJoinEvent.add(memberEvent);
+				}
+				else {
+					MemberEvent memberEvent = new MemberEvent();
+					memberEvent.setEvent(eventRepository.findById(eventId).get());
+					memberEvent.setUser(userRepository.findById(memberNotJoinEventDto.getUserId()).get());
+					Optional<RoleEvent> roleEventOp = roleEventRepository.findMemberRole();
+					RoleEvent roleEvent = roleEventOp.get();
+					memberEvent.setRoleEvent(roleEvent);
+					memberEvent.setPaymentValue(0);
+					memberEvent.setRegisterStatus(true);
+					memberEvent.setPaidBeforeClosing(false);
+					memberEvent.setCreatedBy("LinhLHN");
+					memberEvent.setCreatedOn(LocalDateTime.now());
+					memberEventRepository.save(memberEvent);
+					listJoinEvent.add(memberEvent);
+				}
+			}
+			if(listJoinEvent.size() == 0) {
+				responseMessage.setMessage("Không có thành viên nào được thêm");
+			}
+			else {
+				responseMessage.setData(listJoinEvent);
+				responseMessage.setMessage("Thêm thành viên thành công");
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	public List<MemberNotJoinEventDto> pageableMemberNotJoinEvent(List<MemberNotJoinEventDto> currentList, int pageNo, int pageSize) {
+		List<MemberNotJoinEventDto> result = new ArrayList<MemberNotJoinEventDto>();
+		for(int i = pageNo * pageSize; i < (pageNo + 1) * pageSize && i < currentList.size(); i++) {
+			result.add(currentList.get(i));
+		}
+		return result;
+	}
 }
