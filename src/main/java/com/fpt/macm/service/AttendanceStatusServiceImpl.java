@@ -43,7 +43,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	TrainingScheduleRepository trainingScheduleRepository;
 
 	@Override
-	public ResponseMessage takeAttendanceByStudentId(String studentId) {
+	public ResponseMessage takeAttendanceByStudentId(String studentId, int status) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			TrainingSchedule trainingSchedule = trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now());
@@ -54,7 +54,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 						.findByTrainingScheduleId(trainingSchedule.getId());
 				for (AttendanceStatus attendanceStatus : attendancesStatus) {
 					if (attendanceStatus.getUser().getId() == user.getId()) {
-						attendanceStatus.setStatus(!attendanceStatus.isStatus());
+						attendanceStatus.setStatus(status);
 						attendanceStatus.setUpdatedOn(LocalDateTime.now());
 						attendanceStatus.setUpdatedBy("toandv");
 						attendanceStatusRepository.save(attendanceStatus);
@@ -78,13 +78,17 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 					.findByTrainingScheduleId(trainingScheduleId);
 			List<AttendanceStatusDto> attendanceStatusDtos = new ArrayList<AttendanceStatusDto>();
 			int attend = 0;
+			int absent = 0;
 			for (AttendanceStatus attendanceStatus : attendancesStatus) {
 				AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
 				attendanceStatusDto.setName(attendanceStatus.getUser().getName());
 				attendanceStatusDto.setStudentId(attendanceStatus.getUser().getStudentId());
-				attendanceStatusDto.setStatus(attendanceStatus.isStatus());
-				if (attendanceStatus.isStatus()) {
+				attendanceStatusDto.setStatus(attendanceStatus.getStatus());
+				if (attendanceStatus.getStatus() == 1) {
 					attend++;
+				}
+				if(attendanceStatus.getStatus() == 0) {
+					absent++;
 				}
 				attendanceStatusDto.setDate(attendanceStatus.getTrainingSchedule().getDate());
 				attendanceStatusDtos.add(attendanceStatusDto);
@@ -92,7 +96,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			responseMessage.setData(attendanceStatusDtos);
 			responseMessage.setMessage(Constant.MSG_057);
 			responseMessage.setTotalActive(attend);
-			responseMessage.setTotalDeactive(attendanceStatusDtos.size() - attend);
+			responseMessage.setTotalDeactive(absent);
 			responseMessage.setTotalResult(attendanceStatusDtos.size());
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
@@ -129,7 +133,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 					attendanceTrainingReportDto.setStudentName(user.getName());
 					attendanceTrainingReportDto.setRoleName(Utils.convertRoleFromDbToExcel(user.getRole()));
 					for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
-						if (attendanceStatus.getUser().getId() == user.getId() && !attendanceStatus.isStatus()) {
+						if (attendanceStatus.getUser().getId() == user.getId() && attendanceStatus.getStatus() == 0) {
 							totalAbsent++;
 						}
 					}

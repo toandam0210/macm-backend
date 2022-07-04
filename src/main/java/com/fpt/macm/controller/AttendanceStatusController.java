@@ -20,8 +20,8 @@ public class AttendanceStatusController {
 	AttendanceStatusService attendanceStatusService;
 	
 	@PutMapping("/takeattendance/{studentId}")
-	ResponseEntity<ResponseMessage> takeAttendanceByStudentId(@PathVariable(name = "studentId") String studentId) {
-		return new ResponseEntity<ResponseMessage>(attendanceStatusService.takeAttendanceByStudentId(studentId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> takeAttendanceByStudentId(@PathVariable(name = "studentId") String studentId, @RequestParam int status) {
+		return new ResponseEntity<ResponseMessage>(attendanceStatusService.takeAttendanceByStudentId(studentId, status), HttpStatus.OK);
 	}
 	
 	@GetMapping("/checkattendance/{trainingScheduleId}")

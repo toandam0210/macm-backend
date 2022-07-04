@@ -5,7 +5,7 @@ import java.time.LocalDate;
 public class AttendanceStatusDto {
 	private String name;
 	private String studentId;
-	private boolean status;
+	private int status;
 	private LocalDate date;
 	public String getName() {
 		return name;
@@ -25,12 +25,13 @@ public class AttendanceStatusDto {
 	public void setDate(LocalDate date) {
 		this.date = date;
 	}
-	public boolean isStatus() {
+	public int getStatus() {
 		return status;
 	}
-	public void setStatus(boolean status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
+	
 	
 	
 }
