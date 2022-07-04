@@ -12,7 +12,7 @@ public interface MemberEventService {
 	ResponseMessage getAllMemberCancelJoinEvent(int eventId, int pageNo, int pageSize, String sortBy);
 	ResponseMessage updateMemberEventPaymentStatus(int memberEventId);
 	ResponseMessage getReportPaymentStatusByEventId(int eventId, int pageNo, int pageSize, String sortBy);
-	ResponseMessage getAllMemberJoinEventByRoleEventId(int eventId, int filterIndex, int pageNo, int pageSize, String sortBy);
+	ResponseMessage getAllMemberJoinEventByRoleEventId(int eventId, int filterIndex);
 	ResponseMessage getAllEventRole();
 	ResponseMessage getListMemberEventToUpdateRole(int eventId);
 	ResponseMessage getListMemberNotJoinEvent(int eventId, int pageNo, int pageSize);

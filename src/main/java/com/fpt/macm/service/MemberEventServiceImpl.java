@@ -50,7 +50,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 	@Autowired
 	RoleEventRepository roleEventRepository;
-	
+
 	@Autowired
 	UserRepository userRepository;
 
@@ -252,39 +252,51 @@ public class MemberEventServiceImpl implements MemberEventService {
 	}
 
 	@Override
-	public ResponseMessage getAllMemberJoinEventByRoleEventId(int eventId, int filterIndex, int pageNo, int pageSize,
-			String sortBy) {
+	public ResponseMessage getAllMemberJoinEventByRoleEventId(int eventId, int filterIndex) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<MemberEvent> pageResponse;
-
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdOrderByIdAsc(eventId);
+			List<MemberEvent> membersEventFilter = new ArrayList<MemberEvent>();
 			switch (filterIndex) {
 			case 0:
 				// filter all
-				pageResponse = memberEventRepository.findAllMemberEventByEventId(eventId, paging);
+				for (MemberEvent memberEvent : membersEvent) {
+					if (memberEvent.isRegisterStatus()) {
+						membersEventFilter.add(memberEvent);
+					}
+				}
 				break;
 			case 1:
 				// filter thành viên tham gia
-				pageResponse = memberEventRepository.findAllMemberJoinEvent(eventId, paging);
+				for (MemberEvent memberEvent : membersEvent) {
+					if (memberEvent.isRegisterStatus()
+							&& memberEvent.getRoleEvent().getName().equals(Constant.ROLE_EVENT_MEMBER)) {
+						membersEventFilter.add(memberEvent);
+					}
+				}
 				break;
 			case 2:
 				// filter thành viên ban tổ chức
-				pageResponse = memberEventRepository.findAllEventMemberOrganizingCommittee(eventId, paging);
+				for (MemberEvent memberEvent : membersEvent) {
+					if (memberEvent.isRegisterStatus()
+							&& !memberEvent.getRoleEvent().getName().equals(Constant.ROLE_EVENT_MEMBER)) {
+						membersEventFilter.add(memberEvent);
+					}
+				}
 				break;
 			default:
-				pageResponse = memberEventRepository.findAllMemberEventByEventId(eventId, paging);
+				for (MemberEvent memberEvent : membersEvent) {
+					if (memberEvent.isRegisterStatus()) {
+						membersEventFilter.add(memberEvent);
+					}
+				}
 				break;
 			}
 
-			List<MemberEvent> membersEvent = new ArrayList<MemberEvent>();
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
-			if (pageResponse != null && pageResponse.hasContent()) {
-				membersEvent = pageResponse.getContent();
-			}
 
-			for (MemberEvent memberEvent : membersEvent) {
+			for (MemberEvent memberEvent : membersEventFilter) {
 				MemberEventDto memberEventDto = new MemberEventDto();
 				memberEventDto.setId(memberEvent.getId());
 				memberEventDto.setUserName(memberEvent.getUser().getName());
@@ -304,8 +316,6 @@ public class MemberEventServiceImpl implements MemberEventService {
 			}
 
 			responseMessage.setData(membersEventDto);
-			responseMessage.setPageNo(pageNo);
-			responseMessage.setPageSize(pageSize);
 			responseMessage.setMessage(Constant.MSG_058);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -341,7 +351,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberEvent> membersEvent = memberEventRepository.findByEventId(eventId);
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdOrderByIdAsc(eventId);
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			for (MemberEvent memberEvent : membersEvent) {
 				if (memberEvent.isRegisterStatus() && memberEvent.getUser().isActive()) {
@@ -371,7 +381,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
 	public ResponseMessage getListMemberNotJoinEvent(int eventId, int pageNo, int pageSize) {
 		// TODO Auto-generated method stub
@@ -380,10 +390,11 @@ public class MemberEventServiceImpl implements MemberEventService {
 			List<User> listUser = (List<User>) userRepository.findAll();
 			List<MemberNotJoinEventDto> listNotJoin = new ArrayList<MemberNotJoinEventDto>();
 			for (User user : listUser) {
-				Optional<MemberEvent> getMemberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventId, user.getId());
-				if(getMemberEventOp.isPresent()) {
+				Optional<MemberEvent> getMemberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventId,
+						user.getId());
+				if (getMemberEventOp.isPresent()) {
 					MemberEvent getMemberEvent = getMemberEventOp.get();
-					if(getMemberEvent.isRegisterStatus()) {
+					if (getMemberEvent.isRegisterStatus()) {
 						continue;
 					} else {
 						MemberNotJoinEventDto memberNotJoinEventDto = new MemberNotJoinEventDto();
@@ -395,8 +406,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 						memberNotJoinEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(user.getRole()));
 						listNotJoin.add(memberNotJoinEventDto);
 					}
-				}
-				else {
+				} else {
 					MemberNotJoinEventDto memberNotJoinEventDto = new MemberNotJoinEventDto();
 					memberNotJoinEventDto.setUserId(user.getId());
 					memberNotJoinEventDto.setUserName(user.getName());
@@ -424,8 +434,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 		try {
 			List<MemberEvent> listJoinEvent = new ArrayList<MemberEvent>();
 			for (MemberNotJoinEventDto memberNotJoinEventDto : listToJoin) {
-				if(memberNotJoinEventDto.isRegisteredStatus()) {
-					MemberEvent memberEvent = memberEventRepository.findMemberEventByEventAndUser(eventId, memberNotJoinEventDto.getUserId()).get();
+				if (memberNotJoinEventDto.isRegisteredStatus()) {
+					MemberEvent memberEvent = memberEventRepository
+							.findMemberEventByEventAndUser(eventId, memberNotJoinEventDto.getUserId()).get();
 					Optional<RoleEvent> roleEventOp = roleEventRepository.findMemberRole();
 					RoleEvent roleEvent = roleEventOp.get();
 					memberEvent.setRoleEvent(roleEvent);
@@ -436,8 +447,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEvent.setCreatedOn(LocalDateTime.now());
 					memberEventRepository.save(memberEvent);
 					listJoinEvent.add(memberEvent);
-				}
-				else {
+				} else {
 					MemberEvent memberEvent = new MemberEvent();
 					memberEvent.setEvent(eventRepository.findById(eventId).get());
 					memberEvent.setUser(userRepository.findById(memberNotJoinEventDto.getUserId()).get());
@@ -453,10 +463,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 					listJoinEvent.add(memberEvent);
 				}
 			}
-			if(listJoinEvent.size() == 0) {
+			if (listJoinEvent.size() == 0) {
 				responseMessage.setMessage("Không có thành viên nào được thêm");
-			}
-			else {
+			} else {
 				responseMessage.setData(listJoinEvent);
 				responseMessage.setMessage("Thêm thành viên thành công");
 			}
@@ -467,9 +476,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 		return responseMessage;
 	}
 
-	public List<MemberNotJoinEventDto> pageableMemberNotJoinEvent(List<MemberNotJoinEventDto> currentList, int pageNo, int pageSize) {
+	public List<MemberNotJoinEventDto> pageableMemberNotJoinEvent(List<MemberNotJoinEventDto> currentList, int pageNo,
+			int pageSize) {
 		List<MemberNotJoinEventDto> result = new ArrayList<MemberNotJoinEventDto>();
-		for(int i = pageNo * pageSize; i < (pageNo + 1) * pageSize && i < currentList.size(); i++) {
+		for (int i = pageNo * pageSize; i < (pageNo + 1) * pageSize && i < currentList.size(); i++) {
 			result.add(currentList.get(i));
 		}
 		return result;
