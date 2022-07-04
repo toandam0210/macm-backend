@@ -1,7 +1,6 @@
 package com.fpt.macm.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -16,18 +15,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fpt.macm.model.Constant;
-
-
 @SpringBootTest
-public class AttendanceStatusControllerTest {
+public class SemesterControllerTest {
 	@Autowired
 	private WebApplicationContext context;
 
 	private MockMvc mockMvc;
 
 	@InjectMocks
-	AttendanceStatusController attendanceStatusController;
+	SemesterController semesterController;
 
 	@BeforeEach
 	public void setup() throws Exception {
@@ -35,32 +31,49 @@ public class AttendanceStatusControllerTest {
 	}
 	
 	@Test
-	public void takeAttendanceSuccessTest() throws Exception {
-		this.mockMvc.perform(put("/api/admin/headtechnique/takeattendance/{studentId}", "HE140855")
+	public void getListMonthsBySemestersSuccessTest() throws Exception {
+		this.mockMvc.perform(get("/api/semester/getlistmonths").param("semester", "Spring")
 		.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())
 		.andExpect(content()
 				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.message").value(Constant.MSG_056));
+		.andExpect(jsonPath("$.data.size()").value("4"));
+	}
+	@Test
+	public void getListMonthsBySemestersSuccessTest2() throws Exception {
+		this.mockMvc.perform(get("/api/semester/getlistmonths").param("semester", "Summer")
+		.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content()
+				.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value("4"));
+	}
+	@Test
+	public void getListMonthsBySemestersSuccessTest3() throws Exception {
+		this.mockMvc.perform(get("/api/semester/getlistmonths").param("semester", "Fall")
+		.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content()
+				.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value("4"));
+	}
+	@Test
+	public void getTop3SemestersSuccessTest() throws Exception {
+		this.mockMvc.perform(get("/api/semester/gettop3semesters")
+		.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content()
+				.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value("2"));
 	}
 	
 	@Test
-	public void checkAttendanceSuccessTest() throws Exception {
-		this.mockMvc.perform(get("/api/admin/headtechnique/checkattendance/{trainingScheduleId}", 1)
+	public void getCurrentSemestersSuccessTest() throws Exception {
+		this.mockMvc.perform(get("/api/semester/currentsemester")
 		.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())
 		.andExpect(content()
 				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("37"));
-	}
-	
-	@Test
-	public void attendanceReportSuccessTest() throws Exception {
-		this.mockMvc.perform(get("/api/admin/headtechnique/checkattendance/report").param("semester", "Summer2022")
-		.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("19"));
+		.andExpect(jsonPath("$.data.size()").value("1"));
 	}
 }
