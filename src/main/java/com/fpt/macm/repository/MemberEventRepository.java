@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.MemberEvent;
 
 @Repository
@@ -18,19 +17,7 @@ public interface MemberEventRepository extends PagingAndSortingRepository<Member
 	@Query(value = "SELECT * FROM member_event WHERE event_id = ?1 AND register_status = false", nativeQuery = true)
 	Page<MemberEvent> findAllMemberCancelJoinEventByEventId(int eventId, Pageable pageable);
 
-	@Query(value = "select * from member_event where event_id = ?1", nativeQuery = true)
-	List<MemberEvent> findByEventId(int eventId);
-
-	@Query(value = "SELECT m.id, register_status, created_by, created_on, payment_value, updated_by, updated_on, event_id, role_in_event, user_id FROM member_event m WHERE event_id = ?1 AND register_status = true", nativeQuery = true)
-	Page<MemberEvent> findAllMemberEventByEventId(int eventId, Pageable pageable);
-
-	@Query(value = "SELECT m.id, register_status, created_by, created_on, payment_value, updated_by, updated_on, event_id, role_in_event, user_id FROM member_event m join role_event e on m.role_in_event = e.id where m.event_id = ?1 and e.\"name\" = '"
-			+ Constant.ROLE_EVENT_MEMBER + "' and register_status = true", nativeQuery = true)
-	Page<MemberEvent> findAllMemberJoinEvent(int eventId, Pageable pageable);
-
-	@Query(value = "SELECT m.id, register_status, created_by, created_on, payment_value, updated_by, updated_on, event_id, role_in_event, user_id FROM member_event m join role_event e on m.role_in_event = e.id where m.event_id = ?1 and e.\"name\" != '"
-			+ Constant.ROLE_EVENT_MEMBER + "' and register_status = true", nativeQuery = true)
-	Page<MemberEvent> findAllEventMemberOrganizingCommittee(int eventId, Pageable pageable);
+	List<MemberEvent> findByEventIdOrderByIdAsc(int eventId);
 	
 	@Query(value = "select * from member_event where event_id = ?1 and register_status = true", nativeQuery = true)
 	List<MemberEvent> findMemberEventByEventId(int eventId);

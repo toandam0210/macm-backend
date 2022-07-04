@@ -57,32 +57,33 @@ public class MemberEventController {
 
 	@GetMapping("/headculture/getmemberjoinevent/{eventId}")
 	ResponseEntity<ResponseMessage> getAllMemberJoinEvent(@PathVariable(name = "eventId") int eventId,
-			@RequestParam(defaultValue = "0") int filterIndex, @RequestParam(defaultValue = "0") int pageNo,
-			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
+			@RequestParam(defaultValue = "0") int filterIndex) {
 		return new ResponseEntity<ResponseMessage>(
-				memberEventService.getAllMemberJoinEventByRoleEventId(eventId, filterIndex, pageNo, pageSize, sortBy),
+				memberEventService.getAllMemberJoinEventByRoleEventId(eventId, filterIndex), HttpStatus.OK);
+	}
+
+	@GetMapping("/headculture/getlistmembereventtoupdaterole/{eventId}")
+	ResponseEntity<ResponseMessage> getListMemberEventToUpdateRole(@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.getListMemberEventToUpdateRole(eventId),
 				HttpStatus.OK);
 	}
-	
-	@GetMapping("/headculture/getlistmembereventtoupdaterole/{eventId}")
-	ResponseEntity<ResponseMessage> getListMemberEventToUpdateRole(@PathVariable(name = "eventId") int eventId){
-		return new ResponseEntity<ResponseMessage>(memberEventService.getListMemberEventToUpdateRole(eventId), HttpStatus.OK);
-	}
-	
+
 	@GetMapping("/headculture/getallroleevent")
-	ResponseEntity<ResponseMessage> getAllRoleEvent(){
+	ResponseEntity<ResponseMessage> getAllRoleEvent() {
 		return new ResponseEntity<ResponseMessage>(memberEventService.getAllEventRole(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headculture/getlistmembernotjoin/{eventId}")
-	ResponseEntity<ResponseMessage> getListMemberNotJoinEvent(@PathVariable(name = "eventId") int eventId, 
-			@RequestParam(defaultValue = "0") int pageNo,	@RequestParam(defaultValue = "10") int pageSize){
-		return new ResponseEntity<ResponseMessage>(memberEventService.getListMemberNotJoinEvent(eventId, pageNo, pageSize), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getListMemberNotJoinEvent(@PathVariable(name = "eventId") int eventId,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				memberEventService.getListMemberNotJoinEvent(eventId, pageNo, pageSize), HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/headculture/addlistmemberjoin/{eventId}")
-	ResponseEntity<ResponseMessage> addListMemberJoinEvent(@PathVariable(name = "eventId") int eventId, 
-			@RequestBody List<MemberNotJoinEventDto> listToJoin){
-		return new ResponseEntity<ResponseMessage>(memberEventService.addListMemberJoinEvent(eventId, listToJoin), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> addListMemberJoinEvent(@PathVariable(name = "eventId") int eventId,
+			@RequestBody List<MemberNotJoinEventDto> listToJoin) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.addListMemberJoinEvent(eventId, listToJoin),
+				HttpStatus.OK);
 	}
 }

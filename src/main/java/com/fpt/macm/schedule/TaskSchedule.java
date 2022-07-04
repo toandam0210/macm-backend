@@ -220,7 +220,7 @@ public class TaskSchedule {
 			Event event = eventSchedule.getEvent();
 			LocalDate startDate = (LocalDate) eventService.getStartDateOfEvent(event.getId()).getData().get(0);
 			if (startDate.compareTo(LocalDate.now()) == 0) {
-				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository.findByEventId(event.getId());
+				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository.findByEventIdOrderByIdAsc(event.getId());
 				for (MemberEvent memberEvent : membersEvent) {
 					if (memberEvent.isRegisterStatus()) {
 						AttendanceEvent attendanceEvent = new AttendanceEvent();
@@ -296,7 +296,7 @@ public class TaskSchedule {
 		for (Event event : listEvent) {
 			LocalDate getStartDate = eventService.getStartDate(event.getId());
 			if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
-				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository.findByEventId(event.getId());
+				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository.findByEventIdOrderByIdAsc(event.getId());
 				String message = Constant.messageEvent(event);
 				Notification notification = new Notification();
 				notification.setMessage(message);
