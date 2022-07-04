@@ -83,7 +83,7 @@ public class MemberEvent {
 		this.roleEvent = roleEvent;
 	}
 
-	public boolean getRegisterStatus() {
+	public boolean isRegisterStatus() {
 		return registerStatus;
 	}
 
@@ -94,7 +94,7 @@ public class MemberEvent {
 	public String getCreatedBy() {
 		return createdBy;
 	}
-
+	
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
