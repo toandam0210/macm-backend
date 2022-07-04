@@ -36,7 +36,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 	EventScheduleRepository eventScheduleRepository;
 
 	@Override
-	public ResponseMessage takeAttendanceByMemberEventId(int memberEventId) {
+	public ResponseMessage takeAttendanceByMemberEventId(int memberEventId, int status) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -46,7 +46,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 			AttendanceEvent attendanceEvent = attendanceEventRepository
 					.findByEventIdAndMemberEventId(event.getId(), memberEventId).get();
 
-			attendanceEvent.setStatus(!attendanceEvent.getStatus());
+			attendanceEvent.setStatus(status);
 			attendanceEvent.setUpdatedBy("toandv");
 			attendanceEvent.setUpdatedOn(LocalDateTime.now());
 			attendanceEventRepository.save(attendanceEvent);
@@ -73,14 +73,18 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 			}
 
 			int attend = 0;
+			int absent = 0;
 			for (AttendanceEvent attendanceEvent : attendancesEvent) {
 				AttendanceEventDto attendanceEventDto = new AttendanceEventDto();
 				attendanceEventDto.setEventName(attendanceEvent.getEvent().getName());
 				attendanceEventDto.setName(attendanceEvent.getMemberEvent().getUser().getName());
 				attendanceEventDto.setStudentId(attendanceEvent.getMemberEvent().getUser().getStudentId());
 				attendanceEventDto.setStatus(attendanceEvent.getStatus());
-				if (attendanceEvent.getStatus()) {
+				if (attendanceEvent.getStatus() == 1) {
 					attend++;
+				}
+				if (attendanceEvent.getStatus() == 0) {
+					absent++;
 				}
 				attendanceEventDto.setDate(startDate);
 				attendanceEventDtos.add(attendanceEventDto);
@@ -88,7 +92,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 			responseMessage.setData(attendanceEventDtos);
 			responseMessage.setMessage(Constant.MSG_057);
 			responseMessage.setTotalActive(attend);
-			responseMessage.setTotalDeactive(attendanceEventDtos.size() - attend);
+			responseMessage.setTotalDeactive(absent);
 			responseMessage.setTotalResult(attendanceEventDtos.size());
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
