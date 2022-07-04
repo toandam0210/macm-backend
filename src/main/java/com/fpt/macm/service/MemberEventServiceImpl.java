@@ -150,8 +150,8 @@ public class MemberEventServiceImpl implements MemberEventService {
 						: amountPerRegisterEstimate;
 				fundBalance = memberEvent.getPaymentValue() != 0 ? (fundAmount - amountPerRegisterEstimate)
 						: (fundAmount + amountPerRegisterEstimate);
+				memberEvent.setPaidBeforeClosing(memberEvent.getPaymentValue() != 0 ? false : true);
 				memberEvent.setPaymentValue(memberEvent.getPaymentValue() != 0 ? 0 : amountPerRegisterEstimate);
-				memberEvent.setPaidBeforeClosing(true);
 			} else {
 				if (memberEvent.getPaymentValue() == 0) {
 					fundChange = amountPerRegisterActual;
