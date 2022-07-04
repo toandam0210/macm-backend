@@ -68,4 +68,9 @@ public class EventController {
 			@RequestParam double money, @RequestParam(defaultValue = "true") boolean isIncurred, @RequestParam(defaultValue = "true") boolean isUseClubFund) {
 		return new ResponseEntity<ResponseMessage>(eventService.updateAfterEvent(id, money, isIncurred, isUseClubFund), HttpStatus.OK);
 	}
+	
+	@GetMapping("/geteventbyid")
+	ResponseEntity<ResponseMessage> getEventById(@PathVariable(name = "eventId") int id) {
+		return new ResponseEntity<ResponseMessage>(eventService.getEventById(id), HttpStatus.OK);
+	}
 }
