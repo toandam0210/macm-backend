@@ -64,6 +64,15 @@ public class Tournament {
 	
 	@Column
 	private double feePlayerPay;
+	
+	@Column
+	private double totalAmountEstimate;
+	
+	@Column
+	private double totalAmountFromClubEstimate;
+	
+	@Column
+	private double totalAmountFromClubActual;
 
 	public int getId() {
 		return id;
@@ -183,6 +192,30 @@ public class Tournament {
 
 	public void setFeePlayerPay(double feePlayerPay) {
 		this.feePlayerPay = feePlayerPay;
+	}
+
+	public double getTotalAmountEstimate() {
+		return totalAmountEstimate;
+	}
+
+	public void setTotalAmountEstimate(double totalAmountEstimate) {
+		this.totalAmountEstimate = totalAmountEstimate;
+	}
+
+	public double getTotalAmountFromClubEstimate() {
+		return totalAmountFromClubEstimate;
+	}
+
+	public void setTotalAmountFromClubEstimate(double totalAmountFromClubEstimate) {
+		this.totalAmountFromClubEstimate = totalAmountFromClubEstimate;
+	}
+
+	public double getTotalAmountFromClubActual() {
+		return totalAmountFromClubActual;
+	}
+
+	public void setTotalAmountFromClubActual(double totalAmountFromClubActual) {
+		this.totalAmountFromClubActual = totalAmountFromClubActual;
 	}
 	
 	
