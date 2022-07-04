@@ -205,7 +205,7 @@ public class TaskSchedule {
 					attendanceStatus.setTrainingSchedule(trainingSchedule);
 					attendanceStatus.setCreatedOn(LocalDateTime.now());
 					attendanceStatus.setCreatedBy("toandv");
-					attendanceStatus.setStatus(false);
+					attendanceStatus.setStatus(2);
 					attendanceStatusRepository.save(attendanceStatus);
 					logger.info("atten oke");
 				}
