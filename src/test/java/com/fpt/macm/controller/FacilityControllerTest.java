@@ -51,9 +51,9 @@ public class FacilityControllerTest {
 
 	private FacilityDto createFacilityDto() {
 		FacilityDto facilityDto = new FacilityDto();
-		facilityDto.setFacilityName("Dao găm");
-		facilityDto.setFacilityCategoryName("Vũ khí");
-		facilityDto.setFacilityCategoryId(2);
+		facilityDto.setFacilityName("Giáp tay");
+		facilityDto.setFacilityCategoryName("Giáp");
+		facilityDto.setFacilityCategoryId(1);
 		facilityDto.setQuantityUsable(10);
 		facilityDto.setQuantityBroken(0);
 		return facilityDto;
@@ -77,7 +77,7 @@ public class FacilityControllerTest {
 	}
 
 	@Test
-	public void getAllFacilitySuccessByFacilityCategoryIdFailure() throws Exception {
+	public void getAllFacilitySuccessByFacilityCategoryIdFail() throws Exception {
 		this.mockMvc
 				.perform(get("/api/facility/headtechnique/getallfacilitybyfacilitycategoryid")
 						.param("facilityCategoryId", "100").param("pageSize", "100"))
@@ -88,6 +88,9 @@ public class FacilityControllerTest {
 	@Test
 	public void createNewFacilitySuccess() throws Exception{
 		FacilityDto facilityDto = createFacilityDto();
+		facilityDto.setFacilityName("Dao găm");
+		facilityDto.setFacilityCategoryId(2);
+		facilityDto.setFacilityCategoryName("Vũ khí");
 		this.mockMvc.perform(post("/api/facility/headtechnique/createnewfacility")
 		.content(asJsonString(facilityDto))
 		.contentType(MediaType.APPLICATION_JSON))
@@ -95,6 +98,122 @@ public class FacilityControllerTest {
 		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 		.andExpect(jsonPath("$.data.size()").value(1));
 	}
+	
+	@Test
+	public void createNewFacilityFail() throws Exception{
+		FacilityDto facilityDto = createFacilityDto();
+		this.mockMvc.perform(post("/api/facility/headtechnique/createnewfacility")
+		.content(asJsonString(facilityDto))
+		.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(0));
+	}
+	
+	@Test
+	public void updateFacilitySucessName() throws Exception{
+		FacilityDto facilityDto = createFacilityDto();
+		facilityDto.setFacilityName("Giáp tay 2");
+		facilityDto.setFacilityCategoryName("Giáp");
+		facilityDto.setFacilityCategoryId(1);
+		facilityDto.setQuantityUsable(0);
+		facilityDto.setQuantityBroken(0);
+		this.mockMvc.perform(put("/api/facility/headtechnique/updatefacilitybyid/{facilityId}", "1")
+		.content(asJsonString(facilityDto))
+		.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(1));
+	}
+	
+	@Test
+	public void updateFacilitySucessCategory() throws Exception{
+		FacilityDto facilityDto = createFacilityDto();
+		facilityDto.setFacilityName("Giáp tay 2");
+		facilityDto.setFacilityCategoryName("Vũ khí");
+		facilityDto.setFacilityCategoryId(2);
+		facilityDto.setQuantityUsable(0);
+		facilityDto.setQuantityBroken(0);
+		this.mockMvc.perform(put("/api/facility/headtechnique/updatefacilitybyid/{facilityId}", "1")
+		.content(asJsonString(facilityDto))
+		.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(1));
+	}
+	
+	@Test
+	public void updateFacilitySucessQuantity() throws Exception{
+		FacilityDto facilityDto = createFacilityDto();
+		facilityDto.setFacilityName("Giáp tay 2");
+		facilityDto.setFacilityCategoryName("Vũ khí");
+		facilityDto.setFacilityCategoryId(2);
+		facilityDto.setQuantityUsable(10);
+		facilityDto.setQuantityBroken(0);
+		this.mockMvc.perform(put("/api/facility/headtechnique/updatefacilitybyid/{facilityId}", "1")
+		.content(asJsonString(facilityDto))
+		.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(1));
+	}
+	
+	@Test
+	public void updateFacilityFailName() throws Exception{
+		FacilityDto facilityDto = createFacilityDto();
+		facilityDto.setFacilityName("Súng");
+		facilityDto.setFacilityCategoryName("Vũ khí");
+		facilityDto.setFacilityCategoryId(2);
+		facilityDto.setQuantityUsable(10);
+		facilityDto.setQuantityBroken(0);
+		this.mockMvc.perform(put("/api/facility/headtechnique/updatefacilitybyid/{facilityId}", "1")
+		.content(asJsonString(facilityDto))
+		.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(0));
+	}
+	
+	@Test
+	public void updateFacilityFailQuantity() throws Exception{
+		FacilityDto facilityDto = createFacilityDto();
+		facilityDto.setFacilityName("Giáp tay 2");
+		facilityDto.setFacilityCategoryName("Vũ khí");
+		facilityDto.setFacilityCategoryId(2);
+		facilityDto.setQuantityUsable(10);
+		facilityDto.setQuantityBroken(15);
+		this.mockMvc.perform(put("/api/facility/headtechnique/updatefacilitybyid/{facilityId}", "1")
+		.content(asJsonString(facilityDto))
+		.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(0));
+	}
+	
+	@Test
+	public void getAllFacilityReportSuccess() throws Exception {
+		this.mockMvc.perform(get("/api/facility/headtechnique/getfacilityreport"))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(43));
+	}
+	
+	@Test
+	public void getAllFacilityReportIsAddSuccess() throws Exception {
+		this.mockMvc.perform(get("/api/facility/headtechnique/getfacilityreport").param("filterIndex", "1"))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(23));
+	}
+	
+	@Test
+	public void getAllFacilityReportIsSubSuccess() throws Exception {
+		this.mockMvc.perform(get("/api/facility/headtechnique/getfacilityreport").param("filterIndex", "2"))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value(20));
+	}
+
 
 	public static String asJsonString(final Object obj) {
 		try {
