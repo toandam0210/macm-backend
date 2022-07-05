@@ -39,7 +39,7 @@ public class CommonScheduleServiceImpl implements CommonScheduleService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<CommonSchedule> getAllCommonSchedule = commonScheduleRepository.findAll();
+			List<CommonSchedule> getAllCommonSchedule = commonScheduleRepository.listAll();
 			responseMessage.setData(getAllCommonSchedule);
 			responseMessage.setMessage(Constant.MSG_105);
 		} catch (Exception e) {

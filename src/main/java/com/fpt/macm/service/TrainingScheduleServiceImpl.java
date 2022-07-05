@@ -125,6 +125,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 						commonSession.setFinishTime(trainingSchedule.getFinishTime());
 						commonSession.setCreatedOn(LocalDateTime.now());
 						commonSession.setUpdatedOn(LocalDateTime.now());
+						commonSession.setType(0);
 						commonScheduleRepository.save(commonSession);
 					}
 					else {
@@ -258,6 +259,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					commonSchedule.setFinishTime(scheduleDto.getFinishTime());
 					commonSchedule.setCreatedOn(LocalDateTime.now());
 					commonSchedule.setUpdatedOn(LocalDateTime.now());
+					commonSchedule.setType(0);
 					listCommon.add(commonSchedule);
 				}
 			}
