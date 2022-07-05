@@ -36,7 +36,7 @@ public class AttendanceStatusControllerTest {
 	
 	@Test
 	public void takeAttendanceSuccessTest() throws Exception {
-		this.mockMvc.perform(put("/api/admin/headtechnique/takeattendance/{studentId}", "HE140855")
+		this.mockMvc.perform(put("/api/admin/headtechnique/takeattendance/{studentId}", "HE140855").param("status", "1")
 		.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())
 		.andExpect(content()
@@ -46,12 +46,12 @@ public class AttendanceStatusControllerTest {
 	
 	@Test
 	public void checkAttendanceSuccessTest() throws Exception {
-		this.mockMvc.perform(get("/api/admin/headtechnique/checkattendance/{trainingScheduleId}", 1)
+		this.mockMvc.perform(get("/api/admin/headtechnique/checkattendance/{trainingScheduleId}", 37)
 		.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())
 		.andExpect(content()
 				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("37"));
+		.andExpect(jsonPath("$.data.size()").value("20"));
 	}
 	
 	@Test
@@ -61,6 +61,6 @@ public class AttendanceStatusControllerTest {
 		.andExpect(status().isOk())
 		.andExpect(content()
 				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("19"));
+		.andExpect(jsonPath("$.data.size()").value("20"));
 	}
 }

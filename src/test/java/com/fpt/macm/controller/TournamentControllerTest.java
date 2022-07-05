@@ -1,7 +1,6 @@
 package com.fpt.macm.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -107,16 +106,16 @@ public class TournamentControllerTest {
 		return tournamentDto;
 	}
 	
-	@Test
-	public void createTournamentSuccessTest() throws Exception {
-		Tournament tournament = tournament();
-		this.mockMvc.perform(post("/api/tournament/headclub/createtournament").content(asJsonString(tournament))
-		.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
+//	@Test
+//	public void createTournamentSuccessTest() throws Exception {
+//		Tournament tournament = tournament();
+//		this.mockMvc.perform(post("/api/tournament/headclub/createtournament").content(asJsonString(tournament))
+//		.contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(status().isOk())
+//		.andExpect(content()
+//				.contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(jsonPath("$.data.size()").value("1"));
+//	}
 	
 	@Test
 	public void updateTournamentSuccessTest() throws Exception {
