@@ -33,6 +33,7 @@ import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.RoleRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.UserRepository;
+import com.fpt.macm.security.oauth2.OpenIdConnectUserDetails;
 import com.fpt.macm.security.payload.UserLoginResponse;
 import com.fpt.macm.utils.Utils;
 
@@ -375,7 +376,7 @@ public class UserServiceImpl implements UserService {
 		return responseMessage;
 	}
 	@Override
-	public UserLoginResponse userLogin() {
+	public UserLoginResponse userLogin(OpenIdConnectUserDetails oidConnectUserDetails) {
 			String username = SecurityContextHolder.getContext().getAuthentication().getName();
 			User user = userRepository.findByEmail(username).get();
 			UserLoginResponse userLoginResponse = new UserLoginResponse();
@@ -384,6 +385,7 @@ public class UserServiceImpl implements UserService {
 			userLoginResponse.setRoleId(user.getRole().getId());
 			userLoginResponse.setRoleName(user.getRole().getName());
 			userLoginResponse.setEmail(user.getEmail());
+			userLoginResponse.setToken(oidConnectUserDetails.getToken().getAdditionalInformation().get("id_token").toString());
 		
 		return userLoginResponse;
 	}

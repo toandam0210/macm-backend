@@ -6,6 +6,7 @@ public class UserLoginResponse {
 	private int roleId;
 	private String roleName;
 	private String email;
+	private String token;
 	public String getName() {
 		return name;
 	}
@@ -35,6 +36,12 @@ public class UserLoginResponse {
 	}
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	public String getToken() {
+		return token;
+	}
+	public void setToken(String token) {
+		this.token = token;
 	}
 	
 }
