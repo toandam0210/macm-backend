@@ -17,10 +17,12 @@ import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.EventSchedule;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
+import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
+import com.fpt.macm.repository.TrainingScheduleRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -39,7 +41,13 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	CommonScheduleRepository commonScheduleRepository;
 	
 	@Autowired
+	TrainingScheduleRepository trainingScheduleRepository;
+	
+	@Autowired
 	CommonScheduleService commonScheduleService;
+	
+	@Autowired
+	TrainingScheduleService trainingScheduleService;
 	
 	@Autowired
 	SemesterService semesterService;
@@ -113,6 +121,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 			List<EventSchedule> listEventSchedule = new ArrayList<EventSchedule>();
 			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
 			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
+			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
 			Boolean isInterrupted = false;
 			String title = "";
 			for (ScheduleDto scheduleDto : listPreview) {
@@ -134,6 +143,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 					commonSession.setFinishTime(scheduleDto.getFinishTime());
 					commonSession.setCreatedOn(LocalDateTime.now());
 					commonSession.setUpdatedOn(LocalDateTime.now());
+					commonSession.setType(1);
 					listCommon.add(commonSession);
 				}
 				else {
@@ -155,9 +165,12 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 						commonSession.setFinishTime(scheduleDto.getFinishTime());
 						commonSession.setCreatedOn(LocalDateTime.now());
 						commonSession.setUpdatedOn(LocalDateTime.now());
+						commonSession.setType(1);
 						listCommon.add(commonSession);
 						CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(scheduleDto.getDate());
 						listCommonOverwritten.add(getCommonSession);
+						TrainingSchedule getTrainingSession = trainingScheduleService.getTrainingSessionByDate(scheduleDto.getDate());
+						listTrainingOverwritten.add(getTrainingSession);
 					}
 					else {
 						isInterrupted = true;
@@ -175,6 +188,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 				} else {
 					eventScheduleRepository.saveAll(listEventSchedule);
 					commonScheduleRepository.deleteAll(listCommonOverwritten);
+					trainingScheduleRepository.deleteAll(listTrainingOverwritten);
 					commonScheduleRepository.saveAll(listCommon);
 					responseMessage.setData(listEventSchedule);
 					responseMessage.setMessage(Constant.MSG_066);
@@ -430,6 +444,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 			List<EventSchedule> listEventSchedule = new ArrayList<EventSchedule>();
 			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
 			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
+			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
 			Boolean isInterrupted = false;
 			String title = "";
 			for (ScheduleDto scheduleDto : listPreview) {
@@ -451,6 +466,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 					commonSession.setFinishTime(scheduleDto.getFinishTime());
 					commonSession.setCreatedOn(LocalDateTime.now());
 					commonSession.setUpdatedOn(LocalDateTime.now());
+					commonSession.setType(1);
 					listCommon.add(commonSession);
 				}
 				else {
@@ -475,6 +491,8 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 						listCommon.add(commonSession);
 						CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(scheduleDto.getDate());
 						listCommonOverwritten.add(getCommonSession);
+						TrainingSchedule getTrainingSession = trainingScheduleService.getTrainingSessionByDate(scheduleDto.getDate());
+						listTrainingOverwritten.add(getTrainingSession);
 					}
 					else {
 						isInterrupted = true;
@@ -498,6 +516,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 					}
 					eventScheduleRepository.saveAll(listEventSchedule);
 					commonScheduleRepository.deleteAll(listCommonOverwritten);
+					trainingScheduleRepository.deleteAll(listTrainingOverwritten);
 					commonScheduleRepository.saveAll(listCommon);
 					responseMessage.setData(listEventSchedule);
 					responseMessage.setMessage(Constant.MSG_102);

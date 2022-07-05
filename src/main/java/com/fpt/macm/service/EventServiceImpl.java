@@ -75,6 +75,11 @@ public class EventServiceImpl implements EventService{
 			event.setCreatedOn(LocalDateTime.now());
 			event.setSemester(semester.getName());
 			eventRepository.save(event);
+			//trừ tiền từ clb
+			List<ClubFund> clubFunds = clubFundRepository.findAll();
+			ClubFund clubFund = clubFunds.get(0);
+			clubFund.setFundAmount(clubFund.getFundAmount() - event.getAmountFromClub());
+			clubFundRepository.save(clubFund);
 			responseMessage.setData(Arrays.asList(event));
 			responseMessage.setMessage(Constant.MSG_052);
 		} catch (Exception e) {
@@ -386,8 +391,7 @@ public class EventServiceImpl implements EventService{
 						//trừ tiền từ clb
 						List<ClubFund> clubFunds = clubFundRepository.findAll();
 						ClubFund clubFund = clubFunds.get(0);
-						double fundAmount = clubFund.getFundAmount();
-						clubFund.setFundAmount(fundAmount - money);
+						clubFund.setFundAmount(clubFund.getFundAmount() - money);
 						clubFundRepository.save(clubFund);
 					}
 					else {
@@ -399,8 +403,7 @@ public class EventServiceImpl implements EventService{
 					//cộng tiền vào clb
 					List<ClubFund> clubFunds = clubFundRepository.findAll();
 					ClubFund clubFund = clubFunds.get(0);
-					double fundAmount = clubFund.getFundAmount();
-					clubFund.setFundAmount(fundAmount + money);
+					clubFund.setFundAmount(clubFund.getFundAmount() + money);
 					clubFundRepository.save(clubFund);
 					getEvent.setAmountFromClub(getEvent.getAmountFromClub() - money >= 0 ? getEvent.getAmountFromClub() - money : 0);
 					getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());

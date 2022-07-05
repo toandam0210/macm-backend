@@ -132,6 +132,7 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 					commonSession.setFinishTime(scheduleDto.getFinishTime());
 					commonSession.setCreatedOn(LocalDateTime.now());
 					commonSession.setUpdatedOn(LocalDateTime.now());
+					commonSession.setType(2);
 					listCommon.add(commonSession);
 				} else {
 					if (isOverwritten) {
@@ -207,6 +208,7 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 						commonSession.setFinishTime(tournamentSchedule.getFinishTime());
 						commonSession.setCreatedOn(LocalDateTime.now());
 						commonSession.setUpdatedOn(LocalDateTime.now());
+						commonSession.setType(2);
 						commonScheduleRepository.save(commonSession);
 					}
 					else {
