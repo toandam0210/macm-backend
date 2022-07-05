@@ -105,7 +105,7 @@ public class TournamentScheduleControllerTest {
 		.andExpect(status().isOk())
 		.andExpect(content()
 				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
+		.andExpect(jsonPath("$.data.size()").value("0"));
 	}
 	
 	@Test
@@ -235,7 +235,7 @@ public class TournamentScheduleControllerTest {
 	
 	@Test
 	public void deleteTournamentScheduleSessionSuccessTest() throws Exception {
-		this.mockMvc.perform(delete("/api/tournamentschedule/headclub/tournamentschedule/delete/{tournamentSessionId}", 21))
+		this.mockMvc.perform(delete("/api/tournamentschedule/headclub/tournamentschedule/delete/{tournamentSessionId}", 34))
 		.andExpect(status().isOk())
 		.andExpect(content()
 				.contentType(MediaType.APPLICATION_JSON))
