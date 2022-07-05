@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 import com.fpt.macm.model.CommonSchedule;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.Semester;
 import com.fpt.macm.repository.CommonScheduleRepository;
+import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -19,6 +21,9 @@ public class CommonScheduleServiceImpl implements CommonScheduleService{
 
 	@Autowired
 	CommonScheduleRepository commonScheduleRepository;
+	
+	@Autowired
+	SemesterRepository semesterRepository;
 	
 	@Override
 	public CommonSchedule getCommonSessionByDate(LocalDate date) {
@@ -63,6 +68,22 @@ public class CommonScheduleServiceImpl implements CommonScheduleService{
 			else {
 				responseMessage.setMessage(Constant.MSG_104);
 			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getCommonScheduleBySemester(int semesterId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Semester getSemester = semesterRepository.findById(semesterId).get();
+			List<CommonSchedule> getCommonScheduleBySemester = commonScheduleRepository.listCommonScheduleByTime(getSemester.getStartDate(), getSemester.getEndDate());
+			responseMessage.setData(getCommonScheduleBySemester);
+			responseMessage.setMessage(Constant.MSG_130 + getSemester.getName());
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

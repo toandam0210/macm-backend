@@ -226,6 +226,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 						commonSession.setFinishTime(eventSchedule.getFinishTime());
 						commonSession.setCreatedOn(LocalDateTime.now());
 						commonSession.setUpdatedOn(LocalDateTime.now());
+						commonSession.setType(1);
 						commonScheduleRepository.save(commonSession);
 					}
 					else {
@@ -488,6 +489,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 						commonSession.setFinishTime(scheduleDto.getFinishTime());
 						commonSession.setCreatedOn(LocalDateTime.now());
 						commonSession.setUpdatedOn(LocalDateTime.now());
+						commonSession.setType(1);
 						listCommon.add(commonSession);
 						CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(scheduleDto.getDate());
 						listCommonOverwritten.add(getCommonSession);
