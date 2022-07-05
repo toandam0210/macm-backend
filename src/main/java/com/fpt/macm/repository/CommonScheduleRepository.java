@@ -16,4 +16,7 @@ public interface CommonScheduleRepository extends JpaRepository<CommonSchedule, 
 	
 	@Query(value = "select * from common_schedule order by date asc", nativeQuery = true)
 	List<CommonSchedule> listAll();
+	
+	@Query(value = "select * from common_schedule where date between ?1 and ?2", nativeQuery = true)
+	List<CommonSchedule> listCommonScheduleByTime(LocalDate startDate, LocalDate finishDate);
 }
