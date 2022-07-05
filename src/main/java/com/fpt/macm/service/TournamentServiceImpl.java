@@ -112,6 +112,8 @@ public class TournamentServiceImpl implements TournamentService {
 			tournament.setSemester(semester.getName());
 			tournament.setCreatedBy("toandv");
 			tournament.setCreatedOn(LocalDateTime.now());
+			tournament.setTotalAmount(0);
+			tournament.setTotalAmountFromClubActual(0);
 			Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 			Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
 			for (CompetitiveType competitiveType : competitiveTypes) {
@@ -229,9 +231,7 @@ public class TournamentServiceImpl implements TournamentService {
 				Tournament tournament = tournamentOp.get();
 				tournament.setName(tournamentDto.getName());
 				tournament.setMaxQuantityComitee(tournamentDto.getMaxQuantityComitee());
-				tournament.setAmount_per_register(tournamentDto.getAmount_per_register());
 				tournament.setDescription(tournamentDto.getDescription());
-				tournament.setTotalAmount(tournamentDto.getTotalAmount());
 				Set<CompetitiveTypeDto> competitiveTypeDtos = tournamentDto.getCompetitiveTypesDto();
 				Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 				Set<ExhibitionTypeDto> exhibitionTypeDtos = tournamentDto.getExhibitionTypesDto();
@@ -377,12 +377,16 @@ public class TournamentServiceImpl implements TournamentService {
 				}
 				tournamentDto.setCompetitiveTypesDto(competitiveTypeDtos);
 				tournamentDto.setExhibitionTypesDto(exhibitionTypeDtos);
-				tournamentDto.setAmount_per_register(tournament.getAmount_per_register());
+				tournamentDto.setFeeOrganizingCommiteePay(tournament.getFeeOrganizingCommiteePay());
+				tournamentDto.setFeePlayerPay(tournament.getFeePlayerPay());
 				tournamentDto.setMaxQuantityComitee(tournament.getMaxQuantityComitee());
 				tournamentDto.setStartDate(startDate);
 				tournamentDto.setTotalAmount(tournament.getTotalAmount());
 				tournamentDto.setName(tournament.getName());
 				tournamentDto.setId(tournament.getId());
+				tournamentDto.setTotalAmountEstimate(tournament.getTotalAmountEstimate());
+				tournamentDto.setTotalAmountFromClubActual(tournament.getTotalAmountFromClubActual());
+				tournamentDto.setTotalAmountFromClubEstimate(tournament.getTotalAmountFromClubEstimate());
 				tournamentDtos.add(tournamentDto);
 
 			}
@@ -759,7 +763,7 @@ public class TournamentServiceImpl implements TournamentService {
 			ClubFund clubFund = clubFunds.get(0);
 			double fundAmount = clubFund.getFundAmount();
 
-			double tournamentFee = tournament.getAmount_per_register();
+			double tournamentFee = tournament.getFeeOrganizingCommiteePay();
 
 			double fundBalance = tournamentOrganizingCommittee.isPaymentStatus() ? (fundAmount - tournamentFee)
 					: (fundAmount + tournamentFee);
@@ -853,7 +857,7 @@ public class TournamentServiceImpl implements TournamentService {
 			ClubFund clubFund = clubFunds.get(0);
 			double fundAmount = clubFund.getFundAmount();
 
-			double tournamentFee = tournament.getAmount_per_register();
+			double tournamentFee = tournament.getFeePlayerPay();
 
 			double fundBalance = tournamentPlayer.isPaymentStatus() ? (fundAmount - tournamentFee)
 					: (fundAmount + tournamentFee);

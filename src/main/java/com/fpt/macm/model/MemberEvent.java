@@ -31,10 +31,13 @@ public class MemberEvent {
 	private RoleEvent roleEvent;
 
 	@Column
-	private boolean attendanceStatus;
+	private boolean registerStatus;
 
 	@Column
-	private boolean paymentStatus;
+	private double paymentValue;
+	
+	@Column
+	private boolean isPaidBeforeClosing;
 
 	@Column
 	private String createdBy;
@@ -47,7 +50,6 @@ public class MemberEvent {
 
 	@Column
 	private LocalDateTime updatedOn;
-	
 
 	public int getId() {
 		return id;
@@ -81,22 +83,18 @@ public class MemberEvent {
 		this.roleEvent = roleEvent;
 	}
 
-	public boolean getAttendanceStatus() {
-		return attendanceStatus;
+	public boolean isRegisterStatus() {
+		return registerStatus;
 	}
 
-	public void setAttendanceStatus(boolean attendanceStatus) {
-		this.attendanceStatus = attendanceStatus;
-	}
-
-	public boolean getPaymentStatus() {
-		return paymentStatus;
+	public void setRegisterStatus(boolean registerStatus) {
+		this.registerStatus = registerStatus;
 	}
 
 	public String getCreatedBy() {
 		return createdBy;
 	}
-
+	
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}
@@ -125,14 +123,20 @@ public class MemberEvent {
 		this.updatedOn = updatedOn;
 	}
 
-	public boolean isPaymentStatus() {
-		return paymentStatus;
+	public double getPaymentValue() {
+		return paymentValue;
 	}
 
-	public void setPaymentStatus(boolean paymentStatus) {
-		this.paymentStatus = paymentStatus;
+	public void setPaymentValue(double paymentValue) {
+		this.paymentValue = paymentValue;
 	}
-	
-	
+
+	public boolean isPaidBeforeClosing() {
+		return isPaidBeforeClosing;
+	}
+
+	public void setPaidBeforeClosing(boolean isPaidBeforeClosing) {
+		this.isPaidBeforeClosing = isPaidBeforeClosing;
+	}
 
 }

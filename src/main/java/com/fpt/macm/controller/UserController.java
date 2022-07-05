@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fpt.macm.dto.InforInQrCode;
 import com.fpt.macm.dto.UserDto;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.service.UserService;
@@ -28,53 +29,53 @@ import com.fpt.macm.service.UserService;
 public class UserController {
 
 	@Autowired
-	UserService userSerivce;
+	UserService userService;
 
 	@GetMapping("/getbystudentid/{studentId}")
 	ResponseEntity<ResponseMessage> getUserByStudentId(@PathVariable(name = "studentId") String studentId) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.getUserByStudentId(studentId), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.getUserByStudentId(studentId), HttpStatus.OK);
 	}
 
 	@GetMapping("/viceheadclub/getalladmin")
 	ResponseEntity<ResponseMessage> getAllAdminForViceHeadClub(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.getAllAdminForViceHeadClub(pageNo, pageSize, sortBy),
+		return new ResponseEntity<ResponseMessage>(userService.getAllAdminForViceHeadClub(pageNo, pageSize, sortBy),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/headclub/getalladmin")
 	ResponseEntity<ResponseMessage> getAllAdminForHeadClub(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.getAllAdminForHeadClub(pageNo, pageSize, sortBy),
+		return new ResponseEntity<ResponseMessage>(userService.getAllAdminForHeadClub(pageNo, pageSize, sortBy),
 				HttpStatus.OK);
 	}
 
 	@PutMapping("/updateuser/{studentId}")
 	ResponseEntity<ResponseMessage> updateUserByStudentId(@PathVariable(name = "studentId") String studentId,
 			@RequestBody UserDto userDto) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.updateUser(studentId, userDto), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.updateUser(studentId, userDto), HttpStatus.OK);
 	}
 
 	@PutMapping("/deleteadmin/{studentId}")
 	ResponseEntity<ResponseMessage> deleteAdminByStudentId(@PathVariable(name = "studentId") String studentId, @RequestParam String semester) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.deleteAdmin(studentId,semester), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.deleteAdmin(studentId,semester), HttpStatus.OK);
 	}
 
 	@GetMapping("/getallmemberandcollaborator")
 	ResponseEntity<ResponseMessage> getAllMemberAndCollaborator(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.getAllMemberAndCollaborator(pageNo, pageSize, sortBy),
+		return new ResponseEntity<ResponseMessage>(userService.getAllMemberAndCollaborator(pageNo, pageSize, sortBy),
 				HttpStatus.OK);
 	}
 
 	@PostMapping("/adduser")
 	ResponseEntity<ResponseMessage> addNewMember(@RequestBody UserDto user) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.addAnMemberOrCollaborator(user), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.addAnMemberOrCollaborator(user), HttpStatus.OK);
 	}
 
 	@PutMapping("/updatestatus")
 	ResponseEntity<ResponseMessage> updateStatusForUser(@RequestParam String studentId, @RequestParam String semester) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.updateStatusForUser(studentId,semester), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.updateStatusForUser(studentId,semester), HttpStatus.OK);
 	}
 
 	@GetMapping("/users/search")
@@ -82,18 +83,18 @@ public class UserController {
 			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
 			@RequestParam(defaultValue = "id") String sortBy) {
 		return new ResponseEntity<ResponseMessage>(
-				userSerivce.searchUserByStudentIdOrName(inputSearch, pageNo, pageSize, sortBy), HttpStatus.OK);
+				userService.searchUserByStudentIdOrName(inputSearch, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 
 	@PostMapping("/users/import")
 	ResponseEntity<ResponseMessage> addListUserFromExcel(@RequestParam("file") MultipartFile file) throws Exception {
-		return new ResponseEntity<ResponseMessage>(userSerivce.addUsersFromExcel(file), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.addUsersFromExcel(file), HttpStatus.OK);
 	}
 
 	@GetMapping("/users/export")
 	public ResponseEntity<Resource> exportListUserToExcel() {
 		String filename = "users.xlsx";
-		InputStreamResource file = new InputStreamResource(userSerivce.exportUsersToExcel());
+		InputStreamResource file = new InputStreamResource(userService.exportUsersToExcel());
 
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
 				.contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(file);
@@ -102,28 +103,33 @@ public class UserController {
 	@GetMapping("/viceheadclub/getallmembers")
 	ResponseEntity<ResponseMessage> getAllMembers(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.findAllMember(pageNo, pageSize, sortBy), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.findAllMember(pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 	
 	@GetMapping("/viceheadclub/getallusers")
 	ResponseEntity<ResponseMessage> getAllUsers() {
-		return new ResponseEntity<ResponseMessage>(userSerivce.getAllUser(), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.getAllUser(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/viceheadclub/getmembers/semester")
 	ResponseEntity<ResponseMessage> getMembersBySemester(@RequestParam String semester) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.getMembersBySemester(semester), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.getMembersBySemester(semester), HttpStatus.OK);
 	}
 	
 	@GetMapping("/viceheadclub/getadmins/semester")
 	ResponseEntity<ResponseMessage> getAdminsBySemester(@RequestParam String semester) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.getAdminBySemester(semester), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.getAdminBySemester(semester), HttpStatus.OK);
 	}
 	
 	@PostMapping("/viceheadclub/member/search")
 	ResponseEntity<ResponseMessage> searchByMutipleField(@RequestBody List<UserDto> userDtos,@RequestParam(required = false,defaultValue = "") String name,@RequestParam(required = false,defaultValue = "") String studentId,@RequestParam(required = false,defaultValue = "") String email,@RequestParam(required = false,defaultValue = "") String gender,
 			@RequestParam(required = false) Integer generation,@RequestParam(required = false) Integer roleId,@RequestParam(required = false,defaultValue = "") String isActive,@RequestParam(required = false,defaultValue = "") String dateFrom,@RequestParam(required = false,defaultValue = "") String dateTo) {
-		return new ResponseEntity<ResponseMessage>(userSerivce.searchByMultipleField(userDtos, name, studentId, email, gender, generation, roleId, isActive, dateFrom, dateTo), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.searchByMultipleField(userDtos, name, studentId, email, gender, generation, roleId, isActive, dateFrom, dateTo), HttpStatus.OK);
+	}
+	
+	@PostMapping("/member/qrcode/create")
+	ResponseEntity<ResponseMessage> generateQrCode(@RequestBody InforInQrCode inforInQrCode) {
+		return new ResponseEntity<ResponseMessage>(userService.generateQrCode(inforInQrCode), HttpStatus.OK);
 	}
 
 }

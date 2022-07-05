@@ -29,12 +29,12 @@ public class EventPaymentStatusReport {
 
 	@Column
 	private double fundChange;
-	
+
 	@Column
 	private double fundBalance;
 
 	@Column
-	private boolean paymentStatus;
+	private double paymentValue;
 
 	@Column
 	private LocalDateTime createdOn;
@@ -74,14 +74,6 @@ public class EventPaymentStatusReport {
 		this.fundChange = fundChange;
 	}
 
-	public boolean isPaymentStatus() {
-		return paymentStatus;
-	}
-
-	public void setPaymentStatus(boolean paymentStatus) {
-		this.paymentStatus = paymentStatus;
-	}
-
 	public LocalDateTime getCreatedOn() {
 		return createdOn;
 	}
@@ -104,6 +96,14 @@ public class EventPaymentStatusReport {
 
 	public void setFundBalance(double fundBalance) {
 		this.fundBalance = fundBalance;
+	}
+
+	public double getPaymentValue() {
+		return paymentValue;
+	}
+
+	public void setPaymentValue(double paymentValue) {
+		this.paymentValue = paymentValue;
 	}
 
 }

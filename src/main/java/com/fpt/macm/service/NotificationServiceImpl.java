@@ -63,9 +63,8 @@ public class NotificationServiceImpl implements NotificationService{
 	}
 
 	@Override
-	public ResponseMessage sendNotificationToAllUser(Notification notification) {
+	public void sendNotificationToAllUser(Notification notification) {
 		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<User> users = (List<User>) userRepository.findAll();
 			
@@ -83,16 +82,25 @@ public class NotificationServiceImpl implements NotificationService{
 				
 				notificationToUserRepository.save(notificationToUser);
 			}
-			
-			
-			responseMessage.setData(notificationToUsers);
-			responseMessage.setMessage(Constant.MSG_018);
 		} catch (Exception e) {
 			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
 		}
-		
-		return responseMessage;
+	}
+
+	@Override
+	public void sendNotificationToAnUser(User user, Notification notification) {
+		// TODO Auto-generated method stub
+		try {
+			NotificationToUser notificationToUser = new NotificationToUser();
+				
+			notificationToUser.setNotification(notification);
+			notificationToUser.setUser(user);
+			notificationToUser.setRead(false);
+			notificationToUser.setCreatedOn(LocalDateTime.now());
+			notificationToUserRepository.save(notificationToUser);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
 	}
 
 }
