@@ -52,7 +52,7 @@ public class TrainingScheduleController {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.updateTrainingSessionTime(date, commonSchedule), HttpStatus.OK);
 	}
 	
-	@PutMapping("/headtechnique/deletesession/{trainingId}")
+	@PutMapping("/headtechnique/deletesession")
 	ResponseEntity<ResponseMessage> deleteTrainingSession(@RequestParam String date) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.deleteTrainingSession(date), HttpStatus.OK);
 	}
