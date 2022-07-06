@@ -23,11 +23,11 @@ public class CompetitiveMatch {
 	private int round;
 	
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "competitiveTypeId")
+	@JoinColumn(name = "first_competitive_player")
 	private CompetitivePlayerBracket firstPlayer;
 	
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "competitiveTypeId")
+	@JoinColumn(name = "second_competitive_player")
 	private CompetitivePlayerBracket secondPlayer;
 	
 	@Column
