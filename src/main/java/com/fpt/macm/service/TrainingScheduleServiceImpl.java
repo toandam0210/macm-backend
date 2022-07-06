@@ -125,6 +125,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 						commonSession.setFinishTime(trainingSchedule.getFinishTime());
 						commonSession.setCreatedOn(LocalDateTime.now());
 						commonSession.setUpdatedOn(LocalDateTime.now());
+						commonSession.setType(0);
 						commonScheduleRepository.save(commonSession);
 					}
 					else {
@@ -158,25 +159,27 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 	}
 
 	@Override
-	public ResponseMessage updateTrainingSessionTime(int trainingScheduleId, CommonSchedule updateCommonSession) {
+	public ResponseMessage updateTrainingSessionTime(String date, CommonSchedule updateCommonSession) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<TrainingSchedule> currentSession = trainingScheduleRepository.findById(trainingScheduleId);
-			TrainingSchedule getTrainingSession = currentSession.get();
-			if(getTrainingSession.getDate().compareTo(LocalDate.now()) > 0) {
-				getTrainingSession.setStartTime(updateCommonSession.getStartTime());
-				getTrainingSession.setFinishTime(updateCommonSession.getFinishTime());
-				getTrainingSession.setUpdatedBy("LinhLHN");
-				getTrainingSession.setUpdatedOn(LocalDateTime.now());
-				trainingScheduleRepository.save(getTrainingSession);
-				responseMessage.setData(Arrays.asList(getTrainingSession));
-				responseMessage.setMessage(Constant.MSG_042);
+			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
+			if(getDate.compareTo(LocalDate.now()) > 0) {
+				TrainingSchedule getTrainingSession = getTrainingSessionByDate(getDate);
 				CommonSchedule commonSession = commonScheduleService.getCommonSessionByDate(getTrainingSession.getDate());
-				commonSession.setStartTime(updateCommonSession.getStartTime());
-				commonSession.setFinishTime(updateCommonSession.getFinishTime());
-				commonSession.setUpdatedOn(LocalDateTime.now());
-				commonScheduleRepository.save(commonSession);
+				if(getTrainingSession != null && commonSession.getType() == 0) {
+					getTrainingSession.setStartTime(updateCommonSession.getStartTime());
+					getTrainingSession.setFinishTime(updateCommonSession.getFinishTime());
+					getTrainingSession.setUpdatedBy("LinhLHN");
+					getTrainingSession.setUpdatedOn(LocalDateTime.now());
+					trainingScheduleRepository.save(getTrainingSession);
+					commonSession.setStartTime(updateCommonSession.getStartTime());
+					commonSession.setFinishTime(updateCommonSession.getFinishTime());
+					commonSession.setUpdatedOn(LocalDateTime.now());
+					commonScheduleRepository.save(commonSession);
+					responseMessage.setData(Arrays.asList(getTrainingSession));
+					responseMessage.setMessage(Constant.MSG_042);
+				}
 			}
 			else {
 				responseMessage.setMessage(Constant.MSG_043);
@@ -189,18 +192,20 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 	}
 
 	@Override
-	public ResponseMessage deleteTrainingSession(int trainingScheduleId) {
+	public ResponseMessage deleteTrainingSession(String date) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<TrainingSchedule> currentSession = trainingScheduleRepository.findById(trainingScheduleId);
-			TrainingSchedule getTrainingSession = currentSession.get();
-			if(getTrainingSession.getDate().compareTo(LocalDate.now()) > 0) {
-				trainingScheduleRepository.delete(getTrainingSession);
-				responseMessage.setData(Arrays.asList(getTrainingSession));
-				responseMessage.setMessage(Constant.MSG_044);
+			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
+			if(getDate.compareTo(LocalDate.now()) > 0) {
+				TrainingSchedule getTrainingSession = getTrainingSessionByDate(getDate);
 				CommonSchedule commonSession = commonScheduleService.getCommonSessionByDate(getTrainingSession.getDate());
-				commonScheduleRepository.delete(commonSession);
+				if(getTrainingSession != null && commonSession.getType() == 0) {
+					trainingScheduleRepository.delete(getTrainingSession);
+					commonScheduleRepository.delete(commonSession);
+					responseMessage.setData(Arrays.asList(getTrainingSession));
+					responseMessage.setMessage(Constant.MSG_044);
+				}
 			}
 			else {
 				responseMessage.setMessage(Constant.MSG_045);
@@ -258,6 +263,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					commonSchedule.setFinishTime(scheduleDto.getFinishTime());
 					commonSchedule.setCreatedOn(LocalDateTime.now());
 					commonSchedule.setUpdatedOn(LocalDateTime.now());
+					commonSchedule.setType(0);
 					listCommon.add(commonSchedule);
 				}
 			}

@@ -13,8 +13,8 @@ public interface TrainingScheduleService {
 	ResponseMessage createTrainingSchedule(List<ScheduleDto> listPreview);
 	ResponseMessage createTrainingSession(TrainingSchedule trainingSchedule);
 	ResponseMessage getListTrainingSchedule();
-	ResponseMessage updateTrainingSessionTime(int trainingScheduleId, CommonSchedule updateCommonSession);
-	ResponseMessage deleteTrainingSession(int trainingScheduleId);
+	ResponseMessage updateTrainingSessionTime(String date, CommonSchedule updateCommonSession);
+	ResponseMessage deleteTrainingSession(String date);
 	ResponseMessage getTrainingSessionByDate(String date);
 	ResponseMessage getTraningScheduleBySemester(int semesterId);
 	TrainingSchedule getTrainingSessionByDate(LocalDate date);

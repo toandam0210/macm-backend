@@ -47,14 +47,14 @@ public class TrainingScheduleController {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSchedule(listPreview), HttpStatus.OK);
 	}
 	
-	@PutMapping("/headtechnique/updatesession/{trainingId}")
-	ResponseEntity<ResponseMessage> updateTrainingSessionTime(@PathVariable(name = "trainingId") int trainingId, @RequestBody CommonSchedule commonSchedule) {
-		return new ResponseEntity<ResponseMessage>(trainingScheduleService.updateTrainingSessionTime(trainingId, commonSchedule), HttpStatus.OK);
+	@PutMapping("/headtechnique/updatesession")
+	ResponseEntity<ResponseMessage> updateTrainingSessionTime(@RequestParam String date, @RequestBody CommonSchedule commonSchedule) {
+		return new ResponseEntity<ResponseMessage>(trainingScheduleService.updateTrainingSessionTime(date, commonSchedule), HttpStatus.OK);
 	}
 	
-	@PutMapping("/headtechnique/deletesession/{trainingId}")
-	ResponseEntity<ResponseMessage> deleteTrainingSession(@PathVariable(name = "trainingId") int trainingId) {
-		return new ResponseEntity<ResponseMessage>(trainingScheduleService.deleteTrainingSession(trainingId), HttpStatus.OK);
+	@PutMapping("/headtechnique/deletesession")
+	ResponseEntity<ResponseMessage> deleteTrainingSession(@RequestParam String date) {
+		return new ResponseEntity<ResponseMessage>(trainingScheduleService.deleteTrainingSession(date), HttpStatus.OK);
 	}
 	
 	@GetMapping("/gettrainingschedulebysemester/{semesterId}")

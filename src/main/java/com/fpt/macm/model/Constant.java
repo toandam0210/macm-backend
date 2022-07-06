@@ -179,6 +179,7 @@ public class Constant {
 	public static final String MSG_127 = "Không thành công. Không thể cập nhật sự kiện trong quá khứ";
 	public static final String MSG_128 = "Không thành công. Không thể tổng kết sự kiện chưa kết thúc";
 	public static final String MSG_129 = "Tổng kết sự kiện thành công";
+	public static final String MSG_130 = "Lịch hoạt động theo kỳ ";
 	public static String messageEvent(Event event) {
 		return "Chỉ còn một ngày nữa là sự kiện " + event.getName() + " mà bạn đã đăng ký sẽ diễn ra. Bạn nhớ tham gia nhé!";
 	}
