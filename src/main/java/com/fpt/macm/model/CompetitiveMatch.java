@@ -7,24 +7,28 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "competitive_type")
-public class CompetitiveType {
+@Table(name = "competitive_match")
+public class CompetitiveMatch {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
 	@Column
-	private double weightMin;
+	private int round;
 	
-	@Column
-	private double weightMax;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "competitiveTypeId")
+	private CompetitivePlayerBracket firstPlayer;
 	
-	@Column
-	private boolean gender;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "competitiveTypeId")
+	private CompetitivePlayerBracket secondPlayer;
 	
 	@Column
 	private String createdBy;
@@ -46,28 +50,28 @@ public class CompetitiveType {
 		this.id = id;
 	}
 
-	public double getWeightMin() {
-		return weightMin;
+	public int getRound() {
+		return round;
 	}
 
-	public void setWeightMin(double weightMin) {
-		this.weightMin = weightMin;
+	public void setRound(int round) {
+		this.round = round;
 	}
 
-	public double getWeightMax() {
-		return weightMax;
+	public CompetitivePlayerBracket getFirstPlayer() {
+		return firstPlayer;
 	}
 
-	public void setWeightMax(double weightMax) {
-		this.weightMax = weightMax;
+	public void setFirstPlayer(CompetitivePlayerBracket firstPlayer) {
+		this.firstPlayer = firstPlayer;
 	}
 
-	public boolean isGender() {
-		return gender;
+	public CompetitivePlayerBracket getSecondPlayer() {
+		return secondPlayer;
 	}
 
-	public void setGender(boolean gender) {
-		this.gender = gender;
+	public void setSecondPlayer(CompetitivePlayerBracket secondPlayer) {
+		this.secondPlayer = secondPlayer;
 	}
 
 	public String getCreatedBy() {
@@ -101,7 +105,6 @@ public class CompetitiveType {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
-	
 	
 	
 }

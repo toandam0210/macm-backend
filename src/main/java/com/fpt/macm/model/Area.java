@@ -10,21 +10,15 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "competitive_type")
-public class CompetitiveType {
+@Table(name = "area")
+public class Area {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
 	@Column
-	private double weightMin;
-	
-	@Column
-	private double weightMax;
-	
-	@Column
-	private boolean gender;
+	private String name;
 	
 	@Column
 	private String createdBy;
@@ -46,28 +40,12 @@ public class CompetitiveType {
 		this.id = id;
 	}
 
-	public double getWeightMin() {
-		return weightMin;
+	public String getName() {
+		return name;
 	}
 
-	public void setWeightMin(double weightMin) {
-		this.weightMin = weightMin;
-	}
-
-	public double getWeightMax() {
-		return weightMax;
-	}
-
-	public void setWeightMax(double weightMax) {
-		this.weightMax = weightMax;
-	}
-
-	public boolean isGender() {
-		return gender;
-	}
-
-	public void setGender(boolean gender) {
-		this.gender = gender;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public String getCreatedBy() {
@@ -101,7 +79,6 @@ public class CompetitiveType {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
-	
 	
 	
 }
