@@ -7,24 +7,32 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "competitive_type")
-public class CompetitiveType {
+@Table(name = "competitive_bracket")
+public class CompetitivePlayerBracket {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column
-	private double weightMin;
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "competitiveTypeId")
+	private CompetitiveType competitiveType;
+	
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "playerId")
+	private CompetitivePlayer competitivePlayer;
+	
 	
 	@Column
-	private double weightMax;
+	private int round;
 	
 	@Column
-	private boolean gender;
+	private int numerical_order_id;
 	
 	@Column
 	private String createdBy;
@@ -46,28 +54,36 @@ public class CompetitiveType {
 		this.id = id;
 	}
 
-	public double getWeightMin() {
-		return weightMin;
+	public CompetitiveType getCompetitiveType() {
+		return competitiveType;
 	}
 
-	public void setWeightMin(double weightMin) {
-		this.weightMin = weightMin;
+	public void setCompetitiveType(CompetitiveType competitiveType) {
+		this.competitiveType = competitiveType;
 	}
 
-	public double getWeightMax() {
-		return weightMax;
+	public CompetitivePlayer getCompetitivePlayer() {
+		return competitivePlayer;
 	}
 
-	public void setWeightMax(double weightMax) {
-		this.weightMax = weightMax;
+	public void setCompetitivePlayer(CompetitivePlayer competitivePlayer) {
+		this.competitivePlayer = competitivePlayer;
 	}
 
-	public boolean isGender() {
-		return gender;
+	public int getNumerical_order_id() {
+		return numerical_order_id;
 	}
 
-	public void setGender(boolean gender) {
-		this.gender = gender;
+	public void setNumerical_order_id(int numerical_order_id) {
+		this.numerical_order_id = numerical_order_id;
+	}
+
+	public int getRound() {
+		return round;
+	}
+
+	public void setRound(int round) {
+		this.round = round;
 	}
 
 	public String getCreatedBy() {
@@ -101,7 +117,5 @@ public class CompetitiveType {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
-	
-	
 	
 }
