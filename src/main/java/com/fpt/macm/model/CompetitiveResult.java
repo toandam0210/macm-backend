@@ -1,6 +1,5 @@
 package com.fpt.macm.model;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.CascadeType;
@@ -15,7 +14,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "competitive_type")
+@Table(name = "competitive_result")
 public class CompetitiveResult {
 	
 	@Id
