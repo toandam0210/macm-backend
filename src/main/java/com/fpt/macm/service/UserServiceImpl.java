@@ -28,6 +28,7 @@ import com.fpt.macm.model.Role;
 import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.AdminSemesterRepository;
+import com.fpt.macm.repository.CollaboratorReportRepository;
 import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.RoleRepository;
 import com.fpt.macm.repository.SemesterRepository;
@@ -54,6 +55,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	SemesterService semesterService;
+	
+	@Autowired
+	CollaboratorReportRepository collaboratorReportRepository;
 	
 	private static final int ORDER_QR_CODE_SIZE_WIDTH = 300;
     private static final int ORDER_QR_CODE_SIZE_HEIGHT = 300;
