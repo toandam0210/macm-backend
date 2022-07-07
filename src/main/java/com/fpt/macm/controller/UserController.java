@@ -131,5 +131,5 @@ public class UserController {
 	ResponseEntity<ResponseMessage> generateQrCode(@RequestBody InforInQrCode inforInQrCode) {
 		return new ResponseEntity<ResponseMessage>(userService.generateQrCode(inforInQrCode), HttpStatus.OK);
 	}
-
+	
 }

@@ -106,7 +106,7 @@ public class TaskSchedule {
 		int countFemale = 0;
 		Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 		collaboratorReport.setNumberJoin(listCollaborator.size());
-		collaboratorReport.setSemester(semester);
+		collaboratorReport.setSemester(semester.getName());
 		for (User collaborator : listCollaborator) {
 			if (LocalDate.now().compareTo(collaborator.getCreatedOn().plusMonths(1).plusDays(1)) == 0) {
 				if (collaborator.isGender()) {
@@ -118,18 +118,12 @@ public class TaskSchedule {
 					countPassed++;
 					role.setId(collaborator.getRole().getId() - 3);
 					collaborator.setRole(role);
+					collaborator.setUpdatedBy("Hệ Thống");
+					collaborator.setUpdatedOn(LocalDateTime.now());
 					userRepository.save(collaborator);
 					MemberSemester statusSemester = new MemberSemester();
 					statusSemester.setUser(collaborator);
-					if (LocalDate.now().getMonthValue() == 1) {
-						statusSemester.setSemester("Spring" + LocalDate.now().getYear());
-					}
-					if (LocalDate.now().getMonthValue() == 5) {
-						statusSemester.setSemester("Summer" + LocalDate.now().getYear());
-					}
-					if (LocalDate.now().getMonthValue() == 9) {
-						statusSemester.setSemester("Fall" + LocalDate.now().getYear());
-					}
+					statusSemester.setSemester(semester.getName());
 					statusSemester.setStatus(collaborator.isActive());
 					stautsSemesterRepository.save(statusSemester);
 				} else {
@@ -159,20 +153,20 @@ public class TaskSchedule {
 			List<User> members = userRepository.findMemberWithoutPaging();
 			List<User> admins = userRepository.findAllAdmin();
 			for (User user : members) {
-				MemberSemester statusSemester = new MemberSemester();
-				statusSemester.setUser(user);
-				if (LocalDate.now().getMonthValue() == 1) {
-					statusSemester.setSemester("Spring" + LocalDate.now().getYear());
-				}
-				if (LocalDate.now().getMonthValue() == 5) {
-					statusSemester.setSemester("Summer" + LocalDate.now().getYear());
-				}
-				if (LocalDate.now().getMonthValue() == 9) {
-					statusSemester.setSemester("Fall" + LocalDate.now().getYear());
-				}
-				statusSemester.setStatus(user.isActive());
-				stautsSemesterRepository.save(statusSemester);
-				logger.info("add member oke");
+					MemberSemester statusSemester = new MemberSemester();
+					statusSemester.setUser(user);
+					if (LocalDate.now().getMonthValue() == 1) {
+						statusSemester.setSemester("Spring" + LocalDate.now().getYear());
+					}
+					if (LocalDate.now().getMonthValue() == 5) {
+						statusSemester.setSemester("Summer" + LocalDate.now().getYear());
+					}
+					if (LocalDate.now().getMonthValue() == 9) {
+						statusSemester.setSemester("Fall" + LocalDate.now().getYear());
+					}
+					statusSemester.setStatus(user.isActive());
+					stautsSemesterRepository.save(statusSemester);
+					logger.info("add member oke");
 			}
 			for (User user : admins) {
 				AdminSemester adminSemester = new AdminSemester();
@@ -190,6 +184,7 @@ public class TaskSchedule {
 				adminSemesterRepository.save(adminSemester);
 				logger.info("add admin oke");
 			}
+			logger.info("loi roi");
 		}
 	}
 
