@@ -21,11 +21,14 @@ public class MacmApplication {
 		@Override
 		public void addCorsMappings(CorsRegistry reg) {
 			reg.addMapping("/**")
-	        .allowedOrigins("*")
+	        .allowedOriginPatterns("*")
 	        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-	        .maxAge(3600);
+	        .allowedHeaders("Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method",
+                    "Access-Control-Request-Headers")
+            .exposedHeaders("Access-Control-Allow-Origin", "Access-Control-Allow-Credentials")
+            .allowCredentials(true).maxAge(3600);
 		}
 		};
 	}
-
+	
 }
