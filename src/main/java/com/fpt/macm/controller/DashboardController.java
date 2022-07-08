@@ -32,4 +32,9 @@ public class DashboardController {
 	ResponseEntity<ResponseMessage> getEventReport() {
 		return new ResponseEntity<ResponseMessage>(dashboardService.eventReport(), HttpStatus.OK);
 	}
+	
+	@GetMapping("/member/status")
+	ResponseEntity<ResponseMessage> getUserStatusReport() {
+		return new ResponseEntity<ResponseMessage>(dashboardService.statusMemberReport(), HttpStatus.OK);
+	}
 }
