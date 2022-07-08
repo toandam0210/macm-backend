@@ -3,6 +3,7 @@ package com.fpt.macm.schedule;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,7 @@ import com.fpt.macm.model.Role;
 import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.model.User;
+import com.fpt.macm.model.UserStatusReport;
 import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.AttendanceEventRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
@@ -37,6 +39,7 @@ import com.fpt.macm.repository.MembershipShipInforRepository;
 import com.fpt.macm.repository.MembershipStatusRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.UserRepository;
+import com.fpt.macm.repository.UserStatusReportRepository;
 import com.fpt.macm.service.EventScheduleServiceImpl;
 import com.fpt.macm.service.EventService;
 import com.fpt.macm.service.NotificationService;
@@ -90,6 +93,9 @@ public class TaskSchedule {
 
 	@Autowired
 	NotificationService notificationService;
+	
+	@Autowired
+	UserStatusReportRepository userStatusReportRepository;
 
 	@Autowired
 	SemesterService semesterService;
@@ -137,6 +143,13 @@ public class TaskSchedule {
 				}
 			}
 		}
+		Optional<UserStatusReport> userStatusReportOp = userStatusReportRepository.findBySemester(semester.getName());
+		if(userStatusReportOp.isPresent()) {
+			UserStatusReport userStatusReport = userStatusReportOp.get();
+			userStatusReport.setNumberActiveInSemester(userStatusReport.getNumberActiveInSemester() + countPassed);
+			userStatusReport.setTotalNumberUserInSemester(userStatusReport.getTotalNumberUserInSemester() + countPassed);
+			userStatusReportRepository.save(userStatusReport);
+		}
 		collaboratorReport.setNumberPassed(countPassed);
 		collaboratorReport.setNumberNotPassed(countNotPassed);
 		collaboratorReport.setNumberMale(countMale);
@@ -152,7 +165,14 @@ public class TaskSchedule {
 				&& LocalDate.now().getDayOfWeek().toString().compareTo("MONDAY") == 0) {
 			List<User> members = userRepository.findMemberWithoutPaging();
 			List<User> admins = userRepository.findAllAdmin();
+			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+			UserStatusReport userStatusReport = new UserStatusReport();
+			userStatusReport.setSemester(semester.getName());
+			int numberUserActive = 0;
+			int numberUserDeactive = 0;
 			for (User user : members) {
+				if (user.isActive()) {
+					numberUserActive++;
 					MemberSemester statusSemester = new MemberSemester();
 					statusSemester.setUser(user);
 					if (LocalDate.now().getMonthValue() == 1) {
@@ -167,8 +187,13 @@ public class TaskSchedule {
 					statusSemester.setStatus(user.isActive());
 					stautsSemesterRepository.save(statusSemester);
 					logger.info("add member oke");
+				}
+				else {
+					numberUserDeactive++;
+				}
 			}
 			for (User user : admins) {
+				numberUserActive++;
 				AdminSemester adminSemester = new AdminSemester();
 				adminSemester.setUser(user);
 				if (LocalDate.now().getMonthValue() == 1) {
@@ -184,6 +209,10 @@ public class TaskSchedule {
 				adminSemesterRepository.save(adminSemester);
 				logger.info("add admin oke");
 			}
+			userStatusReport.setNumberActiveInSemester(numberUserActive);
+			userStatusReport.setNumberDeactiveInSemester(numberUserDeactive);
+			userStatusReport.setTotalNumberUserInSemester(numberUserActive + numberUserDeactive);
+			userStatusReportRepository.save(userStatusReport);
 			logger.info("loi roi");
 		}
 	}

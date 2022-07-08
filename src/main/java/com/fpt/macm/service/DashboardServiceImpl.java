@@ -17,6 +17,7 @@ import com.fpt.macm.model.MemberEvent;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Semester;
 import com.fpt.macm.model.TrainingSchedule;
+import com.fpt.macm.model.UserStatusReport;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CollaboratorReportRepository;
 import com.fpt.macm.repository.EventRepository;
@@ -24,6 +25,7 @@ import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
+import com.fpt.macm.repository.UserStatusReportRepository;
 
 @Service
 public class DashboardServiceImpl implements DashboardService {
@@ -51,6 +53,9 @@ public class DashboardServiceImpl implements DashboardService {
 	
 	@Autowired
 	EventService eventService;
+	
+	@Autowired
+	UserStatusReportRepository userStatusReportRepository;
 	
 	
 	@Override
@@ -148,10 +153,17 @@ public class DashboardServiceImpl implements DashboardService {
 	public ResponseMessage statusMemberReport() {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			
+			List<UserStatusReport> userStatusReports = userStatusReportRepository.findAll();
+			if(userStatusReports.size() > 0) {
+				responseMessage.setData(userStatusReports);
+				responseMessage.setMessage("Lấy dữ liệu report thành công");
+				responseMessage.setTotalResult(userStatusReports.size());
+			}else {
+				responseMessage.setMessage("Không có dữ liệu");
+			}
 		} catch (Exception e) {
-			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
 		}
-		return null;
+		return responseMessage;
 	}
 }
