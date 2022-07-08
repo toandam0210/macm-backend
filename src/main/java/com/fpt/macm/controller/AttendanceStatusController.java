@@ -29,7 +29,7 @@ public class AttendanceStatusController {
 		return new ResponseEntity<ResponseMessage>(attendanceStatusService.checkAttendanceStatusByTrainingSchedule(trainingScheduleId), HttpStatus.OK);
 	}
 	@GetMapping("/checkattendance/report")
-	ResponseEntity<ResponseMessage> attendanceReportBySemester(@RequestParam String semester) {
+	ResponseEntity<ResponseMessage> userAttendanceReportBySemester(@RequestParam String semester) {
 		return new ResponseEntity<ResponseMessage>(attendanceStatusService.attendanceTrainingReport(semester), HttpStatus.OK);
 	}
 }

@@ -5,7 +5,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -15,8 +14,8 @@ public class CollaboratorReport {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@OneToOne(mappedBy = "collaboratorReport")
-    private Semester semester;
+	@Column
+    private String semester;
 	
 	@Column
 	private int numberJoin;
@@ -41,11 +40,11 @@ public class CollaboratorReport {
 		this.id = id;
 	}
 
-	public Semester getSemester() {
+	public String getSemester() {
 		return semester;
 	}
 
-	public void setSemester(Semester semester) {
+	public void setSemester(String semester) {
 		this.semester = semester;
 	}
 

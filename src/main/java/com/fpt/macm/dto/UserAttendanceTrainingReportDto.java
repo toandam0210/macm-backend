@@ -1,6 +1,6 @@
 package com.fpt.macm.dto;
 
-public class AttendanceTrainingReportDto {
+public class UserAttendanceTrainingReportDto {
 	private String studentId;
 	private String studentName;
 	private String roleName;

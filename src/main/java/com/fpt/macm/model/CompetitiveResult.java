@@ -2,29 +2,41 @@ package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "competitive_type")
-public class CompetitiveType {
+@Table(name = "competitive_result")
+public class CompetitiveResult {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
 	@Column
-	private double weightMin;
+	private LocalDateTime time;
+	
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "match_id", referencedColumnName = "id")
+	private CompetitiveMatch match;
+	
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "areaId")
+	private Area area;
 	
 	@Column
-	private double weightMax;
+	private int firstPoint;
 	
 	@Column
-	private boolean gender;
+	private int secondPoint;
 	
 	@Column
 	private String createdBy;
@@ -46,28 +58,44 @@ public class CompetitiveType {
 		this.id = id;
 	}
 
-	public double getWeightMin() {
-		return weightMin;
+	public LocalDateTime getTime() {
+		return time;
 	}
 
-	public void setWeightMin(double weightMin) {
-		this.weightMin = weightMin;
+	public void setTime(LocalDateTime time) {
+		this.time = time;
 	}
 
-	public double getWeightMax() {
-		return weightMax;
+	public CompetitiveMatch getMatch() {
+		return match;
 	}
 
-	public void setWeightMax(double weightMax) {
-		this.weightMax = weightMax;
+	public void setMatch(CompetitiveMatch match) {
+		this.match = match;
 	}
 
-	public boolean isGender() {
-		return gender;
+	public Area getArea() {
+		return area;
 	}
 
-	public void setGender(boolean gender) {
-		this.gender = gender;
+	public void setArea(Area area) {
+		this.area = area;
+	}
+
+	public int getFirstPoint() {
+		return firstPoint;
+	}
+
+	public void setFirstPoint(int firstPoint) {
+		this.firstPoint = firstPoint;
+	}
+
+	public int getSecondPoint() {
+		return secondPoint;
+	}
+
+	public void setSecondPoint(int secondPoint) {
+		this.secondPoint = secondPoint;
 	}
 
 	public String getCreatedBy() {
@@ -101,7 +129,6 @@ public class CompetitiveType {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
-	
 	
 	
 }

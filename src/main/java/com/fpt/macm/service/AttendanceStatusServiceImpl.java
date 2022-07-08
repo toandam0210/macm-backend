@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.AttendanceStatusDto;
-import com.fpt.macm.dto.AttendanceTrainingReportDto;
+import com.fpt.macm.dto.UserAttendanceTrainingReportDto;
 import com.fpt.macm.model.AttendanceStatus;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ResponseMessage;
@@ -110,7 +110,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 		try {
 			Optional<Semester> semesterOp = semesterRepository.findByName(semesterName);
 			List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository.findAll();
-			List<AttendanceTrainingReportDto> attendanceTrainingReportsDto = new ArrayList<AttendanceTrainingReportDto>();
+			List<UserAttendanceTrainingReportDto> attendanceTrainingReportsDto = new ArrayList<UserAttendanceTrainingReportDto>();
 			if (semesterOp.isPresent()) {
 				Semester semester = semesterOp.get();
 				List<User> users = new ArrayList<User>();
@@ -128,7 +128,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				usersAttendance.addAll(users);
 				for (User user : usersAttendance) {
 					int totalAbsent = 0;
-					AttendanceTrainingReportDto attendanceTrainingReportDto = new AttendanceTrainingReportDto();
+					UserAttendanceTrainingReportDto attendanceTrainingReportDto = new UserAttendanceTrainingReportDto();
 					attendanceTrainingReportDto.setStudentId(user.getStudentId());
 					attendanceTrainingReportDto.setStudentName(user.getName());
 					attendanceTrainingReportDto.setRoleName(Utils.convertRoleFromDbToExcel(user.getRole()));
