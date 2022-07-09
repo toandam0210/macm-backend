@@ -94,4 +94,5 @@ public class TournamentPlayer {
 		this.updatedOn = updatedOn;
 	}
 
+	
 }

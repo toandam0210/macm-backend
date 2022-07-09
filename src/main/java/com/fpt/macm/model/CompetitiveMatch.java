@@ -23,11 +23,15 @@ public class CompetitiveMatch {
 	private int round;
 	
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "first_competitive_player")
+	@JoinColumn(name = "type_id")
+	private CompetitiveType competitiveType;
+	
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "first_player_id")
 	private CompetitivePlayerBracket firstPlayer;
 	
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "second_competitive_player")
+	@JoinColumn(name = "second_player_id")
 	private CompetitivePlayerBracket secondPlayer;
 	
 	@Column
@@ -105,6 +109,13 @@ public class CompetitiveMatch {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
-	
+
+	public CompetitiveType getCompetitiveType() {
+		return competitiveType;
+	}
+
+	public void setCompetitiveType(CompetitiveType competitiveType) {
+		this.competitiveType = competitiveType;
+	}
 	
 }

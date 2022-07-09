@@ -450,8 +450,7 @@ public class TournamentServiceImpl implements TournamentService {
 			List<CompetitivePlayerDto> competitivePlayersDto = new ArrayList<CompetitivePlayerDto>();
 
 			for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
-				Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository
-						.findByTournamentPlayerId(tournamentPlayer.getId());
+				Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findByTournamentPlayerId(tournamentPlayer.getId());
 				if (competitivePlayerOp.isPresent()) {
 					CompetitivePlayer competitivePlayer = competitivePlayerOp.get();
 					if (weightMin != 0 && weightMax != 0) {
@@ -922,6 +921,52 @@ public class TournamentServiceImpl implements TournamentService {
 
 			responseMessage.setData(tournamentPlayerPaymentStatusReportsDto);
 			responseMessage.setMessage(Constant.MSG_126);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllCompetitivePlayerByType(int tournamentId, int competitiveTypeId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			Tournament tournament = tournamentOp.get();
+			Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+			List<CompetitivePlayerDto> competitivePlayersDto = new ArrayList<CompetitivePlayerDto>();
+			Optional<CompetitiveType> competitiveTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
+			CompetitiveType getCompetitiveType = competitiveTypeOp.get();
+			double weightMin = getCompetitiveType.getWeightMin();
+			double weightMax = getCompetitiveType.getWeightMax();
+			boolean gender = getCompetitiveType.isGender();
+			for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+				Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findByTournamentPlayerId(tournamentPlayer.getId());
+				if (competitivePlayerOp.isPresent()) {
+					CompetitivePlayer competitivePlayer = competitivePlayerOp.get();
+					if (competitivePlayer.getWeight() <= weightMax && competitivePlayer.getWeight() >= weightMin && competitivePlayer.getTournamentPlayer().getUser().isGender() == gender) {
+						CompetitivePlayerDto competitivePlayerDto = convertToCompetitivePlayerDto(
+								competitivePlayer);
+						competitivePlayersDto.add(competitivePlayerDto);
+					}
+				}
+			}
+
+			Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+			for (CompetitivePlayerDto competitivePlayerDto : competitivePlayersDto) {
+				for (CompetitiveType competitiveType : competitiveTypes) {
+					if (competitivePlayerDto.getWeight() >= competitiveType.getWeightMin()
+							&& competitivePlayerDto.getWeight() <= competitiveType.getWeightMax()) {
+						competitivePlayerDto.setWeightMax(competitiveType.getWeightMax());
+						competitivePlayerDto.setWeightMin(competitiveType.getWeightMin());
+						break;
+					}
+				}
+			}
+			responseMessage.setData(competitivePlayersDto);
+			responseMessage.setMessage(Constant.MSG_114);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

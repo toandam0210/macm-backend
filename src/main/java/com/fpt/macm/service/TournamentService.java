@@ -47,4 +47,6 @@ public interface TournamentService {
 	ResponseMessage updateTournamentPlayerPaymentStatus(int tournamentPlayerId);
 	
 	ResponseMessage getAllTournamentPlayerPaymentStatusReport(int tournamentId);
+	
+	ResponseMessage getAllCompetitivePlayerByType(int tournamentId, int competitiveTypeId);
 }
