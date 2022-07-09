@@ -77,6 +77,13 @@ public class TournamentController {
 				tournamentService.getAllCompetitivePlayer(tournamentId, weightMin, weightMax), HttpStatus.OK);
 	}
 
+	@GetMapping("/headclub/getallcompetitiveplayerbytype/{tournamentId}")
+	ResponseEntity<ResponseMessage> getAllCompetitivePlayerByType(@PathVariable(name = "tournamentId") int tournamentId,
+			@RequestParam(defaultValue = "0") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllCompetitivePlayerByType(tournamentId, competitiveTypeId), HttpStatus.OK);
+	}
+	
 	@GetMapping("/headclub/getallexhibitionteam/{tournamentId}")
 	ResponseEntity<ResponseMessage> getAllExhibitionTeam(@PathVariable(name = "tournamentId") int tournamentId,
 			@RequestParam(defaultValue = "0") int exhibitionType) {
@@ -150,4 +157,6 @@ public class TournamentController {
 		return new ResponseEntity<ResponseMessage>(
 				tournamentService.getAllTournamentPlayerPaymentStatusReport(tournamentId), HttpStatus.OK);
 	}
+	
+	
 }

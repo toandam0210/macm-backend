@@ -3,6 +3,7 @@ package com.fpt.macm.utils;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
 
@@ -71,6 +72,11 @@ public class Utils {
 	public static LocalDate ConvertStringToLocalDate(String input) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		return LocalDate.parse(input, formatter);
+	}
+	
+	public static LocalDateTime ConvertStringToLocalDateTime(String input) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+		return LocalDateTime.parse(input, formatter);
 	}
 
 	public static void convertNameOfRole(Role role) {

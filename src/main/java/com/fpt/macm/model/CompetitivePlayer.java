@@ -24,7 +24,7 @@ public class CompetitivePlayer {
     @JoinColumn(name = "player_id", referencedColumnName = "id")
     private TournamentPlayer tournamentPlayer;
 
-	@Column
+	@Column(nullable = true)
 	private double weight;
 
 	@Column

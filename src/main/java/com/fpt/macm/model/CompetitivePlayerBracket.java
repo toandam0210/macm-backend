@@ -24,7 +24,7 @@ public class CompetitivePlayerBracket {
 	private CompetitiveType competitiveType;
 	
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "playerId")
+	@JoinColumn(name = "player_id")
 	private CompetitivePlayer competitivePlayer;
 	
 	
@@ -32,7 +32,7 @@ public class CompetitivePlayerBracket {
 	private int round;
 	
 	@Column
-	private int numerical_order_id;
+	private Integer numerical_order_id;
 	
 	@Column
 	private String createdBy;
@@ -70,11 +70,11 @@ public class CompetitivePlayerBracket {
 		this.competitivePlayer = competitivePlayer;
 	}
 
-	public int getNumerical_order_id() {
+	public Integer getNumerical_order_id() {
 		return numerical_order_id;
 	}
 
-	public void setNumerical_order_id(int numerical_order_id) {
+	public void setNumerical_order_id(Integer numerical_order_id) {
 		this.numerical_order_id = numerical_order_id;
 	}
 
