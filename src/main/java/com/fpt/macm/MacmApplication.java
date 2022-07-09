@@ -21,7 +21,7 @@ public class MacmApplication {
 		@Override
 		public void addCorsMappings(CorsRegistry reg) {
 			reg.addMapping("/**")
-	        .allowedOriginPatterns("https://capstone-project-macm.herokuapp.com", "localhost:3000","*")
+	        .allowedOriginPatterns("https://capstone-project-macm.herokuapp.com/**", "localhost:3000/**")
 	        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
 	        .allowedHeaders("Content-Type", "X-Requested-With", "accept", "Origin", "Access-Control-Request-Method",
                     "Access-Control-Request-Headers")
