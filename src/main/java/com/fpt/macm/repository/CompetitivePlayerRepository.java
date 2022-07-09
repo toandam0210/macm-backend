@@ -9,7 +9,5 @@ import com.fpt.macm.model.CompetitivePlayer;
 
 @Repository
 public interface CompetitivePlayerRepository extends JpaRepository<CompetitivePlayer, Integer>{
-
 	Optional<CompetitivePlayer> findByTournamentPlayerId(int tournamentPlayerId);
-	
 }
