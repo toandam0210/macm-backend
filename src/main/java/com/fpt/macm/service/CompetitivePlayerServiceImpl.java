@@ -49,7 +49,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(userId, tournamentId);
-			if(tournamentPlayerOp.isEmpty()) {
+			if(!tournamentPlayerOp.isPresent()) {
 				Tournament getTounament = tournamentRepository.findById(tournamentId).get();
 				Set<TournamentPlayer> players = getTounament.getTournamentPlayers();
 				TournamentPlayer newTournamentPlayer = new TournamentPlayer();
@@ -96,7 +96,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 			} else {
 				TournamentPlayer getTournamentPlayer = tournamentPlayerOp.get();
 				Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId());
-				if(competitivePlayerOp.isEmpty()) {
+				if(!competitivePlayerOp.isPresent()) {
 					CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
 					newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
 					if(weight != 0) {
