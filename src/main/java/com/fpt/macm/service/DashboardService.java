@@ -7,4 +7,5 @@ public interface DashboardService {
 	ResponseMessage attendanceReport(String semester);
 	ResponseMessage eventReport();
 	ResponseMessage statusMemberReport();
+	ResponseMessage feeReport(String semester);
 }

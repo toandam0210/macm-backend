@@ -37,4 +37,9 @@ public class DashboardController {
 	ResponseEntity<ResponseMessage> getUserStatusReport() {
 		return new ResponseEntity<ResponseMessage>(dashboardService.statusMemberReport(), HttpStatus.OK);
 	}
+	
+	@GetMapping("/fee")
+	ResponseEntity<ResponseMessage> feeReportBySemester(@RequestParam String semester) {
+		return new ResponseEntity<ResponseMessage>(dashboardService.feeReport(semester), HttpStatus.OK);
+	}
 }
