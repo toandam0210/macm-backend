@@ -11,7 +11,7 @@ import com.fpt.macm.security.user.CustomOAuth2UserService;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.authorizeHttpRequests()
+		http.cors().and().csrf().disable().authorizeHttpRequests()
 				.anyRequest().authenticated()
 				.and().oauth2Login()
 				.userInfoEndpoint().userService(oAuth2UserService);
