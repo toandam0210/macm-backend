@@ -1,6 +1,8 @@
 package com.fpt.macm.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,11 +19,11 @@ public class LoginController {
 	
 	@Autowired
 	UserRepository userRepository;
-//	
-//	@GetMapping("/login")
-//	ResponseEntity<ResponseMessage> getUserLogin(){
-//		return new ResponseEntity<ResponseMessage>(userService.userLogin(), HttpStatus.OK);
-//	}
+	
+	@GetMapping("/login")
+	ResponseEntity<String> getUserLogin(@CurrentUser UserPrincipal userPrincipal){
+		return new ResponseEntity<String>("Oke roi day", HttpStatus.OK);
+	}
 	
 	@GetMapping("/profile")
     public User getCurrentUser(@CurrentUser UserPrincipal userPrincipal) {
