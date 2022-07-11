@@ -16,10 +16,16 @@ public class Notification {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@Column
 	private String message;
-	
+
+	@Column
+	private int notificationType;
+
+	@Column
+	private int notificationTypeId;
+
 	@Column
 	private LocalDateTime createdOn;
 
@@ -46,6 +52,21 @@ public class Notification {
 	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
 	}
-	
-	
+
+	public int getNotificationType() {
+		return notificationType;
+	}
+
+	public void setNotificationType(int notificationType) {
+		this.notificationType = notificationType;
+	}
+
+	public int getNotificationTypeId() {
+		return notificationTypeId;
+	}
+
+	public void setNotificationTypeId(int notificationTypeId) {
+		this.notificationTypeId = notificationTypeId;
+	}
+
 }
