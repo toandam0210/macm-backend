@@ -61,8 +61,18 @@ public class CompetitiveController {
 	}
 	
 	@PostMapping("/headclub/updateresultmatch/{matchId}")
-	ResponseEntity<ResponseMessage> updateResultMatch (@PathVariable(name = "matchId") int matchId,
-			@RequestParam int areaId, @RequestParam String time, @RequestParam int firstPoint, @RequestParam int secondPoint) {
-		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateResultMatch(matchId, areaId, time, firstPoint, secondPoint), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateTimeAndPlaceMatch (@PathVariable(name = "matchId") int matchId,
+			@RequestParam int areaId, @RequestParam String time) {
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateTimeAndPlaceMatch(matchId, areaId, time), HttpStatus.OK);
+	}
+	
+	@PutMapping("/headclub/updateresultmatch/{resultId}")
+	ResponseEntity<ResponseMessage> updateResultMatch (@PathVariable(name = "resultId") int resultId, @RequestParam int firstPoint, @RequestParam int secondPoint) {
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateResultMatch(resultId, firstPoint, secondPoint), HttpStatus.OK);
+	}
+	
+	@GetMapping("/headclub/listmatchs/{competitiveTypeId}")
+	ResponseEntity<ResponseMessage> listMatchs (@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(competitiveMatchService.listMatchs(competitiveTypeId), HttpStatus.OK);
 	}
 }

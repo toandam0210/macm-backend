@@ -3,16 +3,20 @@ package com.fpt.macm.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.dto.CompetitiveMatchDto;
 import com.fpt.macm.model.CompetitiveMatch;
 import com.fpt.macm.model.CompetitivePlayerBracket;
+import com.fpt.macm.model.CompetitiveResult;
 import com.fpt.macm.model.CompetitiveType;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
+import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 
 @Service
@@ -26,6 +30,9 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 	
 	@Autowired
 	CompetitiveTypeRepository competitiveTypeRepository;
+	
+	@Autowired
+	CompetitiveResultRepository competitiveResultRepository;
 	
 	@Override
 	public ResponseMessage spawnMatchs(int competitiveTypeId, int round) {
@@ -114,5 +121,41 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 			power *= 2;
 		}
 		return power;
+	}
+
+	@Override
+	public ResponseMessage listMatchs(int competitiveTypeId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByType(competitiveTypeId);
+			List<CompetitiveMatchDto> listMatchDto = new ArrayList<CompetitiveMatchDto>();
+			for (CompetitiveMatch competitiveMatch : listMatchs) {
+				CompetitiveMatchDto newCompetitiveMatchDto = new CompetitiveMatchDto();
+				newCompetitiveMatchDto.setId(competitiveMatch.getId());
+				newCompetitiveMatchDto.setRound(competitiveMatch.getRound());
+				newCompetitiveMatchDto.setFirstPlayer(competitiveMatch.getFirstPlayer().getCompetitivePlayer().getTournamentPlayer().getUser());
+				newCompetitiveMatchDto.setSecondPlayer(competitiveMatch.getSecondPlayer().getCompetitivePlayer().getTournamentPlayer().getUser());
+				Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(competitiveMatch.getId());
+				if(getResultOp.isPresent()) {
+					CompetitiveResult getResult = getResultOp.get();
+					newCompetitiveMatchDto.setArea(getResult.getArea());
+					newCompetitiveMatchDto.setTime(getResult.getTime());
+					if(getResult.getFirstPoint() != null) {
+						newCompetitiveMatchDto.setFirstPoint(getResult.getFirstPoint());
+					}
+					if(getResult.getSecondPoint() != null) {
+						newCompetitiveMatchDto.setSecondPoint(getResult.getSecondPoint());
+					}
+				}
+				listMatchDto.add(newCompetitiveMatchDto);
+			}
+			responseMessage.setData(listMatchDto);
+			responseMessage.setMessage("Danh sách trận đấu");
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 }
