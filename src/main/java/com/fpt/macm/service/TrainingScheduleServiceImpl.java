@@ -41,6 +41,9 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 	@Autowired
 	SemesterService semesterService;
 	
+	@Autowired
+	NotificationServiceImpl notificationServiceImpl;
+	
 	@Override
 	public ResponseMessage createPreviewTrainingSchedule(String startDate, String finishDate, List<String> dayOfWeek, String startTime, String finishTime) {
 		// TODO Auto-generated method stub
@@ -127,6 +130,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 						commonSession.setUpdatedOn(LocalDateTime.now());
 						commonSession.setType(0);
 						commonScheduleRepository.save(commonSession);
+						
+						notificationServiceImpl.createTrainingSessionCreateNotification(trainingSchedule.getDate());
 					}
 					else {
 						responseMessage.setMessage(Constant.MSG_041);
@@ -179,6 +184,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					commonScheduleRepository.save(commonSession);
 					responseMessage.setData(Arrays.asList(getTrainingSession));
 					responseMessage.setMessage(Constant.MSG_042);
+					
+					notificationServiceImpl.createTrainingSessionUpdateNotification(getDate, updateCommonSession.getStartTime(), updateCommonSession.getFinishTime());
 				}
 			}
 			else {
@@ -205,6 +212,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					commonScheduleRepository.delete(commonSession);
 					responseMessage.setData(Arrays.asList(getTrainingSession));
 					responseMessage.setMessage(Constant.MSG_044);
+					
+					notificationServiceImpl.createTrainingSessionDeleteNotification(getDate);
 				}
 			}
 			else {

@@ -1,6 +1,8 @@
 package com.fpt.macm.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -110,7 +112,7 @@ public class NotificationServiceImpl implements NotificationService{
 	public void createTournamentNotification(int tournamentId, String tournamentName) {
 		try {
 			Notification notification = new Notification();
-			notification.setMessage("Sắp tới có giải đấu " + tournamentName);
+			notification.setMessage("Sắp tới có giải đấu " + tournamentName + ".");
 			notification.setNotificationType(0);
 			notification.setNotificationTypeId(tournamentId);
 			notification.setCreatedOn(LocalDateTime.now());
@@ -119,7 +121,46 @@ public class NotificationServiceImpl implements NotificationService{
 			// TODO: handle exception
 			System.out.println(e.getMessage());
 		}
-		
+	}
+	
+	public void createEventNotification(int eventId, String eventName) {
+		try {
+			Notification notification = new Notification();
+			notification.setMessage("Sắp tới có sự kiện " + eventName + ".");
+			notification.setNotificationType(1);
+			notification.setNotificationTypeId(eventId);
+			notification.setCreatedOn(LocalDateTime.now());
+			notificationRepository.save(notification);
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public void createTrainingSessionCreateNotification(LocalDate date) {
+		Notification notification = new Notification();
+		notification.setMessage("Ngày " + date + " có buổi tập mới được thêm.");
+		notification.setNotificationType(2);
+		notification.setNotificationTypeId(0);
+		notification.setCreatedOn(LocalDateTime.now());
+		notificationRepository.save(notification);
+	}
+	
+	public void createTrainingSessionUpdateNotification(LocalDate date, LocalTime newStartTime, LocalTime newEndTime) {
+		Notification notification = new Notification();
+		notification.setMessage("Buổi tập ngày " + date + " thay đổi thời gian tập thành: " + newStartTime + " - " + newEndTime + ".");
+		notification.setNotificationType(2);
+		notification.setNotificationTypeId(0);
+		notification.setCreatedOn(LocalDateTime.now());
+		notificationRepository.save(notification);
 	}
 
+	public void createTrainingSessionDeleteNotification(LocalDate date) {
+		Notification notification = new Notification();
+		notification.setMessage("Buổi tập ngày " + date + " đã hủy.");
+		notification.setNotificationType(2);
+		notification.setNotificationTypeId(0);
+		notification.setCreatedOn(LocalDateTime.now());
+		notificationRepository.save(notification);
+	}
 }
