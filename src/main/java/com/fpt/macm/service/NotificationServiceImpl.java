@@ -50,12 +50,12 @@ public class NotificationServiceImpl implements NotificationService{
 			
 			if (pageResponse != null && pageResponse.hasContent()) {
 				notifications = pageResponse.getContent();
+				responseMessage.setData(notifications);
+				responseMessage.setPageNo(pageNo);
+				responseMessage.setPageSize(pageSize);
+				responseMessage.setTotalPage(pageResponse.getTotalPages());
+				responseMessage.setMessage(Constant.MSG_016);
 			}
-			
-			responseMessage.setData(notifications);
-			responseMessage.setPageNo(pageNo);
-			responseMessage.setPageSize(pageSize);
-			responseMessage.setMessage(Constant.MSG_016);
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
