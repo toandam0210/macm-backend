@@ -15,6 +15,7 @@ import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.NotificationToUserRepository;
+import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
 
 @Service
@@ -28,6 +29,9 @@ public class NotificationServiceImpl implements NotificationService{
 	
 	@Autowired
 	NotificationToUserRepository notificationToUserRepository;
+	
+	@Autowired
+	TournamentRepository tournamentRepository;
 	
 	@Override
 	public ResponseMessage getAllNotification() {
@@ -101,6 +105,21 @@ public class NotificationServiceImpl implements NotificationService{
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
+	}
+	
+	public void createTournamentNotification(int tournamentId, String tournamentName) {
+		try {
+			Notification notification = new Notification();
+			notification.setMessage("Sắp tới có giải đấu " + tournamentName);
+			notification.setNotificationType(0);
+			notification.setNotificationTypeId(tournamentId);
+			notification.setCreatedOn(LocalDateTime.now());
+			notificationRepository.save(notification);
+		} catch (Exception e) {
+			// TODO: handle exception
+			System.out.println(e.getMessage());
+		}
+		
 	}
 
 }
