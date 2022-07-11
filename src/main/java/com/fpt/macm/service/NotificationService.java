@@ -6,7 +6,7 @@ import com.fpt.macm.model.User;
 
 public interface NotificationService {
 
-	ResponseMessage getAllNotification();
+	ResponseMessage getAllNotification(int pageNo, int pageSize, String sortBy);
 	ResponseMessage createNotification(Notification notification);
 	void sendNotificationToAllUser(Notification notification);
 	void sendNotificationToAnUser(User user, Notification notification);

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.ResponseMessage;
@@ -18,8 +19,9 @@ public class NotificationController {
 	NotificationService notificationService;
 	
 	@GetMapping("/getallnotification")
-	ResponseEntity<ResponseMessage> getAllNotification(){
-		return new ResponseEntity<ResponseMessage>(notificationService.getAllNotification(), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllNotification(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
+		return new ResponseEntity<ResponseMessage>(notificationService.getAllNotification(pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 	
 }

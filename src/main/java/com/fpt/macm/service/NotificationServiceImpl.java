@@ -8,6 +8,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.model.Constant;
@@ -36,12 +40,21 @@ public class NotificationServiceImpl implements NotificationService{
 	TournamentRepository tournamentRepository;
 	
 	@Override
-	public ResponseMessage getAllNotification() {
+	public ResponseMessage getAllNotification(int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<Notification> notification = notificationRepository.findAll();
-			responseMessage.setData(notification);
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
+			Page<Notification> pageResponse = notificationRepository.findAll(paging);
+			List<Notification> notifications = new ArrayList<Notification>();
+			
+			if (pageResponse != null && pageResponse.hasContent()) {
+				notifications = pageResponse.getContent();
+			}
+			
+			responseMessage.setData(notifications);
+			responseMessage.setPageNo(pageNo);
+			responseMessage.setPageSize(pageSize);
 			responseMessage.setMessage(Constant.MSG_016);
 		} catch (Exception e) {
 			// TODO: handle exception
