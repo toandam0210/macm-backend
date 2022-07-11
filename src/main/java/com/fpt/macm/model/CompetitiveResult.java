@@ -32,11 +32,11 @@ public class CompetitiveResult {
 	@JoinColumn(name = "areaId")
 	private Area area;
 	
-	@Column
-	private int firstPoint;
+	@Column(nullable = true)
+	private Integer firstPoint;
 	
-	@Column
-	private int secondPoint;
+	@Column(nullable = true)
+	private Integer secondPoint;
 	
 	@Column
 	private String createdBy;
@@ -82,19 +82,19 @@ public class CompetitiveResult {
 		this.area = area;
 	}
 
-	public int getFirstPoint() {
+	public Integer getFirstPoint() {
 		return firstPoint;
 	}
 
-	public void setFirstPoint(int firstPoint) {
+	public void setFirstPoint(Integer firstPoint) {
 		this.firstPoint = firstPoint;
 	}
 
-	public int getSecondPoint() {
+	public Integer getSecondPoint() {
 		return secondPoint;
 	}
 
-	public void setSecondPoint(int secondPoint) {
+	public void setSecondPoint(Integer secondPoint) {
 		this.secondPoint = secondPoint;
 	}
 

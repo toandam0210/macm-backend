@@ -4,4 +4,5 @@ import com.fpt.macm.model.ResponseMessage;
 
 public interface CompetitiveMatchService {
 	ResponseMessage spawnMatchs (int competitiveTypeId, int round);
+	ResponseMessage listMatchs(int competitiveTypeId);
 }
