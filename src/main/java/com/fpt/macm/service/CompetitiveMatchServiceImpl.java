@@ -14,10 +14,12 @@ import com.fpt.macm.model.CompetitivePlayerBracket;
 import com.fpt.macm.model.CompetitiveResult;
 import com.fpt.macm.model.CompetitiveType;
 import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.User;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
+import com.fpt.macm.repository.UserRepository;
 
 @Service
 public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
@@ -33,6 +35,9 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 	
 	@Autowired
 	CompetitiveResultRepository competitiveResultRepository;
+	
+	@Autowired
+	UserRepository userRepository;
 	
 	@Override
 	public ResponseMessage spawnMatchs(int competitiveTypeId, int round) {
@@ -137,12 +142,23 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				CompetitiveMatchDto newCompetitiveMatchDto = new CompetitiveMatchDto();
 				newCompetitiveMatchDto.setId(competitiveMatch.getId());
 				newCompetitiveMatchDto.setRound(competitiveMatch.getRound());
-				newCompetitiveMatchDto.setFirstStudentId(competitiveMatch.getFirstStudentId());
+				if(competitiveMatch.getFirstStudentId() != null) {
+					newCompetitiveMatchDto.setFirstStudentId(competitiveMatch.getFirstStudentId());
+					User fisrtUser = userRepository.getByStudentId(competitiveMatch.getFirstStudentId());
+					newCompetitiveMatchDto.setFirstNameAndId(fisrtUser.getName() + " - " + fisrtUser.getStudentId());
+				}
+				else {
+					newCompetitiveMatchDto.setFirstStudentId(null);
+					newCompetitiveMatchDto.setFirstNameAndId(null);
+				}
 				if(competitiveMatch.getSecondStudentId() != null) {
 					newCompetitiveMatchDto.setSecondStudentId(competitiveMatch.getSecondStudentId());
+					User secondUser = userRepository.getByStudentId(competitiveMatch.getSecondStudentId());
+					newCompetitiveMatchDto.setSecondNameAndId(secondUser.getName() + " - " + secondUser.getStudentId());
 				}
 				else {
 					newCompetitiveMatchDto.setSecondStudentId(null);
+					newCompetitiveMatchDto.setSecondNameAndId(null);
 				}
 				Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(competitiveMatch.getId());
 				if(getResultOp.isPresent()) {
