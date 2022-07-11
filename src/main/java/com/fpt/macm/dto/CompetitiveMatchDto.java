@@ -8,12 +8,13 @@ import com.fpt.macm.model.User;
 public class CompetitiveMatchDto {
 	private int id;
 	private int round;
-	private User firstPlayer;
-	private User secondPlayer;
+	private String firstStudentId;
+	private String secondStudentId;
 	private LocalDateTime time;
-	private Area area;
+	private String area;
 	private Integer firstPoint;
 	private Integer secondPoint;
+	
 	public int getId() {
 		return id;
 	}
@@ -26,39 +27,51 @@ public class CompetitiveMatchDto {
 	public void setRound(int round) {
 		this.round = round;
 	}
-	public User getFirstPlayer() {
-		return firstPlayer;
+	
+	public String getFirstStudentId() {
+		return firstStudentId;
 	}
-	public void setFirstPlayer(User firstPlayer) {
-		this.firstPlayer = firstPlayer;
+	
+	public void setFirstStudentId(String firstStudentId) {
+		this.firstStudentId = firstStudentId;
 	}
-	public User getSecondPlayer() {
-		return secondPlayer;
+	
+	public String getSecondStudentId() {
+		return secondStudentId;
 	}
-	public void setSecondPlayer(User secondPlayer) {
-		this.secondPlayer = secondPlayer;
+	
+	public void setSecondStudentId(String secondStudentId) {
+		this.secondStudentId = secondStudentId;
 	}
+	
 	public LocalDateTime getTime() {
 		return time;
 	}
+	
 	public void setTime(LocalDateTime time) {
 		this.time = time;
 	}
-	public Area getArea() {
+	
+	public String getArea() {
 		return area;
 	}
-	public void setArea(Area area) {
+	
+	public void setArea(String area) {
 		this.area = area;
 	}
+	
 	public Integer getFirstPoint() {
 		return firstPoint;
 	}
+	
 	public void setFirstPoint(Integer firstPoint) {
 		this.firstPoint = firstPoint;
 	}
+	
 	public Integer getSecondPoint() {
 		return secondPoint;
 	}
+	
 	public void setSecondPoint(Integer secondPoint) {
 		this.secondPoint = secondPoint;
 	}

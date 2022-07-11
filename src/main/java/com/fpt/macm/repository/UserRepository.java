@@ -47,4 +47,7 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	@Query(value = "select * from \"user\" where is_active and role_id < 13", nativeQuery = true)
 	List<User> findMembersActive();
 	
+	@Query(value = "select * from \"user\" where student_id like ?1",nativeQuery = true)
+	User getByStudentId(String studentId);
+	
 }

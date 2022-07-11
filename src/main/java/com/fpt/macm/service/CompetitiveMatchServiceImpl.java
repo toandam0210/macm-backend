@@ -63,8 +63,8 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				CompetitiveMatch newCompetitiveMatch = new CompetitiveMatch();
 				newCompetitiveMatch.setCompetitiveType(competitiveType);
 				newCompetitiveMatch.setRound(round);
-				newCompetitiveMatch.setFirstPlayer(listLoseSemi.get(0));
-				newCompetitiveMatch.setSecondPlayer(listLoseSemi.get(1));
+				newCompetitiveMatch.setFirstStudentId(listLoseSemi.get(0).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+				newCompetitiveMatch.setSecondStudentId(listLoseSemi.get(1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
 				newCompetitiveMatch.setCreatedBy("LinhLHN");
 				newCompetitiveMatch.setCreatedOn(LocalDateTime.now());
 				newCompetitiveMatch.setUpdatedBy("LinhLHN");
@@ -73,8 +73,8 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				listMatch.add(newCompetitiveMatch);
 				newCompetitiveMatch.setCompetitiveType(competitiveType);
 				newCompetitiveMatch.setRound(round);
-				newCompetitiveMatch.setFirstPlayer(listPlayers.get(0));
-				newCompetitiveMatch.setSecondPlayer(listPlayers.get(1));
+				newCompetitiveMatch.setFirstStudentId(listPlayers.get(0).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+				newCompetitiveMatch.setSecondStudentId(listPlayers.get(1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
 				newCompetitiveMatch.setCreatedBy("LinhLHN");
 				newCompetitiveMatch.setCreatedOn(LocalDateTime.now());
 				newCompetitiveMatch.setUpdatedBy("LinhLHN");
@@ -83,6 +83,17 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				listMatch.add(newCompetitiveMatch);
 			}
 			for(int i = 0; i < freePlayer; i++) {
+				CompetitiveMatch newCompetitiveMatch = new CompetitiveMatch();
+				newCompetitiveMatch.setCompetitiveType(competitiveType);
+				newCompetitiveMatch.setRound(round);
+				newCompetitiveMatch.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+				newCompetitiveMatch.setSecondStudentId(null);
+				newCompetitiveMatch.setCreatedBy("LinhLHN");
+				newCompetitiveMatch.setCreatedOn(LocalDateTime.now());
+				newCompetitiveMatch.setUpdatedBy("LinhLHN");
+				newCompetitiveMatch.setUpdatedOn(LocalDateTime.now());
+				competitiveMatchRepository.save(newCompetitiveMatch);
+				listMatch.add(newCompetitiveMatch);
 				CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
 				newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
 				newCompetitivePlayerBracket.setCompetitivePlayer(listPlayers.get(i).getCompetitivePlayer());
@@ -98,8 +109,8 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				CompetitiveMatch newCompetitiveMatch = new CompetitiveMatch();
 				newCompetitiveMatch.setCompetitiveType(competitiveType);
 				newCompetitiveMatch.setRound(round);
-				newCompetitiveMatch.setFirstPlayer(listPlayers.get(i));
-				newCompetitiveMatch.setSecondPlayer(listPlayers.get(i + 1));
+				newCompetitiveMatch.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+				newCompetitiveMatch.setSecondStudentId(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
 				newCompetitiveMatch.setCreatedBy("LinhLHN");
 				newCompetitiveMatch.setCreatedOn(LocalDateTime.now());
 				newCompetitiveMatch.setUpdatedBy("LinhLHN");
@@ -114,14 +125,6 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 		}
 		return responseMessage;
 	}
-	
-	public int nextPower(int number) {
-		int power = 1;
-		while (power < number) {
-			power *= 2;
-		}
-		return power;
-	}
 
 	@Override
 	public ResponseMessage listMatchs(int competitiveTypeId) {
@@ -134,12 +137,17 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				CompetitiveMatchDto newCompetitiveMatchDto = new CompetitiveMatchDto();
 				newCompetitiveMatchDto.setId(competitiveMatch.getId());
 				newCompetitiveMatchDto.setRound(competitiveMatch.getRound());
-				newCompetitiveMatchDto.setFirstPlayer(competitiveMatch.getFirstPlayer().getCompetitivePlayer().getTournamentPlayer().getUser());
-				newCompetitiveMatchDto.setSecondPlayer(competitiveMatch.getSecondPlayer().getCompetitivePlayer().getTournamentPlayer().getUser());
+				newCompetitiveMatchDto.setFirstStudentId(competitiveMatch.getFirstStudentId());
+				if(competitiveMatch.getSecondStudentId() != null) {
+					newCompetitiveMatchDto.setSecondStudentId(competitiveMatch.getSecondStudentId());
+				}
+				else {
+					newCompetitiveMatchDto.setSecondStudentId(null);
+				}
 				Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(competitiveMatch.getId());
 				if(getResultOp.isPresent()) {
 					CompetitiveResult getResult = getResultOp.get();
-					newCompetitiveMatchDto.setArea(getResult.getArea());
+					newCompetitiveMatchDto.setArea(getResult.getArea().getName());
 					newCompetitiveMatchDto.setTime(getResult.getTime());
 					if(getResult.getFirstPoint() != null) {
 						newCompetitiveMatchDto.setFirstPoint(getResult.getFirstPoint());
@@ -152,10 +160,30 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 			}
 			responseMessage.setData(listMatchDto);
 			responseMessage.setMessage("Danh sách trận đấu");
+			List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository.listByTypeAndRound(competitiveTypeId, 1);
+			responseMessage.setTotalResult(maxRound(listPlayers.size()));
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
+	}
+	
+	public int nextPower(int number) {
+		int power = 1;
+		while (power < number) {
+			power *= 2;
+		}
+		return power;
+	}
+	
+	public int maxRound(int number) {
+		int i = 1;
+		int power = 2;
+		while (power < number) {
+			power *= 2;
+			i++;
+		}
+		return i;
 	}
 }

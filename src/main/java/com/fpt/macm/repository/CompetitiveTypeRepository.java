@@ -3,6 +3,7 @@ package com.fpt.macm.repository;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.fpt.macm.model.CompetitiveType;
@@ -11,4 +12,7 @@ import com.fpt.macm.model.CompetitiveType;
 public interface CompetitiveTypeRepository extends JpaRepository<CompetitiveType, Integer> {
 	
 	List<CompetitiveType> findByGender(boolean gender);
+	
+	@Query(value = "select tournament_id from competitive_type where id = ?1", nativeQuery = true)
+	int findTournamentOfType(int competitiveTypeId);
 }

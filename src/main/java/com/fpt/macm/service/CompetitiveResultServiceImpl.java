@@ -9,11 +9,21 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.model.Area;
 import com.fpt.macm.model.CompetitiveMatch;
+import com.fpt.macm.model.CompetitivePlayer;
+import com.fpt.macm.model.CompetitivePlayerBracket;
 import com.fpt.macm.model.CompetitiveResult;
+import com.fpt.macm.model.CompetitiveType;
 import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.TournamentPlayer;
+import com.fpt.macm.model.User;
 import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
+import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
+import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
+import com.fpt.macm.repository.CompetitiveTypeRepository;
+import com.fpt.macm.repository.TournamentPlayerRepository;
+import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -26,7 +36,22 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 	CompetitiveResultRepository competitiveResultRepository;
 	
 	@Autowired
+	CompetitiveTypeRepository competitiveTypeRepository;
+	
+	@Autowired
 	AreaRepository areaRepository;
+	
+	@Autowired
+	UserRepository userRepository;
+	
+	@Autowired
+	TournamentPlayerRepository tournamentPlayerRepository;
+	
+	@Autowired
+	CompetitivePlayerRepository competitivePlayerRepository;
+	
+	@Autowired
+	CompetitivePlayerBracketRepository competitivePlayerBracketRepository;
 	
 	@Override
 	public ResponseMessage updateTimeAndPlaceMatch(int matchId, int areaId, String time) {
@@ -77,6 +102,7 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 			Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findById(resultId);
 			if(getResultOp.isPresent()) {
 				CompetitiveResult getResult = getResultOp.get();
+				CompetitiveType getType = getResult.getMatch().getCompetitiveType();
 				if(getResult.getArea() != null && getResult.getTime() != null) {
 					getResult.setFirstPoint(firstPoint);
 					getResult.setSecondPoint(secondPoint);
@@ -85,6 +111,38 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 					competitiveResultRepository.save(getResult);
 					responseMessage.setData(Arrays.asList(getResult));
 					responseMessage.setMessage("Cập nhật kết quả thành công");
+					if(firstPoint > secondPoint) {
+						CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
+						newCompetitivePlayerBracket.setCompetitiveType(getType);
+						User getUser = userRepository.getByStudentId(getResult.getMatch().getFirstStudentId());
+						TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(getUser.getId(), competitiveTypeRepository.findTournamentOfType(getType.getId())).get();
+						CompetitivePlayer getPlayer = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId()).get();
+						newCompetitivePlayerBracket.setCompetitivePlayer(getPlayer);
+						newCompetitivePlayerBracket.setRound(getResult.getMatch().getRound() + 1);
+						CompetitivePlayerBracket getCompetitivePlayerBracket = competitivePlayerBracketRepository.findByPlayerId(getPlayer.getId()).get();
+						newCompetitivePlayerBracket.setNumerical_order_id(getCompetitivePlayerBracket.getNumerical_order_id());
+						newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
+						newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
+						newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
+						newCompetitivePlayerBracket.setUpdatedOn(LocalDateTime.now());
+						competitivePlayerBracketRepository.save(newCompetitivePlayerBracket);
+					}
+					else {
+						CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
+						newCompetitivePlayerBracket.setCompetitiveType(getType);
+						User getUser = userRepository.getByStudentId(getResult.getMatch().getSecondStudentId());
+						TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(getUser.getId(), competitiveTypeRepository.findTournamentOfType(getType.getId())).get();
+						CompetitivePlayer getPlayer = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId()).get();
+						newCompetitivePlayerBracket.setCompetitivePlayer(getPlayer);
+						newCompetitivePlayerBracket.setRound(getResult.getMatch().getRound() + 1);
+						CompetitivePlayerBracket getCompetitivePlayerBracket = competitivePlayerBracketRepository.findByPlayerId(getPlayer.getId()).get();
+						newCompetitivePlayerBracket.setNumerical_order_id(getCompetitivePlayerBracket.getNumerical_order_id());
+						newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
+						newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
+						newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
+						newCompetitivePlayerBracket.setUpdatedOn(LocalDateTime.now());
+						competitivePlayerBracketRepository.save(newCompetitivePlayerBracket);
+					}
 				}
 				else {
 					responseMessage.setMessage("Chưa có thời gian địa điểm nên không thể cập nhật kết quả");

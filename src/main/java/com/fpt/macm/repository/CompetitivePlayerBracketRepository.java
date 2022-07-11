@@ -18,4 +18,7 @@ public interface CompetitivePlayerBracketRepository extends JpaRepository<Compet
 	
 	@Query(value = "select * from competitive_player_bracket where competitive_type_id = ?1 and round = ?2 order by numerical_order_id", nativeQuery = true)
 	List<CompetitivePlayerBracket> listSortByNumerical(int competitiveTypeId, int round);
+	
+	@Query(value = "select * from competitive_player_bracket where competitive_player_id = ?1 limit 1", nativeQuery = true)
+	Optional<CompetitivePlayerBracket> listByPlayer(int competitivePlayId);
 }

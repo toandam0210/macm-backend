@@ -60,7 +60,7 @@ public class CompetitiveController {
 		return new ResponseEntity<ResponseMessage>(competitiveMatchService.spawnMatchs(competitiveTypeId, round), HttpStatus.OK);
 	}
 	
-	@PostMapping("/headclub/updateresultmatch/{matchId}")
+	@PostMapping("/headclub/updatetimeandplacematch/{matchId}")
 	ResponseEntity<ResponseMessage> updateTimeAndPlaceMatch (@PathVariable(name = "matchId") int matchId,
 			@RequestParam int areaId, @RequestParam String time) {
 		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateTimeAndPlaceMatch(matchId, areaId, time), HttpStatus.OK);
