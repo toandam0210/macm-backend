@@ -2,6 +2,7 @@ package com.fpt.macm.model;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -9,28 +10,28 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "competitive_match")
-public class CompetitiveMatch {
-	
+@Table(name = "exhibition_result")
+public class ExhibitionResult {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column
-	private int round;
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "team_id", referencedColumnName = "id")
+	private ExhibitionTeam team;
 	
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "type_id")
-	private CompetitiveType competitiveType;
+	@JoinColumn(name = "areaId")
+	private Area area;
 	
 	@Column
-	private String firstStudentId;
+	private LocalDateTime time;
 	
-	@Column
-	private String secondStudentId;
+	@Column Double score;
 	
 	@Column
 	private String createdBy;
@@ -52,28 +53,36 @@ public class CompetitiveMatch {
 		this.id = id;
 	}
 
-	public int getRound() {
-		return round;
+	public ExhibitionTeam getTeam() {
+		return team;
 	}
 
-	public void setRound(int round) {
-		this.round = round;
+	public void setTeam(ExhibitionTeam team) {
+		this.team = team;
 	}
 
-	public String getFirstStudentId() {
-		return firstStudentId;
+	public Area getArea() {
+		return area;
 	}
 
-	public void setFirstStudentId(String firstStudentId) {
-		this.firstStudentId = firstStudentId;
+	public void setArea(Area area) {
+		this.area = area;
 	}
 
-	public String getSecondStudentId() {
-		return secondStudentId;
+	public LocalDateTime getTime() {
+		return time;
 	}
 
-	public void setSecondStudentId(String secondStudentId) {
-		this.secondStudentId = secondStudentId;
+	public void setTime(LocalDateTime time) {
+		this.time = time;
+	}
+
+	public Double getScore() {
+		return score;
+	}
+
+	public void setScore(Double score) {
+		this.score = score;
 	}
 
 	public String getCreatedBy() {
@@ -107,13 +116,6 @@ public class CompetitiveMatch {
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
 	}
-
-	public CompetitiveType getCompetitiveType() {
-		return competitiveType;
-	}
-
-	public void setCompetitiveType(CompetitiveType competitiveType) {
-		this.competitiveType = competitiveType;
-	}
+	
 	
 }
