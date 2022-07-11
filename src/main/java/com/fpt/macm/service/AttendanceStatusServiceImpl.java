@@ -3,6 +3,7 @@ package com.fpt.macm.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -52,14 +53,19 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				User user = userOp.get();
 				List<AttendanceStatus> attendancesStatus = attendanceStatusRepository
 						.findByTrainingScheduleId(trainingSchedule.getId());
+				AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
+				attendanceStatusDto.setName(user.getName());
+				attendanceStatusDto.setStudentId(studentId);
 				for (AttendanceStatus attendanceStatus : attendancesStatus) {
 					if (attendanceStatus.getUser().getId() == user.getId()) {
 						attendanceStatus.setStatus(status);
+						attendanceStatusDto.setStatus(status);
 						attendanceStatus.setUpdatedOn(LocalDateTime.now());
 						attendanceStatus.setUpdatedBy("toandv");
 						attendanceStatusRepository.save(attendanceStatus);
 					}
 				}
+				responseMessage.setData(Arrays.asList(attendanceStatusDto));
 				responseMessage.setMessage(Constant.MSG_055);
 			} else {
 				responseMessage.setMessage(Constant.MSG_056);
