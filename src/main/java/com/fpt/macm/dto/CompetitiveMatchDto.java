@@ -10,6 +10,8 @@ public class CompetitiveMatchDto {
 	private int round;
 	private String firstStudentId;
 	private String secondStudentId;
+	private String firstNameAndId;
+	private String secondNameAndId;
 	private LocalDateTime time;
 	private String area;
 	private Integer firstPoint;
@@ -75,5 +77,18 @@ public class CompetitiveMatchDto {
 	public void setSecondPoint(Integer secondPoint) {
 		this.secondPoint = secondPoint;
 	}
+	public String getFirstNameAndId() {
+		return firstNameAndId;
+	}
+	public void setFirstNameAndId(String firstNameAndId) {
+		this.firstNameAndId = firstNameAndId;
+	}
+	public String getSecondNameAndId() {
+		return secondNameAndId;
+	}
+	public void setSecondNameAndId(String secondNameAndId) {
+		this.secondNameAndId = secondNameAndId;
+	}
+	
 	
 }
