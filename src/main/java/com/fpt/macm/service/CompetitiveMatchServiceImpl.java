@@ -55,7 +55,6 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 			}
 			else {
 				int nextPower = nextPower(numberPlayer);
-				int freePlayer = nextPower - numberPlayer;
 				int round = 1;
 				while (nextPower > 1) {
 					int countMatch = nextPower/2;
@@ -73,6 +72,7 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 					round++;
 				}
 				List<CompetitiveMatch> listMatch = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
+				List<CompetitiveMatch> listNewMatch = new ArrayList<CompetitiveMatch>();
 				for(int i = 1; i < listMatch.size(); i++) {
 					CompetitiveMatch getMatch = listMatch.get(i);
 					getMatch.setNextIsFirst(i%2 == 0);
@@ -80,29 +80,9 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 					getMatch.setUpdatedBy("LinhLHN");
 					getMatch.setUpdatedOn(LocalDateTime.now());
 					competitiveMatchRepository.save(getMatch);
+					listNewMatch.add(getMatch);
 				}
-				List<CompetitiveMatch> listMatchRound1 = competitiveMatchRepository.listMatchsByTypeAndRound(competitiveTypeId, 1);
-				List<CompetitiveMatchDto> listMatchPreview = new ArrayList<CompetitiveMatchDto>();
-				int currentMatch = 0;
-				for(int i = 0; i < freePlayer; i++) {
-					CompetitiveMatchDto newMatchPreview = new CompetitiveMatchDto();
-					newMatchPreview.setId(listMatchRound1.get(currentMatch).getId());
-					newMatchPreview.setRound(1);
-					newMatchPreview.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-					newMatchPreview.setSecondStudentId(null);
-					listMatchPreview.add(newMatchPreview);
-					currentMatch++;
-				}
-				for(int i = freePlayer; i < numberPlayer; i+= 2) {
-					CompetitiveMatchDto newMatchPreview = new CompetitiveMatchDto();
-					newMatchPreview.setId(listMatchRound1.get(currentMatch).getId());
-					newMatchPreview.setRound(1);
-					newMatchPreview.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-					newMatchPreview.setSecondStudentId(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-					listMatchPreview.add(newMatchPreview);
-					currentMatch++;
-				}
-				responseMessage.setData(listMatchPreview);
+				responseMessage.setData(listNewMatch);
 				responseMessage.setMessage("Danh sách trận đấu");
 			}
 		} catch (Exception e) {
@@ -238,6 +218,54 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 			}
 			responseMessage.setData(listMatchUpdated);
 			responseMessage.setMessage("Danh sách trận đấu chính thức");
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage previewMatchsPlayer(int competitiveTypeId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository.listPlayersByType(competitiveTypeId);
+			int numberPlayer = listPlayers.size();
+			int nextPower = nextPower(numberPlayer);
+			int freePlayer = nextPower - numberPlayer;
+			List<CompetitiveMatch> listMatch = competitiveMatchRepository.listMatchsByTypeAsc(competitiveTypeId);
+			List<CompetitiveMatchDto> listMatchPreview = new ArrayList<CompetitiveMatchDto>();
+			int currentMatch = 0;
+			for(int i = 0; i < freePlayer; i++) {
+				CompetitiveMatchDto newMatchPreview = new CompetitiveMatchDto();
+				newMatchPreview.setId(listMatch.get(currentMatch).getId());
+				newMatchPreview.setRound(1);
+				newMatchPreview.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+				newMatchPreview.setFirstName(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getName());
+				newMatchPreview.setSecondStudentId(null);
+				listMatchPreview.add(newMatchPreview);
+				currentMatch++;
+			}
+			for(int i = freePlayer; i < numberPlayer; i+= 2) {
+				CompetitiveMatchDto newMatchPreview = new CompetitiveMatchDto();
+				newMatchPreview.setId(listMatch.get(currentMatch).getId());
+				newMatchPreview.setRound(1);
+				newMatchPreview.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+				newMatchPreview.setFirstName(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getName());
+				newMatchPreview.setSecondStudentId(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+				newMatchPreview.setSecondName(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getName());
+				listMatchPreview.add(newMatchPreview);
+				currentMatch++;
+			}
+			for(int i = currentMatch; i < listMatch.size(); i++) {
+				CompetitiveMatchDto newMatchPreview = new CompetitiveMatchDto();
+				newMatchPreview.setId(listMatch.get(i).getId());
+				newMatchPreview.setRound(listMatch.get(i).getRound());
+				listMatchPreview.add(newMatchPreview);
+			}
+			responseMessage.setData(listMatchPreview);
+			responseMessage.setMessage("Bảng thi đấu dự kiến");
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
