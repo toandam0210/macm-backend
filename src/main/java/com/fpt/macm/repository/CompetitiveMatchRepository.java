@@ -13,9 +13,12 @@ public interface CompetitiveMatchRepository extends JpaRepository<CompetitiveMat
 	@Query(value = "select * from competitive_match where type_id = ?1", nativeQuery = true)
 	List<CompetitiveMatch> listMatchsByType(int competitiveTypeId);
 	
-	@Query(value = "select * from competitive_match where type_id = ?1 and round = ?2 order by created_on", nativeQuery = true)
-	List<CompetitiveMatch> listMatchsByTypeAndRound(int competitiveTypeId, int round);
+	@Query(value = "select * from competitive_match where type_id = ?1 and order by created_on", nativeQuery = true)
+	List<CompetitiveMatch> listMatchsByTypeAndRound(int competitiveTypeId);
 	
 	@Query(value = "select * from competitive_match where type_id = ?1 order by created_on desc", nativeQuery = true)
 	List<CompetitiveMatch> listMatchsByTypeDesc(int competitiveTypeId);
+	
+	@Query(value = "select * from competitive_match where type_id = ?1 order by created_on asc", nativeQuery = true)
+	List<CompetitiveMatch> listMatchsByTypeAsc(int competitiveTypeId);
 }

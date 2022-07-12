@@ -57,8 +57,21 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService{
 			newTeam.setTeamName(name);
 			Set<ExhibitionPlayer> listMembers = new HashSet<>();
 			boolean isRegister = true;
+			int countMale = 0;
+			int countFemale = 0;
 			for (String studentId : listStudentId) {
 				User getUser = userRepository.findByStudentId(studentId).get();
+				if(getUser.isGender()) {
+					countMale++;
+				}
+				else {
+					countFemale++;
+				}
+				if(countMale > getType.getNumberMale() || countFemale > getType.getNumberFemale()) {
+					isRegister = false;
+					responseMessage.setMessage("Số lượng thành viên không hợp lệ");
+					break;
+				}
 				Optional<TournamentPlayer> getTournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(getUser.getId(), exhibitionTypeRepository.findTournamentOfType(exhibition_type_id));
 				if(getTournamentPlayerOp.isPresent()) {
 					TournamentPlayer getTournamentPlayer = getTournamentPlayerOp.get();
@@ -66,6 +79,7 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService{
 					if(getExhibitionPlayerOp.isPresent()) {
 						isRegister = false;
 						responseMessage.setMessage("Có thành viên đã đăng ký nội dung này");
+						break;
 					}
 					else {
 						continue;
@@ -98,7 +112,7 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService{
 						TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(getUser.getId(), exhibitionTypeRepository.findTournamentOfType(exhibition_type_id)).get();
 						ExhibitionPlayer newExhibitionPlayer = new ExhibitionPlayer();
 						newExhibitionPlayer.setTournamentPlayer(getTournamentPlayer);
-						newExhibitionPlayer.setRoleInTeam(i == 0? true : false);
+						newExhibitionPlayer.setRoleInTeam(i == 0);
 						listMembers.add(newExhibitionPlayer);
 					}
 				}
