@@ -97,97 +97,58 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 	}
 
 	@Override
-	public ResponseMessage updateResultMatch(int resultId, int firstPoint, int secondPoint) {
+	public ResponseMessage updateResultMatch(int matchId, int firstPoint, int secondPoint) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findById(resultId);
-			if(getResultOp.isPresent()) {
-				CompetitiveResult getResult = getResultOp.get();
-				CompetitiveMatch getMatch = getResult.getMatch();
-				CompetitiveMatch nextMatch = competitiveMatchRepository.getById(getMatch.getNextMatchId());
-				if(getMatch.getFirstStudentId() == null) {
-					if(getMatch.getSecondStudentId() == null) {
-						responseMessage.setMessage("Chưa xếp tuyển thủ vào trận này");
-					}
-					else {
-						if(getMatch.isNextIsFirst()) {
-							nextMatch.setFirstStudentId(getMatch.getSecondStudentId());
-							nextMatch.setUpdatedBy("LinhLHN");
-							nextMatch.setUpdatedOn(LocalDateTime.now());
-							competitiveMatchRepository.save(nextMatch);
-							responseMessage.setMessage("Tuyển thủ vào thẳng");
-							responseMessage.setData(Arrays.asList(getMatch.getSecondStudentId()));
-						}
-						else {
-							nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
-							nextMatch.setUpdatedBy("LinhLHN");
-							nextMatch.setUpdatedOn(LocalDateTime.now());
-							competitiveMatchRepository.save(nextMatch);
-							responseMessage.setMessage("Tuyển thủ vào thẳng");
-							responseMessage.setData(Arrays.asList(getMatch.getSecondStudentId()));
-						}
-					}
-				}
-				else if(getMatch.getSecondStudentId() == null) {
-					if(getMatch.isNextIsFirst()) {
-						nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
-						nextMatch.setUpdatedBy("LinhLHN");
-						nextMatch.setUpdatedOn(LocalDateTime.now());
-						competitiveMatchRepository.save(nextMatch);
-						responseMessage.setMessage("Tuyển thủ vào thẳng");
-						responseMessage.setData(Arrays.asList(getMatch.getFirstStudentId()));
-					}
-					else {
-						nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
-						nextMatch.setUpdatedBy("LinhLHN");
-						nextMatch.setUpdatedOn(LocalDateTime.now());
-						competitiveMatchRepository.save(nextMatch);
-						responseMessage.setMessage("Tuyển thủ vào thẳng");
-						responseMessage.setData(Arrays.asList(getMatch.getFirstStudentId()));
-					}
-				}
-				else {
-					if(getResult.getArea() != null && getResult.getTime() != null) {
+			CompetitiveMatch getMatch = competitiveMatchRepository.findById(matchId).get();
+			CompetitiveMatch nextMatch = competitiveMatchRepository.getById(getMatch.getNextMatchId());
+			if(getMatch.getFirstStudentId() == null || getMatch.getSecondStudentId() == null) {
+				responseMessage.setMessage("Trận đấu này chưa đủ tuyển thủ");
+			}
+			else {
+				Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(matchId);
+				if(getResultOp.isPresent()) {
+					CompetitiveResult getResult = getResultOp.get();
+					if(getResult.getTime() != null) {
 						getResult.setFirstPoint(firstPoint);
 						getResult.setSecondPoint(secondPoint);
 						getResult.setUpdatedBy("LinhLHN");
 						getResult.setUpdatedOn(LocalDateTime.now());
 						competitiveResultRepository.save(getResult);
-						responseMessage.setData(Arrays.asList(getResult));
-						responseMessage.setMessage("Cập nhật kết quả thành công");
 						if(firstPoint > secondPoint) {
 							if(getMatch.isNextIsFirst()) {
 								nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
-								nextMatch.setUpdatedBy("LinhLHN");
-								nextMatch.setUpdatedOn(LocalDateTime.now());
-								competitiveMatchRepository.save(nextMatch);
 							}
 							else {
 								nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
-								nextMatch.setUpdatedBy("LinhLHN");
-								nextMatch.setUpdatedOn(LocalDateTime.now());
-								competitiveMatchRepository.save(nextMatch);
 							}
+							nextMatch.setUpdatedBy("LinhLHN");
+							nextMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(nextMatch);
+							responseMessage.setData(Arrays.asList(getMatch.getFirstStudentId()));
+							responseMessage.setMessage("Tuyển thủ thứ nhất thắng");
 						}
 						else {
 							if(getMatch.isNextIsFirst()) {
 								nextMatch.setFirstStudentId(getMatch.getSecondStudentId());
-								nextMatch.setUpdatedBy("LinhLHN");
-								nextMatch.setUpdatedOn(LocalDateTime.now());
-								competitiveMatchRepository.save(nextMatch);
 							}
 							else {
 								nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
-								nextMatch.setUpdatedBy("LinhLHN");
-								nextMatch.setUpdatedOn(LocalDateTime.now());
-								competitiveMatchRepository.save(nextMatch);
 							}
+							nextMatch.setUpdatedBy("LinhLHN");
+							nextMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(nextMatch);
+							responseMessage.setData(Arrays.asList(getMatch.getSecondStudentId()));
+							responseMessage.setMessage("Tuyển thủ thứ hai thắng");
 						}
 					}
 					else {
-						responseMessage.setMessage("Chưa có thời gian địa điểm nên không thể cập nhật kết quả");
+						responseMessage.setMessage("Chưa có thời gian nên không thể cập nhật kết quả");
 					}
+				}
+				else {
+					responseMessage.setMessage("Chưa có địa điểm nên không thể cập nhật kết quả");
 				}
 			}
 		} catch (Exception e) {
