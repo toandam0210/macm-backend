@@ -2,9 +2,7 @@ package com.fpt.macm.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -171,48 +169,50 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 		try {
 			List<CompetitiveMatch> listMatchUpdated = new ArrayList<CompetitiveMatch>();
 			for (CompetitiveMatchDto matchDto : listUpdated) {
-				CompetitiveMatch getMatch = competitiveMatchRepository.findById(matchDto.getId()).get();
-				if(matchDto.getFirstStudentId() != null) {
-					getMatch.setFirstStudentId(matchDto.getFirstStudentId());
-				}
-				if(matchDto.getSecondStudentId() != null) {
-					getMatch.setSecondStudentId(matchDto.getSecondStudentId());
-				}
-				getMatch.setUpdatedBy("LinhLHN");
-				getMatch.setUpdatedOn(LocalDateTime.now());
-				competitiveMatchRepository.save(getMatch);
-				listMatchUpdated.add(getMatch);
-				CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId()).get();
-				if(getMatch.getFirstStudentId() == null) {
-					if(getMatch.isNextIsFirst()) {
-						nextMatch.setFirstStudentId(getMatch.getSecondStudentId());
-						nextMatch.setUpdatedBy("LinhLHN");
-						nextMatch.setUpdatedOn(LocalDateTime.now());
-						competitiveMatchRepository.save(nextMatch);
-						listMatchUpdated.add(nextMatch);
+				if(matchDto.getRound() == 1) {
+					CompetitiveMatch getMatch = competitiveMatchRepository.findById(matchDto.getId()).get();
+					if(matchDto.getFirstStudentId() != null) {
+						getMatch.setFirstStudentId(matchDto.getFirstStudentId());
 					}
-					else {
-						nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
-						nextMatch.setUpdatedBy("LinhLHN");
-						nextMatch.setUpdatedOn(LocalDateTime.now());
-						competitiveMatchRepository.save(nextMatch);
-						listMatchUpdated.add(nextMatch);
+					if(matchDto.getSecondStudentId() != null) {
+						getMatch.setSecondStudentId(matchDto.getSecondStudentId());
 					}
-				}
-				else if(getMatch.getSecondStudentId() == null) {
-					if(getMatch.isNextIsFirst()) {
-						nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
-						nextMatch.setUpdatedBy("LinhLHN");
-						nextMatch.setUpdatedOn(LocalDateTime.now());
-						competitiveMatchRepository.save(nextMatch);
-						listMatchUpdated.add(nextMatch);
+					getMatch.setUpdatedBy("LinhLHN");
+					getMatch.setUpdatedOn(LocalDateTime.now());
+					competitiveMatchRepository.save(getMatch);
+					listMatchUpdated.add(getMatch);
+					CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId()).get();
+					if(getMatch.getFirstStudentId() == null) {
+						if(getMatch.isNextIsFirst()) {
+							nextMatch.setFirstStudentId(getMatch.getSecondStudentId());
+							nextMatch.setUpdatedBy("LinhLHN");
+							nextMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(nextMatch);
+							listMatchUpdated.add(nextMatch);
+						}
+						else {
+							nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
+							nextMatch.setUpdatedBy("LinhLHN");
+							nextMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(nextMatch);
+							listMatchUpdated.add(nextMatch);
+						}
 					}
-					else {
-						nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
-						nextMatch.setUpdatedBy("LinhLHN");
-						nextMatch.setUpdatedOn(LocalDateTime.now());
-						competitiveMatchRepository.save(nextMatch);
-						listMatchUpdated.add(nextMatch);
+					else if(getMatch.getSecondStudentId() == null) {
+						if(getMatch.isNextIsFirst()) {
+							nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
+							nextMatch.setUpdatedBy("LinhLHN");
+							nextMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(nextMatch);
+							listMatchUpdated.add(nextMatch);
+						}
+						else {
+							nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
+							nextMatch.setUpdatedBy("LinhLHN");
+							nextMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(nextMatch);
+							listMatchUpdated.add(nextMatch);
+						}
 					}
 				}
 			}
@@ -266,6 +266,7 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 			}
 			responseMessage.setData(listMatchPreview);
 			responseMessage.setMessage("Bảng thi đấu dự kiến");
+			responseMessage.setTotalResult(maxRound(numberPlayer));
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
