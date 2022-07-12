@@ -141,20 +141,20 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				if(competitiveMatch.getFirstStudentId() != null) {
 					newCompetitiveMatchDto.setFirstStudentId(competitiveMatch.getFirstStudentId());
 					User fisrtUser = userRepository.getByStudentId(competitiveMatch.getFirstStudentId());
-					newCompetitiveMatchDto.setFirstNameAndId(fisrtUser.getName() + " - " + fisrtUser.getStudentId());
+					newCompetitiveMatchDto.setFirstName(fisrtUser.getName());
 				}
 				else {
 					newCompetitiveMatchDto.setFirstStudentId(null);
-					newCompetitiveMatchDto.setFirstNameAndId(null);
+					newCompetitiveMatchDto.setFirstName(null);
 				}
 				if(competitiveMatch.getSecondStudentId() != null) {
 					newCompetitiveMatchDto.setSecondStudentId(competitiveMatch.getSecondStudentId());
 					User secondUser = userRepository.getByStudentId(competitiveMatch.getSecondStudentId());
-					newCompetitiveMatchDto.setSecondNameAndId(secondUser.getName() + " - " + secondUser.getStudentId());
+					newCompetitiveMatchDto.setSecondName(secondUser.getName());
 				}
 				else {
 					newCompetitiveMatchDto.setSecondStudentId(null);
-					newCompetitiveMatchDto.setSecondNameAndId(null);
+					newCompetitiveMatchDto.setSecondName(null);
 				}
 				Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(competitiveMatch.getId());
 				if(getResultOp.isPresent()) {
@@ -170,6 +170,7 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				}
 				listMatchDto.add(newCompetitiveMatchDto);
 			}
+			Collections.sort(listMatchDto);
 			responseMessage.setData(listMatchDto);
 			responseMessage.setMessage("Danh sách trận đấu");
 			List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository.listPlayersByType(competitiveTypeId);
