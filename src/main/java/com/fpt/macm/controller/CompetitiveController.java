@@ -51,13 +51,13 @@ public class CompetitiveController {
 	}
 	
 	@GetMapping("/headclub/getlistplayerbracket/{competitiveTypeId}")
-	ResponseEntity<ResponseMessage> getListPlayerBracket (@PathVariable(name = "competitiveTypeId") int competitiveTypeId, @RequestParam int round) {
-		return new ResponseEntity<ResponseMessage>(competitivePlayerBracketService.getListPlayerBracket(competitiveTypeId, round), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getListPlayerBracket (@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(competitivePlayerBracketService.getListPlayerBracket(competitiveTypeId), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headclub/spawnmatchs/{competitiveTypeId}")
-	ResponseEntity<ResponseMessage> spawnMatchs (@PathVariable(name = "competitiveTypeId") int competitiveTypeId, @RequestParam int round) {
-		return new ResponseEntity<ResponseMessage>(competitiveMatchService.spawnMatchs(competitiveTypeId, round), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> spawnMatchs (@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(competitiveMatchService.spawnMatchs(competitiveTypeId), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headclub/updatetimeandplacematch/{matchId}")
@@ -67,7 +67,7 @@ public class CompetitiveController {
 	}
 	
 	@PutMapping("/headclub/updateresultmatch/{resultId}")
-	ResponseEntity<ResponseMessage> updateResultMatch (@PathVariable(name = "resultId") int resultId, @RequestParam int firstPoint, @RequestParam int secondPoint) {
+	ResponseEntity<ResponseMessage> updateResultMatch (@PathVariable(name = "resultId") int resultId, @RequestParam (defaultValue = "0") int firstPoint, @RequestParam (defaultValue = "0") int secondPoint) {
 		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateResultMatch(resultId, firstPoint, secondPoint), HttpStatus.OK);
 	}
 	

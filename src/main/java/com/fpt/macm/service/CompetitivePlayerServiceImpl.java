@@ -83,7 +83,6 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 							CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
 							newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
 							newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
-							newCompetitivePlayerBracket.setRound(1);
 							newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
 							newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
 							newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
@@ -117,7 +116,6 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 								CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
 								newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
 								newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
-								newCompetitivePlayerBracket.setRound(1);
 								newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
 								newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
 								newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
@@ -155,7 +153,6 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 							CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
 							newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
 							newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
-							newCompetitivePlayerBracket.setRound(1);
 							newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
 							newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
 							newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
@@ -175,8 +172,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 					CompetitivePlayerBracket getCompetitivePlayerBracket = competitivePlayerBracketRepository.findByPlayerId(getCompetitivePlayer.getId()).get();
 					CompetitiveType getCompetitiveType = getCompetitivePlayerBracket.getCompetitiveType();
 					if(getCompetitiveType.getWeightMin() > weight || getCompetitiveType.getWeightMax() < weight) {
-						getCompetitivePlayerBracket.setRound(0);
-						competitivePlayerBracketRepository.save(getCompetitivePlayerBracket);
+						competitivePlayerBracketRepository.delete(getCompetitivePlayerBracket);
 						responseMessage.setMessage("Loại khỏi giải đấu vì đăng ký sai hạng cân");
 					}
 					getCompetitivePlayer.setWeight(weight);
