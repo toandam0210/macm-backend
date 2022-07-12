@@ -2,9 +2,7 @@ package com.fpt.macm.dto;
 
 import java.time.LocalDateTime;
 
-import com.fpt.macm.model.Area;
-import com.fpt.macm.model.CompetitiveMatch;
-import com.fpt.macm.model.User;
+import com.fpt.macm.model.CompetitiveType;
 
 public class CompetitiveMatchDto implements Comparable<CompetitiveMatchDto> {
 	private int id;
@@ -17,6 +15,7 @@ public class CompetitiveMatchDto implements Comparable<CompetitiveMatchDto> {
 	private String area;
 	private Integer firstPoint;
 	private Integer secondPoint;
+	
 	
 	public int getId() {
 		return id;
@@ -90,6 +89,7 @@ public class CompetitiveMatchDto implements Comparable<CompetitiveMatchDto> {
 	public void setSecondName(String secondName) {
 		this.secondName = secondName;
 	}
+
 	@Override
 	public int compareTo(CompetitiveMatchDto o) {
 		// TODO Auto-generated method stub

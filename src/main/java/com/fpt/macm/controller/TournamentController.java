@@ -19,6 +19,7 @@ import com.fpt.macm.dto.TournamentDto;
 import com.fpt.macm.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Tournament;
+import com.fpt.macm.service.CompetitiveTypeService;
 import com.fpt.macm.service.TournamentService;
 
 @RestController
@@ -26,6 +27,9 @@ import com.fpt.macm.service.TournamentService;
 public class TournamentController {
 	@Autowired
 	TournamentService tournamentService;
+	
+	@Autowired
+	CompetitiveTypeService competitiveTypeService;
 
 	@PostMapping("/headclub/createtournament")
 	ResponseEntity<ResponseMessage> createTournament(@RequestBody Tournament tournament) {
@@ -158,5 +162,8 @@ public class TournamentController {
 				tournamentService.getAllTournamentPlayerPaymentStatusReport(tournamentId), HttpStatus.OK);
 	}
 	
-	
+	@GetMapping("/treasurer/getallcompetitivetype/{tournamentId}")
+	ResponseEntity<ResponseMessage> getAllCompetitiveType(@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(competitiveTypeService.getAllType(tournamentId), HttpStatus.OK);
+	}
 }
