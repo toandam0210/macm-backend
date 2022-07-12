@@ -6,6 +6,7 @@ public class FeeDashboardDto {
 	private int month;
 	private double totalIncome;
 	private double totalSpend;
+	private double balance;
 
 	public String getSemester() {
 		return semester;
@@ -37,6 +38,14 @@ public class FeeDashboardDto {
 
 	public void setTotalSpend(double totalSpend) {
 		this.totalSpend = totalSpend;
+	}
+
+	public double getBalance() {
+		return balance;
+	}
+
+	public void setBalance(double balance) {
+		this.balance = balance;
 	}
 
 }
