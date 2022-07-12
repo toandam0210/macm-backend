@@ -5,9 +5,11 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
 import com.fpt.macm.model.CompetitivePlayerBracket;
 
+@Repository
 public interface CompetitivePlayerBracketRepository extends JpaRepository<CompetitivePlayerBracket, Integer>{
 	
 	@Query(value = "select * from competitive_player_bracket where player_id = ?1", nativeQuery = true)

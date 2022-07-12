@@ -76,7 +76,9 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				for(int i = 1; i < listMatch.size(); i++) {
 					CompetitiveMatch getMatch = listMatch.get(i);
 					getMatch.setNextIsFirst(i%2 == 0);
-					getMatch.setNextMatchId(listMatch.get(i/2).getId());
+					getMatch.setNextMatchId(listMatch.get((i + 1)/2 - 1).getId());
+					getMatch.setUpdatedBy("LinhLHN");
+					getMatch.setUpdatedOn(LocalDateTime.now());
 					competitiveMatchRepository.save(getMatch);
 				}
 				List<CompetitiveMatch> listMatchRound1 = competitiveMatchRepository.listMatchsByTypeAndRound(competitiveTypeId, 1);
@@ -87,13 +89,22 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 					getMatch.setRound(1);
 					getMatch.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
 					getMatch.setSecondStudentId(null);
-					getMatch.setCreatedBy("LinhLHN");
-					getMatch.setCreatedOn(LocalDateTime.now());
 					getMatch.setUpdatedBy("LinhLHN");
 					getMatch.setUpdatedOn(LocalDateTime.now());
 					competitiveMatchRepository.save(getMatch);
 					listMatch.add(getMatch);
 					currentMatch++;
+					CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId()).get();
+					if(getMatch.isNextIsFirst()) {
+						nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
+					}
+					else {
+						nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
+					}
+					nextMatch.setUpdatedBy("LinhLHN");
+					nextMatch.setUpdatedOn(LocalDateTime.now());
+					competitiveMatchRepository.save(nextMatch);
+					listMatch.add(nextMatch);
 				}
 				for(int i = freePlayer; i < numberPlayer; i+= 2) {
 					CompetitiveMatch newCompetitiveMatch = listMatchRound1.get(currentMatch);
@@ -101,8 +112,6 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 					newCompetitiveMatch.setRound(1);
 					newCompetitiveMatch.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
 					newCompetitiveMatch.setSecondStudentId(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-					newCompetitiveMatch.setCreatedBy("LinhLHN");
-					newCompetitiveMatch.setCreatedOn(LocalDateTime.now());
 					newCompetitiveMatch.setUpdatedBy("LinhLHN");
 					newCompetitiveMatch.setUpdatedOn(LocalDateTime.now());
 					competitiveMatchRepository.save(newCompetitiveMatch);

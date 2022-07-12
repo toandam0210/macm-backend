@@ -9,13 +9,8 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.model.Area;
 import com.fpt.macm.model.CompetitiveMatch;
-import com.fpt.macm.model.CompetitivePlayer;
-import com.fpt.macm.model.CompetitivePlayerBracket;
 import com.fpt.macm.model.CompetitiveResult;
-import com.fpt.macm.model.CompetitiveType;
 import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.TournamentPlayer;
-import com.fpt.macm.model.User;
 import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
@@ -58,34 +53,41 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(matchId);
-			if(getResultOp.isPresent()) {
-				CompetitiveResult getResult = getResultOp.get();
-				Area area = areaRepository.getById(areaId);
-				getResult.setArea(area);
-				LocalDateTime getTime = Utils.ConvertStringToLocalDateTime(time);
-				getResult.setTime(getTime);
-				getResult.setUpdatedBy("LinhLHN");
-				getResult.setUpdatedOn(LocalDateTime.now());
-				competitiveResultRepository.save(getResult);
-				responseMessage.setData(Arrays.asList(getResult));
+			CompetitiveMatch getMatch = competitiveMatchRepository.findById(matchId).get();
+			if(getMatch.getFirstStudentId() == null || getMatch.getSecondStudentId() == null) {
+				responseMessage.setMessage("Không thể tổ chức trận đấu chỉ có một tuyển thủ");
 			}
 			else {
-				CompetitiveResult newResult = new CompetitiveResult();
-				CompetitiveMatch getMatch = competitiveMatchRepository.getById(matchId);
-				newResult.setMatch(getMatch);
-				Area area = areaRepository.getById(areaId);
-				newResult.setArea(area);
-				LocalDateTime getTime = Utils.ConvertStringToLocalDateTime(time);
-				newResult.setTime(getTime);
-				newResult.setFirstPoint(0);
-				newResult.setSecondPoint(0);
-				newResult.setCreatedBy("LinhLHN");
-				newResult.setCreatedOn(LocalDateTime.now());
-				newResult.setUpdatedBy("LinhLHN");
-				newResult.setUpdatedOn(LocalDateTime.now());
-				competitiveResultRepository.save(newResult);
-				responseMessage.setData(Arrays.asList(newResult));
+				Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(matchId);
+				if(getResultOp.isPresent()) {
+					CompetitiveResult getResult = getResultOp.get();
+					Area area = areaRepository.getById(areaId);
+					getResult.setArea(area);
+					LocalDateTime getTime = Utils.ConvertStringToLocalDateTime(time);
+					getResult.setTime(getTime);
+					getResult.setUpdatedBy("LinhLHN");
+					getResult.setUpdatedOn(LocalDateTime.now());
+					competitiveResultRepository.save(getResult);
+					responseMessage.setData(Arrays.asList(getResult));
+					responseMessage.setMessage("Cập nhật thời gian và địa điểm cho trận đấu có id là " + matchId);
+				}
+				else {
+					CompetitiveResult newResult = new CompetitiveResult();
+					newResult.setMatch(getMatch);
+					Area area = areaRepository.findById(areaId).get();
+					newResult.setArea(area);
+					LocalDateTime getTime = Utils.ConvertStringToLocalDateTime(time);
+					newResult.setTime(getTime);
+					newResult.setFirstPoint(0);
+					newResult.setSecondPoint(0);
+					newResult.setCreatedBy("LinhLHN");
+					newResult.setCreatedOn(LocalDateTime.now());
+					newResult.setUpdatedBy("LinhLHN");
+					newResult.setUpdatedOn(LocalDateTime.now());
+					competitiveResultRepository.save(newResult);
+					responseMessage.setData(Arrays.asList(newResult));
+					responseMessage.setMessage("Tạo thời gian và địa điểm cho trận đấu có id là " + matchId);
+				}
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -103,7 +105,6 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 			if(getResultOp.isPresent()) {
 				CompetitiveResult getResult = getResultOp.get();
 				CompetitiveMatch getMatch = getResult.getMatch();
-				CompetitiveType getType = getResult.getMatch().getCompetitiveType();
 				CompetitiveMatch nextMatch = competitiveMatchRepository.getById(getMatch.getNextMatchId());
 				if(getMatch.getFirstStudentId() == null) {
 					if(getMatch.getSecondStudentId() == null) {
@@ -115,12 +116,16 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 							nextMatch.setUpdatedBy("LinhLHN");
 							nextMatch.setUpdatedOn(LocalDateTime.now());
 							competitiveMatchRepository.save(nextMatch);
+							responseMessage.setMessage("Tuyển thủ vào thẳng");
+							responseMessage.setData(Arrays.asList(getMatch.getSecondStudentId()));
 						}
 						else {
 							nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
 							nextMatch.setUpdatedBy("LinhLHN");
 							nextMatch.setUpdatedOn(LocalDateTime.now());
 							competitiveMatchRepository.save(nextMatch);
+							responseMessage.setMessage("Tuyển thủ vào thẳng");
+							responseMessage.setData(Arrays.asList(getMatch.getSecondStudentId()));
 						}
 					}
 				}
@@ -130,12 +135,16 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 						nextMatch.setUpdatedBy("LinhLHN");
 						nextMatch.setUpdatedOn(LocalDateTime.now());
 						competitiveMatchRepository.save(nextMatch);
+						responseMessage.setMessage("Tuyển thủ vào thẳng");
+						responseMessage.setData(Arrays.asList(getMatch.getFirstStudentId()));
 					}
 					else {
 						nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
 						nextMatch.setUpdatedBy("LinhLHN");
 						nextMatch.setUpdatedOn(LocalDateTime.now());
 						competitiveMatchRepository.save(nextMatch);
+						responseMessage.setMessage("Tuyển thủ vào thẳng");
+						responseMessage.setData(Arrays.asList(getMatch.getFirstStudentId()));
 					}
 				}
 				else {

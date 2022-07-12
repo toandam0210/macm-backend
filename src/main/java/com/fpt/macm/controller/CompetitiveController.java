@@ -67,7 +67,7 @@ public class CompetitiveController {
 	}
 	
 	@PutMapping("/headclub/updateresultmatch/{resultId}")
-	ResponseEntity<ResponseMessage> updateResultMatch (@PathVariable(name = "resultId") int resultId, @RequestParam int firstPoint, @RequestParam int secondPoint) {
+	ResponseEntity<ResponseMessage> updateResultMatch (@PathVariable(name = "resultId") int resultId, @RequestParam (defaultValue = "0") int firstPoint, @RequestParam (defaultValue = "0") int secondPoint) {
 		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateResultMatch(resultId, firstPoint, secondPoint), HttpStatus.OK);
 	}
 	
