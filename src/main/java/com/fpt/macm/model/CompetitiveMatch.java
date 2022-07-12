@@ -33,6 +33,12 @@ public class CompetitiveMatch {
 	private String secondStudentId;
 	
 	@Column
+	private Integer nextMatchId;
+	
+	@Column
+	private boolean nextIsFirst;
+	
+	@Column
 	private String createdBy;
 
 	@Column
@@ -76,6 +82,14 @@ public class CompetitiveMatch {
 		this.secondStudentId = secondStudentId;
 	}
 
+	public Integer getNextMatchId() {
+		return nextMatchId;
+	}
+
+	public void setNextMatchId(Integer nextMatchId) {
+		this.nextMatchId = nextMatchId;
+	}
+
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -114,6 +128,14 @@ public class CompetitiveMatch {
 
 	public void setCompetitiveType(CompetitiveType competitiveType) {
 		this.competitiveType = competitiveType;
+	}
+
+	public boolean isNextIsFirst() {
+		return nextIsFirst;
+	}
+
+	public void setNextIsFirst(boolean nextIsFirst) {
+		this.nextIsFirst = nextIsFirst;
 	}
 	
 }

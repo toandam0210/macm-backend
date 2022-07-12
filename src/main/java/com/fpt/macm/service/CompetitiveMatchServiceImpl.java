@@ -2,6 +2,9 @@ package com.fpt.macm.service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,91 +43,75 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 	UserRepository userRepository;
 	
 	@Override
-	public ResponseMessage spawnMatchs(int competitiveTypeId, int round) {
+	public ResponseMessage spawnMatchs(int competitiveTypeId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			CompetitiveType competitiveType = competitiveTypeRepository.findById(competitiveTypeId).get();
-			List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository.listByTypeAndRound(competitiveTypeId, round);
+			List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository.listPlayersByType(competitiveTypeId);
 			int numberPlayer = listPlayers.size();
-			int nextPower = nextPower(numberPlayer);
-			List<CompetitiveMatch> listMatch = new ArrayList<CompetitiveMatch>();
-			int freePlayer = nextPower - numberPlayer;
-			if(numberPlayer == 2) {
-				List<CompetitivePlayerBracket> listSemiFinal = competitivePlayerBracketRepository.listByTypeAndRound(competitiveType.getId(), round - 1);
-				List<CompetitivePlayerBracket> listLoseSemi = new ArrayList<CompetitivePlayerBracket>();
-				for (CompetitivePlayerBracket competitivePlayerBracket : listSemiFinal) {
-					boolean isWin = false;
-					for (CompetitivePlayerBracket winSemi : listPlayers) {
-						if(competitivePlayerBracket.getCompetitivePlayer().equals(winSemi.getCompetitivePlayer())) {
-							isWin = true;
-							break;
-						}
+			if(numberPlayer < 4) {
+				responseMessage.setMessage("Số lượng tuyển thủ không đạt 4 người trở lên, không thi đấu hạng cân này");
+			}
+			else {
+				int nextPower = nextPower(numberPlayer);
+				int freePlayer = nextPower - numberPlayer;
+				int round = 1;
+				while (nextPower > 1) {
+					int countMatch = nextPower/2;
+					for(int i = 0; i < countMatch; i++) {
+						CompetitiveMatch newMatch = new CompetitiveMatch();
+						newMatch.setRound(round);
+						newMatch.setCompetitiveType(competitiveType);
+						newMatch.setCreatedBy("LinhLHN");
+						newMatch.setCreatedOn(LocalDateTime.now());
+						newMatch.setUpdatedBy("LinhLHN");
+						newMatch.setUpdatedOn(LocalDateTime.now());
+						competitiveMatchRepository.save(newMatch);
 					}
-					if(!isWin) {
-						listLoseSemi.add(competitivePlayerBracket);
-					}
+					nextPower = countMatch;
+					round++;
 				}
-				CompetitiveMatch newCompetitiveMatch = new CompetitiveMatch();
-				newCompetitiveMatch.setCompetitiveType(competitiveType);
-				newCompetitiveMatch.setRound(round);
-				newCompetitiveMatch.setFirstStudentId(listLoseSemi.get(0).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-				newCompetitiveMatch.setSecondStudentId(listLoseSemi.get(1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-				newCompetitiveMatch.setCreatedBy("LinhLHN");
-				newCompetitiveMatch.setCreatedOn(LocalDateTime.now());
-				newCompetitiveMatch.setUpdatedBy("LinhLHN");
-				newCompetitiveMatch.setUpdatedOn(LocalDateTime.now());
-				competitiveMatchRepository.save(newCompetitiveMatch);
-				listMatch.add(newCompetitiveMatch);
-				newCompetitiveMatch.setCompetitiveType(competitiveType);
-				newCompetitiveMatch.setRound(round);
-				newCompetitiveMatch.setFirstStudentId(listPlayers.get(0).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-				newCompetitiveMatch.setSecondStudentId(listPlayers.get(1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-				newCompetitiveMatch.setCreatedBy("LinhLHN");
-				newCompetitiveMatch.setCreatedOn(LocalDateTime.now());
-				newCompetitiveMatch.setUpdatedBy("LinhLHN");
-				newCompetitiveMatch.setUpdatedOn(LocalDateTime.now());
-				competitiveMatchRepository.save(newCompetitiveMatch);
-				listMatch.add(newCompetitiveMatch);
+				List<CompetitiveMatch> listMatch = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
+				for(int i = 1; i < listMatch.size(); i++) {
+					CompetitiveMatch getMatch = listMatch.get(i);
+					getMatch.setNextIsFirst(i%2 == 0);
+					getMatch.setNextMatchId(listMatch.get(i/2).getId());
+					competitiveMatchRepository.save(getMatch);
+				}
+				List<CompetitiveMatch> listMatchRound1 = competitiveMatchRepository.listMatchsByTypeAndRound(competitiveTypeId, 1);
+				int currentMatch = 0;
+				for(int i = 0; i < freePlayer; i++) {
+					CompetitiveMatch getMatch = listMatchRound1.get(currentMatch);
+					getMatch.setCompetitiveType(competitiveType);
+					getMatch.setRound(1);
+					getMatch.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+					getMatch.setSecondStudentId(null);
+					getMatch.setCreatedBy("LinhLHN");
+					getMatch.setCreatedOn(LocalDateTime.now());
+					getMatch.setUpdatedBy("LinhLHN");
+					getMatch.setUpdatedOn(LocalDateTime.now());
+					competitiveMatchRepository.save(getMatch);
+					listMatch.add(getMatch);
+					currentMatch++;
+				}
+				for(int i = freePlayer; i < numberPlayer; i+= 2) {
+					CompetitiveMatch newCompetitiveMatch = listMatchRound1.get(currentMatch);
+					newCompetitiveMatch.setCompetitiveType(competitiveType);
+					newCompetitiveMatch.setRound(1);
+					newCompetitiveMatch.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+					newCompetitiveMatch.setSecondStudentId(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+					newCompetitiveMatch.setCreatedBy("LinhLHN");
+					newCompetitiveMatch.setCreatedOn(LocalDateTime.now());
+					newCompetitiveMatch.setUpdatedBy("LinhLHN");
+					newCompetitiveMatch.setUpdatedOn(LocalDateTime.now());
+					competitiveMatchRepository.save(newCompetitiveMatch);
+					listMatch.add(newCompetitiveMatch);
+					currentMatch++;
+				}
+				responseMessage.setData(listMatch);
+				responseMessage.setMessage("Danh sách trận đấu");
 			}
-			for(int i = 0; i < freePlayer; i++) {
-				CompetitiveMatch newCompetitiveMatch = new CompetitiveMatch();
-				newCompetitiveMatch.setCompetitiveType(competitiveType);
-				newCompetitiveMatch.setRound(round);
-				newCompetitiveMatch.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-				newCompetitiveMatch.setSecondStudentId(null);
-				newCompetitiveMatch.setCreatedBy("LinhLHN");
-				newCompetitiveMatch.setCreatedOn(LocalDateTime.now());
-				newCompetitiveMatch.setUpdatedBy("LinhLHN");
-				newCompetitiveMatch.setUpdatedOn(LocalDateTime.now());
-				competitiveMatchRepository.save(newCompetitiveMatch);
-				listMatch.add(newCompetitiveMatch);
-				CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
-				newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
-				newCompetitivePlayerBracket.setCompetitivePlayer(listPlayers.get(i).getCompetitivePlayer());
-				newCompetitivePlayerBracket.setRound(round + 1);
-				newCompetitivePlayerBracket.setNumerical_order_id(listPlayers.get(i).getNumerical_order_id());
-				newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
-				newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
-				newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
-				newCompetitivePlayerBracket.setUpdatedOn(LocalDateTime.now());
-				competitivePlayerBracketRepository.save(newCompetitivePlayerBracket);
-			}
-			for(int i = freePlayer; i < numberPlayer; i+= 2) {
-				CompetitiveMatch newCompetitiveMatch = new CompetitiveMatch();
-				newCompetitiveMatch.setCompetitiveType(competitiveType);
-				newCompetitiveMatch.setRound(round);
-				newCompetitiveMatch.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-				newCompetitiveMatch.setSecondStudentId(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-				newCompetitiveMatch.setCreatedBy("LinhLHN");
-				newCompetitiveMatch.setCreatedOn(LocalDateTime.now());
-				newCompetitiveMatch.setUpdatedBy("LinhLHN");
-				newCompetitiveMatch.setUpdatedOn(LocalDateTime.now());
-				competitiveMatchRepository.save(newCompetitiveMatch);
-				listMatch.add(newCompetitiveMatch);
-			}
-			responseMessage.setData(listMatch);
-			responseMessage.setMessage("Danh sách trận đấu vòng " + round);
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
@@ -176,7 +163,7 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 			}
 			responseMessage.setData(listMatchDto);
 			responseMessage.setMessage("Danh sách trận đấu");
-			List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository.listByTypeAndRound(competitiveTypeId, 1);
+			List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository.listPlayersByType(competitiveTypeId);
 			responseMessage.setTotalResult(maxRound(listPlayers.size()));
 		} catch (Exception e) {
 			// TODO: handle exception

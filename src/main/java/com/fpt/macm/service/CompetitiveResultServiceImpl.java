@@ -102,50 +102,83 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 			Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findById(resultId);
 			if(getResultOp.isPresent()) {
 				CompetitiveResult getResult = getResultOp.get();
+				CompetitiveMatch getMatch = getResult.getMatch();
 				CompetitiveType getType = getResult.getMatch().getCompetitiveType();
-				if(getResult.getArea() != null && getResult.getTime() != null) {
-					getResult.setFirstPoint(firstPoint);
-					getResult.setSecondPoint(secondPoint);
-					getResult.setUpdatedBy("LinhLHN");
-					getResult.setUpdatedOn(LocalDateTime.now());
-					competitiveResultRepository.save(getResult);
-					responseMessage.setData(Arrays.asList(getResult));
-					responseMessage.setMessage("Cập nhật kết quả thành công");
-					if(firstPoint > secondPoint) {
-						CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
-						newCompetitivePlayerBracket.setCompetitiveType(getType);
-						User getUser = userRepository.getByStudentId(getResult.getMatch().getFirstStudentId());
-						TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(getUser.getId(), competitiveTypeRepository.findTournamentOfType(getType.getId())).get();
-						CompetitivePlayer getPlayer = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId()).get();
-						newCompetitivePlayerBracket.setCompetitivePlayer(getPlayer);
-						newCompetitivePlayerBracket.setRound(getResult.getMatch().getRound() + 1);
-						CompetitivePlayerBracket getCompetitivePlayerBracket = competitivePlayerBracketRepository.findByPlayerId(getPlayer.getId()).get();
-						newCompetitivePlayerBracket.setNumerical_order_id(getCompetitivePlayerBracket.getNumerical_order_id());
-						newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
-						newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
-						newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
-						newCompetitivePlayerBracket.setUpdatedOn(LocalDateTime.now());
-						competitivePlayerBracketRepository.save(newCompetitivePlayerBracket);
+				CompetitiveMatch nextMatch = competitiveMatchRepository.getById(getMatch.getNextMatchId());
+				if(getMatch.getFirstStudentId() == null) {
+					if(getMatch.getSecondStudentId() == null) {
+						responseMessage.setMessage("Chưa xếp tuyển thủ vào trận này");
 					}
 					else {
-						CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
-						newCompetitivePlayerBracket.setCompetitiveType(getType);
-						User getUser = userRepository.getByStudentId(getResult.getMatch().getSecondStudentId());
-						TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(getUser.getId(), competitiveTypeRepository.findTournamentOfType(getType.getId())).get();
-						CompetitivePlayer getPlayer = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId()).get();
-						newCompetitivePlayerBracket.setCompetitivePlayer(getPlayer);
-						newCompetitivePlayerBracket.setRound(getResult.getMatch().getRound() + 1);
-						CompetitivePlayerBracket getCompetitivePlayerBracket = competitivePlayerBracketRepository.findByPlayerId(getPlayer.getId()).get();
-						newCompetitivePlayerBracket.setNumerical_order_id(getCompetitivePlayerBracket.getNumerical_order_id());
-						newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
-						newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
-						newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
-						newCompetitivePlayerBracket.setUpdatedOn(LocalDateTime.now());
-						competitivePlayerBracketRepository.save(newCompetitivePlayerBracket);
+						if(getMatch.isNextIsFirst()) {
+							nextMatch.setFirstStudentId(getMatch.getSecondStudentId());
+							nextMatch.setUpdatedBy("LinhLHN");
+							nextMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(nextMatch);
+						}
+						else {
+							nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
+							nextMatch.setUpdatedBy("LinhLHN");
+							nextMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(nextMatch);
+						}
+					}
+				}
+				else if(getMatch.getSecondStudentId() == null) {
+					if(getMatch.isNextIsFirst()) {
+						nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
+						nextMatch.setUpdatedBy("LinhLHN");
+						nextMatch.setUpdatedOn(LocalDateTime.now());
+						competitiveMatchRepository.save(nextMatch);
+					}
+					else {
+						nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
+						nextMatch.setUpdatedBy("LinhLHN");
+						nextMatch.setUpdatedOn(LocalDateTime.now());
+						competitiveMatchRepository.save(nextMatch);
 					}
 				}
 				else {
-					responseMessage.setMessage("Chưa có thời gian địa điểm nên không thể cập nhật kết quả");
+					if(getResult.getArea() != null && getResult.getTime() != null) {
+						getResult.setFirstPoint(firstPoint);
+						getResult.setSecondPoint(secondPoint);
+						getResult.setUpdatedBy("LinhLHN");
+						getResult.setUpdatedOn(LocalDateTime.now());
+						competitiveResultRepository.save(getResult);
+						responseMessage.setData(Arrays.asList(getResult));
+						responseMessage.setMessage("Cập nhật kết quả thành công");
+						if(firstPoint > secondPoint) {
+							if(getMatch.isNextIsFirst()) {
+								nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
+								nextMatch.setUpdatedBy("LinhLHN");
+								nextMatch.setUpdatedOn(LocalDateTime.now());
+								competitiveMatchRepository.save(nextMatch);
+							}
+							else {
+								nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
+								nextMatch.setUpdatedBy("LinhLHN");
+								nextMatch.setUpdatedOn(LocalDateTime.now());
+								competitiveMatchRepository.save(nextMatch);
+							}
+						}
+						else {
+							if(getMatch.isNextIsFirst()) {
+								nextMatch.setFirstStudentId(getMatch.getSecondStudentId());
+								nextMatch.setUpdatedBy("LinhLHN");
+								nextMatch.setUpdatedOn(LocalDateTime.now());
+								competitiveMatchRepository.save(nextMatch);
+							}
+							else {
+								nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
+								nextMatch.setUpdatedBy("LinhLHN");
+								nextMatch.setUpdatedOn(LocalDateTime.now());
+								competitiveMatchRepository.save(nextMatch);
+							}
+						}
+					}
+					else {
+						responseMessage.setMessage("Chưa có thời gian địa điểm nên không thể cập nhật kết quả");
+					}
 				}
 			}
 		} catch (Exception e) {

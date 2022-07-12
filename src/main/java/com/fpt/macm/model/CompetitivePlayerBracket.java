@@ -27,12 +27,8 @@ public class CompetitivePlayerBracket {
 	@JoinColumn(name = "player_id")
 	private CompetitivePlayer competitivePlayer;
 	
-	
 	@Column
-	private int round;
-	
-	@Column
-	private Integer numerical_order_id;
+	private Integer numericalOrderId;
 	
 	@Column
 	private String createdBy;
@@ -70,20 +66,12 @@ public class CompetitivePlayerBracket {
 		this.competitivePlayer = competitivePlayer;
 	}
 
-	public Integer getNumerical_order_id() {
-		return numerical_order_id;
+	public Integer getNumericalOrderId() {
+		return numericalOrderId;
 	}
 
-	public void setNumerical_order_id(Integer numerical_order_id) {
-		this.numerical_order_id = numerical_order_id;
-	}
-
-	public int getRound() {
-		return round;
-	}
-
-	public void setRound(int round) {
-		this.round = round;
+	public void setNumericalOrderId(Integer numericalOrderId) {
+		this.numericalOrderId = numericalOrderId;
 	}
 
 	public String getCreatedBy() {
