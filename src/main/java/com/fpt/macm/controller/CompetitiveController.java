@@ -72,9 +72,9 @@ public class CompetitiveController {
 		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateTimeAndPlaceMatch(matchId, areaId, time), HttpStatus.OK);
 	}
 	
-	@PutMapping("/headclub/updateresultmatch/{resultId}")
-	ResponseEntity<ResponseMessage> updateResultMatch (@PathVariable(name = "resultId") int resultId, @RequestParam (defaultValue = "0") int firstPoint, @RequestParam (defaultValue = "0") int secondPoint) {
-		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateResultMatch(resultId, firstPoint, secondPoint), HttpStatus.OK);
+	@PutMapping("/headclub/updateresultmatch/{matchId}")
+	ResponseEntity<ResponseMessage> updateResultMatch (@PathVariable(name = "matchId") int matchId, @RequestParam (defaultValue = "0") int firstPoint, @RequestParam (defaultValue = "0") int secondPoint) {
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateResultMatch(matchId, firstPoint, secondPoint), HttpStatus.OK);
 	}
 	
 	@GetMapping("/headclub/listmatchs/{competitiveTypeId}")
