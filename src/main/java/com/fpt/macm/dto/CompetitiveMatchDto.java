@@ -2,8 +2,6 @@ package com.fpt.macm.dto;
 
 import java.time.LocalDateTime;
 
-import com.fpt.macm.model.CompetitiveType;
-
 public class CompetitiveMatchDto implements Comparable<CompetitiveMatchDto> {
 	private int id;
 	private int round;
