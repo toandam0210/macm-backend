@@ -7,15 +7,11 @@ import com.fpt.macm.model.CompetitiveType;
 public class CompetitiveMatchDto implements Comparable<CompetitiveMatchDto> {
 	private int id;
 	private int round;
-	private String firstStudentId;
-	private String secondStudentId;
-	private String firstName;
-	private String secondName;
 	private LocalDateTime time;
 	private String area;
-	private Integer firstPoint;
-	private Integer secondPoint;
-	
+	private String status;
+	private PlayerMatchDto firstPlayer;
+	private PlayerMatchDto secondPlayer;
 	
 	public int getId() {
 		return id;
@@ -28,22 +24,6 @@ public class CompetitiveMatchDto implements Comparable<CompetitiveMatchDto> {
 	}
 	public void setRound(int round) {
 		this.round = round;
-	}
-	
-	public String getFirstStudentId() {
-		return firstStudentId;
-	}
-	
-	public void setFirstStudentId(String firstStudentId) {
-		this.firstStudentId = firstStudentId;
-	}
-	
-	public String getSecondStudentId() {
-		return secondStudentId;
-	}
-	
-	public void setSecondStudentId(String secondStudentId) {
-		this.secondStudentId = secondStudentId;
 	}
 	
 	public LocalDateTime getTime() {
@@ -61,35 +41,31 @@ public class CompetitiveMatchDto implements Comparable<CompetitiveMatchDto> {
 	public void setArea(String area) {
 		this.area = area;
 	}
-	
-	public Integer getFirstPoint() {
-		return firstPoint;
-	}
-	
-	public void setFirstPoint(Integer firstPoint) {
-		this.firstPoint = firstPoint;
-	}
-	
-	public Integer getSecondPoint() {
-		return secondPoint;
-	}
-	
-	public void setSecondPoint(Integer secondPoint) {
-		this.secondPoint = secondPoint;
-	}
-	public String getFirstName() {
-		return firstName;
-	}
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-	public String getSecondName() {
-		return secondName;
-	}
-	public void setSecondName(String secondName) {
-		this.secondName = secondName;
-	}
 
+	public String getStatus() {
+		return status;
+	}
+	
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	public PlayerMatchDto getFirstPlayer() {
+		return firstPlayer;
+	}
+	
+	public void setFirstPlayer(PlayerMatchDto firstPlayer) {
+		this.firstPlayer = firstPlayer;
+	}
+	
+	public PlayerMatchDto getSecondPlayer() {
+		return secondPlayer;
+	}
+	
+	public void setSecondPlayer(PlayerMatchDto secondPlayer) {
+		this.secondPlayer = secondPlayer;
+	}
+	
 	@Override
 	public int compareTo(CompetitiveMatchDto o) {
 		// TODO Auto-generated method stub

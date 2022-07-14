@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.dto.CompetitiveMatchDto;
+import com.fpt.macm.dto.PlayerMatchDto;
 import com.fpt.macm.model.CompetitiveMatch;
 import com.fpt.macm.model.CompetitivePlayerBracket;
 import com.fpt.macm.model.CompetitiveResult;
@@ -101,22 +102,24 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				newCompetitiveMatchDto.setId(competitiveMatch.getId());
 				newCompetitiveMatchDto.setRound(competitiveMatch.getRound());
 				if(competitiveMatch.getFirstStudentId() != null) {
-					newCompetitiveMatchDto.setFirstStudentId(competitiveMatch.getFirstStudentId());
+					PlayerMatchDto firstPlayer = new PlayerMatchDto();
+					firstPlayer.setStudentId(competitiveMatch.getFirstStudentId());
 					User fisrtUser = userRepository.getByStudentId(competitiveMatch.getFirstStudentId());
-					newCompetitiveMatchDto.setFirstName(fisrtUser.getName());
+					firstPlayer.setStudentName(fisrtUser.getName());
+					newCompetitiveMatchDto.setFirstPlayer(firstPlayer);
 				}
 				else {
-					newCompetitiveMatchDto.setFirstStudentId(null);
-					newCompetitiveMatchDto.setFirstName(null);
+					newCompetitiveMatchDto.setFirstPlayer(null);
 				}
 				if(competitiveMatch.getSecondStudentId() != null) {
-					newCompetitiveMatchDto.setSecondStudentId(competitiveMatch.getSecondStudentId());
+					PlayerMatchDto secondPlayer = new PlayerMatchDto();
+					secondPlayer.setStudentId(competitiveMatch.getSecondStudentId());
 					User secondUser = userRepository.getByStudentId(competitiveMatch.getSecondStudentId());
-					newCompetitiveMatchDto.setSecondName(secondUser.getName());
+					secondPlayer.setStudentName(secondUser.getName());
+					newCompetitiveMatchDto.setSecondPlayer(secondPlayer);
 				}
 				else {
-					newCompetitiveMatchDto.setSecondStudentId(null);
-					newCompetitiveMatchDto.setSecondName(null);
+					newCompetitiveMatchDto.setSecondPlayer(null);
 				}
 				Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(competitiveMatch.getId());
 				if(getResultOp.isPresent()) {
@@ -124,10 +127,10 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 					newCompetitiveMatchDto.setArea(getResult.getArea().getName());
 					newCompetitiveMatchDto.setTime(getResult.getTime());
 					if(getResult.getFirstPoint() != null) {
-						newCompetitiveMatchDto.setFirstPoint(getResult.getFirstPoint());
+						newCompetitiveMatchDto.getFirstPlayer().setPoint(getResult.getFirstPoint());
 					}
 					if(getResult.getSecondPoint() != null) {
-						newCompetitiveMatchDto.setSecondPoint(getResult.getSecondPoint());
+						newCompetitiveMatchDto.getSecondPlayer().setPoint(getResult.getSecondPoint());
 					}
 				}
 				listMatchDto.add(newCompetitiveMatchDto);
@@ -171,11 +174,11 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 			for (CompetitiveMatchDto matchDto : listUpdated) {
 				if(matchDto.getRound() == 1) {
 					CompetitiveMatch getMatch = competitiveMatchRepository.findById(matchDto.getId()).get();
-					if(matchDto.getFirstStudentId() != null) {
-						getMatch.setFirstStudentId(matchDto.getFirstStudentId());
+					if(matchDto.getFirstPlayer() != null) {
+						getMatch.setFirstStudentId(matchDto.getFirstPlayer().getStudentId());
 					}
-					if(matchDto.getSecondStudentId() != null) {
-						getMatch.setSecondStudentId(matchDto.getSecondStudentId());
+					if(matchDto.getSecondPlayer() != null) {
+						getMatch.setSecondStudentId(matchDto.getSecondPlayer().getStudentId());
 					}
 					getMatch.setUpdatedBy("LinhLHN");
 					getMatch.setUpdatedOn(LocalDateTime.now());
@@ -241,9 +244,11 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				CompetitiveMatchDto newMatchPreview = new CompetitiveMatchDto();
 				newMatchPreview.setId(listMatch.get(currentMatch).getId());
 				newMatchPreview.setRound(1);
-				newMatchPreview.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-				newMatchPreview.setFirstName(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getName());
-				newMatchPreview.setSecondStudentId(null);
+				PlayerMatchDto firstPlayer = new PlayerMatchDto();
+				firstPlayer.setStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+				firstPlayer.setStudentName(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getName());
+				newMatchPreview.setFirstPlayer(firstPlayer);
+				newMatchPreview.setSecondPlayer(null);
 				listMatchPreview.add(newMatchPreview);
 				currentMatch++;
 			}
@@ -251,10 +256,14 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				CompetitiveMatchDto newMatchPreview = new CompetitiveMatchDto();
 				newMatchPreview.setId(listMatch.get(currentMatch).getId());
 				newMatchPreview.setRound(1);
-				newMatchPreview.setFirstStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-				newMatchPreview.setFirstName(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getName());
-				newMatchPreview.setSecondStudentId(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
-				newMatchPreview.setSecondName(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getName());
+				PlayerMatchDto firstPlayer = new PlayerMatchDto();
+				firstPlayer.setStudentId(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+				firstPlayer.setStudentName(listPlayers.get(i).getCompetitivePlayer().getTournamentPlayer().getUser().getName());
+				newMatchPreview.setFirstPlayer(firstPlayer);
+				PlayerMatchDto secondPlayer = new PlayerMatchDto();
+				secondPlayer.setStudentId(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getStudentId());
+				secondPlayer.setStudentName(listPlayers.get(i + 1).getCompetitivePlayer().getTournamentPlayer().getUser().getName());
+				newMatchPreview.setSecondPlayer(secondPlayer);
 				listMatchPreview.add(newMatchPreview);
 				currentMatch++;
 			}
