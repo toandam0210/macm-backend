@@ -3,31 +3,34 @@ package com.fpt.macm.dto;
 public class InforInQrCode {
 	private String studentId;
 	private String studentName;
-	private String email;
-
+	private String date;
+	private boolean status;
 	public String getStudentId() {
 		return studentId;
 	}
-
 	public void setStudentId(String studentId) {
 		this.studentId = studentId;
 	}
-
 	public String getStudentName() {
 		return studentName;
 	}
-
 	public void setStudentName(String studentName) {
 		this.studentName = studentName;
 	}
-
-	public String getEmail() {
-		return email;
+	public String getDate() {
+		return date;
+	}
+	public void setDate(String date) {
+		this.date = date;
+	}
+	public boolean isStatus() {
+		return status;
+	}
+	public void setStatus(boolean status) {
+		this.status = status;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+	
 	
 	
 }
