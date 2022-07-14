@@ -20,14 +20,17 @@ import com.fpt.macm.dto.InforInQrCode;
 import com.fpt.macm.dto.UserDto;
 import com.fpt.macm.helper.ExcelHelper;
 import com.fpt.macm.model.AdminSemester;
+import com.fpt.macm.model.AttendanceStatus;
 import com.fpt.macm.model.Constant;
 import com.fpt.macm.model.ERole;
 import com.fpt.macm.model.MemberSemester;
 import com.fpt.macm.model.ResponseMessage;
 import com.fpt.macm.model.Role;
 import com.fpt.macm.model.Semester;
+import com.fpt.macm.model.TrainingSchedule;
 import com.fpt.macm.model.User;
 import com.fpt.macm.repository.AdminSemesterRepository;
+import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CollaboratorReportRepository;
 import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.RoleRepository;
@@ -57,7 +60,13 @@ public class UserServiceImpl implements UserService {
 	SemesterService semesterService;
 	
 	@Autowired
+	TrainingScheduleService trainingScheduleService;
+	
+	@Autowired
 	CollaboratorReportRepository collaboratorReportRepository;
+	
+	@Autowired
+	AttendanceStatusRepository attendanceStatusRepository;
 	
 	private static final int ORDER_QR_CODE_SIZE_WIDTH = 300;
     private static final int ORDER_QR_CODE_SIZE_HEIGHT = 300;
@@ -643,9 +652,26 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage generateQrCode(InforInQrCode inforInQrCode) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingSessionByDate(LocalDate.now());
+			String qrCode = "";
+			inforInQrCode.setDate(LocalDate.now().toString());
+			if (trainingSchedule != null) {
+				User user = userRepository.findByStudentId(inforInQrCode.getStudentId()).get();
+				AttendanceStatus attendanceStatus = attendanceStatusRepository.findByUserIdAndTrainingScheduleId(user.getId(),trainingSchedule.getId());
+				if(attendanceStatus == null) {
+					inforInQrCode.setStatus(false);
+				}else {
+					if(attendanceStatus.getStatus() == 0 || attendanceStatus.getStatus() == 2) {
+						inforInQrCode.setStatus(false);
+					}else {
+						inforInQrCode.setStatus(true);
+					}
+				}
+			}else {
+				inforInQrCode.setStatus(false);
+			}
 			String prettyData = Utils.prettyObject(inforInQrCode);
-
-			String qrCode = Utils.generateQrCode(prettyData, ORDER_QR_CODE_SIZE_WIDTH, ORDER_QR_CODE_SIZE_HEIGHT);
+			qrCode = Utils.generateQrCode(prettyData, ORDER_QR_CODE_SIZE_WIDTH, ORDER_QR_CODE_SIZE_HEIGHT);
 			responseMessage.setData(Arrays.asList(qrCode));
 			responseMessage.setMessage("Generate QR Code successful");
 		} catch (Exception e) {

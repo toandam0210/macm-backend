@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -449,7 +450,8 @@ public class UserControllerTest {
 		InforInQrCode inforInQrCode = new InforInQrCode();
 		inforInQrCode.setStudentId("HE140855");
 		inforInQrCode.setStudentName("dam van toan");
-		inforInQrCode.setEmail(null);
+		inforInQrCode.setDate(LocalDate.now().toString());
+		inforInQrCode.setStatus(true);
 		this.mockMvc.perform(post("/api/admin/hr/member/qrcode/create").content(asJsonString(inforInQrCode))
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
 		.andExpect(jsonPath("$.data.size()").value(1));

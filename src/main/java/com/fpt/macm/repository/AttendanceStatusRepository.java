@@ -15,4 +15,7 @@ public interface AttendanceStatusRepository extends JpaRepository<AttendanceStat
 	@Query(value = "select * from  attendance_status where user_id = ?1", nativeQuery = true)
 	List<AttendanceStatus> findByUserId(int userId);
 	
+	@Query(value = "select * from  attendance_status where user_id = ?1 and traning_schedule_id = ?2", nativeQuery = true)
+	AttendanceStatus findByUserIdAndTrainingScheduleId(int userId, int trainingScheduleId);
+	
 }

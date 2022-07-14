@@ -1,10 +1,9 @@
 package com.fpt.macm.dto;
 
-public class InforInQrCode {
+public class PlayerMatchDto {
 	private String studentId;
 	private String studentName;
-	private String date;
-	private boolean status;
+	private Integer point;
 	public String getStudentId() {
 		return studentId;
 	}
@@ -17,20 +16,12 @@ public class InforInQrCode {
 	public void setStudentName(String studentName) {
 		this.studentName = studentName;
 	}
-	public String getDate() {
-		return date;
+	public Integer getPoint() {
+		return point;
 	}
-	public void setDate(String date) {
-		this.date = date;
+	public void setPoint(Integer point) {
+		this.point = point;
 	}
-	public boolean isStatus() {
-		return status;
-	}
-	public void setStatus(boolean status) {
-		this.status = status;
-	}
-
-	
 	
 	
 }
