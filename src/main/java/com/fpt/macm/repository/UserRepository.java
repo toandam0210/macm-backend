@@ -1,5 +1,6 @@
 package com.fpt.macm.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -27,4 +28,7 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	Page<User> searchByStudentIdOrName(String searchInput, Pageable pageable);
 	
 	Optional<User> findByEmail(String email);
+	
+	@Query(value = "select * from \"user\" where role_id in (13,14,15)", nativeQuery = true)
+	List<User> findCollaborator();
 }
