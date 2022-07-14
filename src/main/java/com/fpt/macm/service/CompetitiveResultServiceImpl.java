@@ -102,7 +102,6 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			CompetitiveMatch getMatch = competitiveMatchRepository.findById(matchId).get();
-			CompetitiveMatch nextMatch = competitiveMatchRepository.getById(getMatch.getNextMatchId());
 			if(getMatch.getFirstStudentId() == null || getMatch.getSecondStudentId() == null) {
 				responseMessage.setMessage("Trận đấu này chưa đủ tuyển thủ");
 			}
@@ -110,48 +109,44 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 				Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(matchId);
 				if(getResultOp.isPresent()) {
 					CompetitiveResult getResult = getResultOp.get();
-					//if(getResult.getTime() != null) {
-						getResult.setFirstPoint(firstPoint);
-						getResult.setSecondPoint(secondPoint);
-						getResult.setUpdatedBy("LinhLHN");
-						getResult.setUpdatedOn(LocalDateTime.now());
-						competitiveResultRepository.save(getResult);
-						if(firstPoint > secondPoint) {
+					getResult.setFirstPoint(firstPoint);
+					getResult.setSecondPoint(secondPoint);
+					getResult.setUpdatedBy("LinhLHN");
+					getResult.setUpdatedOn(LocalDateTime.now());
+					competitiveResultRepository.save(getResult);
+					if(getMatch.getNextMatchId() != null) {
+						CompetitiveMatch nextMatch = competitiveMatchRepository.getById(getMatch.getNextMatchId());
+						String studentId = firstPoint > secondPoint? getMatch.getFirstStudentId() : getMatch.getSecondStudentId();
 							if(getMatch.isNextIsFirst()) {
-								nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
+								nextMatch.setFirstStudentId(studentId);
 							}
 							else {
-								nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
+								nextMatch.setSecondStudentId(studentId);
 							}
 							nextMatch.setUpdatedBy("LinhLHN");
 							nextMatch.setUpdatedOn(LocalDateTime.now());
 							competitiveMatchRepository.save(nextMatch);
-							responseMessage.setData(Arrays.asList(getMatch.getFirstStudentId()));
-							responseMessage.setMessage("Tuyển thủ thứ nhất thắng");
+					}
+					if(getMatch.getLoseMatchId() != null) {
+						CompetitiveMatch loseMatch = competitiveMatchRepository.getById(getMatch.getLoseMatchId());
+						String studentId = firstPoint < secondPoint? getMatch.getFirstStudentId() : getMatch.getSecondStudentId();
+						if(getMatch.isNextIsFirst()) {
+							loseMatch.setFirstStudentId(studentId);
 						}
 						else {
-							if(getMatch.isNextIsFirst()) {
-								nextMatch.setFirstStudentId(getMatch.getSecondStudentId());
-							}
-							else {
-								nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
-							}
-							nextMatch.setUpdatedBy("LinhLHN");
-							nextMatch.setUpdatedOn(LocalDateTime.now());
-							competitiveMatchRepository.save(nextMatch);
-							responseMessage.setData(Arrays.asList(getMatch.getSecondStudentId()));
-							responseMessage.setMessage("Tuyển thủ thứ hai thắng");
+							loseMatch.setSecondStudentId(studentId);
 						}
-//					}
-//					else {
-//						responseMessage.setMessage("Chưa có thời gian nên không thể cập nhật kết quả");
-//					}
-						
+						loseMatch.setUpdatedBy("LinhLHN");
+						loseMatch.setUpdatedOn(LocalDateTime.now());
+						competitiveMatchRepository.save(loseMatch);
+					}
 				}
 				else {
+					//responseMessage.setMessage("Chưa tổ chức trận đấu");
 					CompetitiveResult newResult = new CompetitiveResult();
+					newResult.setArea(areaRepository.getById(1));
+					newResult.setTime(LocalDateTime.now());
 					newResult.setMatch(getMatch);
-					newResult.setArea(areaRepository.findById(1).get());
 					newResult.setFirstPoint(firstPoint);
 					newResult.setSecondPoint(secondPoint);
 					newResult.setCreatedBy("LinhLHN");
@@ -159,31 +154,31 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService{
 					newResult.setUpdatedBy("LinhLHN");
 					newResult.setUpdatedOn(LocalDateTime.now());
 					competitiveResultRepository.save(newResult);
-					if(firstPoint > secondPoint) {
-						if(getMatch.isNextIsFirst()) {
-							nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
-						}
-						else {
-							nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
-						}
-						nextMatch.setUpdatedBy("LinhLHN");
-						nextMatch.setUpdatedOn(LocalDateTime.now());
-						competitiveMatchRepository.save(nextMatch);
-						responseMessage.setData(Arrays.asList(getMatch.getFirstStudentId()));
-						responseMessage.setMessage("Tuyển thủ thứ nhất thắng");
+					if(getMatch.getNextMatchId() != null) {
+						CompetitiveMatch nextMatch = competitiveMatchRepository.getById(getMatch.getNextMatchId());
+						String studentId = firstPoint > secondPoint? getMatch.getFirstStudentId() : getMatch.getSecondStudentId();
+							if(getMatch.isNextIsFirst()) {
+								nextMatch.setFirstStudentId(studentId);
+							}
+							else {
+								nextMatch.setSecondStudentId(studentId);
+							}
+							nextMatch.setUpdatedBy("LinhLHN");
+							nextMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(nextMatch);
 					}
-					else {
+					if(getMatch.getLoseMatchId() != null) {
+						CompetitiveMatch loseMatch = competitiveMatchRepository.getById(getMatch.getLoseMatchId());
+						String studentId = firstPoint < secondPoint? getMatch.getFirstStudentId() : getMatch.getSecondStudentId();
 						if(getMatch.isNextIsFirst()) {
-							nextMatch.setFirstStudentId(getMatch.getSecondStudentId());
+							loseMatch.setFirstStudentId(studentId);
 						}
 						else {
-							nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
+							loseMatch.setSecondStudentId(studentId);
 						}
-						nextMatch.setUpdatedBy("LinhLHN");
-						nextMatch.setUpdatedOn(LocalDateTime.now());
-						competitiveMatchRepository.save(nextMatch);
-						responseMessage.setData(Arrays.asList(getMatch.getSecondStudentId()));
-						responseMessage.setMessage("Tuyển thủ thứ hai thắng");
+						loseMatch.setUpdatedBy("LinhLHN");
+						loseMatch.setUpdatedOn(LocalDateTime.now());
+						competitiveMatchRepository.save(loseMatch);
 					}
 				}
 			}
