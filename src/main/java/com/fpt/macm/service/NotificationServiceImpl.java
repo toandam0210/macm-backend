@@ -152,7 +152,7 @@ public class NotificationServiceImpl implements NotificationService{
 	
 	public void createTrainingSessionCreateNotification(LocalDate date) {
 		Notification notification = new Notification();
-		notification.setMessage("Ngày " + date + " có buổi tập mới được thêm.");
+		notification.setMessage("Thông báo, có buổi tập mới vào ngày " + date + ".");
 		notification.setNotificationType(2);
 		notification.setNotificationTypeId(0);
 		notification.setCreatedOn(LocalDateTime.now());
@@ -170,7 +170,7 @@ public class NotificationServiceImpl implements NotificationService{
 
 	public void createTrainingSessionDeleteNotification(LocalDate date) {
 		Notification notification = new Notification();
-		notification.setMessage("Buổi tập ngày " + date + " đã hủy.");
+		notification.setMessage("Thông báo, nghỉ tập ngày " + date + ".");
 		notification.setNotificationType(2);
 		notification.setNotificationTypeId(0);
 		notification.setCreatedOn(LocalDateTime.now());
