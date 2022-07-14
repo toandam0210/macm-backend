@@ -444,16 +444,16 @@ public class UserControllerTest {
 		.andExpect(jsonPath("$.data.size()").value(2));
 	}
 	
-	@Test
-	public void testGenerateQrCode() throws Exception{
-		InforInQrCode inforInQrCode = new InforInQrCode();
-		inforInQrCode.setStudentId("HE140855");
-		inforInQrCode.setStudentName("dam van toan");
-		inforInQrCode.setEmail(null);
-		this.mockMvc.perform(post("/api/admin/hr/member/qrcode/create").content(asJsonString(inforInQrCode))
-				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
-		.andExpect(jsonPath("$.data.size()").value(1));
-	}
+//	@Test
+//	public void testGenerateQrCode() throws Exception{
+//		InforInQrCode inforInQrCode = new InforInQrCode();
+//		inforInQrCode.setStudentId("HE140855");
+//		inforInQrCode.setStudentName("dam van toan");
+//		inforInQrCode.setEmail(null);
+//		this.mockMvc.perform(post("/api/admin/hr/member/qrcode/create").content(asJsonString(inforInQrCode))
+//				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+//		.andExpect(jsonPath("$.data.size()").value(1));
+//	}
 	public static String asJsonString(final Object obj) {
 	    try {
 	      return new ObjectMapper().writeValueAsString(obj);
