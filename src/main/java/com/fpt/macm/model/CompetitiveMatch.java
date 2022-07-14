@@ -36,6 +36,9 @@ public class CompetitiveMatch {
 	private Integer nextMatchId;
 	
 	@Column
+	private Integer loseMatchId;
+	
+	@Column
 	private boolean nextIsFirst;
 	
 	@Column
@@ -88,6 +91,14 @@ public class CompetitiveMatch {
 
 	public void setNextMatchId(Integer nextMatchId) {
 		this.nextMatchId = nextMatchId;
+	}
+	
+	public Integer getLoseMatchId() {
+		return loseMatchId;
+	}
+
+	public void setLoseMatchId(Integer loseMatchId) {
+		this.loseMatchId = loseMatchId;
 	}
 
 	public String getCreatedBy() {

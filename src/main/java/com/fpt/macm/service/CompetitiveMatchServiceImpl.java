@@ -70,12 +70,26 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 					nextPower = countMatch;
 					round++;
 				}
+				CompetitiveMatch newMatch = new CompetitiveMatch();
+				newMatch.setRound(round);
+				newMatch.setCompetitiveType(competitiveType);
+				newMatch.setCreatedBy("LinhLHN");
+				newMatch.setCreatedOn(LocalDateTime.now());
+				newMatch.setUpdatedBy("LinhLHN");
+				newMatch.setUpdatedOn(LocalDateTime.now());
+				competitiveMatchRepository.save(newMatch);
 				List<CompetitiveMatch> listMatch = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
 				List<CompetitiveMatch> listNewMatch = new ArrayList<CompetitiveMatch>();
-				for(int i = 1; i < listMatch.size(); i++) {
+				for(int i = 2; i < listMatch.size(); i++) {
 					CompetitiveMatch getMatch = listMatch.get(i);
-					getMatch.setNextIsFirst(i%2 == 0);
-					getMatch.setNextMatchId(listMatch.get((i + 1)/2 - 1).getId());
+					getMatch.setNextIsFirst(i%2 == 1);
+					getMatch.setNextMatchId(listMatch.get(i/2).getId());
+					if(i == 2 || i == 3) {
+						getMatch.setLoseMatchId(listMatch.get(0).getId());
+					}
+					else {
+						getMatch.setLoseMatchId(null);
+					}
 					getMatch.setUpdatedBy("LinhLHN");
 					getMatch.setUpdatedOn(LocalDateTime.now());
 					competitiveMatchRepository.save(getMatch);
