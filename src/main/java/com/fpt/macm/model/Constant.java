@@ -51,7 +51,7 @@ public class Constant {
     public static final String MSG_038 = "Không thành công. Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc";
     public static final String MSG_039 = "Không thành công. Không thể thêm lịch tập vào quá khứ";
     public static final String MSG_040 = "Không thành công. Không có ngày nào đạt yêu cầu";
-    public static final String MSG_041 = "Không thành công. Đã có lịch tập trong ngày ";
+    public static final String MSG_041 = "Không thành công. Đã có lịch tập trong ngày này";
     public static final String MSG_042 = "Cập nhật buổi tập thành công";
     public static final String MSG_043 = "Không thành công. Không thể cập nhật buổi tập trong quá khứ";
     public static final String MSG_044 = "Xóa buổi tập thành công";
@@ -61,4 +61,5 @@ public class Constant {
     public static final String MSG_048 = "Người dùng với MSSV: ";
     public static final String MSG_049 = "Người dùng với Email: ";
     public static final String MSG_050 = " đã tồn tại. ";
+    public static final String MSG_051 = "Không có lịch tập trong ngày này";
 }
