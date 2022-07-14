@@ -17,4 +17,7 @@ public interface MemberEventService {
 	ResponseMessage getListMemberEventToUpdateRole(int eventId);
 	ResponseMessage getListMemberNotJoinEvent(int eventId, int pageNo, int pageSize);
 	ResponseMessage addListMemberJoinEvent(int eventId, List<MemberNotJoinEventDto> listToJoin);
+	ResponseMessage registerToJoinEvent(int eventId, String studentId);
+	ResponseMessage registerToJoinOrganizingCommittee(int eventId, String studentId, int roleEventId);
+	ResponseMessage cancelToJoinEvent(int eventId, String studentId);
 }

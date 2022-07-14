@@ -86,4 +86,25 @@ public class MemberEventController {
 		return new ResponseEntity<ResponseMessage>(memberEventService.addListMemberJoinEvent(eventId, listToJoin),
 				HttpStatus.OK);
 	}
+
+	@PostMapping("/registertojoinevent/{eventId}/{studentId}")
+	ResponseEntity<ResponseMessage> registerToJoinEvent(@PathVariable(name = "eventId") int eventId,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.registerToJoinEvent(eventId, studentId),
+				HttpStatus.OK);
+	}
+
+	@PostMapping("/registertojoinorganizingcommittee/{eventId}/{studentId}/{roleEventId}")
+	ResponseEntity<ResponseMessage> registerToJoinOrganizingCommittee(@PathVariable(name = "eventId") int eventId,
+			@PathVariable(name = "studentId") String studentId, @PathVariable(name = "roleEventId") int roleEventId) {
+		return new ResponseEntity<ResponseMessage>(
+				memberEventService.registerToJoinOrganizingCommittee(eventId, studentId, roleEventId), HttpStatus.OK);
+	}
+
+	@PutMapping("/canceltojoinevent/{eventId}/{studentId}")
+	ResponseEntity<ResponseMessage> cancelToJoinEvent(@PathVariable(name = "eventId") int eventId,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.cancelToJoinEvent(eventId, studentId),
+				HttpStatus.OK);
+	}
 }
