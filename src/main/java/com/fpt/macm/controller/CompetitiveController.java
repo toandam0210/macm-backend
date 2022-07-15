@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.CompetitiveMatchDto;
+import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.CompetitiveMatchService;
 import com.fpt.macm.service.CompetitivePlayerBracketService;
@@ -93,7 +94,7 @@ public class CompetitiveController {
 	}
 	
 	@PostMapping("/headclub/spawntimeandarea/{tournamentId}")
-	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId) {
-		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId, @RequestBody List<Area> listArea) {
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId, listArea), HttpStatus.OK);
 	}
 }
