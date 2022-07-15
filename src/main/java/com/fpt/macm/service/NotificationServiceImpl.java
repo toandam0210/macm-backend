@@ -6,6 +6,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -15,30 +17,57 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.entity.Event;
+import com.fpt.macm.model.entity.MemberEvent;
+import com.fpt.macm.model.entity.MembershipInfo;
+import com.fpt.macm.model.entity.MembershipStatus;
 import com.fpt.macm.model.entity.Notification;
 import com.fpt.macm.model.entity.NotificationToUser;
+import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
+import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.MemberEventRepository;
+import com.fpt.macm.repository.MembershipShipInforRepository;
+import com.fpt.macm.repository.MembershipStatusRepository;
 import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.NotificationToUserRepository;
+import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
 
 @Service
-public class NotificationServiceImpl implements NotificationService{
+public class NotificationServiceImpl implements NotificationService {
 
 	@Autowired
 	NotificationRepository notificationRepository;
-	
+
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	NotificationToUserRepository notificationToUserRepository;
-	
+
 	@Autowired
 	TournamentRepository tournamentRepository;
-	
+
+	@Autowired
+	MembershipStatusRepository membershipStatusRepository;
+
+	@Autowired
+	MembershipShipInforRepository membershipShipInforRepository;
+
+	@Autowired
+	SemesterService semesterService;
+
+	@Autowired
+	MemberEventRepository memberEventRepository;
+
+	@Autowired
+	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
+
 	@Override
 	public ResponseMessage getAllNotification(int pageNo, int pageSize, String sortBy) {
 		// TODO Auto-generated method stub
@@ -47,7 +76,7 @@ public class NotificationServiceImpl implements NotificationService{
 			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
 			Page<Notification> pageResponse = notificationRepository.findAll(paging);
 			List<Notification> notifications = new ArrayList<Notification>();
-			
+
 			if (pageResponse != null && pageResponse.hasContent()) {
 				notifications = pageResponse.getContent();
 				responseMessage.setData(notifications);
@@ -60,7 +89,7 @@ public class NotificationServiceImpl implements NotificationService{
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
-		
+
 		return responseMessage;
 	}
 
@@ -70,7 +99,7 @@ public class NotificationServiceImpl implements NotificationService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			notification.setCreatedOn(LocalDateTime.now());
-			
+
 			notificationRepository.save(notification);
 			responseMessage.setData(Arrays.asList(notification));
 			responseMessage.setMessage(Constant.MSG_017);
@@ -86,19 +115,19 @@ public class NotificationServiceImpl implements NotificationService{
 		// TODO Auto-generated method stub
 		try {
 			List<User> users = (List<User>) userRepository.findAll();
-			
+
 			List<NotificationToUser> notificationToUsers = new ArrayList<NotificationToUser>();
-			
+
 			for (User user : users) {
 				NotificationToUser notificationToUser = new NotificationToUser();
-				
+
 				notificationToUser.setNotification(notification);
 				notificationToUser.setUser(user);
 				notificationToUser.setRead(false);
 				notificationToUser.setCreatedOn(LocalDateTime.now());
-				
+
 				notificationToUsers.add(notificationToUser);
-				
+
 				notificationToUserRepository.save(notificationToUser);
 			}
 		} catch (Exception e) {
@@ -111,7 +140,7 @@ public class NotificationServiceImpl implements NotificationService{
 		// TODO Auto-generated method stub
 		try {
 			NotificationToUser notificationToUser = new NotificationToUser();
-				
+
 			notificationToUser.setNotification(notification);
 			notificationToUser.setUser(user);
 			notificationToUser.setRead(false);
@@ -121,7 +150,7 @@ public class NotificationServiceImpl implements NotificationService{
 			// TODO: handle exception
 		}
 	}
-	
+
 	public void createTournamentNotification(int tournamentId, String tournamentName) {
 		try {
 			Notification notification = new Notification();
@@ -135,7 +164,7 @@ public class NotificationServiceImpl implements NotificationService{
 			System.out.println(e.getMessage());
 		}
 	}
-	
+
 	public void createEventNotification(int eventId, String eventName) {
 		try {
 			Notification notification = new Notification();
@@ -149,7 +178,7 @@ public class NotificationServiceImpl implements NotificationService{
 			System.out.println(e.getMessage());
 		}
 	}
-	
+
 	public void createTrainingSessionCreateNotification(LocalDate date) {
 		Notification notification = new Notification();
 		notification.setMessage("Thông báo, có buổi tập mới vào ngày " + date + ".");
@@ -158,10 +187,11 @@ public class NotificationServiceImpl implements NotificationService{
 		notification.setCreatedOn(LocalDateTime.now());
 		notificationRepository.save(notification);
 	}
-	
+
 	public void createTrainingSessionUpdateNotification(LocalDate date, LocalTime newStartTime, LocalTime newEndTime) {
 		Notification notification = new Notification();
-		notification.setMessage("Buổi tập ngày " + date + " thay đổi thời gian tập thành: " + newStartTime + " - " + newEndTime + ".");
+		notification.setMessage(
+				"Buổi tập ngày " + date + " thay đổi thời gian tập thành: " + newStartTime + " - " + newEndTime + ".");
 		notification.setNotificationType(2);
 		notification.setNotificationTypeId(0);
 		notification.setCreatedOn(LocalDateTime.now());
@@ -175,5 +205,93 @@ public class NotificationServiceImpl implements NotificationService{
 		notification.setNotificationTypeId(0);
 		notification.setCreatedOn(LocalDateTime.now());
 		notificationRepository.save(notification);
+	}
+
+	@Override
+	public ResponseMessage checkPaymentStatus(String studentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<String> messages = new ArrayList<String>();
+			User user = userRepository.findByStudentId(studentId).get();
+			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+			Optional<MembershipInfo> membershipInfoOp = membershipShipInforRepository
+					.findBySemester(semester.getName());
+			if (membershipInfoOp.isPresent()) {
+				MembershipInfo membershipInfo = membershipInfoOp.get();
+				MembershipStatus membershipStatus = membershipStatusRepository
+						.findByMemberShipInfoIdAndUserId(membershipInfo.getId(), user.getId()).get();
+				if (!membershipStatus.isStatus()) {
+					String message = "Số tiền membership bạn cần đóng kỳ " + semester.getName() + ": "
+							+ membershipInfo.getAmount() + " VND";
+					messages.add(message);
+				}
+			}
+
+			List<MemberEvent> membersEvent = memberEventRepository.findByUserId(user.getId());
+			if (!membersEvent.isEmpty()) {
+				for (MemberEvent memberEvent : membersEvent) {
+					Event event = memberEvent.getEvent();
+					double amountPerRegisterEstimate = event.getAmountPerRegisterEstimated();
+					double amountPerRegisterActual = event.getAmountPerRegisterActual();
+
+					if (amountPerRegisterEstimate != 0) {
+						if (amountPerRegisterActual == 0) {
+							if (memberEvent.getPaymentValue() == 0) {
+								String message = "Số tiền bạn cần phải đóng cho sự kiện " + event.getName() + ": "
+										+ amountPerRegisterEstimate + " VND";
+								messages.add(message);
+							}
+						} else {
+							if (memberEvent.getPaymentValue() == 0) {
+								String message = "Số tiền bạn cần phải đóng cho sự kiện " + event.getName() + ": "
+										+ amountPerRegisterActual + " VND";
+								messages.add(message);
+							} else if (amountPerRegisterActual > amountPerRegisterEstimate) {
+								if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
+									String message = "Số tiền bạn cần phải đóng thêm cho sự kiện " + event.getName()
+											+ ": " + (amountPerRegisterActual - amountPerRegisterEstimate) + " VND";
+									messages.add(message);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+					.findByUserId(user.getId());
+			if (!tournamentOrganizingCommittees.isEmpty()) {
+				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+					if (!tournamentOrganizingCommittee.isPaymentStatus()) {
+						String message = "Số tiền bạn cần phải đóng cho giải đấu "
+								+ tournamentOrganizingCommittee.getTournament().getName() + ": "
+								+ tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay() + " VND";
+						messages.add(message);
+					}
+				}
+			}
+
+			List<Tournament> tournaments = tournamentRepository.findAll();
+			for (Tournament tournament : tournaments) {
+				Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+				for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+					if (studentId.equals(tournamentPlayer.getUser().getStudentId())
+							&& !tournamentPlayer.isPaymentStatus()) {
+						String message = "Số tiền bạn cần phải đóng cho giải đấu " + tournament.getName() + ": "
+								+ tournament.getFeePlayerPay() + " VND";
+						messages.add(message);
+					}
+				}
+			}
+
+			responseMessage.setData(messages);
+			responseMessage.setMessage(
+					"Lấy trạng thái đóng tiền của " + user.getName() + " - " + user.getStudentId() + " thành công");
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 }

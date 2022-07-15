@@ -12,4 +12,5 @@ public interface TournamentOrganizingCommitteeRepository extends JpaRepository<T
 
 	List<TournamentOrganizingCommittee> findByTournamentId(int tournamentId);
 	
+	List<TournamentOrganizingCommittee> findByUserId(int userId);
 }
