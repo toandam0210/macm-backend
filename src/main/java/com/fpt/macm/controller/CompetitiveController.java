@@ -91,4 +91,9 @@ public class CompetitiveController {
 	ResponseEntity<ResponseMessage> previewMatchsPlayer (@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
 		return new ResponseEntity<ResponseMessage>(competitiveMatchService.previewMatchsPlayer(competitiveTypeId), HttpStatus.OK);
 	}
+	
+	@PostMapping("/headclub/spawntimeandarea/{tournamentId}")
+	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
+	}
 }

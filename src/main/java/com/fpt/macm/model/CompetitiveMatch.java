@@ -13,7 +13,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "competitive_match")
-public class CompetitiveMatch {
+public class CompetitiveMatch implements Comparable<CompetitiveMatch>{
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -148,5 +148,15 @@ public class CompetitiveMatch {
 	public void setNextIsFirst(boolean nextIsFirst) {
 		this.nextIsFirst = nextIsFirst;
 	}
+
+	@Override
+	public int compareTo(CompetitiveMatch o) {
+		// TODO Auto-generated method stub
+		if(this.getRound() == o.getRound()) {
+			return this.getId() - o.getId();
+		}
+		return this.getRound() - o.getRound();
+	}
+	
 	
 }
