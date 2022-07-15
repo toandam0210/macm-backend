@@ -49,4 +49,6 @@ public interface TournamentService {
 	ResponseMessage getAllTournamentPlayerPaymentStatusReport(int tournamentId);
 	
 	ResponseMessage getAllCompetitivePlayerByType(int tournamentId, int competitiveTypeId);
+	
+	ResponseMessage registerToJoinTournamentOrganizingComittee(int tournamentId, String studentId, int roleId);
 }

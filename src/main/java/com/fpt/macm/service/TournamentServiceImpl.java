@@ -39,6 +39,7 @@ import com.fpt.macm.model.entity.TournamentOrganizingCommitteePaymentStatusRepor
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.TournamentPlayerPaymentStatusReport;
 import com.fpt.macm.model.entity.TournamentSchedule;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
@@ -54,6 +55,7 @@ import com.fpt.macm.repository.TournamentPlayerPaymentStatusReportRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
+import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -103,6 +105,9 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	TournamentPlayerPaymentStatusReportRepository tournamentPlayerPaymentStatusReportRepository;
+	
+	@Autowired
+	UserRepository userRepository;
 
 	@Override
 	public ResponseMessage createTournament(Tournament tournament) {
@@ -232,6 +237,8 @@ public class TournamentServiceImpl implements TournamentService {
 				tournament.setName(tournamentDto.getName());
 				tournament.setMaxQuantityComitee(tournamentDto.getMaxQuantityComitee());
 				tournament.setDescription(tournamentDto.getDescription());
+				tournament.setRegistrationPlayerDeadline(tournamentDto.getRegistrationPlayerDeadline());
+				tournament.setRegistrationOrganizingCommitteeDeadline(tournamentDto.getRegistrationOrganizingCommitteeDeadline());
 				Set<CompetitiveTypeDto> competitiveTypeDtos = tournamentDto.getCompetitiveTypesDto();
 				Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 				Set<ExhibitionTypeDto> exhibitionTypeDtos = tournamentDto.getExhibitionTypesDto();
@@ -967,6 +974,69 @@ public class TournamentServiceImpl implements TournamentService {
 			}
 			responseMessage.setData(competitivePlayersDto);
 			responseMessage.setMessage(Constant.MSG_114);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage registerToJoinTournamentOrganizingComittee(int tournamentId, String studentId, int roleId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			Tournament tournament = tournamentRepository.findById(tournamentId).get();
+			RoleEvent roleEvent = roleEventRepository.findById(roleId).get();
+			
+			List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository.findByTournamentId(tournament.getId());
+			int countTournamentOrganizingCommittee = 0;
+			for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+				if (user.getId() == tournamentOrganizingCommittee.getUser().getId()) {
+					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_DECLINED)) {
+						responseMessage.setMessage("Yêu cầu đăng kí tham gia vào ban tổ chức của bạn đã bị từ chối");
+						return responseMessage;
+					}
+					responseMessage.setMessage("Bạn đã đăng ký tham gia ban tổ chức giải đấu rồi");
+					return responseMessage;
+				}
+				if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
+					countTournamentOrganizingCommittee++;
+				}
+			}
+			
+			Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
+			if (tournamentPlayerOp.isPresent()) {
+				responseMessage.setMessage("Bạn đã đăng ký tham gia giải đấu rồi");
+				return responseMessage;
+			}
+			
+			if (LocalDateTime.now().isBefore(tournament.getRegistrationOrganizingCommitteeDeadline())) {
+				if (!roleEvent.getName().equals(Constant.ROLE_EVENT_MEMBER)) {
+					if (countTournamentOrganizingCommittee < tournament.getMaxQuantityComitee()) {
+						TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
+						tournamentOrganizingCommittee.setTournament(tournament);
+						tournamentOrganizingCommittee.setUser(user);
+						tournamentOrganizingCommittee.setRoleEvent(roleEvent);
+						tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_PENDING);
+						tournamentOrganizingCommittee.setPaymentStatus(false);
+						tournamentOrganizingCommittee.setCreatedBy(user.getName() + " - " + user.getStudentId());
+						tournamentOrganizingCommittee.setCreatedOn(LocalDateTime.now());
+						tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
+						responseMessage.setData(Arrays.asList(tournamentOrganizingCommittee));
+						responseMessage.setMessage("Đăng ký thành công");
+					} else {
+						responseMessage.setMessage("Đã đủ số lượng ban tổ chức");
+					}
+				} else {
+					responseMessage.setMessage("Vai trò không hợp lệ");
+				}
+			} else {
+				responseMessage.setMessage(Constant.MSG_131);
+			}
+			
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
