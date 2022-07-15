@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.ClubFundReport;
+import com.fpt.macm.model.entity.ClubFundReport;
 
 @Repository
 public interface ClubFundReportRepository extends JpaRepository<ClubFundReport, Integer>{

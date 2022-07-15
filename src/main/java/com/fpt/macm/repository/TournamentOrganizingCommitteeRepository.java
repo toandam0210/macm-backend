@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.TournamentOrganizingCommittee;
+import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 
 @Repository
 public interface TournamentOrganizingCommitteeRepository extends JpaRepository<TournamentOrganizingCommittee, Integer>{

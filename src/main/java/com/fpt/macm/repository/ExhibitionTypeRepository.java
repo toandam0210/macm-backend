@@ -4,7 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.ExhibitionType;
+import com.fpt.macm.model.entity.ExhibitionType;
 
 @Repository
 public interface ExhibitionTypeRepository extends JpaRepository<ExhibitionType, Integer> {

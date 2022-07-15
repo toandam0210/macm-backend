@@ -2,8 +2,8 @@ package com.fpt.macm.service;
 
 import java.time.LocalDate;
 
-import com.fpt.macm.model.CommonSchedule;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.response.ResponseMessage;
 
 public interface CommonScheduleService {
 	CommonSchedule getCommonSessionByDate(LocalDate date);

@@ -1,7 +1,7 @@
 package com.fpt.macm.service;
 
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Rule;
+import com.fpt.macm.model.entity.Rule;
+import com.fpt.macm.model.response.ResponseMessage;
 
 public interface RuleService {
 

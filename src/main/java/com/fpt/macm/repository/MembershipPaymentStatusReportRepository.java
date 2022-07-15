@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.MembershipPaymentStatusReport;
+import com.fpt.macm.model.entity.MembershipPaymentStatusReport;
 
 @Repository
 public interface MembershipPaymentStatusReportRepository extends PagingAndSortingRepository<MembershipPaymentStatusReport, Integer>{

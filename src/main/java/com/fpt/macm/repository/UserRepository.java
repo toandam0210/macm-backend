@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.User;
+import com.fpt.macm.model.entity.User;
 
 @Repository
 public interface UserRepository extends PagingAndSortingRepository<User, Integer>{

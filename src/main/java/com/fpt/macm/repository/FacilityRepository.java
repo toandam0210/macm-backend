@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 
-import com.fpt.macm.model.Facility;
+import com.fpt.macm.model.entity.Facility;
 
 public interface FacilityRepository extends PagingAndSortingRepository<Facility, Integer>{
 

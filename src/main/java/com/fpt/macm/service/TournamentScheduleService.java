@@ -2,9 +2,9 @@ package com.fpt.macm.service;
 
 import java.util.List;
 
-import com.fpt.macm.dto.ScheduleDto;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.TournamentSchedule;
+import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.TournamentSchedule;
+import com.fpt.macm.model.response.ResponseMessage;
 
 public interface TournamentScheduleService {
 	ResponseMessage createPreviewTournamentSchedule(String tournamentName, String startDate, String finishDate, String startTime, String finishTime);

@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.CompetitivePlayerBracket;
+import com.fpt.macm.model.entity.CompetitivePlayerBracket;
 
 @Repository
 public interface CompetitivePlayerBracketRepository extends JpaRepository<CompetitivePlayerBracket, Integer>{

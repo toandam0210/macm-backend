@@ -3,10 +3,10 @@ package com.fpt.macm.service;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.fpt.macm.dto.ScheduleDto;
-import com.fpt.macm.model.CommonSchedule;
-import com.fpt.macm.model.EventSchedule;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.entity.EventSchedule;
+import com.fpt.macm.model.response.ResponseMessage;
 
 public interface EventScheduleService {
 	ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime);

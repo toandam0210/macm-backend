@@ -9,12 +9,12 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.CompetitivePlayer;
-import com.fpt.macm.model.CompetitivePlayerBracket;
-import com.fpt.macm.model.CompetitiveType;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Tournament;
-import com.fpt.macm.model.TournamentPlayer;
+import com.fpt.macm.model.entity.CompetitivePlayer;
+import com.fpt.macm.model.entity.CompetitivePlayerBracket;
+import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentPlayer;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;

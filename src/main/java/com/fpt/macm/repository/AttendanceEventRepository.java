@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.AttendanceEvent;
+import com.fpt.macm.model.entity.AttendanceEvent;
 
 @Repository
 public interface AttendanceEventRepository extends JpaRepository<AttendanceEvent, Integer>{
