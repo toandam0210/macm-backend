@@ -203,7 +203,7 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 	}
 
 	@Override
-	public ResponseMessage spawnTimeAndArea(int tournamentId) {
+	public ResponseMessage spawnTimeAndArea(int tournamentId, List<Area> listArea) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -223,7 +223,6 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 			Collections.sort(listMatch);
 			List<TournamentSchedule> listTournamentSchedules = tournamentScheduleRepository
 					.findByTournamentId(tournamentId);
-			List<Area> listArea = areaRepository.findAll();
 			List<CompetitiveResult> listResult = new ArrayList<CompetitiveResult>();
 			int countMatchNeedHeld = listMatch.size();
 			int countMatchCanHeld = 0;
