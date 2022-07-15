@@ -76,7 +76,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 				responseMessage.setData(Arrays.asList(newCompetitivePlayer));
 				responseMessage.setMessage("Đăng ký thành công");
 				if(weight != 0) {
-					List<CompetitiveType> listType = competitiveTypeRepository.findByGender(userRepository.findById(userId).get().isGender());
+					List<CompetitiveType> listType = competitiveTypeRepository.findByTournamentAndGender(tournamentId,userRepository.findById(userId).get().isGender());
 					for (CompetitiveType competitiveType : listType) {
 						if(competitiveType.getWeightMin() < weight && weight <= competitiveType.getWeightMax()) {
 							CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId()).get();
@@ -109,7 +109,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 					responseMessage.setData(Arrays.asList(newCompetitivePlayer));
 					responseMessage.setMessage("Đăng ký thành công");
 					if(weight != 0) {
-						List<CompetitiveType> listType = competitiveTypeRepository.findByGender(userRepository.findById(userId).get().isGender());
+						List<CompetitiveType> listType = competitiveTypeRepository.findByTournamentAndGender(tournamentId, userRepository.findById(userId).get().isGender());
 						for (CompetitiveType competitiveType : listType) {
 							if(competitiveType.getWeightMin() < weight && weight <= competitiveType.getWeightMax()) {
 								CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId()).get();
@@ -147,7 +147,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 				CompetitivePlayer getCompetitivePlayer = competitivePlayerOp.get();
 				if(getCompetitivePlayer.getWeight() == 0) {
 					getCompetitivePlayer.setWeight(weight);
-					List<CompetitiveType> listType = competitiveTypeRepository.findByGender(getCompetitivePlayer.getTournamentPlayer().getUser().isGender());
+					List<CompetitiveType> listType = competitiveTypeRepository.findByTournamentAndGender(competitiveTypeRepository.findTournamentByCompetitivePlayerId(competitivePlayerId),getCompetitivePlayer.getTournamentPlayer().getUser().isGender());
 					for (CompetitiveType competitiveType : listType) {
 						if(competitiveType.getWeightMin() < weight && weight <= competitiveType.getWeightMax()) {
 							CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();

@@ -175,4 +175,13 @@ public class TournamentController {
 				tournamentService.registerToJoinTournamentOrganizingComittee(tournamentId, studentId, roleId),
 				HttpStatus.OK);
 	}
+	
+	@PostMapping("/registertojointournamentcompetitivetype/{tournamentId}/{studentId}")
+	ResponseEntity<ResponseMessage> registerToJoinTournamentCompetitvetyped(
+			@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId,
+			@RequestParam(defaultValue = "0") double weight) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.registerToJoinTournamentCompetitiveType(tournamentId, studentId, weight),
+				HttpStatus.OK);
+	}
 }
