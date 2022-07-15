@@ -10,4 +10,5 @@ public interface NotificationService {
 	ResponseMessage createNotification(Notification notification);
 	void sendNotificationToAllUser(Notification notification);
 	void sendNotificationToAnUser(User user, Notification notification);
+	ResponseMessage checkPaymentStatus(String studentId);
 }
