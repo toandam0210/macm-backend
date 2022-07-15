@@ -2,9 +2,9 @@ package com.fpt.macm.service;
 
 import java.util.List;
 
-import com.fpt.macm.dto.MemberEventDto;
-import com.fpt.macm.dto.MemberNotJoinEventDto;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.dto.MemberEventDto;
+import com.fpt.macm.model.dto.MemberNotJoinEventDto;
+import com.fpt.macm.model.response.ResponseMessage;
 
 public interface MemberEventService {
 
@@ -17,4 +17,7 @@ public interface MemberEventService {
 	ResponseMessage getListMemberEventToUpdateRole(int eventId);
 	ResponseMessage getListMemberNotJoinEvent(int eventId, int pageNo, int pageSize);
 	ResponseMessage addListMemberJoinEvent(int eventId, List<MemberNotJoinEventDto> listToJoin);
+	ResponseMessage registerToJoinEvent(int eventId, String studentId);
+	ResponseMessage registerToJoinOrganizingCommittee(int eventId, String studentId, int roleEventId);
+	ResponseMessage cancelToJoinEvent(int eventId, String studentId);
 }

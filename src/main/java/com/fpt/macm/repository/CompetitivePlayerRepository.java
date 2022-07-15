@@ -5,7 +5,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.CompetitivePlayer;
+import com.fpt.macm.model.entity.CompetitivePlayer;
 
 @Repository
 public interface CompetitivePlayerRepository extends JpaRepository<CompetitivePlayer, Integer>{

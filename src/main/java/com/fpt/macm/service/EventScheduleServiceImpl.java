@@ -11,13 +11,14 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.dto.ScheduleDto;
-import com.fpt.macm.model.CommonSchedule;
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.EventSchedule;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Semester;
-import com.fpt.macm.model.TrainingSchedule;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.entity.Event;
+import com.fpt.macm.model.entity.EventSchedule;
+import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.TrainingSchedule;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
@@ -51,6 +52,9 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	
 	@Autowired
 	SemesterService semesterService;
+	
+	@Autowired
+	NotificationServiceImpl notificationServiceImpl;
 	
 	@Override
 	public ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime) {
@@ -124,6 +128,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
 			Boolean isInterrupted = false;
 			String title = "";
+			Event event = eventRepository.findById(eventId).get();
 			for (ScheduleDto scheduleDto : listPreview) {
 				if(!scheduleDto.getExisted()) {
 					EventSchedule eventSchedule = new EventSchedule();
@@ -192,6 +197,8 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 					commonScheduleRepository.saveAll(listCommon);
 					responseMessage.setData(listEventSchedule);
 					responseMessage.setMessage(Constant.MSG_066);
+					
+					notificationServiceImpl.createEventNotification(eventId, event.getName());
 				}
 			}
 		} catch (Exception e) {

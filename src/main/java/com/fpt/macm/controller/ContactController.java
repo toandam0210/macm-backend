@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpt.macm.model.Contact;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.entity.Contact;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.ContactService;
 
 @RestController

@@ -15,14 +15,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.dto.EventDto;
-import com.fpt.macm.model.ClubFund;
-import com.fpt.macm.model.CommonSchedule;
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.Event;
-import com.fpt.macm.model.EventSchedule;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Semester;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.EventDto;
+import com.fpt.macm.model.entity.ClubFund;
+import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.entity.Event;
+import com.fpt.macm.model.entity.EventSchedule;
+import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
@@ -104,6 +104,8 @@ public class EventServiceImpl implements EventService{
 				getEvent.setName(event.getName());
 				getEvent.setDescription(event.getDescription());
 				getEvent.setMaxQuantityComitee(event.getMaxQuantityComitee());
+				getEvent.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+				getEvent.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
 				getEvent.setUpdatedBy("LinhLHN");
 				getEvent.setUpdatedOn(LocalDateTime.now());
 				List<EventSchedule> getEventSchedules = eventScheduleService.listEventScheduleByEvent(id);
@@ -192,6 +194,8 @@ public class EventServiceImpl implements EventService{
 				eventDto.setName(event.getName());
 				eventDto.setId(event.getId());
 				eventDto.setDescription(event.getDescription());
+				eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+				eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
 				eventDtos.add(eventDto);
 			}
 			responseMessage.setData(eventDtos);
@@ -263,6 +267,8 @@ public class EventServiceImpl implements EventService{
 						eventDto.setName(event.getName());
 						eventDto.setId(event.getId());
 						eventDto.setDescription(event.getDescription());
+						eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+						eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
 						eventDtos.add(eventDto);
 					}
 					Collections.sort(eventDtos);
@@ -339,6 +345,8 @@ public class EventServiceImpl implements EventService{
 						eventDto.setName(event.getName());
 						eventDto.setId(event.getId());
 						eventDto.setDescription(event.getDescription());
+						eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+						eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
 						eventDtos.add(eventDto);
 					}
 				}

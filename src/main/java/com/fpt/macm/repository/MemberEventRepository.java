@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.MemberEvent;
+import com.fpt.macm.model.entity.MemberEvent;
 
 @Repository
 public interface MemberEventRepository extends PagingAndSortingRepository<MemberEvent, Integer> {

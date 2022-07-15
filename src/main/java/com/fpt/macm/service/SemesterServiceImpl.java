@@ -8,8 +8,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Semester;
+import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.SemesterRepository;
 
 @Service

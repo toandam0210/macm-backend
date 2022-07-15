@@ -11,12 +11,12 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.dto.ScheduleDto;
-import com.fpt.macm.model.CommonSchedule;
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Semester;
-import com.fpt.macm.model.TrainingSchedule;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.TrainingSchedule;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
@@ -40,6 +40,9 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 	
 	@Autowired
 	SemesterService semesterService;
+	
+	@Autowired
+	NotificationServiceImpl notificationServiceImpl;
 	
 	@Override
 	public ResponseMessage createPreviewTrainingSchedule(String startDate, String finishDate, List<String> dayOfWeek, String startTime, String finishTime) {
@@ -127,6 +130,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 						commonSession.setUpdatedOn(LocalDateTime.now());
 						commonSession.setType(0);
 						commonScheduleRepository.save(commonSession);
+						
+						notificationServiceImpl.createTrainingSessionCreateNotification(trainingSchedule.getDate());
 					}
 					else {
 						responseMessage.setMessage(Constant.MSG_041);
@@ -179,6 +184,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					commonScheduleRepository.save(commonSession);
 					responseMessage.setData(Arrays.asList(getTrainingSession));
 					responseMessage.setMessage(Constant.MSG_042);
+					
+					notificationServiceImpl.createTrainingSessionUpdateNotification(getDate, updateCommonSession.getStartTime(), updateCommonSession.getFinishTime());
 				}
 			}
 			else {
@@ -205,6 +212,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					commonScheduleRepository.delete(commonSession);
 					responseMessage.setData(Arrays.asList(getTrainingSession));
 					responseMessage.setMessage(Constant.MSG_044);
+					
+					notificationServiceImpl.createTrainingSessionDeleteNotification(getDate);
 				}
 			}
 			else {

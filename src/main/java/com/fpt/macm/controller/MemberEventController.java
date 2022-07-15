@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpt.macm.dto.MemberEventDto;
-import com.fpt.macm.dto.MemberNotJoinEventDto;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.dto.MemberEventDto;
+import com.fpt.macm.model.dto.MemberNotJoinEventDto;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.MemberEventService;
 
 @RestController
@@ -84,6 +84,27 @@ public class MemberEventController {
 	ResponseEntity<ResponseMessage> addListMemberJoinEvent(@PathVariable(name = "eventId") int eventId,
 			@RequestBody List<MemberNotJoinEventDto> listToJoin) {
 		return new ResponseEntity<ResponseMessage>(memberEventService.addListMemberJoinEvent(eventId, listToJoin),
+				HttpStatus.OK);
+	}
+
+	@PostMapping("/registertojoinevent/{eventId}/{studentId}")
+	ResponseEntity<ResponseMessage> registerToJoinEvent(@PathVariable(name = "eventId") int eventId,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.registerToJoinEvent(eventId, studentId),
+				HttpStatus.OK);
+	}
+
+	@PostMapping("/registertojoinorganizingcommittee/{eventId}/{studentId}/{roleEventId}")
+	ResponseEntity<ResponseMessage> registerToJoinOrganizingCommittee(@PathVariable(name = "eventId") int eventId,
+			@PathVariable(name = "studentId") String studentId, @PathVariable(name = "roleEventId") int roleEventId) {
+		return new ResponseEntity<ResponseMessage>(
+				memberEventService.registerToJoinOrganizingCommittee(eventId, studentId, roleEventId), HttpStatus.OK);
+	}
+
+	@PutMapping("/canceltojoinevent/{eventId}/{studentId}")
+	ResponseEntity<ResponseMessage> cancelToJoinEvent(@PathVariable(name = "eventId") int eventId,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.cancelToJoinEvent(eventId, studentId),
 				HttpStatus.OK);
 	}
 }

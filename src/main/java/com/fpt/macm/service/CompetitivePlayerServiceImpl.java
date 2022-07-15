@@ -9,12 +9,12 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.CompetitivePlayer;
-import com.fpt.macm.model.CompetitivePlayerBracket;
-import com.fpt.macm.model.CompetitiveType;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Tournament;
-import com.fpt.macm.model.TournamentPlayer;
+import com.fpt.macm.model.entity.CompetitivePlayer;
+import com.fpt.macm.model.entity.CompetitivePlayerBracket;
+import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentPlayer;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
@@ -76,14 +76,13 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 				responseMessage.setData(Arrays.asList(newCompetitivePlayer));
 				responseMessage.setMessage("Đăng ký thành công");
 				if(weight != 0) {
-					List<CompetitiveType> listType = competitiveTypeRepository.findByGender(userRepository.findById(userId).get().isGender());
+					List<CompetitiveType> listType = competitiveTypeRepository.findByTournamentAndGender(tournamentId,userRepository.findById(userId).get().isGender());
 					for (CompetitiveType competitiveType : listType) {
 						if(competitiveType.getWeightMin() < weight && weight <= competitiveType.getWeightMax()) {
 							CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId()).get();
 							CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
 							newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
 							newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
-							newCompetitivePlayerBracket.setRound(1);
 							newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
 							newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
 							newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
@@ -110,14 +109,13 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 					responseMessage.setData(Arrays.asList(newCompetitivePlayer));
 					responseMessage.setMessage("Đăng ký thành công");
 					if(weight != 0) {
-						List<CompetitiveType> listType = competitiveTypeRepository.findByGender(userRepository.findById(userId).get().isGender());
+						List<CompetitiveType> listType = competitiveTypeRepository.findByTournamentAndGender(tournamentId, userRepository.findById(userId).get().isGender());
 						for (CompetitiveType competitiveType : listType) {
 							if(competitiveType.getWeightMin() < weight && weight <= competitiveType.getWeightMax()) {
 								CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId()).get();
 								CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
 								newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
 								newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
-								newCompetitivePlayerBracket.setRound(1);
 								newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
 								newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
 								newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
@@ -149,13 +147,12 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 				CompetitivePlayer getCompetitivePlayer = competitivePlayerOp.get();
 				if(getCompetitivePlayer.getWeight() == 0) {
 					getCompetitivePlayer.setWeight(weight);
-					List<CompetitiveType> listType = competitiveTypeRepository.findByGender(getCompetitivePlayer.getTournamentPlayer().getUser().isGender());
+					List<CompetitiveType> listType = competitiveTypeRepository.findByTournamentAndGender(competitiveTypeRepository.findTournamentByCompetitivePlayerId(competitivePlayerId),getCompetitivePlayer.getTournamentPlayer().getUser().isGender());
 					for (CompetitiveType competitiveType : listType) {
 						if(competitiveType.getWeightMin() < weight && weight <= competitiveType.getWeightMax()) {
 							CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
 							newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
 							newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
-							newCompetitivePlayerBracket.setRound(1);
 							newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
 							newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
 							newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
@@ -175,8 +172,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 					CompetitivePlayerBracket getCompetitivePlayerBracket = competitivePlayerBracketRepository.findByPlayerId(getCompetitivePlayer.getId()).get();
 					CompetitiveType getCompetitiveType = getCompetitivePlayerBracket.getCompetitiveType();
 					if(getCompetitiveType.getWeightMin() > weight || getCompetitiveType.getWeightMax() < weight) {
-						getCompetitivePlayerBracket.setRound(0);
-						competitivePlayerBracketRepository.save(getCompetitivePlayerBracket);
+						competitivePlayerBracketRepository.delete(getCompetitivePlayerBracket);
 						responseMessage.setMessage("Loại khỏi giải đấu vì đăng ký sai hạng cân");
 					}
 					getCompetitivePlayer.setWeight(weight);

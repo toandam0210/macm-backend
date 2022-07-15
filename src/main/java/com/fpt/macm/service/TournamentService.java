@@ -2,10 +2,10 @@ package com.fpt.macm.service;
 
 import java.util.List;
 
-import com.fpt.macm.dto.TournamentDto;
-import com.fpt.macm.dto.TournamentOrganizingCommitteeDto;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Tournament;
+import com.fpt.macm.model.dto.TournamentDto;
+import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
+import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.response.ResponseMessage;
 
 public interface TournamentService {
 
@@ -49,4 +49,8 @@ public interface TournamentService {
 	ResponseMessage getAllTournamentPlayerPaymentStatusReport(int tournamentId);
 	
 	ResponseMessage getAllCompetitivePlayerByType(int tournamentId, int competitiveTypeId);
+	
+	ResponseMessage registerToJoinTournamentOrganizingComittee(int tournamentId, String studentId, int roleId);
+	
+	ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight);
 }

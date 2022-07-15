@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.FacilityCategory;
+import com.fpt.macm.model.entity.FacilityCategory;
 
 @Repository
 public interface FacilityCategoryRepository extends JpaRepository<FacilityCategory, Integer> {

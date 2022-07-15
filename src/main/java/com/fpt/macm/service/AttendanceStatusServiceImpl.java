@@ -3,6 +3,7 @@ package com.fpt.macm.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -11,14 +12,14 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.dto.AttendanceStatusDto;
-import com.fpt.macm.dto.UserAttendanceTrainingReportDto;
-import com.fpt.macm.model.AttendanceStatus;
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Semester;
-import com.fpt.macm.model.TrainingSchedule;
-import com.fpt.macm.model.User;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.AttendanceStatusDto;
+import com.fpt.macm.model.dto.UserAttendanceTrainingReportDto;
+import com.fpt.macm.model.entity.AttendanceStatus;
+import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.TrainingSchedule;
+import com.fpt.macm.model.entity.User;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
@@ -52,14 +53,19 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				User user = userOp.get();
 				List<AttendanceStatus> attendancesStatus = attendanceStatusRepository
 						.findByTrainingScheduleId(trainingSchedule.getId());
+				AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
+				attendanceStatusDto.setName(user.getName());
+				attendanceStatusDto.setStudentId(studentId);
 				for (AttendanceStatus attendanceStatus : attendancesStatus) {
 					if (attendanceStatus.getUser().getId() == user.getId()) {
 						attendanceStatus.setStatus(status);
+						attendanceStatusDto.setStatus(status);
 						attendanceStatus.setUpdatedOn(LocalDateTime.now());
 						attendanceStatus.setUpdatedBy("toandv");
 						attendanceStatusRepository.save(attendanceStatus);
 					}
 				}
+				responseMessage.setData(Arrays.asList(attendanceStatusDto));
 				responseMessage.setMessage(Constant.MSG_055);
 			} else {
 				responseMessage.setMessage(Constant.MSG_056);

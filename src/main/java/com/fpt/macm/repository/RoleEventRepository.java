@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.RoleEvent;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.entity.RoleEvent;
 
 @Repository
 public interface RoleEventRepository extends JpaRepository<RoleEvent, Integer>{

@@ -8,10 +8,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.ClubFund;
-import com.fpt.macm.model.ClubFundReport;
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.entity.ClubFund;
+import com.fpt.macm.model.entity.ClubFundReport;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ClubFundReportRepository;
 import com.fpt.macm.repository.ClubFundRepository;
 

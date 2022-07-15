@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.DashboardService;
 
 @RestController
@@ -36,5 +36,10 @@ public class DashboardController {
 	@GetMapping("/member/status")
 	ResponseEntity<ResponseMessage> getUserStatusReport() {
 		return new ResponseEntity<ResponseMessage>(dashboardService.statusMemberReport(), HttpStatus.OK);
+	}
+	
+	@GetMapping("/fee")
+	ResponseEntity<ResponseMessage> feeReportBySemester(@RequestParam String semester) {
+		return new ResponseEntity<ResponseMessage>(dashboardService.feeReport(semester), HttpStatus.OK);
 	}
 }

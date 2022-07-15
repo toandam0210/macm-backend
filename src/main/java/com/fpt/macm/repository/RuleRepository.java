@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.Rule;
+import com.fpt.macm.model.entity.Rule;
 
 @Repository
 public interface RuleRepository extends PagingAndSortingRepository<Rule, Integer>{

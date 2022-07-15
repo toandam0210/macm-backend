@@ -11,12 +11,13 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.dto.ScheduleDto;
-import com.fpt.macm.model.CommonSchedule;
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Semester;
-import com.fpt.macm.model.TournamentSchedule;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentSchedule;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
@@ -40,6 +41,9 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 	@Autowired
 	CommonScheduleRepository commonScheduleRepository;
 
+	@Autowired
+	NotificationServiceImpl notificationServiceImpl;
+	
 	@Override
 	public ResponseMessage createPreviewTournamentSchedule(String tournamentName, String startDate, String finishDate,
 			String startTime, String finishTime) {
@@ -115,6 +119,7 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
 			Boolean isInterrupted = false;
 			String title = "";
+			Tournament tournament = tournamentRepository.findById(tournamentId).get();
 			for (ScheduleDto scheduleDto : listPreview) {
 				if (!scheduleDto.getExisted()) {
 					TournamentSchedule tournamentSchedule = new TournamentSchedule();
@@ -176,6 +181,8 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 					responseMessage.setData(listTournamentSchedule);
 					responseMessage.setMessage(Constant.MSG_100);
 					responseMessage.setTotalResult(listTournamentSchedule.size());
+					
+					notificationServiceImpl.createTournamentNotification(tournamentId, tournament.getName());
 				}
 			}
 		} catch (Exception e) {
