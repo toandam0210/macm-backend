@@ -185,4 +185,5 @@ public class Constant {
 	public static String messageEvent(Event event) {
 		return "Chỉ còn một ngày nữa là sự kiện " + event.getName() + " mà bạn đã đăng ký sẽ diễn ra. Bạn nhớ tham gia nhé!";
 	}
+	public static final String MSG_131 = "Đã hết hạn đăng ký";
 }

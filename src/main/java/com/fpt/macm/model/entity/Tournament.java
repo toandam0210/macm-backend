@@ -58,21 +58,27 @@ public class Tournament {
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "tournament_id")
 	private Set<TournamentPlayer> tournamentPlayers;
-	
+
 	@Column
 	private double totalAmount;
-	
+
 	@Column
 	private double feePlayerPay;
-	
+
 	@Column
 	private double totalAmountEstimate;
-	
+
 	@Column
 	private double totalAmountFromClubEstimate;
-	
+
 	@Column
 	private double totalAmountFromClubActual;
+
+	@Column
+	private LocalDateTime registrationPlayerDeadline;
+
+	@Column
+	private LocalDateTime registrationOrganizingCommitteeDeadline;
 
 	public int getId() {
 		return id;
@@ -217,7 +223,21 @@ public class Tournament {
 	public void setTotalAmountFromClubActual(double totalAmountFromClubActual) {
 		this.totalAmountFromClubActual = totalAmountFromClubActual;
 	}
-	
-	
+
+	public LocalDateTime getRegistrationPlayerDeadline() {
+		return registrationPlayerDeadline;
+	}
+
+	public void setRegistrationPlayerDeadline(LocalDateTime registrationPlayerDeadline) {
+		this.registrationPlayerDeadline = registrationPlayerDeadline;
+	}
+
+	public LocalDateTime getRegistrationOrganizingCommitteeDeadline() {
+		return registrationOrganizingCommitteeDeadline;
+	}
+
+	public void setRegistrationOrganizingCommitteeDeadline(LocalDateTime registrationOrganizingCommitteeDeadline) {
+		this.registrationOrganizingCommitteeDeadline = registrationOrganizingCommitteeDeadline;
+	}
 
 }

@@ -1,6 +1,7 @@
 package com.fpt.macm.model.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Set;
 
 import com.fpt.macm.model.entity.TournamentPlayer;
@@ -25,16 +26,20 @@ public class TournamentDto {
 	private LocalDate startDate;
 
 	private Set<TournamentPlayer> tournamentPlayers;
-	
+
 	private double totalAmount;
-	
+
 	private double feePlayerPay;
-	
+
 	private double totalAmountEstimate;
-	
+
 	private double totalAmountFromClubEstimate;
-	
+
 	private double totalAmountFromClubActual;
+
+	private LocalDateTime registrationPlayerDeadline;
+
+	private LocalDateTime registrationOrganizingCommitteeDeadline;
 
 	public int getId() {
 		return id;
@@ -155,7 +160,21 @@ public class TournamentDto {
 	public void setTotalAmountFromClubActual(double totalAmountFromClubActual) {
 		this.totalAmountFromClubActual = totalAmountFromClubActual;
 	}
-	
-	
+
+	public LocalDateTime getRegistrationPlayerDeadline() {
+		return registrationPlayerDeadline;
+	}
+
+	public void setRegistrationPlayerDeadline(LocalDateTime registrationPlayerDeadline) {
+		this.registrationPlayerDeadline = registrationPlayerDeadline;
+	}
+
+	public LocalDateTime getRegistrationOrganizingCommitteeDeadline() {
+		return registrationOrganizingCommitteeDeadline;
+	}
+
+	public void setRegistrationOrganizingCommitteeDeadline(LocalDateTime registrationOrganizingCommitteeDeadline) {
+		this.registrationOrganizingCommitteeDeadline = registrationOrganizingCommitteeDeadline;
+	}
 
 }
