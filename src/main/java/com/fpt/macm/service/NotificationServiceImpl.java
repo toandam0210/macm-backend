@@ -14,11 +14,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.Notification;
-import com.fpt.macm.model.NotificationToUser;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.User;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.entity.Notification;
+import com.fpt.macm.model.entity.NotificationToUser;
+import com.fpt.macm.model.entity.User;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.NotificationToUserRepository;
 import com.fpt.macm.repository.TournamentRepository;

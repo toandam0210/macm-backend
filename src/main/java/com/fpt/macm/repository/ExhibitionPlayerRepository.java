@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.ExhibitionPlayer;
+import com.fpt.macm.model.entity.ExhibitionPlayer;
 
 @Repository
 public interface ExhibitionPlayerRepository extends JpaRepository<ExhibitionPlayer, Integer>{

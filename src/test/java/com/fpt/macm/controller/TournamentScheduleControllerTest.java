@@ -29,11 +29,11 @@ import org.springframework.web.context.WebApplicationContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fpt.macm.dto.ScheduleDto;
-import com.fpt.macm.model.CompetitiveType;
-import com.fpt.macm.model.ExhibitionType;
-import com.fpt.macm.model.Tournament;
-import com.fpt.macm.model.TournamentSchedule;
+import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.ExhibitionType;
+import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentSchedule;
 
 @SpringBootTest
 public class TournamentScheduleControllerTest {

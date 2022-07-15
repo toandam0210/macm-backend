@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpt.macm.dto.MemberEventDto;
-import com.fpt.macm.dto.MemberNotJoinEventDto;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.dto.MemberEventDto;
+import com.fpt.macm.model.dto.MemberNotJoinEventDto;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.MemberEventService;
 
 @RestController

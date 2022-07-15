@@ -5,8 +5,8 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Tournament;
+import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.TournamentRepository;
 
 @Service

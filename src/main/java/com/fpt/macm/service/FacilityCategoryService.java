@@ -2,8 +2,8 @@ package com.fpt.macm.service;
 
 import java.util.List;
 
-import com.fpt.macm.model.FacilityCategory;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.entity.FacilityCategory;
+import com.fpt.macm.model.response.ResponseMessage;
 
 public interface FacilityCategoryService {
 	ResponseMessage addNewCategory(List<FacilityCategory> facilityCategories);

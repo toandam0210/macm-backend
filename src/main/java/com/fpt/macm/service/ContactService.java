@@ -1,7 +1,7 @@
 package com.fpt.macm.service;
 
-import com.fpt.macm.model.Contact;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.entity.Contact;
+import com.fpt.macm.model.response.ResponseMessage;
 
 public interface ContactService {
 

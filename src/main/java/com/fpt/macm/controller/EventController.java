@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpt.macm.model.Event;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.entity.Event;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.EventService;
 
 @RestController

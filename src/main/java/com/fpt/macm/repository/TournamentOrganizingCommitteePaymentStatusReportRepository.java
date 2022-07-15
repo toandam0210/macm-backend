@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.TournamentOrganizingCommitteePaymentStatusReport;
+import com.fpt.macm.model.entity.TournamentOrganizingCommitteePaymentStatusReport;
 
 @Repository
 public interface TournamentOrganizingCommitteePaymentStatusReportRepository

@@ -26,8 +26,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fpt.macm.dto.InforInQrCode;
-import com.fpt.macm.dto.UserDto;
+import com.fpt.macm.model.dto.InforInQrCode;
+import com.fpt.macm.model.dto.UserDto;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.service.UserService;
 

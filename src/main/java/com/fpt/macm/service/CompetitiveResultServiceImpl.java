@@ -7,10 +7,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.Area;
-import com.fpt.macm.model.CompetitiveMatch;
-import com.fpt.macm.model.CompetitiveResult;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.entity.Area;
+import com.fpt.macm.model.entity.CompetitiveMatch;
+import com.fpt.macm.model.entity.CompetitiveResult;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerBracketRepository;

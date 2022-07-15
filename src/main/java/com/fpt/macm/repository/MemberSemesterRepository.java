@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.MemberSemester;
+import com.fpt.macm.model.entity.MemberSemester;
 
 @Repository
 public interface MemberSemesterRepository extends JpaRepository<MemberSemester, Integer> {

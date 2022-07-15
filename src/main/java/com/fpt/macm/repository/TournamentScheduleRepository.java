@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.TournamentSchedule;
+import com.fpt.macm.model.entity.TournamentSchedule;
 
 @Repository
 public interface TournamentScheduleRepository extends JpaRepository<TournamentSchedule, Integer> {
