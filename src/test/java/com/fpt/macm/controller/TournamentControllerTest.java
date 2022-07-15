@@ -20,12 +20,12 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fpt.macm.dto.CompetitiveTypeDto;
-import com.fpt.macm.dto.ExhibitionTypeDto;
-import com.fpt.macm.dto.TournamentDto;
-import com.fpt.macm.model.CompetitiveType;
-import com.fpt.macm.model.ExhibitionType;
-import com.fpt.macm.model.Tournament;
+import com.fpt.macm.model.dto.CompetitiveTypeDto;
+import com.fpt.macm.model.dto.ExhibitionTypeDto;
+import com.fpt.macm.model.dto.TournamentDto;
+import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.ExhibitionType;
+import com.fpt.macm.model.entity.Tournament;
 
 @SpringBootTest
 public class TournamentControllerTest {

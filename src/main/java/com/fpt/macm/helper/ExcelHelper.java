@@ -17,8 +17,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fpt.macm.model.Role;
-import com.fpt.macm.model.User;
+import com.fpt.macm.model.entity.Role;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.utils.Utils;
 
 public class ExcelHelper {

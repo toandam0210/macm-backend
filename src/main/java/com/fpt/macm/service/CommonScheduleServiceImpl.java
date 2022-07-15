@@ -8,10 +8,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.CommonSchedule;
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Semester;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.utils.Utils;

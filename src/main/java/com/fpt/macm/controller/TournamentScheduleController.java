@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpt.macm.dto.ScheduleDto;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.TournamentSchedule;
+import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.TournamentSchedule;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.TournamentScheduleService;
 
 @RestController

@@ -13,13 +13,14 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
-import com.fpt.macm.model.Area;
-import com.fpt.macm.model.CompetitiveMatch;
-import com.fpt.macm.model.CompetitiveResult;
-import com.fpt.macm.model.CompetitiveType;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.TournamentSchedule;
+
+import com.fpt.macm.model.entity.Area;
+import com.fpt.macm.model.entity.CompetitiveMatch;
+import com.fpt.macm.model.entity.CompetitiveResult;
+import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.model.entity.TournamentSchedule;
+
 import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerBracketRepository;

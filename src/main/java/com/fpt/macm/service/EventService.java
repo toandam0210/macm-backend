@@ -2,8 +2,8 @@ package com.fpt.macm.service;
 
 import java.time.LocalDate;
 
-import com.fpt.macm.model.Event;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.entity.Event;
+import com.fpt.macm.model.response.ResponseMessage;
 
 public interface EventService {
 	ResponseMessage createEvent(Event event);

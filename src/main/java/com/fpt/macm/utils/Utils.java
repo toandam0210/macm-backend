@@ -13,10 +13,10 @@ import org.springframework.data.domain.Sort;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fpt.macm.dto.RoleEventDto;
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.Role;
-import com.fpt.macm.model.RoleEvent;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.RoleEventDto;
+import com.fpt.macm.model.entity.Role;
+import com.fpt.macm.model.entity.RoleEvent;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;

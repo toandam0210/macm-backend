@@ -1,8 +1,8 @@
 package com.fpt.macm.service;
 
-import com.fpt.macm.dto.FacilityDto;
-import com.fpt.macm.dto.FacilityRequestDto;
-import com.fpt.macm.model.ResponseMessage;
+import com.fpt.macm.model.dto.FacilityDto;
+import com.fpt.macm.model.dto.FacilityRequestDto;
+import com.fpt.macm.model.response.ResponseMessage;
 
 public interface FacilityService {
 

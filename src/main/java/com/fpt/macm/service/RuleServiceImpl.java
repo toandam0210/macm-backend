@@ -13,9 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.Rule;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.entity.Rule;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.RuleRepository;
 
 @Service

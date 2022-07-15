@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.fpt.macm.model.CompetitiveMatch;
+import com.fpt.macm.model.entity.CompetitiveMatch;
 
 @Repository
 public interface CompetitiveMatchRepository extends JpaRepository<CompetitiveMatch, Integer>{
