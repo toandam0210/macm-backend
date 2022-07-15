@@ -54,6 +54,12 @@ public class Event {
 	
 	@Column
 	private String semester;
+	
+	@Column
+	private LocalDateTime registrationMemberDeadline;
+
+	@Column
+	private LocalDateTime registrationOrganizingCommitteeDeadline;
 
 	public double getAmountFromClub() {
 		return amountFromClub;
@@ -165,6 +171,22 @@ public class Event {
 
 	public void setSemester(String semester) {
 		this.semester = semester;
+	}
+
+	public LocalDateTime getRegistrationMemberDeadline() {
+		return registrationMemberDeadline;
+	}
+
+	public void setRegistrationMemberDeadline(LocalDateTime registrationMemberDeadline) {
+		this.registrationMemberDeadline = registrationMemberDeadline;
+	}
+
+	public LocalDateTime getRegistrationOrganizingCommitteeDeadline() {
+		return registrationOrganizingCommitteeDeadline;
+	}
+
+	public void setRegistrationOrganizingCommitteeDeadline(LocalDateTime registrationOrganizingCommitteeDeadline) {
+		this.registrationOrganizingCommitteeDeadline = registrationOrganizingCommitteeDeadline;
 	}
 	
 }

@@ -104,6 +104,8 @@ public class EventServiceImpl implements EventService{
 				getEvent.setName(event.getName());
 				getEvent.setDescription(event.getDescription());
 				getEvent.setMaxQuantityComitee(event.getMaxQuantityComitee());
+				getEvent.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+				getEvent.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
 				getEvent.setUpdatedBy("LinhLHN");
 				getEvent.setUpdatedOn(LocalDateTime.now());
 				List<EventSchedule> getEventSchedules = eventScheduleService.listEventScheduleByEvent(id);
@@ -192,6 +194,8 @@ public class EventServiceImpl implements EventService{
 				eventDto.setName(event.getName());
 				eventDto.setId(event.getId());
 				eventDto.setDescription(event.getDescription());
+				eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+				eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
 				eventDtos.add(eventDto);
 			}
 			responseMessage.setData(eventDtos);
@@ -263,6 +267,8 @@ public class EventServiceImpl implements EventService{
 						eventDto.setName(event.getName());
 						eventDto.setId(event.getId());
 						eventDto.setDescription(event.getDescription());
+						eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+						eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
 						eventDtos.add(eventDto);
 					}
 					Collections.sort(eventDtos);
@@ -339,6 +345,8 @@ public class EventServiceImpl implements EventService{
 						eventDto.setName(event.getName());
 						eventDto.setId(event.getId());
 						eventDto.setDescription(event.getDescription());
+						eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+						eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
 						eventDtos.add(eventDto);
 					}
 				}

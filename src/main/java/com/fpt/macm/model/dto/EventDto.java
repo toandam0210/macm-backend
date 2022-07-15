@@ -1,8 +1,9 @@
 package com.fpt.macm.model.dto;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
-public class EventDto implements Comparable<EventDto>{
+public class EventDto implements Comparable<EventDto> {
 	private int id;
 	private String status;
 	private String name;
@@ -12,6 +13,8 @@ public class EventDto implements Comparable<EventDto>{
 	private double amountFromClub;
 	private LocalDate startDate;
 	private String description;
+	private LocalDateTime registrationMemberDeadline;
+	private LocalDateTime registrationOrganizingCommitteeDeadline;
 
 	public String getStatus() {
 		return status;
@@ -90,6 +93,21 @@ public class EventDto implements Comparable<EventDto>{
 		// TODO Auto-generated method stub
 		return this.getStartDate().compareTo(o.getStartDate()) * -1;
 	}
-	
-	
+
+	public LocalDateTime getRegistrationMemberDeadline() {
+		return registrationMemberDeadline;
+	}
+
+	public void setRegistrationMemberDeadline(LocalDateTime registrationMemberDeadline) {
+		this.registrationMemberDeadline = registrationMemberDeadline;
+	}
+
+	public LocalDateTime getRegistrationOrganizingCommitteeDeadline() {
+		return registrationOrganizingCommitteeDeadline;
+	}
+
+	public void setRegistrationOrganizingCommitteeDeadline(LocalDateTime registrationOrganizingCommitteeDeadline) {
+		this.registrationOrganizingCommitteeDeadline = registrationOrganizingCommitteeDeadline;
+	}
+
 }
