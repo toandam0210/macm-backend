@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.CompetitiveTypeService;
 import com.fpt.macm.service.TournamentService;
@@ -175,14 +176,22 @@ public class TournamentController {
 				tournamentService.registerToJoinTournamentOrganizingComittee(tournamentId, studentId, roleId),
 				HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/registertojointournamentcompetitivetype/{tournamentId}/{studentId}")
-	ResponseEntity<ResponseMessage> registerToJoinTournamentCompetitvetyped(
+	ResponseEntity<ResponseMessage> registerToJoinTournamentCompetitveType(
 			@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId,
 			@RequestParam(defaultValue = "0") double weight) {
 		return new ResponseEntity<ResponseMessage>(
 				tournamentService.registerToJoinTournamentCompetitiveType(tournamentId, studentId, weight),
 				HttpStatus.OK);
 	}
-	
+
+	@PostMapping("/registertojointournamentexhibitiontype/{tournamentId}/{studentId}")
+	ResponseEntity<ResponseMessage> registerToJoinTournamentExhibitionType(
+			@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId,
+			@RequestParam(defaultValue = "0") int exhibitionTypeId, @RequestParam(defaultValue = "0") String teamName,
+			@RequestBody List<User> users) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.registerToJoinTournamentExhibitionType(
+				tournamentId, studentId, exhibitionTypeId, teamName, users), HttpStatus.OK);
+	}
 }
