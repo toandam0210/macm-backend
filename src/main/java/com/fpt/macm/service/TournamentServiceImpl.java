@@ -26,6 +26,7 @@ import com.fpt.macm.model.dto.TournamentOrganizingCommitteePaymentStatusReportDt
 import com.fpt.macm.model.dto.TournamentPlayerDto;
 import com.fpt.macm.model.dto.TournamentPlayerPaymentStatusReportDto;
 import com.fpt.macm.model.entity.ClubFund;
+import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitivePlayerBracket;
 import com.fpt.macm.model.entity.CompetitiveType;
@@ -43,6 +44,7 @@ import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ClubFundRepository;
+import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
@@ -101,6 +103,9 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ClubFundRepository clubFundRepository;
+	
+	@Autowired
+	CompetitiveMatchRepository competitiveMatchRepository;
 
 	@Autowired
 	TournamentOrganizingCommitteePaymentStatusReportRepository tournamentOrganizingCommitteePaymentStatusReportRepository;
@@ -1152,6 +1157,24 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	@Override
+	public List<Tournament> listTournamentsByRegistrationPlayerDeadline(LocalDateTime playerDeadline) {
+		// TODO Auto-generated method stub
+		try {
+			List<Tournament> listTournaments = tournamentRepository.findAll();
+			List<Tournament> listResult = new ArrayList<Tournament>();
+			for (Tournament tournament : listTournaments) {
+				if (tournament.getRegistrationPlayerDeadline().toLocalDate().isEqual(playerDeadline.toLocalDate())
+						&& tournament.getRegistrationPlayerDeadline().getHour() == playerDeadline.getHour()) {
+					listResult.add(tournament);
+				}
+			}
+			return listResult;
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+	}
+
 	public ResponseMessage registerToJoinTournamentExhibitionType(int tournamentId, String studentId,
 			int exhibitionTypeId, String teamName, List<User> teamMember) {
 		// TODO Auto-generated method stub
@@ -1234,5 +1257,4 @@ public class TournamentServiceImpl implements TournamentService {
 		}
 		return responseMessage;
 	}
-
 }
