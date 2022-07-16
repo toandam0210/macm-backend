@@ -1,12 +1,10 @@
 package com.fpt.macm.security.oauth2;
 
-import java.security.AuthProvider;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -14,7 +12,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.fpt.macm.model.User;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.security.UserPrincipal;
 import com.fpt.macm.security.exception.OAuth2AuthenticationProcessingException;

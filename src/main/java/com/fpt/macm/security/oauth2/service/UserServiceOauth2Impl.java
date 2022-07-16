@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.User;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.security.UserPrincipal;
 import com.fpt.macm.security.exception.ResourceNotFoundException;

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fpt.macm.model.User;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.security.CurrentUser;
 import com.fpt.macm.security.UserPrincipal;
