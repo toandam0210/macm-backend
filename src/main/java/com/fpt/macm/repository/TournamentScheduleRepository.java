@@ -1,6 +1,8 @@
 package com.fpt.macm.repository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -12,4 +14,6 @@ import com.fpt.macm.model.entity.TournamentSchedule;
 public interface TournamentScheduleRepository extends JpaRepository<TournamentSchedule, Integer> {
 	@Query(value = "select * from tournament_schedule where tournament_id = ?1",nativeQuery = true)
 	List<TournamentSchedule> findByTournamentId(int tournamentId);
+	
+	Optional<TournamentSchedule> findByDate(LocalDate date);
 }

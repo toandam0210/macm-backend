@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,12 +16,14 @@ import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayerBracket;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
+import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
 
 @Service
@@ -39,6 +42,9 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 	CompetitiveResultRepository competitiveResultRepository;
 	
 	@Autowired
+	TournamentRepository tournamentRepository;
+	
+	@Autowired
 	UserRepository userRepository;
 	
 	@Override
@@ -47,59 +53,64 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			CompetitiveType competitiveType = competitiveTypeRepository.findById(competitiveTypeId).get();
-			List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository.listPlayersByType(competitiveTypeId);
-			int numberPlayer = listPlayers.size();
-			if(numberPlayer < 4) {
-				responseMessage.setMessage("Số lượng tuyển thủ không đạt 4 người trở lên, không thi đấu hạng cân này");
-			}
-			else {
-				int nextPower = nextPower(numberPlayer);
-				int round = 1;
-				while (nextPower > 1) {
-					int countMatch = nextPower/2;
-					for(int i = 0; i < countMatch; i++) {
-						CompetitiveMatch newMatch = new CompetitiveMatch();
-						newMatch.setRound(round);
-						newMatch.setCompetitiveType(competitiveType);
-						newMatch.setCreatedBy("LinhLHN");
-						newMatch.setCreatedOn(LocalDateTime.now());
-						newMatch.setUpdatedBy("LinhLHN");
-						newMatch.setUpdatedOn(LocalDateTime.now());
-						competitiveMatchRepository.save(newMatch);
-					}
-					nextPower = countMatch;
-					round++;
+			Tournament getTournament = tournamentRepository.findById(competitiveTypeRepository.findTournamentOfType(competitiveTypeId)).get();
+			if(getTournament.getRegistrationPlayerDeadline().compareTo(LocalDateTime.now()) <= 0) {
+				List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository.listPlayersByType(competitiveTypeId);
+				int numberPlayer = listPlayers.size();
+				if(numberPlayer < 4) {
+					responseMessage.setMessage("Số lượng tuyển thủ không đạt 4 người trở lên, không thi đấu hạng cân này");
 				}
-				CompetitiveMatch newMatch = new CompetitiveMatch();
-				newMatch.setRound(round);
-				newMatch.setCompetitiveType(competitiveType);
-				newMatch.setCreatedBy("LinhLHN");
-				newMatch.setCreatedOn(LocalDateTime.now());
-				newMatch.setUpdatedBy("LinhLHN");
-				newMatch.setUpdatedOn(LocalDateTime.now());
-				competitiveMatchRepository.save(newMatch);
-				List<CompetitiveMatch> listMatch = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
-				List<CompetitiveMatch> listNewMatch = new ArrayList<CompetitiveMatch>();
-				for(int i = 2; i < listMatch.size(); i++) {
-					CompetitiveMatch getMatch = listMatch.get(i);
-					getMatch.setNextIsFirst(i%2 == 1);
-					getMatch.setNextMatchId(listMatch.get(i/2).getId());
-					if(i == 2 || i == 3) {
-						getMatch.setLoseMatchId(listMatch.get(0).getId());
+				else {
+					int nextPower = nextPower(numberPlayer);
+					int round = 1;
+					while (nextPower > 1) {
+						int countMatch = nextPower/2;
+						for(int i = 0; i < countMatch; i++) {
+							CompetitiveMatch newMatch = new CompetitiveMatch();
+							newMatch.setRound(round);
+							newMatch.setCompetitiveType(competitiveType);
+							newMatch.setStatus(0);
+							newMatch.setCreatedBy("LinhLHN");
+							newMatch.setCreatedOn(LocalDateTime.now());
+							newMatch.setUpdatedBy("LinhLHN");
+							newMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(newMatch);
+						}
+						nextPower = countMatch;
+						round++;
 					}
-					else {
-						getMatch.setLoseMatchId(null);
+					CompetitiveMatch newMatch = new CompetitiveMatch();
+					newMatch.setRound(round);
+					newMatch.setCompetitiveType(competitiveType);
+					newMatch.setCreatedBy("LinhLHN");
+					newMatch.setCreatedOn(LocalDateTime.now());
+					newMatch.setUpdatedBy("LinhLHN");
+					newMatch.setUpdatedOn(LocalDateTime.now());
+					competitiveMatchRepository.save(newMatch);
+					List<CompetitiveMatch> listMatch = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
+					List<CompetitiveMatch> listNewMatch = new ArrayList<CompetitiveMatch>();
+					for(int i = 2; i < listMatch.size(); i++) {
+						CompetitiveMatch getMatch = listMatch.get(i);
+						getMatch.setNextIsFirst(i%2 == 1);
+						getMatch.setNextMatchId(listMatch.get(i/2).getId());
+						if(i == 2 || i == 3) {
+							getMatch.setLoseMatchId(listMatch.get(0).getId());
+						}
+						else {
+							getMatch.setLoseMatchId(null);
+						}
+						getMatch.setUpdatedBy("LinhLHN");
+						getMatch.setUpdatedOn(LocalDateTime.now());
+						competitiveMatchRepository.save(getMatch);
+						listNewMatch.add(getMatch);
 					}
-					getMatch.setUpdatedBy("LinhLHN");
-					getMatch.setUpdatedOn(LocalDateTime.now());
-					competitiveMatchRepository.save(getMatch);
-					listNewMatch.add(getMatch);
+					responseMessage.setData(listNewMatch);
+					responseMessage.setMessage("Danh sách trận đấu");
 				}
-				responseMessage.setData(listNewMatch);
-				responseMessage.setMessage("Danh sách trận đấu");
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
 	}
@@ -115,6 +126,7 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 				CompetitiveMatchDto newCompetitiveMatchDto = new CompetitiveMatchDto();
 				newCompetitiveMatchDto.setId(competitiveMatch.getId());
 				newCompetitiveMatchDto.setRound(competitiveMatch.getRound());
+				newCompetitiveMatchDto.setStatus(competitiveMatch.getStatus());
 				if(competitiveMatch.getFirstStudentId() != null) {
 					PlayerMatchDto firstPlayer = new PlayerMatchDto();
 					firstPlayer.setStudentId(competitiveMatch.getFirstStudentId());
@@ -198,39 +210,6 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 					getMatch.setUpdatedOn(LocalDateTime.now());
 					competitiveMatchRepository.save(getMatch);
 					listMatchUpdated.add(getMatch);
-					CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId()).get();
-					if(getMatch.getFirstStudentId() == null) {
-						if(getMatch.isNextIsFirst()) {
-							nextMatch.setFirstStudentId(getMatch.getSecondStudentId());
-							nextMatch.setUpdatedBy("LinhLHN");
-							nextMatch.setUpdatedOn(LocalDateTime.now());
-							competitiveMatchRepository.save(nextMatch);
-							listMatchUpdated.add(nextMatch);
-						}
-						else {
-							nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
-							nextMatch.setUpdatedBy("LinhLHN");
-							nextMatch.setUpdatedOn(LocalDateTime.now());
-							competitiveMatchRepository.save(nextMatch);
-							listMatchUpdated.add(nextMatch);
-						}
-					}
-					else if(getMatch.getSecondStudentId() == null) {
-						if(getMatch.isNextIsFirst()) {
-							nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
-							nextMatch.setUpdatedBy("LinhLHN");
-							nextMatch.setUpdatedOn(LocalDateTime.now());
-							competitiveMatchRepository.save(nextMatch);
-							listMatchUpdated.add(nextMatch);
-						}
-						else {
-							nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
-							nextMatch.setUpdatedBy("LinhLHN");
-							nextMatch.setUpdatedOn(LocalDateTime.now());
-							competitiveMatchRepository.save(nextMatch);
-							listMatchUpdated.add(nextMatch);
-						}
-					}
 				}
 			}
 			responseMessage.setData(listMatchUpdated);
@@ -290,6 +269,65 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService{
 			responseMessage.setData(listMatchPreview);
 			responseMessage.setMessage("Bảng thi đấu dự kiến");
 			responseMessage.setTotalResult(maxRound(numberPlayer));
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage confirmListMatchsPlayer(int tournamentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Tournament getTournament = tournamentRepository.findById(tournamentId).get();
+			Set<CompetitiveType> listType = getTournament.getCompetitiveTypes();
+			List<CompetitiveMatch> listUpdated = new ArrayList<CompetitiveMatch>();
+			for (CompetitiveType competitiveType : listType) {
+				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByType(competitiveType.getId());
+				for (CompetitiveMatch getMatch : listMatchs) {
+					if(getMatch.getStatus() < 1) {
+						getMatch.setStatus(1);
+						competitiveMatchRepository.save(getMatch);
+						listUpdated.add(getMatch);
+					}
+					if(getMatch.getRound() == 1) {
+						CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId()).get();
+						if(getMatch.getFirstStudentId() == null) {
+							if(getMatch.isNextIsFirst()) {
+								nextMatch.setFirstStudentId(getMatch.getSecondStudentId());
+								nextMatch.setUpdatedBy("LinhLHN");
+								nextMatch.setUpdatedOn(LocalDateTime.now());
+								competitiveMatchRepository.save(nextMatch);
+							}
+							else {
+								nextMatch.setSecondStudentId(getMatch.getSecondStudentId());
+								nextMatch.setUpdatedBy("LinhLHN");
+								nextMatch.setUpdatedOn(LocalDateTime.now());
+								competitiveMatchRepository.save(nextMatch);
+							}
+						}
+						else if(getMatch.getSecondStudentId() == null) {
+							if(getMatch.isNextIsFirst()) {
+								nextMatch.setFirstStudentId(getMatch.getFirstStudentId());
+								nextMatch.setUpdatedBy("LinhLHN");
+								nextMatch.setUpdatedOn(LocalDateTime.now());
+								competitiveMatchRepository.save(nextMatch);
+							}
+							else {
+								nextMatch.setSecondStudentId(getMatch.getFirstStudentId());
+								nextMatch.setUpdatedBy("LinhLHN");
+								nextMatch.setUpdatedOn(LocalDateTime.now());
+								competitiveMatchRepository.save(nextMatch);
+							}
+						}
+						listUpdated.add(nextMatch);
+					}
+				}
+			}
+			responseMessage.setData(listUpdated);
+			responseMessage.setMessage("Xác nhận danh sách trận đấu");
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

@@ -1,5 +1,6 @@
 package com.fpt.macm.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fpt.macm.model.dto.TournamentDto;
@@ -53,4 +54,7 @@ public interface TournamentService {
 	ResponseMessage registerToJoinTournamentOrganizingComittee(int tournamentId, String studentId, int roleId);
 	
 	ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight);
+	
+	List<Tournament> listTournamentsByRegistrationPlayerDeadline(LocalDateTime playerDeadline);
+	
 }

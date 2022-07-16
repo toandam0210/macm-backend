@@ -184,4 +184,5 @@ public class TournamentController {
 				tournamentService.registerToJoinTournamentCompetitiveType(tournamentId, studentId, weight),
 				HttpStatus.OK);
 	}
+	
 }
