@@ -240,7 +240,6 @@ public class TournamentServiceImpl implements TournamentService {
 			if (tournamentOp.isPresent()) {
 				Tournament tournament = tournamentOp.get();
 				tournament.setName(tournamentDto.getName());
-				tournament.setMaxQuantityComitee(tournamentDto.getMaxQuantityComitee());
 				tournament.setDescription(tournamentDto.getDescription());
 				tournament.setRegistrationPlayerDeadline(tournamentDto.getRegistrationPlayerDeadline());
 				tournament.setRegistrationOrganizingCommitteeDeadline(
