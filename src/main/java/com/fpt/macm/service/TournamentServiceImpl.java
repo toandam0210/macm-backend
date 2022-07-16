@@ -125,6 +125,7 @@ public class TournamentServiceImpl implements TournamentService {
 		try {
 			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			tournament.setSemester(semester.getName());
+			tournament.setStatus(0);
 			tournament.setCreatedBy("toandv");
 			tournament.setCreatedOn(LocalDateTime.now());
 			tournament.setTotalAmount(0);

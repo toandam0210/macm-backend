@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +16,6 @@ import com.fpt.macm.model.entity.AdminSemester;
 import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CollaboratorReport;
-import com.fpt.macm.model.entity.CompetitiveMatch;
-import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventSchedule;
 import com.fpt.macm.model.entity.MemberEvent;
@@ -44,6 +41,7 @@ import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.MembershipShipInforRepository;
 import com.fpt.macm.repository.MembershipStatusRepository;
 import com.fpt.macm.repository.SemesterRepository;
+import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.repository.UserStatusReportRepository;
 import com.fpt.macm.service.EventScheduleService;
@@ -116,6 +114,9 @@ public class TaskSchedule {
 	
 	@Autowired
 	TournamentScheduleService tournamentScheduleService;
+	
+	@Autowired
+	TournamentRepository tournamentRepository;
 	
 	Logger logger = LoggerFactory.getLogger(TaskSchedule.class);
 
@@ -383,21 +384,26 @@ public class TaskSchedule {
 		}
 	}
 	
+	@Scheduled(cron = "1 0 0 * * *")
+	public void changeStatusTournamentForUpdatePlayer() {
+		List<Tournament> listTournaments = tournamentService.listTournamentsByRegistrationPlayerDeadline(LocalDateTime.now());
+		for (Tournament tournament : listTournaments) {
+			if(tournament.getStatus() == 0) {
+				tournament.setStatus(1);
+				tournamentRepository.save(tournament);
+				logger.info("Chuyển thành 1");
+			}
+		}
+	}
 	
 	@Scheduled(cron = "1 0 0 * * *")
-	public void changeStatusMatchToUpdateResult() {
+	public void changeStatusTournamentForUpdateResult() {
 		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now());
 		if (tournamentSchedule != null) {
 			Tournament getTournament = tournamentSchedule.getTournament();
-			Set<CompetitiveType> listType = getTournament.getCompetitiveTypes();
-			for (CompetitiveType competitiveType : listType) {
-				List<CompetitiveMatch> listMatch = competitiveMatchRepository.listMatchsByType(competitiveType.getId());
-				for (CompetitiveMatch getMatch : listMatch) {
-					if(getMatch.getStatus() < 2) {
-						getMatch.setStatus(2);
-						competitiveMatchRepository.save(getMatch);
-					}
-				}
+			if(getTournament.getStatus() == 2) {
+				getTournament.setStatus(3);
+				tournamentRepository.save(getTournament);
 			}
 		}
 	}
