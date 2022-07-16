@@ -33,7 +33,7 @@ public class CompetitiveMatch implements Comparable<CompetitiveMatch>{
 	private String secondStudentId;
 	
 	@Column
-	private int status;
+	private boolean status;
 	
 	@Column
 	private Integer nextMatchId;
@@ -88,11 +88,11 @@ public class CompetitiveMatch implements Comparable<CompetitiveMatch>{
 		this.secondStudentId = secondStudentId;
 	}
 
-	public int getStatus() {
+	public boolean getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(boolean status) {
 		this.status = status;
 	}
 
