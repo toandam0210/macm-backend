@@ -63,12 +63,13 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 	CompetitiveTypeService competitiveTypeService;
 
 	@Override
-	public ResponseMessage spawnTimeAndArea(int tournamentId, List<Area> listArea) {
+	public ResponseMessage spawnTimeAndArea(int tournamentId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<CompetitiveMatch> listMatch = new ArrayList<CompetitiveMatch>();
 			Set<CompetitiveType> listType = competitiveTypeService.getAllTypeByTournament(tournamentId);
+			List<Area> listArea = areaRepository.findAll();
 			for (CompetitiveType competitiveType : listType) {
 				List<CompetitiveMatch> listMatchByType = competitiveMatchRepository
 						.listMatchsByType(competitiveType.getId());
