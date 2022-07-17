@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.helper.ExcelHelper;
 import com.fpt.macm.model.Enum.ERole;
+import com.fpt.macm.model.dto.ActiveUserDto;
 import com.fpt.macm.model.dto.InforInQrCode;
 import com.fpt.macm.model.dto.UserDto;
 import com.fpt.macm.model.entity.AdminSemester;
@@ -675,6 +676,30 @@ public class UserServiceImpl implements UserService {
 			responseMessage.setData(Arrays.asList(qrCode));
 			responseMessage.setMessage("Generate QR Code successful");
 		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllActiveMemberAndCollaborator() {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<User> users = userRepository.findActiveMembersAndCollaborators();
+			if (!users.isEmpty()) {
+				List<ActiveUserDto> activeUsersDto = new ArrayList<ActiveUserDto>();
+				for (User user : users) {
+					ActiveUserDto activeUserDto = new ActiveUserDto();
+					activeUserDto.setStudentId(user.getStudentId());
+					activeUserDto.setStudentName(user.getName());
+					activeUsersDto.add(activeUserDto);
+				}
+				responseMessage.setData(activeUsersDto);
+				responseMessage.setMessage("Lấy danh sách tên và MSSV thành viên và CTV active thành công");
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
