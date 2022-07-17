@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.ActiveUserDto;
 import com.fpt.macm.model.dto.CompetitivePlayerDto;
 import com.fpt.macm.model.dto.CompetitiveTypeDto;
 import com.fpt.macm.model.dto.ExhibitionPlayerDto;
@@ -26,7 +27,6 @@ import com.fpt.macm.model.dto.TournamentOrganizingCommitteePaymentStatusReportDt
 import com.fpt.macm.model.dto.TournamentPlayerDto;
 import com.fpt.macm.model.dto.TournamentPlayerPaymentStatusReportDto;
 import com.fpt.macm.model.entity.ClubFund;
-import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitivePlayerBracket;
 import com.fpt.macm.model.entity.CompetitiveType;
@@ -1177,7 +1177,7 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	public ResponseMessage registerToJoinTournamentExhibitionType(int tournamentId, String studentId,
-			int exhibitionTypeId, String teamName, List<User> teamMember) {
+			int exhibitionTypeId, String teamName, List<ActiveUserDto> activeUsersDto) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -1188,7 +1188,8 @@ public class TournamentServiceImpl implements TournamentService {
 				
 				int countMale = 0;
 				int countFemale = 0;
-				for (User member : teamMember) {
+				for (ActiveUserDto activeUserDto : activeUsersDto) {
+					User member = userRepository.findByStudentId(activeUserDto.getStudentId()).get();
 					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
 					if (tournamentPlayerOp.isPresent()) {
 						TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
@@ -1211,7 +1212,8 @@ public class TournamentServiceImpl implements TournamentService {
 				}
 				
 				Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
-				for (User member : teamMember) {
+				for (ActiveUserDto activeUserDto : activeUsersDto) {
+					User member = userRepository.findByStudentId(activeUserDto.getStudentId()).get();
 					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
 					if (!tournamentPlayerOp.isPresent()) {
 						createTournamentPlayer(tournament, member);
