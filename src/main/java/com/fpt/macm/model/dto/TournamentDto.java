@@ -6,7 +6,7 @@ import java.util.Set;
 
 import com.fpt.macm.model.entity.TournamentPlayer;
 
-public class TournamentDto {
+public class TournamentDto implements Comparable<TournamentDto> {
 	private int id;
 
 	private String name;
@@ -21,7 +21,7 @@ public class TournamentDto {
 
 	private Set<ExhibitionTypeDto> exhibitionTypesDto;
 
-	private String status;
+	private int status;
 
 	private LocalDate startDate;
 
@@ -89,11 +89,11 @@ public class TournamentDto {
 		this.exhibitionTypesDto = exhibitionTypesDto;
 	}
 
-	public String getStatus() {
+	public int getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(int status) {
 		this.status = status;
 	}
 
@@ -175,6 +175,12 @@ public class TournamentDto {
 
 	public void setRegistrationOrganizingCommitteeDeadline(LocalDateTime registrationOrganizingCommitteeDeadline) {
 		this.registrationOrganizingCommitteeDeadline = registrationOrganizingCommitteeDeadline;
+	}
+
+	@Override
+	public int compareTo(TournamentDto o) {
+		// TODO Auto-generated method stub
+		return this.getStartDate().compareTo(o.getStartDate()) * -1;
 	}
 
 }

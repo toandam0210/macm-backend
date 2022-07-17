@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -360,7 +361,7 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	@Override
-	public ResponseMessage getAllTournamentBySemester(String semester) {
+	public ResponseMessage getAllTournamentBySemester(String semester, int status) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			if (semester == "") {
@@ -368,20 +369,21 @@ public class TournamentServiceImpl implements TournamentService {
 			}
 			List<Tournament> tournaments = tournamentRepository.findBySemester(semester);
 			List<TournamentDto> tournamentDtos = new ArrayList<TournamentDto>();
+			List<TournamentDto> listResult = new ArrayList<TournamentDto>();
 			for (Tournament tournament : tournaments) {
 				LocalDate startDate = getStartDate(tournament.getId());
 				TournamentDto tournamentDto = new TournamentDto();
 				if (startDate != null) {
 					LocalDate endDate = getEndDate(tournament.getId());
 					if (LocalDate.now().isBefore(startDate)) {
-						tournamentDto.setStatus("Chưa diễn ra");
+						tournamentDto.setStatus(3); //chua dien ra
 					} else if (LocalDate.now().isAfter(endDate)) {
-						tournamentDto.setStatus("Đã kết thúc");
+						tournamentDto.setStatus(1); //da ket thuc
 					} else {
-						tournamentDto.setStatus("Đang diễn ra");
+						tournamentDto.setStatus(2);//dang dien ra
 					}
 				} else {
-					tournamentDto.setStatus("Chưa diễn ra");
+					tournamentDto.setStatus(3);//chua dien ra
 				}
 				Set<CompetitiveTypeDto> competitiveTypeDtos = new HashSet<CompetitiveTypeDto>();
 				Set<ExhibitionTypeDto> exhibitionTypeDtos = new HashSet<ExhibitionTypeDto>();
@@ -411,9 +413,31 @@ public class TournamentServiceImpl implements TournamentService {
 				tournamentDtos.add(tournamentDto);
 
 			}
-			responseMessage.setData(tournamentDtos);
+			if (status == 0) {
+				listResult.addAll(tournamentDtos);
+			} else if (status == 1) {
+				for (TournamentDto tournamentDto : tournamentDtos) {
+					if (tournamentDto.getStatus() == 1) {
+						listResult.add(tournamentDto);
+					}
+				}
+			} else if (status == 2) {
+				for (TournamentDto tournamentDto : tournamentDtos) {
+					if (tournamentDto.getStatus() == 2) {
+						listResult.add(tournamentDto);
+					}
+				}
+			} else {
+				for (TournamentDto tournamentDto : tournamentDtos) {
+					if (tournamentDto.getStatus() == 3) {
+						listResult.add(tournamentDto);
+					}
+				}
+			}
+			Collections.sort(listResult);
+			responseMessage.setData(listResult);
 			responseMessage.setMessage("Lấy danh sách giải đấu thành công" + semester);
-			responseMessage.setTotalResult(tournamentDtos.size());
+			responseMessage.setTotalResult(listResult.size());
 
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());

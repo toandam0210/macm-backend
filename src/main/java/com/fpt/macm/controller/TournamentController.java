@@ -70,8 +70,8 @@ public class TournamentController {
 	}
 
 	@GetMapping("/headclub/tournament/getall")
-	ResponseEntity<ResponseMessage> getAllTournamentBySemester(@RequestParam String semester) {
-		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentBySemester(semester),
+	ResponseEntity<ResponseMessage> getAllTournamentBySemester(@RequestParam String semester, @RequestParam int status) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentBySemester(semester,status),
 				HttpStatus.OK);
 	}
 
