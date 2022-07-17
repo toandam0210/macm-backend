@@ -1,0 +1,440 @@
+package com.fpt.macm.service;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.EventDto;
+import com.fpt.macm.model.entity.ClubFund;
+import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.entity.Event;
+import com.fpt.macm.model.entity.EventSchedule;
+import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.ClubFundRepository;
+import com.fpt.macm.repository.CommonScheduleRepository;
+import com.fpt.macm.repository.EventRepository;
+import com.fpt.macm.repository.EventScheduleRepository;
+import com.fpt.macm.repository.MemberEventRepository;
+import com.fpt.macm.repository.SemesterRepository;
+
+@Service
+public class EventServiceImpl implements EventService{
+
+	@Autowired
+	EventRepository eventRepository;
+	
+	@Autowired
+	EventScheduleRepository eventScheduleRepository;
+	
+	@Autowired
+	CommonScheduleRepository commonScheduleRepository;
+	
+	@Autowired
+	MemberEventRepository memberEventRepository;
+	
+	@Autowired
+	SemesterRepository semesterRepository;
+	
+	@Autowired
+	ClubFundRepository clubFundRepository;
+	
+	@Autowired
+	EventScheduleService eventScheduleService;
+	
+	@Autowired
+	CommonScheduleService commonScheduleService;
+	
+	@Autowired
+	SemesterService semesterService;
+	
+	@Autowired
+	MemberEventService memberEventService;
+	
+	@Override
+	public ResponseMessage createEvent(Event event) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+			event.setAmountPerRegisterActual(0);
+			event.setTotalAmountActual(0);
+			event.setCreatedBy("LinhLHN");
+			event.setCreatedOn(LocalDateTime.now());
+			event.setSemester(semester.getName());
+			eventRepository.save(event);
+			//trừ tiền từ clb
+			List<ClubFund> clubFunds = clubFundRepository.findAll();
+			ClubFund clubFund = clubFunds.get(0);
+			clubFund.setFundAmount(clubFund.getFundAmount() - event.getAmountFromClub());
+			clubFundRepository.save(clubFund);
+			responseMessage.setData(Arrays.asList(event));
+			responseMessage.setMessage(Constant.MSG_052);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateBeforeEvent(int id, Event event) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(id);
+			if(listSchedule.size() > 0 && listSchedule.get(0).getDate().compareTo(LocalDate.now()) <= 0) {
+				responseMessage.setMessage(Constant.MSG_127);
+			}
+			else {
+				Optional<Event> eventOp = eventRepository.findById(id);
+				Event getEvent = eventOp.get();
+				getEvent.setName(event.getName());
+				getEvent.setDescription(event.getDescription());
+				getEvent.setMaxQuantityComitee(event.getMaxQuantityComitee());
+				getEvent.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+				getEvent.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
+				getEvent.setUpdatedBy("LinhLHN");
+				getEvent.setUpdatedOn(LocalDateTime.now());
+				List<EventSchedule> getEventSchedules = eventScheduleService.listEventScheduleByEvent(id);
+				for (EventSchedule eventSchedule : getEventSchedules) {
+					CommonSchedule getCommonSchedule = commonScheduleService.getCommonSessionByDate(eventSchedule.getDate());
+					getCommonSchedule.setTitle(event.getName());
+					getCommonSchedule.setUpdatedOn(LocalDateTime.now());
+					commonScheduleRepository.save(getCommonSchedule);
+				}
+				eventRepository.save(getEvent);
+				responseMessage.setData(Arrays.asList(getEvent));
+				responseMessage.setMessage(Constant.MSG_053);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage deleteEvent(int id) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(id);
+			if(listSchedule.size() > 0 && listSchedule.get(0).getDate().compareTo(LocalDate.now()) <= 0) {
+				responseMessage.setMessage(Constant.MSG_064);
+			}
+			else {
+				for (EventSchedule eventSchedule : listSchedule) {
+					CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(eventSchedule.getDate());
+					commonScheduleRepository.delete(getCommonSession);
+				}
+				Optional<Event> eventOp = eventRepository.findById(id);
+				Event event = eventOp.get();
+				eventScheduleRepository.deleteAll(listSchedule);
+				memberEventRepository.deleteAll(memberEventRepository.findByEventIdOrderByIdAsc(event.getId()));
+				eventRepository.delete(event);
+				responseMessage.setData(Arrays.asList(event));
+				responseMessage.setMessage(Constant.MSG_054);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getEventsByName(String name, int pageNo, int pageSize, String sortBy) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
+			Page<Event> pageResponse = eventRepository.findByName(name, paging);
+			List<Event> eventList = new ArrayList<Event>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				eventList = pageResponse.getContent();
+			}
+			List<EventDto> eventDtos = new ArrayList<EventDto>();
+			for (Event event : eventList) {
+				LocalDate startDate = getStartDate(event.getId());
+				EventDto eventDto = new EventDto();
+				if(startDate != null) {
+					LocalDate endDate = getEndDate(event.getId());
+					if(LocalDate.now().isBefore(startDate)) {
+						eventDto.setStatus("Chưa diễn ra");
+						eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+						eventDto.setTotalAmount(event.getTotalAmountEstimated());
+					}else if(LocalDate.now().isAfter(endDate)) {
+						eventDto.setStatus("Đã kết thúc");
+						eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterActual());
+						eventDto.setTotalAmount(event.getTotalAmountActual());
+					}else {
+						eventDto.setStatus("Đang diễn ra");
+						eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+						eventDto.setTotalAmount(event.getTotalAmountEstimated());
+					}
+				} else {
+					eventDto.setStatus("Chưa diễn ra");
+				}
+				eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
+				eventDto.setAmountFromClub(event.getAmountFromClub());
+				eventDto.setStartDate(startDate);
+				eventDto.setName(event.getName());
+				eventDto.setId(event.getId());
+				eventDto.setDescription(event.getDescription());
+				eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+				eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
+				eventDtos.add(eventDto);
+			}
+			responseMessage.setData(eventDtos);
+			responseMessage.setPageNo(pageNo);
+			responseMessage.setPageSize(pageSize);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getEventById(int id) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Event> eventOp = eventRepository.findById(id);
+			Event getEvent = eventOp.get();
+			responseMessage.setData(Arrays.asList(getEvent));
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getEventsByDate(LocalDate startDate, LocalDate finishDate, int pageNo, int pageSize) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			if(finishDate.compareTo(LocalDate.now()) < 0) {
+				responseMessage.setMessage(Constant.MSG_072);
+			} else {
+				List<EventDto> eventDtos = new ArrayList<EventDto>();
+				List<Event> eventList = new ArrayList<Event>();
+				while(startDate.compareTo(finishDate) <= 0) {
+					EventSchedule getEventSession = eventScheduleService.getEventSessionByDate(startDate);
+					if(getEventSession != null) {
+						Event getEvent = getEventSession.getEvent();
+						if(!eventList.contains(getEvent)) {
+							eventList.add(getEvent);
+						}
+					}
+					startDate.plusDays(1);
+				}
+				if(eventList.size() > 0) {
+					for (Event event : eventList) {
+						LocalDate startDateEvent = (LocalDate) getStartDateOfEvent(event.getId()).getData().get(0);
+						LocalDate endDate = getEndDate(event.getId());
+						EventDto eventDto = new EventDto();
+						if(LocalDate.now().isBefore(startDateEvent)) {
+							eventDto.setStatus("Chưa diễn ra");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+							eventDto.setTotalAmount(event.getTotalAmountEstimated());
+						}else if(LocalDate.now().isAfter(endDate)) {
+							eventDto.setStatus("Đã kết thúc");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterActual());
+							eventDto.setTotalAmount(event.getTotalAmountActual());
+						}else {
+							eventDto.setStatus("Đang diễn ra");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+							eventDto.setTotalAmount(event.getTotalAmountEstimated());
+						}
+						eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
+						eventDto.setAmountFromClub(event.getAmountFromClub());
+						eventDto.setStartDate(startDate);
+						eventDto.setName(event.getName());
+						eventDto.setId(event.getId());
+						eventDto.setDescription(event.getDescription());
+						eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+						eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
+						eventDtos.add(eventDto);
+					}
+					Collections.sort(eventDtos);
+					List<EventDto> getEventPageable = pageableEvent(eventDtos, pageNo, pageSize);
+					responseMessage.setData(getEventPageable);
+					responseMessage.setMessage(Constant.MSG_063 + 
+							" từ ngày " + startDate.getDayOfMonth() + "/" + startDate.getMonthValue() + "/" + startDate.getYear() +
+						    " đến ngày " + finishDate.getDayOfMonth() + "/" + finishDate.getMonthValue() + "/" + finishDate.getYear());
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getStartDateOfEvent(int eventId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
+			if(listSchedule.size() > 0) {
+				responseMessage.setData(Arrays.asList(listSchedule.get(0).getDate()));
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
+	public LocalDate getEndDate(int eventId) {
+		List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
+		if(listSchedule.size() > 0) {
+			return listSchedule.get(listSchedule.size()-1).getDate();
+		}
+		return null;
+	}
+
+	@Override
+	public ResponseMessage getEventsBySemester(String semester, int month, int pageNo, int pageSize) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			if(semester == "") {
+				semester = semesterRepository.findTop3Semester().get(0).getName();
+			}
+			List<Event> events = eventRepository.findBySemester(semester);
+			List<EventDto> eventDtos = new ArrayList<EventDto>();
+			for (Event event : events) {
+				LocalDate startDate = getStartDate(event.getId());
+				if(startDate != null) {
+					if(month == 0 || (month != 0 && getStartDate(event.getId()).getMonthValue() == month)) {
+						EventDto eventDto = new EventDto();
+						LocalDate endDate = getEndDate(event.getId());
+						if(LocalDate.now().isBefore(startDate)) {
+							eventDto.setStatus("Chưa diễn ra");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+							eventDto.setTotalAmount(event.getTotalAmountEstimated());
+						}else if(LocalDate.now().isAfter(endDate)) {
+							eventDto.setStatus("Đã kết thúc");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterActual());
+							eventDto.setTotalAmount(event.getTotalAmountActual());
+						}else {
+							eventDto.setStatus("Đang diễn ra");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+							eventDto.setTotalAmount(event.getTotalAmountEstimated());
+						}
+						eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
+						eventDto.setAmountFromClub(event.getAmountFromClub());
+						eventDto.setStartDate(startDate);
+						eventDto.setName(event.getName());
+						eventDto.setId(event.getId());
+						eventDto.setDescription(event.getDescription());
+						eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+						eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
+						eventDtos.add(eventDto);
+					}
+				}
+			}
+			Collections.sort(eventDtos);
+			List<EventDto> getEventPageable = pageableEvent(eventDtos, pageNo, pageSize);
+			responseMessage.setData(getEventPageable);
+			responseMessage.setMessage(Constant.MSG_063 + " tháng " + month + " kỳ " + semester);
+			responseMessage.setTotalResult(eventDtos.size());
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
+	@Override
+	public LocalDate getStartDate(int eventId) {
+		// TODO Auto-generated method stub
+		try {
+			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
+			if(listSchedule.size() > 0) {
+				return listSchedule.get(0).getDate();
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+		return null;
+	}
+
+	@Override
+	public ResponseMessage updateAfterEvent(int eventId, double money, boolean isIncurred, boolean isUseClubFund) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
+			if(listSchedule.size() > 0 && listSchedule.get(listSchedule.size() - 1).getDate().compareTo(LocalDate.now()) > 0) {
+				responseMessage.setMessage(Constant.MSG_128);
+			}
+			else {
+				Optional<Event> eventOp = eventRepository.findById(eventId);
+				Event getEvent = eventOp.get();
+				if(isIncurred) {
+					int countMemberEvent = memberEventRepository.findMemberEventByEventId(eventId).size();
+					double totalProceedsActual = countMemberEvent * getEvent.getAmountPerRegisterEstimated();
+					double totalAmountActual = totalProceedsActual + money + getEvent.getAmountFromClub();
+					getEvent.setTotalAmountActual(totalAmountActual);
+					if(isUseClubFund) {
+						getEvent.setAmountFromClub(getEvent.getAmountFromClub() + money);
+						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());
+						//trừ tiền từ clb
+						List<ClubFund> clubFunds = clubFundRepository.findAll();
+						ClubFund clubFund = clubFunds.get(0);
+						clubFund.setFundAmount(clubFund.getFundAmount() - money);
+						clubFundRepository.save(clubFund);
+					}
+					else {
+						double amountPerMore = money/countMemberEvent;
+						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated() + amountPerMore);
+					}
+				}
+				else {
+					//cộng tiền vào clb
+					List<ClubFund> clubFunds = clubFundRepository.findAll();
+					ClubFund clubFund = clubFunds.get(0);
+					clubFund.setFundAmount(clubFund.getFundAmount() + money);
+					clubFundRepository.save(clubFund);
+					getEvent.setAmountFromClub(getEvent.getAmountFromClub() - money >= 0 ? getEvent.getAmountFromClub() - money : 0);
+					getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());
+					getEvent.setTotalAmountActual(getEvent.getTotalAmountEstimated());
+				}
+				getEvent.setUpdatedBy("LinhLHN");
+				getEvent.setUpdatedOn(LocalDateTime.now());
+				eventRepository.save(getEvent);
+				responseMessage.setData(Arrays.asList(getEvent));
+				responseMessage.setMessage(Constant.MSG_129);
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
+	public List<EventDto> pageableEvent(List<EventDto> currentList, int pageNo, int pageSize) {
+		List<EventDto> result = new ArrayList<EventDto>();
+		for(int i = pageNo * pageSize; i < (pageNo + 1) * pageSize && i < currentList.size(); i++) {
+			result.add(currentList.get(i));
+		}
+		return result;
+	}
+}

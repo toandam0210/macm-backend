@@ -6,10 +6,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.Constant;
-import com.fpt.macm.model.Contact;
-import com.fpt.macm.model.ResponseMessage;
-import com.fpt.macm.model.SocialNetwork;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.entity.Contact;
+import com.fpt.macm.model.entity.SocialNetwork;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ContactRepository;
 import com.fpt.macm.repository.SocialNetworkRepository;
 
@@ -70,20 +70,4 @@ public class ContactServiceImpl implements ContactService{
 		}
 		return responseMessage;
 	}
-
-	public ResponseMessage updateSocialNetwork(List<SocialNetwork> socialNetworks) {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			socialNetworkRepository.deleteAll();
-			socialNetworkRepository.saveAll(socialNetworks);
-			responseMessage.setData(socialNetworks);
-			responseMessage.setMessage(Constant.MSG_011);
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
 }

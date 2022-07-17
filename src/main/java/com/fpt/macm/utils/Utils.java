@@ -1,12 +1,26 @@
 package com.fpt.macm.utils;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Base64;
+
+import javax.imageio.ImageIO;
 
 import org.springframework.data.domain.Sort;
 
-import com.fpt.macm.dto.UserToCsvDto;
-import com.fpt.macm.model.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.RoleEventDto;
+import com.fpt.macm.model.entity.Role;
+import com.fpt.macm.model.entity.RoleEvent;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.client.j2se.MatrixToImageWriter;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 public class Utils {
 	public static final String SORT_BY_NAME_ASC = "SORT_BY_NAME_ASC";
@@ -54,86 +68,212 @@ public class Utils {
 			return Sort.by(ID_FIELD).ascending();
 		}
 	}
-	
-	public static void convertUserRoleFromDbToCsv(User user, UserToCsvDto userToCsvDto) {
-		switch (user.getRole().getName()) {
-		case "ROLE_HeadClub":
-			userToCsvDto.setRole("Chủ nhiệm");
-			break;
-		case "ROLE_ViceHeadClub":
-			userToCsvDto.setRole("Phó chủ nhiệm");
-			break;
-		case "ROLE_Treasurer":
-			userToCsvDto.setRole("Thủ quỹ");
-			break;
-		case "ROLE_HeadCulture":
-			userToCsvDto.setRole("Trưởng ban văn hóa");
-			break;
-		case "ROLE_ViceHeadCulture":
-			userToCsvDto.setRole("Phó ban văn hóa");
-			break;
-		case "ROLE_HeadCommunication":
-			userToCsvDto.setRole("Trưởng ban truyền thông");
-			break;
-		case "ROLE_ViceHeadCommunication":
-			userToCsvDto.setRole("Phó ban truyền thông");
-			break;
-		case "ROLE_HeadTechnique":
-			userToCsvDto.setRole("Trưởng ban chuyên môn");
-			break;
-		case "ROLE_ViceHeadTechnique":
-			userToCsvDto.setRole("Phó ban chuyên môn");
-			break;
-		case "ROLE_Member_Commnication":
-			userToCsvDto.setRole("Thành viên ban truyền thông");
-			break;
-		case "ROLE_Member_Culture":
-			userToCsvDto.setRole("Thành viên ban văn hóa");
-			break;
-		case "ROLE_Member_Technique":
-			userToCsvDto.setRole("Thành viên ban chuyên môn");
-			break;
-		case "ROLE_Collaborator_Commnunication":
-			userToCsvDto.setRole("CTV truyền thông");
-			break;
-		case "ROLE_Collaborator_Culture":
-			userToCsvDto.setRole("CTV văn hóa");
-			break;
-		case "ROLE_Collaborator_Technique":
-			userToCsvDto.setRole("CTV chuyên môn");
-			break;
 
-		default:
-			userToCsvDto.setRole("Thành viên ban chuyên môn");
-			break;
-		}
-	}
-	
-	public static UserToCsvDto convertUserToUserCsv(User user) {
-		UserToCsvDto userToCsvDto = new UserToCsvDto();
-		userToCsvDto.setStudentId(user.getStudentId());
-		userToCsvDto.setName(user.getName());
-		userToCsvDto.setDateOfBirth(user.getDateOfBirth());
-		userToCsvDto.setPhone(user.getPhone());
-		userToCsvDto.setEmail(user.getEmail());
-		if (user.isGender()) {
-			userToCsvDto.setGender("Nam");
-		} else {
-			userToCsvDto.setGender("Nữ");
-		}
-		userToCsvDto.setImage(user.getImage());
-		if (user.isActive()) {
-			userToCsvDto.setIsActive("Hoạt động");
-		} else {
-			userToCsvDto.setIsActive("Không hoạt động");
-		}
-		convertUserRoleFromDbToCsv(user, userToCsvDto);
-		userToCsvDto.setCurrentAddress(user.getCurrentAddress());
-		return userToCsvDto;
-	}
-	
 	public static LocalDate ConvertStringToLocalDate(String input) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		return LocalDate.parse(input, formatter);
+	}
+	
+	public static LocalDateTime ConvertStringToLocalDateTime(String input) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+		return LocalDateTime.parse(input, formatter);
+	}
+
+	public static void convertNameOfRole(Role role) {
+		switch (role.getName()) {
+		case Constant.ROLE_HEAD_CLUB:
+			role.setName(Constant.ROLE_HEAD_CLUB_VN);
+			break;
+		case Constant.ROLE_VICE_HEAD_CLUB:
+			role.setName(Constant.ROLE_VICE_HEAD_CLUB_VN);
+			break;
+		case Constant.ROLE_TREASURER:
+			role.setName(Constant.ROLE_TREASURER_VN);
+			break;
+		case Constant.ROLE_HEAD_CULTURE:
+			role.setName(Constant.ROLE_HEAD_CULTURE_VN);
+			break;
+		case Constant.ROLE_VICE_HEAD_CULTURE:
+			role.setName(Constant.ROLE_VICE_HEAD_CULTURE_VN);
+			break;
+		case Constant.ROLE_HEAD_COMMUNICATION:
+			role.setName(Constant.ROLE_HEAD_COMMUNICATION_VN);
+			break;
+		case Constant.ROLE_VICE_HEAD_COMMUNICATION:
+			role.setName(Constant.ROLE_VICE_HEAD_COMMUNICATION_VN);
+			break;
+		case Constant.ROLE_HEAD_TECHNIQUE:
+			role.setName(Constant.ROLE_HEAD_TECHNIQUE_VN);
+			break;
+		case Constant.ROLE_VICE_HEAD_TECHNIQUE:
+			role.setName(Constant.ROLE_VICE_HEAD_TECHNIQUE_VN);
+			break;
+		case Constant.ROLE_MEMBER_COMMUNICATION:
+			role.setName(Constant.ROLE_MEMBER_COMMUNICATION_VN);
+			break;
+		case Constant.ROLE_MEMBER_CULTURE:
+			role.setName(Constant.ROLE_MEMBER_CULTURE_VN);
+			break;
+		case Constant.ROLE_MEMBER_TECHNIQUE:
+			role.setName(Constant.ROLE_MEMBER_TECHNIQUE_VN);
+			break;
+		case Constant.ROLE_COLLABORATOR_COMMUNICATION:
+			role.setName(Constant.ROLE_COLLABORATOR_COMMUNICATION_VN);
+			break;
+		case Constant.ROLE_COLLABORATOR_CULTURE:
+			role.setName(Constant.ROLE_COLLABORATOR_CULTURE_VN);
+			break;
+		case Constant.ROLE_COLLABORATOR_TECHNIQUE:
+			role.setName(Constant.ROLE_COLLABORATOR_TECHNIQUE_VN);
+			break;
+
+		default:
+			role.setName(Constant.ROLE_MEMBER_TECHNIQUE_VN);
+			break;
+		}
+	}
+
+	public static void convertRoleFromExcelToDb(String roleInExcel, Role role) {
+		switch (roleInExcel) {
+		case Constant.ROLE_HEAD_CLUB_VN:
+			role.setId(1);
+			break;
+		case Constant.ROLE_VICE_HEAD_CLUB_VN:
+			role.setId(2);
+			break;
+		case Constant.ROLE_TREASURER_VN:
+			role.setId(3);
+			break;
+		case Constant.ROLE_HEAD_CULTURE_VN:
+			role.setId(4);
+			break;
+		case Constant.ROLE_VICE_HEAD_CULTURE_VN:
+			role.setId(5);
+			break;
+		case Constant.ROLE_HEAD_COMMUNICATION_VN:
+			role.setId(6);
+			break;
+		case Constant.ROLE_VICE_HEAD_COMMUNICATION_VN:
+			role.setId(7);
+			break;
+		case Constant.ROLE_HEAD_TECHNIQUE_VN:
+			role.setId(8);
+			break;
+		case Constant.ROLE_VICE_HEAD_TECHNIQUE_VN:
+			role.setId(9);
+			break;
+		case Constant.ROLE_MEMBER_COMMUNICATION_VN:
+			role.setId(10);
+			break;
+		case Constant.ROLE_MEMBER_CULTURE_VN:
+			role.setId(11);
+			break;
+		case Constant.ROLE_MEMBER_TECHNIQUE_VN:
+			role.setId(12);
+			break;
+		case Constant.ROLE_COLLABORATOR_COMMUNICATION_VN:
+			role.setId(13);
+			break;
+		case Constant.ROLE_COLLABORATOR_CULTURE_VN:
+			role.setId(14);
+			break;
+		case Constant.ROLE_COLLABORATOR_TECHNIQUE_VN:
+			role.setId(15);
+			break;
+
+		default:
+			role.setId(12);
+			break;
+		}
+	}
+
+	public static String convertRoleFromDbToExcel(Role role) {
+		switch (role.getId()) {
+		case 1:
+			return Constant.ROLE_HEAD_CLUB_VN;
+		case 2:
+			return Constant.ROLE_VICE_HEAD_CLUB_VN;
+		case 3:
+			return Constant.ROLE_TREASURER_VN;
+		case 4:
+			return Constant.ROLE_HEAD_CULTURE_VN;
+		case 5:
+			return Constant.ROLE_VICE_HEAD_CULTURE_VN;
+		case 6:
+			return Constant.ROLE_HEAD_COMMUNICATION_VN;
+		case 7:
+			return Constant.ROLE_VICE_HEAD_COMMUNICATION_VN;
+		case 8:
+			return Constant.ROLE_HEAD_TECHNIQUE_VN;
+		case 9:
+			return Constant.ROLE_VICE_HEAD_TECHNIQUE_VN;
+		case 10:
+			return Constant.ROLE_MEMBER_COMMUNICATION_VN;
+		case 11:
+			return Constant.ROLE_MEMBER_CULTURE_VN;
+		case 12:
+			return Constant.ROLE_MEMBER_TECHNIQUE_VN;
+		case 13:
+			return Constant.ROLE_COLLABORATOR_COMMUNICATION_VN;
+		case 14:
+			return Constant.ROLE_COLLABORATOR_CULTURE_VN;
+		case 15:
+			return Constant.ROLE_COLLABORATOR_TECHNIQUE_VN;
+
+		default:
+			return Constant.ROLE_MEMBER_TECHNIQUE_VN;
+		}
+	}
+
+	public static void convertNameOfEventRole(RoleEvent roleEvent, RoleEventDto roleEventDto) {
+		switch (roleEvent.getName()) {
+		case Constant.ROLE_EVENT_MEMBER:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
+			break;
+		case Constant.ROLE_EVENT_MEMBER_COMMUNICATION:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_COMMUNICATION_VN);
+			break;
+		case Constant.ROLE_EVENT_MEMBER_CULTURE:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_CULTURE_VN);
+			break;
+		case Constant.ROLE_EVENT_MEMBER_LOGISTIC:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_LOGISTIC_VN);
+			break;
+		case Constant.ROLE_EVENT_MEMBER_TAKE_CARE:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_TAKE_CARE_VN);
+			break;
+		default:
+			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
+			break;
+		}
+	}
+	
+	public static String generateQrCode(String data, int wid, int hei) {
+		StringBuilder result = new StringBuilder();
+		
+		if(!data.isEmpty()) {
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			try {
+				QRCodeWriter writer = new QRCodeWriter();
+				BitMatrix bitMatrix = writer.encode(data, BarcodeFormat.QR_CODE, wid, hei);
+				BufferedImage bufferedImage =  MatrixToImageWriter.toBufferedImage(bitMatrix);
+				ImageIO.write(bufferedImage, "png", os);
+				result.append("data:image/png;base64,");
+				result.append(new String(Base64.getEncoder().encode(os.toByteArray())));
+			} catch (Exception e) {
+				 e.printStackTrace();
+			}
+		}
+		return result.toString();
+	}
+	
+	public static String prettyObject(Object object) {
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(object);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 }
