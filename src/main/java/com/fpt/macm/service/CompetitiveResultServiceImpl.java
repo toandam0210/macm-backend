@@ -95,16 +95,30 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 			}
 			if (countMatchCanHeld >= countMatchNeedHeld) {
 				boolean isRunning = true;
+				int matchEveryDay = countMatchNeedHeld/listTournamentSchedules.size();
+				int matchSurplus = countMatchNeedHeld%listTournamentSchedules.size();
 				int index = 0;
 				CompetitiveResult oldResult = new CompetitiveResult();
+				int countSchedule = 0;
+				boolean isJumpDay;
 				for (TournamentSchedule tournamentSchedule : listTournamentSchedules) {
+					isJumpDay = false;
+					countSchedule++;
+					int countMatchEveryDay = 0;
 					if (isRunning) {
 						LocalDate date = tournamentSchedule.getDate();
 						LocalTime startTime = tournamentSchedule.getStartTime();
 						LocalTime finishTime = tournamentSchedule.getFinishTime();
 						while (startTime.isBefore(finishTime)) {
+							if(isJumpDay) {
+								startTime = startTime.plusMinutes(10);
+								continue;
+							}
 							if (isRunning) {
 								for (Area area : listArea) {
+									if(isJumpDay) {
+										continue;
+									}
 									LocalDateTime timeMatch = LocalDateTime.of(date, startTime);
 									if (isRunning) {
 										CompetitiveResult newResult = new CompetitiveResult();
@@ -124,7 +138,18 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 										competitiveResultRepository.save(newResult);
 										listResult.add(newResult);
 										oldResult = newResult;
+										countMatchEveryDay++;
 										index++;
+										if(countSchedule > matchSurplus) {
+											if(countMatchEveryDay == matchEveryDay) {
+												isJumpDay = true;
+											}
+										}
+										else {
+											if(countMatchEveryDay == matchEveryDay + 1) {
+												isJumpDay = true;
+											}
+										}
 										if (index == listMatch.size()) {
 											isRunning = false;
 										}
