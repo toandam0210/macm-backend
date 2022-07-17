@@ -24,7 +24,7 @@ public interface TournamentService {
 
 	ResponseMessage getTournamentById(int id);
 
-	ResponseMessage getAllTournamentBySemester(String semester);
+	ResponseMessage getAllTournamentBySemester(String semester, int status);
 
 	ResponseMessage getAllCompetitivePlayer(int tournamentId, double weightMin, double weightMax);
 
