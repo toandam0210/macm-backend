@@ -68,10 +68,10 @@ public class CompetitiveController {
 		return new ResponseEntity<ResponseMessage>(competitiveMatchService.spawnMatchs(competitiveTypeId), HttpStatus.OK);
 	}
 	
-	@PostMapping("/headclub/updatetimeandplacematch")
-	ResponseEntity<ResponseMessage> updateTimeAndPlaceMatch (@RequestBody List<CompetitiveResult> listResult,
-			@RequestParam int areaId, @RequestParam String time) {
-		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateTimeAndArea(listResult), HttpStatus.OK);
+	@PutMapping("/headclub/updatetimeandplacematch/{matchId}")
+	ResponseEntity<ResponseMessage> updateTimeAndPlaceMatch (@PathVariable(name = "matchId") int matchId,
+			@RequestBody CompetitiveResult newResult) {
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateTimeAndArea(matchId, newResult), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headclub/updateresultmatch/{matchId}")
@@ -99,7 +99,7 @@ public class CompetitiveController {
 		return new ResponseEntity<ResponseMessage>(competitiveMatchService.confirmListMatchsPlayer(tournamentId), HttpStatus.OK);
 	}
 	
-	@PostMapping("/headclub/spawntimeandarea/{tournamentId}")
+	@PutMapping("/headclub/spawntimeandarea/{tournamentId}")
 	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId, @RequestBody List<Area> listArea) {
 		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId, listArea), HttpStatus.OK);
 	}
