@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.macm.model.dto.ActiveUserDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.Tournament;
-import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.CompetitiveTypeService;
 import com.fpt.macm.service.TournamentService;
@@ -190,8 +190,8 @@ public class TournamentController {
 	ResponseEntity<ResponseMessage> registerToJoinTournamentExhibitionType(
 			@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId,
 			@RequestParam(defaultValue = "0") int exhibitionTypeId, @RequestParam(defaultValue = "0") String teamName,
-			@RequestBody List<User> users) {
+			@RequestBody List<ActiveUserDto> teamMember) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.registerToJoinTournamentExhibitionType(
-				tournamentId, studentId, exhibitionTypeId, teamName, users), HttpStatus.OK);
+				tournamentId, studentId, exhibitionTypeId, teamName, teamMember), HttpStatus.OK);
 	}
 }

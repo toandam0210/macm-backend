@@ -3,10 +3,10 @@ package com.fpt.macm.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fpt.macm.model.dto.ActiveUserDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.Tournament;
-import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 
 public interface TournamentService {
@@ -58,6 +58,6 @@ public interface TournamentService {
 	
 	List<Tournament> listTournamentsByRegistrationPlayerDeadline(LocalDateTime playerDeadline);
 	
-	ResponseMessage registerToJoinTournamentExhibitionType(int tournamentId, String studentId, int exhibitionTypeId, String teamName, List<User> teamMember);
+	ResponseMessage registerToJoinTournamentExhibitionType(int tournamentId, String studentId, int exhibitionTypeId, String teamName, List<ActiveUserDto> activeUsersDto);
 
 }
