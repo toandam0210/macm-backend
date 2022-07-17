@@ -239,7 +239,7 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 				responseMessage.setMessage("Danh sách trận đấu");
 				List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository
 						.listPlayersByType(competitiveTypeId);
-				responseMessage.setTotalResult(maxRound(listPlayers.size()));
+				responseMessage.setTotalResult(maxRound(listPlayers.size()) + 1);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
