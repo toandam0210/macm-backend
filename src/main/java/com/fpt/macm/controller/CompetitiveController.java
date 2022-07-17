@@ -101,6 +101,6 @@ public class CompetitiveController {
 	
 	@PutMapping("/headclub/spawntimeandarea/{tournamentId}")
 	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId, @RequestBody List<Area> listArea) {
-		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId, listArea), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
 	}
 }
