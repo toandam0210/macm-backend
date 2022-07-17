@@ -154,18 +154,47 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 	}
 
 	@Override
-	public ResponseMessage updateTimeAndArea(List<CompetitiveResult> listResults) {
+	public ResponseMessage updateTimeAndArea(int matchId, CompetitiveResult newResult) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			for (CompetitiveResult competitiveResult : listResults) {
-				CompetitiveMatch getMatch = competitiveResult.getMatch();
-				CompetitiveResult getResult = competitiveResultRepository.findByMatchId(getMatch.getId()).get();
-				getResult.setTime(competitiveResult.getTime());
-				getResult.setArea(competitiveResult.getArea());
+			List<CompetitiveResult> listResult = competitiveResultRepository
+					.listResultByAreaOrderTime(newResult.getArea().getId());
+			int checkExisted = -1;
+			for (int i = 0; i < listResult.size(); i++) {
+				if(i == listResult.size() - 1) {
+					if(listResult.get(i).getTime().compareTo(newResult.getTime()) <= 0
+							&& listResult.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
+							&& !listResult.get(i).getMatch().equals(newResult.getMatch())) {
+						checkExisted = i;
+						break;
+					}
+				}
+				if (listResult.get(i).getTime().compareTo(newResult.getTime()) <= 0
+						&& listResult.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
+						&& listResult.get(i + 1).getTime().compareTo(newResult.getTime().plusMinutes(10)) < 0) {
+					if(listResult.get(i).getMatch().equals(newResult.getMatch())) {
+						checkExisted = i + 1;
+						break;
+					}
+					else {
+						checkExisted = i;
+						break;
+					}
+				}
+			}
+			if (checkExisted == -1) {
+				CompetitiveResult getResult = competitiveResultRepository.findByMatchId(matchId).get();
+				getResult.setArea(newResult.getArea());
+				getResult.setTime(newResult.getTime());
+				getResult.setUpdatedBy("LinhLHN");
+				getResult.setUpdatedOn(LocalDateTime.now());
 				competitiveResultRepository.save(getResult);
 				responseMessage.setData(Arrays.asList(getResult));
-				responseMessage.setMessage("Cập nhật thời gian và địa điểm cho trận đấu có id là " + getMatch.getId());
+				responseMessage.setMessage("Cập nhật thời gian và địa điểm thành công");
+			}
+			else {
+				responseMessage.setMessage("Bị trùng với trận khác diễn ra trên cùng sân vào lúc " + listResult.get(checkExisted).getTime());
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
