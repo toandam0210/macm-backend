@@ -95,8 +95,8 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 			}
 			if (countMatchCanHeld >= countMatchNeedHeld) {
 				boolean isRunning = true;
-				int matchEveryDay = countMatchNeedHeld/listTournamentSchedules.size();
-				int matchSurplus = countMatchNeedHeld%listTournamentSchedules.size();
+				int matchEveryDay = countMatchNeedHeld / listTournamentSchedules.size();
+				int matchSurplus = countMatchNeedHeld % listTournamentSchedules.size();
 				int index = 0;
 				CompetitiveResult oldResult = new CompetitiveResult();
 				int countSchedule = 0;
@@ -110,13 +110,13 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 						LocalTime startTime = tournamentSchedule.getStartTime();
 						LocalTime finishTime = tournamentSchedule.getFinishTime();
 						while (startTime.isBefore(finishTime)) {
-							if(isJumpDay) {
+							if (isJumpDay) {
 								startTime = startTime.plusMinutes(10);
 								continue;
 							}
 							if (isRunning) {
 								for (Area area : listArea) {
-									if(isJumpDay) {
+									if (isJumpDay) {
 										continue;
 									}
 									LocalDateTime timeMatch = LocalDateTime.of(date, startTime);
@@ -140,13 +140,12 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 										oldResult = newResult;
 										countMatchEveryDay++;
 										index++;
-										if(countSchedule > matchSurplus) {
-											if(countMatchEveryDay == matchEveryDay) {
+										if (countSchedule > matchSurplus) {
+											if (countMatchEveryDay == matchEveryDay) {
 												isJumpDay = true;
 											}
-										}
-										else {
-											if(countMatchEveryDay == matchEveryDay + 1) {
+										} else {
+											if (countMatchEveryDay == matchEveryDay + 1) {
 												isJumpDay = true;
 											}
 										}
@@ -184,26 +183,35 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			LocalDate getDate = LocalDate.of(newResult.getTime().getYear(), newResult.getTime().getMonthValue(),
+					newResult.getTime().getDayOfMonth());
 			List<CompetitiveResult> listResult = competitiveResultRepository
 					.listResultByAreaOrderTime(newResult.getArea().getId());
+			List<CompetitiveResult> listResultAtDate = new ArrayList<CompetitiveResult>();
+			for (CompetitiveResult competitiveResult : listResult) {
+				LocalDate currentDate = LocalDate.of(competitiveResult.getTime().getYear(),
+						competitiveResult.getTime().getMonthValue(), competitiveResult.getTime().getDayOfMonth());
+				if (getDate.equals(currentDate)) {
+					listResultAtDate.add(competitiveResult);
+				}
+			}
 			int checkExisted = -1;
-			for (int i = 0; i < listResult.size(); i++) {
-				if(i == listResult.size() - 1) {
-					if(listResult.get(i).getTime().compareTo(newResult.getTime()) <= 0
-							&& listResult.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
-							&& !listResult.get(i).getMatch().equals(newResult.getMatch())) {
+			for (int i = 0; i < listResultAtDate.size(); i++) {
+				if (i == listResultAtDate.size() - 1) {
+					if (listResultAtDate.get(i).getTime().compareTo(newResult.getTime()) <= 0
+							&& listResultAtDate.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
+							&& !listResultAtDate.get(i).getMatch().equals(newResult.getMatch())) {
 						checkExisted = i;
 						break;
 					}
 				}
-				if (listResult.get(i).getTime().compareTo(newResult.getTime()) <= 0
-						&& listResult.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
-						&& listResult.get(i + 1).getTime().compareTo(newResult.getTime().plusMinutes(10)) < 0) {
-					if(listResult.get(i).getMatch().equals(newResult.getMatch())) {
+				if (listResultAtDate.get(i).getTime().compareTo(newResult.getTime()) <= 0
+						&& listResultAtDate.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
+						&& listResultAtDate.get(i + 1).getTime().compareTo(newResult.getTime().plusMinutes(10)) < 0) {
+					if (listResultAtDate.get(i).getMatch().equals(newResult.getMatch())) {
 						checkExisted = i + 1;
 						break;
-					}
-					else {
+					} else {
 						checkExisted = i;
 						break;
 					}
@@ -218,9 +226,9 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 				competitiveResultRepository.save(getResult);
 				responseMessage.setData(Arrays.asList(getResult));
 				responseMessage.setMessage("Cập nhật thời gian và địa điểm thành công");
-			}
-			else {
-				responseMessage.setMessage("Bị trùng với trận khác diễn ra trên cùng sân vào lúc " + listResult.get(checkExisted).getTime());
+			} else {
+				responseMessage.setMessage("Bị trùng với trận khác diễn ra trên cùng sân vào lúc "
+						+ listResultAtDate.get(checkExisted).getTime());
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
