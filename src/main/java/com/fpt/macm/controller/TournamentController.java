@@ -195,8 +195,13 @@ public class TournamentController {
 				tournamentId, studentId, exhibitionTypeId, teamName, teamMember), HttpStatus.OK);
 	}
 	
-	@GetMapping("/getallusercompetitveplayer/{tournamentId}/{studentId}")
-	ResponseEntity<ResponseMessage> getAllUserCompetitvePlayer(@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId){
-		return new ResponseEntity<ResponseMessage>(tournamentService.getAllUserCompetitvePlayer(tournamentId, studentId), HttpStatus.OK);
+	@GetMapping("/getallusercompetitiveplayer/{tournamentId}/{studentId}")
+	ResponseEntity<ResponseMessage> getAllUserCompetitivePlayer(@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId){
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllUserCompetitivePlayer(tournamentId, studentId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getalluserexhibitionplayer/{tournamentId}/{studentId}")
+	ResponseEntity<ResponseMessage> getAllUserExhibitionPlayer(@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId){
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllUserExhibitionPlayer(tournamentId, studentId), HttpStatus.OK);
 	}
 }

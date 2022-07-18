@@ -104,7 +104,7 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ClubFundRepository clubFundRepository;
-	
+
 	@Autowired
 	CompetitiveMatchRepository competitiveMatchRepository;
 
@@ -376,14 +376,14 @@ public class TournamentServiceImpl implements TournamentService {
 				if (startDate != null) {
 					LocalDate endDate = getEndDate(tournament.getId());
 					if (LocalDate.now().isBefore(startDate)) {
-						tournamentDto.setStatus(3); //chua dien ra
+						tournamentDto.setStatus(3); // chua dien ra
 					} else if (LocalDate.now().isAfter(endDate)) {
-						tournamentDto.setStatus(1); //da ket thuc
+						tournamentDto.setStatus(1); // da ket thuc
 					} else {
-						tournamentDto.setStatus(2);//dang dien ra
+						tournamentDto.setStatus(2);// dang dien ra
 					}
 				} else {
-					tournamentDto.setStatus(3);//chua dien ra
+					tournamentDto.setStatus(3);// chua dien ra
 				}
 				Set<CompetitiveTypeDto> competitiveTypeDtos = new HashSet<CompetitiveTypeDto>();
 				Set<ExhibitionTypeDto> exhibitionTypeDtos = new HashSet<ExhibitionTypeDto>();
@@ -614,6 +614,9 @@ public class TournamentServiceImpl implements TournamentService {
 		ExhibitionPlayerDto exhibitionPlayerDto = new ExhibitionPlayerDto();
 		exhibitionPlayerDto.setId(exhibitionPlayer.getId());
 		exhibitionPlayerDto.setPlayerId(exhibitionPlayer.getTournamentPlayer().getId());
+		exhibitionPlayerDto.setPlayerName(exhibitionPlayer.getTournamentPlayer().getUser().getName());
+		exhibitionPlayerDto.setPlayerStudentId(exhibitionPlayer.getTournamentPlayer().getUser().getStudentId());
+		exhibitionPlayerDto.setPlayerGender(exhibitionPlayer.getTournamentPlayer().getUser().isGender());
 		exhibitionPlayerDto.setRoleInTeam(exhibitionPlayer.isRoleInTeam());
 		return exhibitionPlayerDto;
 	}
@@ -1209,17 +1212,20 @@ public class TournamentServiceImpl implements TournamentService {
 			if (LocalDateTime.now().isBefore(tournament.getRegistrationPlayerDeadline())) {
 				User user = userRepository.findByStudentId(studentId).get();
 				ExhibitionType exhibitionType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
-				
+
 				int countMale = 0;
 				int countFemale = 0;
 				for (ActiveUserDto activeUserDto : activeUsersDto) {
 					User member = userRepository.findByStudentId(activeUserDto.getStudentId()).get();
-					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
+					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
+							.getPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
 					if (tournamentPlayerOp.isPresent()) {
 						TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
-						Optional<ExhibitionPlayer> exhibitionPlayerOp = exhibitionPlayerRepository.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
+						Optional<ExhibitionPlayer> exhibitionPlayerOp = exhibitionPlayerRepository
+								.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
 						if (exhibitionPlayerOp.isPresent()) {
-							responseMessage.setMessage("Thành viên " + member.getName() + " - " + member.getStudentId() + " đã đăng ký nội dung này");
+							responseMessage.setMessage("Thành viên " + member.getName() + " - " + member.getStudentId()
+									+ " đã đăng ký nội dung này");
 							return responseMessage;
 						}
 					}
@@ -1229,19 +1235,21 @@ public class TournamentServiceImpl implements TournamentService {
 						countFemale++;
 					}
 				}
-				
-				if(countMale != exhibitionType.getNumberMale() || countFemale != exhibitionType.getNumberFemale()) {
+
+				if (countMale != exhibitionType.getNumberMale() || countFemale != exhibitionType.getNumberFemale()) {
 					responseMessage.setMessage("Số lượng thành viên không hợp lệ");
 					return responseMessage;
 				}
-				
+
 				Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
 				for (ActiveUserDto activeUserDto : activeUsersDto) {
 					User member = userRepository.findByStudentId(activeUserDto.getStudentId()).get();
-					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
+					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
+							.getPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
 					if (!tournamentPlayerOp.isPresent()) {
 						createTournamentPlayer(tournament, member);
-						tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
+						tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(member.getId(),
+								tournament.getId());
 					}
 					TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
 					ExhibitionPlayer exhibitionPlayer = new ExhibitionPlayer();
@@ -1255,7 +1263,7 @@ public class TournamentServiceImpl implements TournamentService {
 					exhibitionPlayer.setCreatedOn(LocalDateTime.now());
 					exhibitionPlayers.add(exhibitionPlayer);
 				}
-				
+
 				ExhibitionTeam exhibitionTeam = new ExhibitionTeam();
 				exhibitionTeam.setTeamName(teamName);
 				exhibitionTeam.setExhibitionPlayers(exhibitionPlayers);
@@ -1270,7 +1278,7 @@ public class TournamentServiceImpl implements TournamentService {
 						exhibitionTeams.add(exhibitionTeam);
 					}
 				}
-				
+
 				tournament.setExhibitionTypes(exhibitionTypes);
 				tournamentRepository.save(tournament);
 				responseMessage.setData(Arrays.asList(exhibitionTeamDto));
@@ -1286,23 +1294,28 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	@Override
-	public ResponseMessage getAllUserCompetitvePlayer(int tournamentId, String studentId) {
+	public ResponseMessage getAllUserCompetitivePlayer(int tournamentId, String studentId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
 			User user = userRepository.findByStudentId(studentId).get();
-			Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
+			Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
+					.getPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
 			if (tournamentPlayerOp.isPresent()) {
 				TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
-				Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findByTournamentPlayerId(tournamentPlayer.getId());
+				Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository
+						.findByTournamentPlayerId(tournamentPlayer.getId());
 				if (competitivePlayerOp.isPresent()) {
 					List<CompetitivePlayerDto> competitivePlayersDto = new ArrayList<CompetitivePlayerDto>();
-					CompetitivePlayerBracket competitivePlayerBracket = competitivePlayerBracketRepository.findByPlayerId(competitivePlayerOp.get().getId()).get();
+					CompetitivePlayerBracket competitivePlayerBracket = competitivePlayerBracketRepository
+							.findByPlayerId(competitivePlayerOp.get().getId()).get();
 					CompetitiveType competitiveType = competitivePlayerBracket.getCompetitiveType();
-					List<CompetitivePlayerBracket> competitivePlayersBracket = competitivePlayerBracketRepository.listPlayersByType(competitiveType.getId());
+					List<CompetitivePlayerBracket> competitivePlayersBracket = competitivePlayerBracketRepository
+							.listPlayersByType(competitiveType.getId());
 					for (CompetitivePlayerBracket competitivePlayerBracket2 : competitivePlayersBracket) {
-						CompetitivePlayerDto competitivePlayerDto = convertToCompetitivePlayerDto(competitivePlayerBracket2.getCompetitivePlayer());
+						CompetitivePlayerDto competitivePlayerDto = convertToCompetitivePlayerDto(
+								competitivePlayerBracket2.getCompetitivePlayer());
 						competitivePlayerDto.setWeightMin(competitiveType.getWeightMin());
 						competitivePlayerDto.setWeightMax(competitiveType.getWeightMax());
 						competitivePlayersDto.add(competitivePlayerDto);
@@ -1310,6 +1323,46 @@ public class TournamentServiceImpl implements TournamentService {
 					responseMessage.setData(competitivePlayersDto);
 					responseMessage.setMessage("Lấy danh sách người chơi tham gia cùng hạng cân thành công");
 				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllUserExhibitionPlayer(int tournamentId, String studentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Tournament tournament = tournamentRepository.findById(tournamentId).get();
+			User user = userRepository.findByStudentId(studentId).get();
+			Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
+					.getPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
+			if (tournamentPlayerOp.isPresent()) {
+				TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
+				List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository
+						.findAllByPlayerId(tournamentPlayer.getId());
+				List<ExhibitionTeamDto> exhibitionTeamsDto = new ArrayList<ExhibitionTeamDto>();
+				Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+				for (ExhibitionType exhibitionType : exhibitionTypes) {
+					Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
+					for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
+						Set<ExhibitionPlayer> setExhibitionPlayers = exhibitionTeam.getExhibitionPlayers();
+						for (ExhibitionPlayer exhibitionPlayer : setExhibitionPlayers) {
+							for (ExhibitionPlayer exhibitionPlayerUser : exhibitionPlayers) {
+								if (exhibitionPlayerUser.getId() == exhibitionPlayer.getId()) {
+									ExhibitionTeamDto exhibitionTeamDto = convertToExhibitionTeamDto(exhibitionTeam, exhibitionType.getName());
+									exhibitionTeamsDto.add(exhibitionTeamDto);
+								}
+							}
+						}
+					}
+				}
+				
+				responseMessage.setData(exhibitionTeamsDto);
+				responseMessage.setMessage("Lấy danh sách đội đã đăng ký tham gia thi đấu biểu diễn thành công");
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
