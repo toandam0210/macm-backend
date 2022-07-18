@@ -70,15 +70,16 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 			List<TournamentSchedule> listTournamentSchedules = tournamentScheduleRepository
 					.findByTournamentId(tournamentId);
 			int countMatchNeedHeld = listMatch.size();
+
 			int matchEveryDay = countMatchNeedHeld / listTournamentSchedules.size();
 			int matchSurplus = countMatchNeedHeld % listTournamentSchedules.size();
 			matchEveryDay += matchSurplus;
-
 			List<ExhibitionResult> listResult = new ArrayList<ExhibitionResult>();
 			Tournament getTournament = tournamentRepository.findById(tournamentId).get();
 			Set<ExhibitionType> listType = getTournament.getExhibitionTypes();
 			List<ExhibitionType> listTypeNeedHeld = new ArrayList<ExhibitionType>();
 			for (ExhibitionType exhibitionType : listType) {
+
 				if (exhibitionType.getExhibitionTeams().size() > 0) {
 					listTypeNeedHeld.add(exhibitionType);
 				}
@@ -88,6 +89,7 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 			boolean isRunning = true;
 			for (TournamentSchedule tournamentSchedule : listTournamentSchedules) {
 				LocalDate getDate = tournamentSchedule.getDate();
+
 				LocalTime startTime = tournamentSchedule.getStartTime();
 				startTime = startTime.plusMinutes(10 * (matchEveryDay / listArea.size() + 1));
 				while(true) {
@@ -117,6 +119,7 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 						startTime = startTime.plusMinutes(5);
 					}
 					index++;
+
 					if (index == listTypeNeedHeld.size()) {
 						isRunning = false;
 					}
