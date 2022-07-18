@@ -107,4 +107,10 @@ public class MemberEventController {
 		return new ResponseEntity<ResponseMessage>(memberEventService.cancelToJoinEvent(eventId, studentId),
 				HttpStatus.OK);
 	}
+	
+	@GetMapping("/getalleventbystudentid/{studentId}")
+	ResponseEntity<ResponseMessage> getAllEventByStudentId(@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(
+				memberEventService.getAllEventByStudentId(studentId), HttpStatus.OK);
+	}
 }
