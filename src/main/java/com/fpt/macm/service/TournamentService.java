@@ -63,4 +63,6 @@ public interface TournamentService {
 	ResponseMessage getAllUserCompetitivePlayer(int tournamentId, String studentId);
 	
 	ResponseMessage getAllUserExhibitionPlayer(int tournamentId, String studentId);
+	
+	ResponseMessage getAllUserOrganizingCommittee(int tournamentId, String studentId);
 }

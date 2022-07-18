@@ -1,6 +1,7 @@
 package com.fpt.macm.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -13,4 +14,6 @@ public interface TournamentOrganizingCommitteeRepository extends JpaRepository<T
 	List<TournamentOrganizingCommittee> findByTournamentId(int tournamentId);
 	
 	List<TournamentOrganizingCommittee> findByUserId(int userId);
+	
+	Optional<TournamentOrganizingCommittee> findByTournamentIdAndUserId(int tournamentId, int userId);
 }
