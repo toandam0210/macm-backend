@@ -204,4 +204,11 @@ public class TournamentController {
 	ResponseEntity<ResponseMessage> getAllUserExhibitionPlayer(@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId){
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllUserExhibitionPlayer(tournamentId, studentId), HttpStatus.OK);
 	}
+	
+	@GetMapping("/getalluserorganizingcommittee/{tournamentId}/{studentId}")
+	ResponseEntity<ResponseMessage> getAllUserOrganizingCommittee(
+			@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllUserOrganizingCommittee(tournamentId, studentId), HttpStatus.OK);
+	}
 }

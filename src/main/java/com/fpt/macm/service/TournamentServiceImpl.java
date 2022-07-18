@@ -1370,4 +1370,44 @@ public class TournamentServiceImpl implements TournamentService {
 		}
 		return responseMessage;
 	}
+
+	@Override
+	public ResponseMessage getAllUserOrganizingCommittee(int tournamentId, String studentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			Tournament tournament = tournamentOp.get();
+			User user = userRepository.findByStudentId(studentId).get();
+			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(tournament.getId(), user.getId());
+			if (tournamentOrganizingCommitteeOp.isPresent()) {
+				TournamentOrganizingCommittee userTournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+				if (userTournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)){
+					List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+							.findByTournamentId(tournamentId);
+					List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
+					for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+						if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
+							TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = new TournamentOrganizingCommitteeDto();
+							tournamentOrganizingCommitteeDto.setUserName(tournamentOrganizingCommittee.getUser().getName());
+							tournamentOrganizingCommitteeDto.setUserStudentId(tournamentOrganizingCommittee.getUser().getStudentId());
+							RoleEventDto roleEventDto = new RoleEventDto();
+							roleEventDto.setId(tournamentOrganizingCommittee.getRoleEvent().getId());
+							roleEventDto.setName(tournamentOrganizingCommittee.getRoleEvent().getName());
+							tournamentOrganizingCommitteeDto.setRoleTournamentDto(roleEventDto);
+							Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(),
+									tournamentOrganizingCommitteeDto.getRoleTournamentDto());
+							tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
+						}
+					}
+					responseMessage.setData(tournamentOrganizingCommitteesDto);
+					responseMessage.setMessage("Lấy danh sách ban tổ chức giải đấu cho người dùng thành công");
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
 }
