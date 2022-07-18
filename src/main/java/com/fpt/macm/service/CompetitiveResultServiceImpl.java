@@ -189,8 +189,7 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 					.listResultByAreaOrderTime(newResult.getArea().getId());
 			List<CompetitiveResult> listResultAtDate = new ArrayList<CompetitiveResult>();
 			for (CompetitiveResult competitiveResult : listResult) {
-				LocalDate currentDate = LocalDate.of(competitiveResult.getTime().getYear(),
-						competitiveResult.getTime().getMonthValue(), competitiveResult.getTime().getDayOfMonth());
+				LocalDate currentDate = competitiveResult.getTime().toLocalDate();
 				if (getDate.equals(currentDate)) {
 					listResultAtDate.add(competitiveResult);
 				}
