@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.CompetitiveMatchDto;
-import com.fpt.macm.model.entity.Area;
+import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.CompetitiveMatchService;
 import com.fpt.macm.service.CompetitivePlayerBracketService;
@@ -67,10 +67,10 @@ public class CompetitiveController {
 		return new ResponseEntity<ResponseMessage>(competitiveMatchService.spawnMatchs(competitiveTypeId), HttpStatus.OK);
 	}
 	
-	@PostMapping("/headclub/updatetimeandplacematch/{matchId}")
+	@PutMapping("/headclub/updatetimeandplacematch/{matchId}")
 	ResponseEntity<ResponseMessage> updateTimeAndPlaceMatch (@PathVariable(name = "matchId") int matchId,
-			@RequestParam int areaId, @RequestParam String time) {
-		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateTimeAndPlaceMatch(matchId, areaId, time), HttpStatus.OK);
+			@RequestBody CompetitiveResult newResult) {
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateTimeAndArea(matchId, newResult), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headclub/updateresultmatch/{matchId}")
@@ -83,18 +83,23 @@ public class CompetitiveController {
 		return new ResponseEntity<ResponseMessage>(competitiveMatchService.listMatchs(competitiveTypeId), HttpStatus.OK);
 	}
 	
-	@PutMapping("/headclub/updatelistmatchsplayer")
-	ResponseEntity<ResponseMessage> updateListMatchsPlayer (@RequestBody List<CompetitiveMatchDto> listUpdated) {
-		return new ResponseEntity<ResponseMessage>(competitiveMatchService.updateListMatchsPlayer(listUpdated), HttpStatus.OK);
-	}
-	
 	@PostMapping("/headclub/previewmatchsplayer/{competitiveTypeId}")
 	ResponseEntity<ResponseMessage> previewMatchsPlayer (@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
 		return new ResponseEntity<ResponseMessage>(competitiveMatchService.previewMatchsPlayer(competitiveTypeId), HttpStatus.OK);
 	}
 	
+	@PutMapping("/headclub/updatelistmatchsplayer")
+	ResponseEntity<ResponseMessage> updateListMatchsPlayer (@RequestBody List<CompetitiveMatchDto> listUpdated) {
+		return new ResponseEntity<ResponseMessage>(competitiveMatchService.updateListMatchsPlayer(listUpdated), HttpStatus.OK);
+	}
+	
+	@PutMapping("/headclub/confirmlistmatchsplayer/{tournamentId}")
+	ResponseEntity<ResponseMessage> confirmListMatchsPlayer (@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(competitiveMatchService.confirmListMatchsPlayer(tournamentId), HttpStatus.OK);
+	}
+	
 	@PostMapping("/headclub/spawntimeandarea/{tournamentId}")
-	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId, @RequestBody List<Area> listArea) {
-		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId, listArea), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
 	}
 }

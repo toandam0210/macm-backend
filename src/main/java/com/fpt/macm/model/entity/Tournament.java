@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,7 +48,7 @@ public class Tournament {
 	@Column
 	private LocalDateTime updatedOn;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "tournament_id")
 	private Set<CompetitiveType> competitiveTypes;
 
@@ -73,6 +74,9 @@ public class Tournament {
 
 	@Column
 	private double totalAmountFromClubActual;
+	
+	@Column 
+	private Integer status;
 
 	@Column
 	private LocalDateTime registrationPlayerDeadline;
@@ -240,4 +244,12 @@ public class Tournament {
 		this.registrationOrganizingCommitteeDeadline = registrationOrganizingCommitteeDeadline;
 	}
 
-}
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	
+}	

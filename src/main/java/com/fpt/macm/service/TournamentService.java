@@ -1,7 +1,9 @@
 package com.fpt.macm.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fpt.macm.model.dto.ActiveUserDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.Tournament;
@@ -22,7 +24,7 @@ public interface TournamentService {
 
 	ResponseMessage getTournamentById(int id);
 
-	ResponseMessage getAllTournamentBySemester(String semester);
+	ResponseMessage getAllTournamentBySemester(String semester, int status);
 
 	ResponseMessage getAllCompetitivePlayer(int tournamentId, double weightMin, double weightMax);
 
@@ -53,4 +55,14 @@ public interface TournamentService {
 	ResponseMessage registerToJoinTournamentOrganizingComittee(int tournamentId, String studentId, int roleId);
 	
 	ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight);
+	
+	List<Tournament> listTournamentsByRegistrationPlayerDeadline(LocalDateTime playerDeadline);
+	
+	ResponseMessage registerToJoinTournamentExhibitionType(int tournamentId, String studentId, int exhibitionTypeId, String teamName, List<ActiveUserDto> activeUsersDto);
+
+	ResponseMessage getAllUserCompetitivePlayer(int tournamentId, String studentId);
+	
+	ResponseMessage getAllUserExhibitionPlayer(int tournamentId, String studentId);
+	
+	ResponseMessage getAllUserOrganizingCommittee(int tournamentId, String studentId);
 }

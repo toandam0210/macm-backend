@@ -7,7 +7,7 @@ public class CompetitiveMatchDto implements Comparable<CompetitiveMatchDto> {
 	private int round;
 	private LocalDateTime time;
 	private String area;
-	private String status;
+	private boolean status;
 	private PlayerMatchDto firstPlayer;
 	private PlayerMatchDto secondPlayer;
 	
@@ -40,11 +40,11 @@ public class CompetitiveMatchDto implements Comparable<CompetitiveMatchDto> {
 		this.area = area;
 	}
 
-	public String getStatus() {
+	public boolean getStatus() {
 		return status;
 	}
 	
-	public void setStatus(String status) {
+	public void setStatus(boolean status) {
 		this.status = status;
 	}
 	

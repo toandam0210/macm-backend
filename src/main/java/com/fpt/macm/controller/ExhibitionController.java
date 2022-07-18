@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.service.ExhibitionResultService;
 import com.fpt.macm.service.ExhibitionTeamService;
 
 @RestController
@@ -22,6 +23,9 @@ public class ExhibitionController {
 	
 	@Autowired
 	ExhibitionTeamService exhibitionTeamService;
+	
+	@Autowired
+	ExhibitionResultService exhibitionResultService;
 	
 	@PostMapping("/headclub/registerexhibitionteam/{exhibitionTypeId}")
 	ResponseEntity<ResponseMessage> registerTeam (@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId,
@@ -37,5 +41,10 @@ public class ExhibitionController {
 	@GetMapping("/headclub/gettop3teambytype/{exhibitionTypeId}")
 	ResponseEntity<ResponseMessage> getTop3TeamByType (@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId) {
 		return new ResponseEntity<ResponseMessage>(exhibitionTeamService.getTop3TeamByType(exhibitionTypeId), HttpStatus.OK);
+	}
+	
+	@PostMapping("/headclub/spawntimeandarea/{tournamentId}")
+	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(exhibitionResultService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
 	}
 }

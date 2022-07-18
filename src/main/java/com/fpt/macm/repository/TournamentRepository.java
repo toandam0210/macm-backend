@@ -19,4 +19,5 @@ public interface TournamentRepository extends JpaRepository<Tournament, Integer>
 	List<Tournament> findBySemester(String semester);
 	
 	Optional<Tournament> findByTournamentPlayers(TournamentPlayer tournamentPlayer);
+	
 }

@@ -1,5 +1,6 @@
 package com.fpt.macm.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.fpt.macm.model.dto.ScheduleDto;
@@ -13,4 +14,5 @@ public interface TournamentScheduleService {
 	ResponseMessage createTournamentSesstion(int tournamentId, TournamentSchedule tournamentSchedule);
 	ResponseMessage updateTournamentSession(int tournamentId, TournamentSchedule tournamentSchedule);
 	ResponseMessage deleteTournamentSession(int tournamentId);
+	TournamentSchedule getTournamentSessionByDate(LocalDate date);
 }

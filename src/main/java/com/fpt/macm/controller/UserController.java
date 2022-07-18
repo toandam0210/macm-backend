@@ -132,4 +132,8 @@ public class UserController {
 		return new ResponseEntity<ResponseMessage>(userService.generateQrCode(inforInQrCode), HttpStatus.OK);
 	}
 	
+	@GetMapping("/getallactivememberandcollaborator")
+	ResponseEntity<ResponseMessage> getAllActiveMemberAndCollaborator() {
+		return new ResponseEntity<ResponseMessage>(userService.getAllActiveMemberAndCollaborator(), HttpStatus.OK);
+	}
 }

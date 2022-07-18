@@ -24,4 +24,6 @@ public interface MemberEventRepository extends PagingAndSortingRepository<Member
 	
 	@Query(value = "select * from member_event where event_id = ?1 and user_id = ?2", nativeQuery = true)
 	Optional<MemberEvent> findMemberEventByEventAndUser(int eventId, int userId);
+	
+	List<MemberEvent> findByUserId(int userId);
 }

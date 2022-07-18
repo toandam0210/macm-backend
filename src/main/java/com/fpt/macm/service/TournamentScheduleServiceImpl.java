@@ -284,5 +284,22 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 		}
 		return responseMessage;
 	}
-
+	
+	@Override
+	public TournamentSchedule getTournamentSessionByDate(LocalDate date) {
+		// TODO Auto-generated method stub
+		try {
+			Optional<TournamentSchedule> getTournamentSessionOp = tournamentScheduleRepository.findByDate(date);
+			TournamentSchedule getTournamentSession = getTournamentSessionOp.get();
+			if(getTournamentSession != null) {
+				return getTournamentSession;
+			}
+			else {
+				return null;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			return null;
+		}
+	}
 }

@@ -25,6 +25,8 @@ import com.fpt.macm.model.entity.MembershipStatus;
 import com.fpt.macm.model.entity.Notification;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.entity.UserStatusReport;
@@ -32,19 +34,23 @@ import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.AttendanceEventRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CollaboratorReportRepository;
+import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.MembershipShipInforRepository;
 import com.fpt.macm.repository.MembershipStatusRepository;
 import com.fpt.macm.repository.SemesterRepository;
+import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.repository.UserStatusReportRepository;
-import com.fpt.macm.service.EventScheduleServiceImpl;
+import com.fpt.macm.service.EventScheduleService;
 import com.fpt.macm.service.EventService;
 import com.fpt.macm.service.NotificationService;
 import com.fpt.macm.service.SemesterService;
-import com.fpt.macm.service.TrainingScheduleServiceImpl;
+import com.fpt.macm.service.TournamentScheduleService;
+import com.fpt.macm.service.TournamentService;
+import com.fpt.macm.service.TrainingScheduleService;
 
 @Component
 public class TaskSchedule {
@@ -71,10 +77,7 @@ public class TaskSchedule {
 	EventRepository eventRepository;
 
 	@Autowired
-	TrainingScheduleServiceImpl trainingScheduleServiceImpl;
-
-	@Autowired
-	EventScheduleServiceImpl eventScheduleServiceImpl;
+	TrainingScheduleService trainingScheduleService;
 
 	@Autowired
 	EventService eventService;
@@ -99,6 +102,22 @@ public class TaskSchedule {
 
 	@Autowired
 	SemesterService semesterService;
+	
+	@Autowired
+	TournamentService tournamentService;
+	
+	@Autowired
+	CompetitiveMatchRepository competitiveMatchRepository;
+	
+	@Autowired
+	EventScheduleService eventScheduleService;
+	
+	@Autowired
+	TournamentScheduleService tournamentScheduleService;
+	
+	@Autowired
+	TournamentRepository tournamentRepository;
+	
 	Logger logger = LoggerFactory.getLogger(TaskSchedule.class);
 
 	@Scheduled(cron = "1 0 0 * * *")
@@ -219,7 +238,7 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 2 0 * * *")
 	public void addListAttendanceStatus() {
-		TrainingSchedule trainingSchedule = trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now());
+		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingSessionByDate(LocalDate.now());
 		if (trainingSchedule != null) {
 			List<User> users = (List<User>) userRepository.findAll();
 			for (User user : users) {
@@ -239,7 +258,7 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 2 0 * * *")
 	public void addListMemberEventAttendanceStatus() {
-		EventSchedule eventSchedule = eventScheduleServiceImpl.getEventSessionByDate(LocalDate.now());
+		EventSchedule eventSchedule = eventScheduleService.getEventSessionByDate(LocalDate.now());
 		if (eventSchedule != null) {
 			Event event = eventSchedule.getEvent();
 			LocalDate startDate = (LocalDate) eventService.getStartDateOfEvent(event.getId()).getData().get(0);
@@ -337,7 +356,7 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 59 23 * * *")
 	public void changeStatusAttendanceTraining() {
-		TrainingSchedule trainingSchedule = trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now());
+		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingSessionByDate(LocalDate.now());
 		if (trainingSchedule != null) {
 			List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
 					.findByTrainingScheduleId(trainingSchedule.getId());
@@ -352,7 +371,7 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 59 23 * * *")
 	public void changeStatusAttendanceEvent() {
-		EventSchedule eventSchedule = eventScheduleServiceImpl.getEventSessionByDate(LocalDate.now());
+		EventSchedule eventSchedule = eventScheduleService.getEventSessionByDate(LocalDate.now());
 		if (eventSchedule != null) {
 			List<AttendanceEvent> listAttendanceEvent = attendanceEventRepository
 					.findByEventId(eventSchedule.getEvent().getId());
@@ -361,6 +380,30 @@ public class TaskSchedule {
 					attendanceEvent.setStatus(0);
 					attendanceEventRepository.save(attendanceEvent);
 				}
+			}
+		}
+	}
+	
+	@Scheduled(cron = "1 0 0 * * *")
+	public void changeStatusTournamentForUpdatePlayer() {
+		List<Tournament> listTournaments = tournamentService.listTournamentsByRegistrationPlayerDeadline(LocalDateTime.now());
+		for (Tournament tournament : listTournaments) {
+			if(tournament.getStatus() == 0) {
+				tournament.setStatus(1);
+				tournamentRepository.save(tournament);
+				logger.info("Chuyển thành 1");
+			}
+		}
+	}
+	
+	@Scheduled(cron = "1 0 0 * * *")
+	public void changeStatusTournamentForUpdateResult() {
+		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now());
+		if (tournamentSchedule != null) {
+			Tournament getTournament = tournamentSchedule.getTournament();
+			if(getTournament.getStatus() == 2) {
+				getTournament.setStatus(3);
+				tournamentRepository.save(getTournament);
 			}
 		}
 	}
