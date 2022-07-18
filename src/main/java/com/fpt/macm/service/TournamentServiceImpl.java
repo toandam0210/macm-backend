@@ -1284,4 +1284,37 @@ public class TournamentServiceImpl implements TournamentService {
 		}
 		return responseMessage;
 	}
+
+	@Override
+	public ResponseMessage getAllUserCompetitvePlayer(int tournamentId, String studentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Tournament tournament = tournamentRepository.findById(tournamentId).get();
+			User user = userRepository.findByStudentId(studentId).get();
+			Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
+			if (tournamentPlayerOp.isPresent()) {
+				TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
+				Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findByTournamentPlayerId(tournamentPlayer.getId());
+				if (competitivePlayerOp.isPresent()) {
+					List<CompetitivePlayerDto> competitivePlayersDto = new ArrayList<CompetitivePlayerDto>();
+					CompetitivePlayerBracket competitivePlayerBracket = competitivePlayerBracketRepository.findByPlayerId(competitivePlayerOp.get().getId()).get();
+					CompetitiveType competitiveType = competitivePlayerBracket.getCompetitiveType();
+					List<CompetitivePlayerBracket> competitivePlayersBracket = competitivePlayerBracketRepository.listPlayersByType(competitiveType.getId());
+					for (CompetitivePlayerBracket competitivePlayerBracket2 : competitivePlayersBracket) {
+						CompetitivePlayerDto competitivePlayerDto = convertToCompetitivePlayerDto(competitivePlayerBracket2.getCompetitivePlayer());
+						competitivePlayerDto.setWeightMin(competitiveType.getWeightMin());
+						competitivePlayerDto.setWeightMax(competitiveType.getWeightMax());
+						competitivePlayersDto.add(competitivePlayerDto);
+					}
+					responseMessage.setData(competitivePlayersDto);
+					responseMessage.setMessage("Lấy danh sách người chơi tham gia cùng hạng cân thành công");
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
 }
