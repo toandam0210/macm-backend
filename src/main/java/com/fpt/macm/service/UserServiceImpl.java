@@ -693,6 +693,7 @@ public class UserServiceImpl implements UserService {
 					ActiveUserDto activeUserDto = new ActiveUserDto();
 					activeUserDto.setStudentId(user.getStudentId());
 					activeUserDto.setStudentName(user.getName());
+					activeUserDto.setGender(user.isGender());
 					activeUsersDto.add(activeUserDto);
 				}
 				responseMessage.setData(activeUsersDto);
