@@ -23,8 +23,10 @@ import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
+import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
+import com.fpt.macm.utils.Utils;
 
 @Service
 public class ExhibitionResultServiceImpl implements ExhibitionResultService {
@@ -46,6 +48,9 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 
 	@Autowired
 	CompetitiveMatchRepository competitiveMatchRepository;
+	
+	@Autowired
+	ExhibitionTypeRepository exhibitionTypeRepository;
 
 	@Override
 	public ResponseMessage spawnTimeAndArea(int tournamentId) {
@@ -132,6 +137,43 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 				}
 			}
 			responseMessage.setData(listResult);
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getListExhibitionResult(int exhibitionTypeId, String date) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<ExhibitionResult> listResult = new ArrayList<ExhibitionResult>();
+			if(exhibitionTypeId != 0) {
+				ExhibitionType getType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
+				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
+				for (ExhibitionTeam exhibitionTeam : getTeams) {
+					ExhibitionResult getResult = exhibitionResultRepository.findByTeam(exhibitionTeam.getId()).get();
+					listResult.add(getResult);
+				}
+			}
+			else if (date != ""){
+				LocalDate getDate = Utils.ConvertStringToLocalDate(date);
+				List<ExhibitionResult> listAll = exhibitionResultRepository.findAll();
+				for (ExhibitionResult exhibitionResult : listAll) {
+					if(exhibitionResult.getTime().toLocalDate().equals(getDate)) {
+						listResult.add(exhibitionResult);
+					}
+				}
+			}
+			if(listResult.size() > 0) {
+				responseMessage.setData(listResult);
+				responseMessage.setMessage("Danh sách các trận đấu");
+			}
+			else {
+				responseMessage.setMessage("Không có trận nào");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
