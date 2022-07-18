@@ -194,4 +194,9 @@ public class TournamentController {
 		return new ResponseEntity<ResponseMessage>(tournamentService.registerToJoinTournamentExhibitionType(
 				tournamentId, studentId, exhibitionTypeId, teamName, teamMember), HttpStatus.OK);
 	}
+	
+	@GetMapping("/getallusercompetitveplayer/{tournamentId}/{studentId}")
+	ResponseEntity<ResponseMessage> getAllUserCompetitvePlayer(@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId){
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllUserCompetitvePlayer(tournamentId, studentId), HttpStatus.OK);
+	}
 }
