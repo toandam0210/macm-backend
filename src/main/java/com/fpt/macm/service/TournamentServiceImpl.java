@@ -1091,7 +1091,7 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	@Override
-	public ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight) {
+	public ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight, int competitiveTypeId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -1111,19 +1111,21 @@ public class TournamentServiceImpl implements TournamentService {
 					}
 				}
 
-				List<CompetitiveType> listType = competitiveTypeRepository.findByTournamentAndGender(tournament.getId(),
-						user.isGender());
-				CompetitiveType newCompetitiveType = new CompetitiveType();
-				newCompetitiveType.setWeightMin(0);
-				for (CompetitiveType competitiveType : listType) {
-					if (competitiveType.getWeightMin() <= weight && weight <= competitiveType.getWeightMax()) {
-						newCompetitiveType = competitiveType;
-						break;
+				Optional<CompetitiveType> competitveTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
+				CompetitiveType competitiveType = new CompetitiveType();
+				if (competitveTypeOp.isPresent()) {
+					competitiveType = competitveTypeOp.get();
+					if (user.isGender() == competitiveType.isGender()){
+						responseMessage.setMessage("Giới tính của bạn không phù hợp cho hạng cân này");
+						return responseMessage;
+					}
+					if (weight < competitiveType.getWeightMin() || weight > competitiveType.getWeightMax()) {
+						responseMessage.setMessage("Cân nặng của bạn không phù hợp cho hạng cân này");
+						return responseMessage;
 					}
 				}
-
-				if (newCompetitiveType.getWeightMin() == 0) {
-					responseMessage.setMessage("Cân nặng của bạn không phù hợp với hạng cân của giải đấu");
+				else {
+					responseMessage.setMessage("Không có hạng cân này");
 					return responseMessage;
 				}
 
@@ -1153,7 +1155,7 @@ public class TournamentServiceImpl implements TournamentService {
 					CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository
 							.findByTournamentPlayerId(tournamentPlayer.getId()).get();
 					CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
-					newCompetitivePlayerBracket.setCompetitiveType(newCompetitiveType);
+					newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
 					newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
 					newCompetitivePlayerBracket.setCreatedBy(user.getName() + " - " + user.getStudentId());
 					newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
