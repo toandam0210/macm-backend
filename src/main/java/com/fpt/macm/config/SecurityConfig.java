@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -55,6 +56,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
         return new HttpCookieOAuth2AuthorizationRequestRepository();
     }
+    
+    @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().antMatchers("/v2/api-docs",
+                                   "/configuration/ui",
+                                   "/swagger-resources/**",
+                                   "/configuration/security",
+                                   "/swagger-ui/**",
+                                   "/webjars/**");
+    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -87,7 +98,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/auth/**", "/oauth2/**")
                 .permitAll()
                 // permit all
-                .antMatchers("/api/contact/getallcontact","/api/contact/getallsocialnetwork","/api/news/getallnews","/api/news/getnewsbyid/**","/api/rule/getallrule","/api/semester/currentsemester","/api/semester/getTop3Semesters","/api/semester/getlistmonths","/api/commonschedule/**","/api/event/geteventbyid/**","/api/event/geteventsbyname","/api/event/geteventsbydate","/api/event/geteventsbysemester","/api/eventschedule/geteventschedule","/api/eventschedule/geteventsessionbydate","/api/eventschedule/geteventschedulebyevent/**","/api/role/getroles","/api/trainingschedule/gettrainingschedule","/api/trainingschedule/gettrainingschedulebysemester/**","/api/trainingschedule/gettrainingsesionbydate","/api/profile","/api/event/registertojoinevent/**","/api/event/registertojoinorganizingcommittee/**","/api/event/canceltojoinevent/**","/api/notification/getallnotification","/api/notification/checkpaymentstatus/**","/api/tournament/registertojoinorganizingcommittee/**","/api/tournament/registertojointournamentcompetitivetype/**","/api/tournament/registertojointournamentexhibitiontype/**","/api/tournament/getallusercompetitiveplayer/**","/api/tournament/getalluserexhibitionplayer/**","/api/tournament/getalluserorganizingcommittee/**","/api/admin/hr/member/qrcode/create","/api/event/getalleventbystudentid/**","/swagger-ui/**").permitAll()
+                .antMatchers("/api/contact/getallcontact","/api/contact/getallsocialnetwork","/api/news/getallnews","/api/news/getnewsbyid/**","/api/rule/getallrule","/api/semester/currentsemester","/api/semester/getTop3Semesters","/api/semester/getlistmonths","/api/commonschedule/**","/api/event/geteventbyid/**","/api/event/geteventsbyname","/api/event/geteventsbydate","/api/event/geteventsbysemester","/api/eventschedule/geteventschedule","/api/eventschedule/geteventsessionbydate","/api/eventschedule/geteventschedulebyevent/**","/api/role/getroles","/api/trainingschedule/gettrainingschedule","/api/trainingschedule/gettrainingschedulebysemester/**","/api/trainingschedule/gettrainingsesionbydate","/api/profile","/api/event/registertojoinevent/**","/api/event/registertojoinorganizingcommittee/**","/api/event/canceltojoinevent/**","/api/notification/getallnotification","/api/notification/checkpaymentstatus/**","/api/tournament/registertojoinorganizingcommittee/**","/api/tournament/registertojointournamentcompetitivetype/**","/api/tournament/registertojointournamentexhibitiontype/**","/api/tournament/getallusercompetitiveplayer/**","/api/tournament/getalluserexhibitionplayer/**","/api/tournament/getalluserorganizingcommittee/**","/api/admin/hr/member/qrcode/create","/api/event/getalleventbystudentid/**").permitAll()
                 // HeadClub
                 .antMatchers("/api/tournament/headclub/**","/api/tournamentschedule/headclub/**","/api/area/headclub/**","/api/competitive/headclub/**","/api/exhibition/headclub/**","/api/admin/dashboard/**").hasAnyRole("HeadClub")
                 // ViceHead
