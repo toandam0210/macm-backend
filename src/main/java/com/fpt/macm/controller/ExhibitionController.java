@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.ExhibitionResultService;
 import com.fpt.macm.service.ExhibitionTeamService;
+import com.fpt.macm.service.ExhibitionTypeService;
 
 @RestController
 @RequestMapping("/api/exhibition")
@@ -26,6 +27,9 @@ public class ExhibitionController {
 	
 	@Autowired
 	ExhibitionResultService exhibitionResultService;
+	
+	@Autowired
+	ExhibitionTypeService exhibitionTypeService;
 	
 	@PostMapping("/headclub/registerexhibitionteam/{exhibitionTypeId}")
 	ResponseEntity<ResponseMessage> registerTeam (@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId,
@@ -46,5 +50,15 @@ public class ExhibitionController {
 	@PostMapping("/headclub/spawntimeandarea/{tournamentId}")
 	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(exhibitionResultService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getlistexhibitiontype/{tournamentId}")
+	ResponseEntity<ResponseMessage> getListExhibitionType (@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(exhibitionTypeService.getAllExhibitionType(tournamentId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getlistexhibitionresult")
+	ResponseEntity<ResponseMessage> getExhibitionResult (@RequestParam(defaultValue = "0") int exhibitionTypeId, @RequestParam(defaultValue = "") String date) {
+		return new ResponseEntity<ResponseMessage>(exhibitionResultService.getListExhibitionResult(exhibitionTypeId, date), HttpStatus.OK);
 	}
 }

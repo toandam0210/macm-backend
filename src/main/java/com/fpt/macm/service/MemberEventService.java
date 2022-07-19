@@ -20,4 +20,5 @@ public interface MemberEventService {
 	ResponseMessage registerToJoinEvent(int eventId, String studentId);
 	ResponseMessage registerToJoinOrganizingCommittee(int eventId, String studentId, int roleEventId);
 	ResponseMessage cancelToJoinEvent(int eventId, String studentId);
+	ResponseMessage getAllEventByStudentId(String studentId);
 }

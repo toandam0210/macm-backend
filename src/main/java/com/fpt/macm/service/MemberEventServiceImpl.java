@@ -18,6 +18,7 @@ import com.fpt.macm.model.dto.EventPaymentStatusReportDto;
 import com.fpt.macm.model.dto.MemberEventDto;
 import com.fpt.macm.model.dto.MemberNotJoinEventDto;
 import com.fpt.macm.model.dto.RoleEventDto;
+import com.fpt.macm.model.dto.UserEventDto;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventPaymentStatusReport;
@@ -622,6 +623,41 @@ public class MemberEventServiceImpl implements MemberEventService {
 			else {
 				responseMessage.setMessage("Đã hết hạn hủy đăng ký");
 			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllEventByStudentId(String studentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			List<MemberEvent> membersEvent = memberEventRepository.findByUserId(user.getId());
+			if (!membersEvent.isEmpty()) {
+				List<UserEventDto> userEventsDto = new ArrayList<UserEventDto>();
+				for (MemberEvent memberEvent : membersEvent) {
+					if (memberEvent.isRegisterStatus()) {
+						UserEventDto userEventDto = new UserEventDto();
+						userEventDto.setEventId(memberEvent.getEvent().getId());
+						userEventDto.setEventName(memberEvent.getEvent().getName());
+						userEventDto.setUserName(user.getName());
+						userEventDto.setUserStudentId(user.getStudentId());
+						RoleEventDto roleEventDto = new RoleEventDto();
+						roleEventDto.setId(memberEvent.getRoleEvent().getId());
+						roleEventDto.setName(memberEvent.getRoleEvent().getName());
+						userEventDto.setRoleEventDto(roleEventDto);
+						Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), userEventDto.getRoleEventDto());
+						userEventsDto.add(userEventDto);
+					}
+				}
+				responseMessage.setData(userEventsDto);
+				responseMessage.setMessage("Lấy danh sách sự kiện đã tham gia của " + user.getName() + " - " + user.getStudentId() + " thành công");
+			}
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
