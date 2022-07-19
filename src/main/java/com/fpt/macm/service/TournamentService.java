@@ -54,7 +54,7 @@ public interface TournamentService {
 	
 	ResponseMessage registerToJoinTournamentOrganizingComittee(int tournamentId, String studentId, int roleId);
 	
-	ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight);
+	ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight, int competitiveTypeId);
 	
 	List<Tournament> listTournamentsByRegistrationPlayerDeadline(LocalDateTime playerDeadline);
 	
