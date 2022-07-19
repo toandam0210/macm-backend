@@ -511,7 +511,19 @@ public class MemberEventServiceImpl implements MemberEventService {
 							memberHasRegisteredToEvent.setUpdatedBy(user.getName() + " - " + user.getStudentId());
 							memberHasRegisteredToEvent.setUpdatedOn(LocalDateTime.now());
 							memberEventRepository.save(memberHasRegisteredToEvent);
-							responseMessage.setData(Arrays.asList(memberHasRegisteredToEvent));
+							
+							UserEventDto userEventDto = new UserEventDto();
+							userEventDto.setEventId(memberHasRegisteredToEvent.getEvent().getId());
+							userEventDto.setEventName(memberHasRegisteredToEvent.getEvent().getName());
+							userEventDto.setUserName(user.getName());
+							userEventDto.setUserStudentId(user.getStudentId());
+							RoleEventDto roleEventDto = new RoleEventDto();
+							roleEventDto.setId(memberHasRegisteredToEvent.getRoleEvent().getId());
+							roleEventDto.setName(memberHasRegisteredToEvent.getRoleEvent().getName());
+							userEventDto.setRoleEventDto(roleEventDto);
+							Utils.convertNameOfEventRole(memberHasRegisteredToEvent.getRoleEvent(), userEventDto.getRoleEventDto());
+							
+							responseMessage.setData(Arrays.asList(userEventDto));
 							responseMessage.setMessage("Đăng ký tham gia sự kiện thành công");
 							return responseMessage;
 						}
@@ -530,7 +542,19 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
 				memberEvent.setCreatedOn(LocalDateTime.now());
 				memberEventRepository.save(memberEvent);
-				responseMessage.setData(Arrays.asList(memberEvent));
+				
+				UserEventDto userEventDto = new UserEventDto();
+				userEventDto.setEventId(memberEvent.getEvent().getId());
+				userEventDto.setEventName(memberEvent.getEvent().getName());
+				userEventDto.setUserName(user.getName());
+				userEventDto.setUserStudentId(user.getStudentId());
+				RoleEventDto roleEventDto = new RoleEventDto();
+				roleEventDto.setId(memberEvent.getRoleEvent().getId());
+				roleEventDto.setName(memberEvent.getRoleEvent().getName());
+				userEventDto.setRoleEventDto(roleEventDto);
+				Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), userEventDto.getRoleEventDto());
+				
+				responseMessage.setData(Arrays.asList(userEventDto));
 				responseMessage.setMessage("Đăng ký tham gia sự kiện thành công");
 			} else {
 				responseMessage.setMessage(Constant.MSG_131);
@@ -578,7 +602,19 @@ public class MemberEventServiceImpl implements MemberEventService {
 						memberEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
 						memberEvent.setCreatedOn(LocalDateTime.now());
 						memberEventRepository.save(memberEvent);
-						responseMessage.setData(Arrays.asList(memberEvent));
+						
+						UserEventDto userEventDto = new UserEventDto();
+						userEventDto.setEventId(memberEvent.getEvent().getId());
+						userEventDto.setEventName(memberEvent.getEvent().getName());
+						userEventDto.setUserName(user.getName());
+						userEventDto.setUserStudentId(user.getStudentId());
+						RoleEventDto roleEventDto = new RoleEventDto();
+						roleEventDto.setId(memberEvent.getRoleEvent().getId());
+						roleEventDto.setName(memberEvent.getRoleEvent().getName());
+						userEventDto.setRoleEventDto(roleEventDto);
+						Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), userEventDto.getRoleEventDto());
+						
+						responseMessage.setData(Arrays.asList(userEventDto));
 						responseMessage.setMessage("Đăng ký tham gia ban tổ chức sự kiện thành công");
 					} else {
 						responseMessage.setMessage("Sự kiện này đã đủ số lượng ban tổ chức");
