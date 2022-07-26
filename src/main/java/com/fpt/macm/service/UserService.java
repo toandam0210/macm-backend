@@ -29,4 +29,5 @@ public interface UserService {
 	ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email, String gender, Integer generation, Integer roleId, String isActive, String dateFrom, String dateTo);
 	ResponseMessage generateQrCode(InforInQrCode inforInQrCode);
 	ResponseMessage getAllActiveMemberAndCollaborator();
+	ResponseMessage getAllUserAttendanceStatus(String studentId);
 }

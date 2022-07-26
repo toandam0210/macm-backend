@@ -21,21 +21,31 @@ import com.fpt.macm.helper.ExcelHelper;
 import com.fpt.macm.model.Enum.ERole;
 import com.fpt.macm.model.dto.ActiveUserDto;
 import com.fpt.macm.model.dto.InforInQrCode;
+import com.fpt.macm.model.dto.UserAttendanceStatusDto;
 import com.fpt.macm.model.dto.UserDto;
 import com.fpt.macm.model.entity.AdminSemester;
+import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.AttendanceStatus;
+import com.fpt.macm.model.entity.EventSchedule;
+import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MemberSemester;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AdminSemesterRepository;
+import com.fpt.macm.repository.AttendanceEventRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CollaboratorReportRepository;
+import com.fpt.macm.repository.EventScheduleRepository;
+import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.RoleRepository;
 import com.fpt.macm.repository.SemesterRepository;
+import com.fpt.macm.repository.TournamentScheduleRepository;
+import com.fpt.macm.repository.TrainingScheduleRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 
@@ -68,6 +78,21 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	AttendanceStatusRepository attendanceStatusRepository;
+	
+	@Autowired
+	TrainingScheduleRepository trainingScheduleRepository;
+	
+	@Autowired
+	EventScheduleRepository eventScheduleRepository;
+	
+	@Autowired
+	AttendanceEventRepository attendanceEventRepository;
+	
+	@Autowired
+	MemberEventRepository memberEventRepository;
+	
+	@Autowired
+	TournamentScheduleRepository tournamentScheduleRepository;
 	
 	private static final int ORDER_QR_CODE_SIZE_WIDTH = 300;
     private static final int ORDER_QR_CODE_SIZE_HEIGHT = 300;
@@ -699,6 +724,136 @@ public class UserServiceImpl implements UserService {
 				responseMessage.setData(activeUsersDto);
 				responseMessage.setMessage("Lấy danh sách tên và MSSV thành viên và CTV active thành công");
 			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllUserAttendanceStatus(String studentId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			List<UserAttendanceStatusDto> listUserAttendanceStatusDto = new ArrayList<UserAttendanceStatusDto>();
+			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository.findAll();
+			for (TrainingSchedule trainingSchedule : trainingSchedules) {
+				if (LocalDate.now().isBefore(trainingSchedule.getDate())) {
+					UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+					userAttendanceStatusDto.setUserName(user.getName());
+					userAttendanceStatusDto.setStudentId(user.getStudentId());
+					userAttendanceStatusDto.setStatus(2);
+					userAttendanceStatusDto.setDate(trainingSchedule.getDate());
+					userAttendanceStatusDto.setStartTime(trainingSchedule.getStartTime());
+					userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
+					userAttendanceStatusDto.setTitle("Lịch tập");
+					userAttendanceStatusDto.setType(0);
+					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+				} else {
+					AttendanceStatus attendanceStatus = attendanceStatusRepository.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+					if (attendanceStatus == null) {
+						UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+						userAttendanceStatusDto.setUserName(user.getName());
+						userAttendanceStatusDto.setStudentId(user.getStudentId());
+						userAttendanceStatusDto.setStatus(0);
+						userAttendanceStatusDto.setDate(trainingSchedule.getDate());
+						userAttendanceStatusDto.setStartTime(trainingSchedule.getStartTime());
+						userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
+						userAttendanceStatusDto.setTitle("Lịch tập");
+						userAttendanceStatusDto.setType(0);
+						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+					}
+					else {
+						UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+						userAttendanceStatusDto.setUserName(user.getName());
+						userAttendanceStatusDto.setStudentId(user.getStudentId());
+						userAttendanceStatusDto.setStatus(attendanceStatus.getStatus());
+						userAttendanceStatusDto.setDate(attendanceStatus.getTrainingSchedule().getDate());
+						userAttendanceStatusDto.setStartTime(attendanceStatus.getTrainingSchedule().getStartTime());
+						userAttendanceStatusDto.setFinishTime(attendanceStatus.getTrainingSchedule().getFinishTime());
+						userAttendanceStatusDto.setTitle("Lịch tập");
+						userAttendanceStatusDto.setType(0);
+						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+					}
+				}
+			}
+			
+			List<EventSchedule> listEventSchedule = eventScheduleRepository.findAll();
+			for (EventSchedule eventSchedule : listEventSchedule) {
+				if (LocalDate.now().isBefore(eventSchedule.getDate())) {
+					UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+					userAttendanceStatusDto.setUserName(user.getName());
+					userAttendanceStatusDto.setStudentId(user.getStudentId());
+					userAttendanceStatusDto.setStatus(2);
+					userAttendanceStatusDto.setDate(eventSchedule.getDate());
+					userAttendanceStatusDto.setStartTime(eventSchedule.getStartTime());
+					userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
+					userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
+					userAttendanceStatusDto.setType(1);
+					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+				}
+				else {
+					Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventSchedule.getEvent().getId(), user.getId());
+					if (memberEventOp.isPresent()) {
+						MemberEvent memberEvent = memberEventOp.get();
+						if (memberEvent.isRegisterStatus()) {
+							AttendanceEvent attendanceEvent = attendanceEventRepository.findByEventIdAndMemberEventId(eventSchedule.getEvent().getId(), memberEvent.getId()).get();
+							UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+							userAttendanceStatusDto.setUserName(user.getName());
+							userAttendanceStatusDto.setStudentId(user.getStudentId());
+							userAttendanceStatusDto.setStatus(attendanceEvent.getStatus());
+							userAttendanceStatusDto.setDate(eventSchedule.getDate());
+							userAttendanceStatusDto.setStartTime(eventSchedule.getStartTime());
+							userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
+							userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
+							userAttendanceStatusDto.setType(1);
+							listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+						}
+						else {
+							UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+							userAttendanceStatusDto.setUserName(user.getName());
+							userAttendanceStatusDto.setStudentId(user.getStudentId());
+							userAttendanceStatusDto.setStatus(0);
+							userAttendanceStatusDto.setDate(eventSchedule.getDate());
+							userAttendanceStatusDto.setStartTime(eventSchedule.getStartTime());
+							userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
+							userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
+							userAttendanceStatusDto.setType(1);
+							listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+						}
+					}
+					else {
+						UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+						userAttendanceStatusDto.setUserName(user.getName());
+						userAttendanceStatusDto.setStudentId(user.getStudentId());
+						userAttendanceStatusDto.setStatus(0);
+						userAttendanceStatusDto.setDate(eventSchedule.getDate());
+						userAttendanceStatusDto.setStartTime(eventSchedule.getStartTime());
+						userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
+						userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
+						userAttendanceStatusDto.setType(1);
+						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+					}
+				}
+			}
+			
+			List<TournamentSchedule> listTournamentSchedule = tournamentScheduleRepository.findAll();
+			for (TournamentSchedule tournamentSchedule : listTournamentSchedule) {
+				UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+				userAttendanceStatusDto.setUserName(user.getName());
+				userAttendanceStatusDto.setStudentId(user.getStudentId());
+				userAttendanceStatusDto.setStatus(2);
+				userAttendanceStatusDto.setDate(tournamentSchedule.getDate());
+				userAttendanceStatusDto.setStartTime(tournamentSchedule.getStartTime());
+				userAttendanceStatusDto.setFinishTime(tournamentSchedule.getFinishTime());
+				userAttendanceStatusDto.setTitle(tournamentSchedule.getTournament().getName());
+				userAttendanceStatusDto.setType(2);
+				listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+			}
+			
+			responseMessage.setData(listUserAttendanceStatusDto);
+			responseMessage.setMessage("Lấy dữ liệu điểm danh của " + user.getName() + " - " + user.getStudentId() + " thành công");
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
