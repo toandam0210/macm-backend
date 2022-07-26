@@ -136,4 +136,9 @@ public class UserController {
 	ResponseEntity<ResponseMessage> getAllActiveMemberAndCollaborator() {
 		return new ResponseEntity<ResponseMessage>(userService.getAllActiveMemberAndCollaborator(), HttpStatus.OK);
 	}
+	
+	@GetMapping("/getallattendancestatusofuser/{studentId}")
+	ResponseEntity<ResponseMessage> getAllAttendanceStatusOfUser(@PathVariable(name = "studentId") String studentId){
+		return new ResponseEntity<ResponseMessage>(userService.getAllUserAttendanceStatus(studentId), HttpStatus.OK);
+	}
 }
