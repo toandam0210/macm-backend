@@ -181,7 +181,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 	public void createTrainingSessionCreateNotification(LocalDate date) {
 		Notification notification = new Notification();
-		notification.setMessage("Thông báo, có buổi tập mới vào ngày " + date + ".");
+		notification.setMessage("Thông báo, có buổi tập mới vào ngày " + date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear() + ".");
 		notification.setNotificationType(2);
 		notification.setNotificationTypeId(0);
 		notification.setCreatedOn(LocalDateTime.now());
@@ -191,7 +191,7 @@ public class NotificationServiceImpl implements NotificationService {
 	public void createTrainingSessionUpdateNotification(LocalDate date, LocalTime newStartTime, LocalTime newEndTime) {
 		Notification notification = new Notification();
 		notification.setMessage(
-				"Buổi tập ngày " + date + " thay đổi thời gian tập thành: " + newStartTime + " - " + newEndTime + ".");
+				"Buổi tập ngày " + date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear() + " thay đổi thời gian tập thành: " + newStartTime + " - " + newEndTime + ".");
 		notification.setNotificationType(2);
 		notification.setNotificationTypeId(0);
 		notification.setCreatedOn(LocalDateTime.now());
@@ -200,7 +200,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 	public void createTrainingSessionDeleteNotification(LocalDate date) {
 		Notification notification = new Notification();
-		notification.setMessage("Thông báo, nghỉ tập ngày " + date + ".");
+		notification.setMessage("Thông báo, nghỉ tập ngày " + date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear() + ".");
 		notification.setNotificationType(2);
 		notification.setNotificationTypeId(0);
 		notification.setCreatedOn(LocalDateTime.now());
