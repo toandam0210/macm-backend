@@ -678,7 +678,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage generateQrCode(InforInQrCode inforInQrCode) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingSessionByDate(LocalDate.now());
+			TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
 			String qrCode = "";
 			inforInQrCode.setDate(LocalDate.now().toString());
 			if (trainingSchedule != null) {
