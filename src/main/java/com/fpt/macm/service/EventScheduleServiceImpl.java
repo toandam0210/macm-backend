@@ -174,7 +174,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 						listCommon.add(commonSession);
 						CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(scheduleDto.getDate());
 						listCommonOverwritten.add(getCommonSession);
-						TrainingSchedule getTrainingSession = trainingScheduleService.getTrainingSessionByDate(scheduleDto.getDate());
+						TrainingSchedule getTrainingSession = trainingScheduleService.getTrainingScheduleByDate(scheduleDto.getDate());
 						listTrainingOverwritten.add(getTrainingSession);
 					}
 					else {
@@ -500,7 +500,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 						listCommon.add(commonSession);
 						CommonSchedule getCommonSession = commonScheduleService.getCommonSessionByDate(scheduleDto.getDate());
 						listCommonOverwritten.add(getCommonSession);
-						TrainingSchedule getTrainingSession = trainingScheduleService.getTrainingSessionByDate(scheduleDto.getDate());
+						TrainingSchedule getTrainingSession = trainingScheduleService.getTrainingScheduleByDate(scheduleDto.getDate());
 						listTrainingOverwritten.add(getTrainingSession);
 					}
 					else {

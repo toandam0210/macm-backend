@@ -170,7 +170,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 		try {
 			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
 			if(getDate.compareTo(LocalDate.now()) > 0) {
-				TrainingSchedule getTrainingSession = getTrainingSessionByDate(getDate);
+				TrainingSchedule getTrainingSession = getTrainingScheduleByDate(getDate);
 				CommonSchedule commonSession = commonScheduleService.getCommonSessionByDate(getTrainingSession.getDate());
 				if(getTrainingSession != null && commonSession.getType() == 0) {
 					getTrainingSession.setStartTime(updateCommonSession.getStartTime());
@@ -205,7 +205,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 		try {
 			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
 			if(getDate.compareTo(LocalDate.now()) > 0) {
-				TrainingSchedule getTrainingSession = getTrainingSessionByDate(getDate);
+				TrainingSchedule getTrainingSession = getTrainingScheduleByDate(getDate);
 				CommonSchedule commonSession = commonScheduleService.getCommonSessionByDate(getTrainingSession.getDate());
 				if(getTrainingSession != null && commonSession.getType() == 0) {
 					trainingScheduleRepository.delete(getTrainingSession);
@@ -308,7 +308,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 	}
 
 	@Override
-	public TrainingSchedule getTrainingSessionByDate(LocalDate date) {
+	public TrainingSchedule getTrainingScheduleByDate(LocalDate date) {
 		// TODO Auto-generated method stub
 		try {
 			Optional<TrainingSchedule> getTrainingSessionOp = trainingScheduleRepository.findByDate(date);
