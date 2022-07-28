@@ -183,7 +183,7 @@ public class Constant {
 	public static final String MSG_129 = "Tổng kết sự kiện thành công";
 	public static final String MSG_130 = "Lịch hoạt động theo kỳ ";
 	public static String messageEvent(Event event) {
-		return "Chỉ còn một ngày nữa là sự kiện " + event.getName() + " mà bạn đã đăng ký sẽ diễn ra. Bạn nhớ tham gia nhé!";
+		return "Sự kiện " + event.getName() + " sẽ bắt đầu sau 1 ngày nữa, chuẩn bị lên đồ thôi !!";
 	}
 	public static final String MSG_131 = "Đã hết hạn đăng ký";
 }

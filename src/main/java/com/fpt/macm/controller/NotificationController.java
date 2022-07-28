@@ -19,12 +19,18 @@ public class NotificationController {
 	@Autowired
 	NotificationService notificationService;
 	
-	@GetMapping("/getallnotification")
-	ResponseEntity<ResponseMessage> getAllNotification(@RequestParam(defaultValue = "0") int pageNo,
+	@GetMapping("/getallnotificationbystudentid/{studentId}")
+	ResponseEntity<ResponseMessage> getAllNotificationByStudentId(@PathVariable(name = "studentId") String studentId,@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
-		return new ResponseEntity<ResponseMessage>(notificationService.getAllNotification(pageNo, pageSize, sortBy), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(notificationService.getAllNotificationByStudentId(studentId, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
-	
+
+//	@GetMapping("/getallnotification")
+//	ResponseEntity<ResponseMessage> getAllNotification(@RequestParam(defaultValue = "0") int pageNo,
+//			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
+//		return new ResponseEntity<ResponseMessage>(notificationService.getAllNotification(pageNo, pageSize, sortBy), HttpStatus.OK);
+//	}
+
 	@GetMapping("/checkpaymentstatus/{studentId}")
 	ResponseEntity<ResponseMessage> checkPaymentStatus(@PathVariable(name = "studentId") String studentId){
 		return new ResponseEntity<ResponseMessage>(notificationService.checkPaymentStatus(studentId), HttpStatus.OK);

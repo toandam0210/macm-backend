@@ -1,5 +1,6 @@
 package com.fpt.macm.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -65,4 +66,6 @@ public interface TournamentService {
 	ResponseMessage getAllUserExhibitionPlayer(int tournamentId, String studentId);
 	
 	ResponseMessage getAllUserOrganizingCommittee(int tournamentId, String studentId);
+	
+	LocalDate getStartDate(int tournamentId);
 }
