@@ -14,6 +14,6 @@ import com.fpt.macm.model.entity.TrainingSchedule;
 public interface TrainingScheduleRepository extends JpaRepository<TrainingSchedule, Integer>{
 	Optional<TrainingSchedule> findByDate(LocalDate date);
 	
-	@Query(value = "select * from training_schedule where date between ?1 and ?2", nativeQuery = true)
+	@Query(value = "select * from training_schedule where date between ?1 and ?2 order by date", nativeQuery = true)
 	List<TrainingSchedule> listTrainingScheduleByTime(LocalDate startDate, LocalDate finishDate);
 }
