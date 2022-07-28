@@ -80,6 +80,7 @@ public class NotificationServiceImpl implements NotificationService {
 			Page<NotificationToUser> pageResponse = notificationToUserRepository.findByUserId(user.getId(), paging);
 			List<NotificationToUser> notificationsToUser = new ArrayList<NotificationToUser>();
 			List<UserNotificationDto> userNotificationsDto = new ArrayList<UserNotificationDto>();
+			List<NotificationToUser> unreadNotifications = notificationToUserRepository.findAllUnreadNotificationByUser(user.getId());
 			if (pageResponse != null && pageResponse.hasContent()) {
 				notificationsToUser = pageResponse.getContent();
 				for (NotificationToUser notificationToUser : notificationsToUser) {
@@ -92,6 +93,8 @@ public class NotificationServiceImpl implements NotificationService {
 				responseMessage.setPageNo(pageNo);
 				responseMessage.setPageSize(pageSize);
 				responseMessage.setTotalPage(pageResponse.getTotalPages());
+				// count số lượng chưa đọc
+				responseMessage.setTotalDeactive(unreadNotifications.size());
 			} else {
 				responseMessage.setMessage("Không có thông báo nào!");
 			}
@@ -113,31 +116,6 @@ public class NotificationServiceImpl implements NotificationService {
 		userNotificationDto.setStudentId(notificationToUser.getUser().getStudentId());
 		return userNotificationDto;
 	}
-
-//	@Override
-//	public ResponseMessage getAllNotification(int pageNo, int pageSize, String sortBy) {
-//		// TODO Auto-generated method stub
-//		ResponseMessage responseMessage = new ResponseMessage();
-//		try {
-//			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
-//			Page<Notification> pageResponse = notificationRepository.findAll(paging);
-//			List<Notification> notifications = new ArrayList<Notification>();
-//
-//			if (pageResponse != null && pageResponse.hasContent()) {
-//				notifications = pageResponse.getContent();
-//				responseMessage.setData(notifications);
-//				responseMessage.setPageNo(pageNo);
-//				responseMessage.setPageSize(pageSize);
-//				responseMessage.setTotalPage(pageResponse.getTotalPages());
-//				responseMessage.setMessage(Constant.MSG_016);
-//			}
-//		} catch (Exception e) {
-//			// TODO: handle exception
-//			responseMessage.setMessage(e.getMessage());
-//		}
-//
-//		return responseMessage;
-//	}
 
 	@Override
 	public ResponseMessage createNotification(Notification notification) {
@@ -366,6 +344,48 @@ public class NotificationServiceImpl implements NotificationService {
 					"Lấy trạng thái đóng tiền của " + user.getName() + " - " + user.getStudentId() + " thành công");
 		} catch (Exception e) {
 			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage markNotificationAsRead(int notificationId, String studentId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			Optional<NotificationToUser> notificationToUserOp = notificationToUserRepository.findByUserIdAndNotificationId(user.getId(), notificationId);
+			if (notificationToUserOp.isPresent()) {
+				NotificationToUser notificationToUser = notificationToUserOp.get();
+				notificationToUser.setRead(true);
+				notificationToUserRepository.save(notificationToUser);
+				UserNotificationDto userNotificationDto = convertToUserNotificationDto(notificationToUser);
+				responseMessage.setData(Arrays.asList(userNotificationDto));
+				responseMessage.setMessage("Đánh dấu là đã đọc thành công");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage markAllNotificationAsRead(String studentId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			List<NotificationToUser> notificationsToUser = notificationToUserRepository.findAllUnreadNotificationByUser(user.getId());
+			List<UserNotificationDto> userNotificationsDto = new ArrayList<UserNotificationDto>();
+			for (NotificationToUser notificationToUser : notificationsToUser) {
+				notificationToUser.setRead(true);
+				UserNotificationDto userNotificationDto = convertToUserNotificationDto(notificationToUser);
+				userNotificationsDto.add(userNotificationDto);
+			}
+			notificationToUserRepository.saveAll(notificationsToUser);
+			
+			responseMessage.setData(userNotificationsDto);
+			responseMessage.setMessage("Đánh dấu tất là đã đọc thành công");
+		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
