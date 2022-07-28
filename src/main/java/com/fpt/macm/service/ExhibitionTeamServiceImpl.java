@@ -161,6 +161,10 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService{
 			for (ExhibitionTeam exhibitionTeam : getTeams) {
 				Optional<ExhibitionResult> getResultOp = exhibitionResultRepository.findByTeam(exhibitionTeam.getId());
 				if(getResultOp.isPresent()) {
+					if(getResultOp.get().getScore() == null) {
+						isDone = false;
+						break;
+					}
 					ExhibitionTeamDto newExhibitionTeamDto = new ExhibitionTeamDto();
 					newExhibitionTeamDto.setId(exhibitionTeam.getId());
 					newExhibitionTeamDto.setTeamName(exhibitionTeam.getTeamName());
@@ -180,7 +184,7 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService{
 				else {
 					responseMessage.setData(getTeamDto);
 				}
-				responseMessage.setMessage("Danh sách các đội biểu diễn nội dung " + getType.getName());
+				responseMessage.setMessage("Danh sách các đội đạt giải nội dung " + getType.getName());
 			}
 			else {
 				responseMessage.setMessage("Nội dung này vẫn còn đội biểu diễn chưa thi");
