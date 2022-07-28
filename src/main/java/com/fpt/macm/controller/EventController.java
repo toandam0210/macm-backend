@@ -24,53 +24,71 @@ public class EventController {
 
 	@Autowired
 	EventService eventService;
-	
+
 	@PostMapping("/headculture/createevent")
 	ResponseEntity<ResponseMessage> createEvent(@RequestBody Event event) {
 		return new ResponseEntity<ResponseMessage>(eventService.createEvent(event), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/geteventsbyname")
-	ResponseEntity<ResponseMessage> getEventByName(@RequestParam(defaultValue = "") String name, @RequestParam(defaultValue = "0") int pageNo,
-			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
-		return new ResponseEntity<ResponseMessage>(eventService.getEventsByName(name, pageNo, pageSize, sortBy), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getEventByName(@RequestParam(defaultValue = "") String name,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(eventService.getEventsByName(name, pageNo, pageSize, sortBy),
+				HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headculture/updatebeforeevent/{eventId}")
-	ResponseEntity<ResponseMessage> updateBeforeEvent(@PathVariable(name = "eventId") int id, @RequestBody Event event) {
+	ResponseEntity<ResponseMessage> updateBeforeEvent(@PathVariable(name = "eventId") int id,
+			@RequestBody Event event) {
 		return new ResponseEntity<ResponseMessage>(eventService.updateBeforeEvent(id, event), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headculture/deleteevent/{eventId}")
 	ResponseEntity<ResponseMessage> deleteEvent(@PathVariable(name = "eventId") int id) {
 		return new ResponseEntity<ResponseMessage>(eventService.deleteEvent(id), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/geteventsbydate")
-	ResponseEntity<ResponseMessage> getEventByDate(@RequestParam LocalDate startDate, @RequestParam LocalDate finishDate,
-			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-		return new ResponseEntity<ResponseMessage>(eventService.getEventsByDate(startDate, finishDate, pageNo, pageSize), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getEventByDate(@RequestParam LocalDate startDate,
+			@RequestParam LocalDate finishDate, @RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.getEventsByDate(startDate, finishDate, pageNo, pageSize), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headculture/getstartdate/{eventId}")
 	ResponseEntity<ResponseMessage> getStartDateOfEvent(@PathVariable(name = "eventId") int eventId) {
 		return new ResponseEntity<ResponseMessage>(eventService.getStartDateOfEvent(eventId), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/geteventsbysemester")
-	ResponseEntity<ResponseMessage> getEventBySemester(@RequestParam(defaultValue = "") String semester, @RequestParam(defaultValue = "0") int month, 
-			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-		return new ResponseEntity<ResponseMessage>(eventService.getEventsBySemester(semester, month, pageNo, pageSize), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getEventBySemester(@RequestParam(defaultValue = "") String semester,
+			@RequestParam(defaultValue = "0") int month, @RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(eventService.getEventsBySemester(semester, month, pageNo, pageSize),
+				HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headculture/updateafterevent/{eventId}")
-	ResponseEntity<ResponseMessage> updateAfterEvent(@PathVariable(name = "eventId") int id,
-			@RequestParam double money, @RequestParam(defaultValue = "true") boolean isIncurred, @RequestParam(defaultValue = "true") boolean isUseClubFund) {
-		return new ResponseEntity<ResponseMessage>(eventService.updateAfterEvent(id, money, isIncurred, isUseClubFund), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> updateAfterEvent(@PathVariable(name = "eventId") int id, @RequestParam double money,
+			@RequestParam(defaultValue = "true") boolean isIncurred,
+			@RequestParam(defaultValue = "true") boolean isUseClubFund) {
+		return new ResponseEntity<ResponseMessage>(eventService.updateAfterEvent(id, money, isIncurred, isUseClubFund),
+				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/geteventbyid/{eventId}")
 	ResponseEntity<ResponseMessage> getEventById(@PathVariable(name = "eventId") int id) {
 		return new ResponseEntity<ResponseMessage>(eventService.getEventById(id), HttpStatus.OK);
+	}
+
+	@GetMapping("/geteventsbysemesterandstudentid/{studentId}")
+	ResponseEntity<ResponseMessage> getEventBySemesterAndStudentId(@PathVariable(name = "studentId") String studentId,
+			@RequestParam(defaultValue = "") String semester, @RequestParam(defaultValue = "0") int month,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.getEventsBySemesterAndStudentId(semester, studentId, month, pageNo, pageSize),
+				HttpStatus.OK);
 	}
 }

@@ -17,11 +17,14 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.EventDto;
+import com.fpt.macm.model.dto.UserEventSemesterDto;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventSchedule;
+import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
@@ -29,6 +32,7 @@ import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.SemesterRepository;
+import com.fpt.macm.repository.UserRepository;
 
 @Service
 public class EventServiceImpl implements EventService{
@@ -62,6 +66,9 @@ public class EventServiceImpl implements EventService{
 	
 	@Autowired
 	MemberEventService memberEventService;
+	
+	@Autowired
+	UserRepository userRepository;
 	
 	@Override
 	public ResponseMessage createEvent(Event event) {
@@ -432,6 +439,90 @@ public class EventServiceImpl implements EventService{
 	
 	public List<EventDto> pageableEvent(List<EventDto> currentList, int pageNo, int pageSize) {
 		List<EventDto> result = new ArrayList<EventDto>();
+		for(int i = pageNo * pageSize; i < (pageNo + 1) * pageSize && i < currentList.size(); i++) {
+			result.add(currentList.get(i));
+		}
+		return result;
+	}
+
+	@Override
+	public ResponseMessage getEventsBySemesterAndStudentId(String semester, String studentId, int month, int pageNo,
+			int pageSize) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			
+			if(semester == "") {
+				semester = semesterRepository.findTop3Semester().get(0).getName();
+			}
+			List<Event> events = eventRepository.findBySemester(semester);
+			
+			List<UserEventSemesterDto> userEventsSemesterDto = new ArrayList<UserEventSemesterDto>();
+			
+			for (Event event : events) {
+				LocalDate startDate = getStartDate(event.getId());
+				if(startDate != null) {
+					if(month == 0 || (month != 0 && getStartDate(event.getId()).getMonthValue() == month)) {
+						UserEventSemesterDto userEventSemesterDto = new UserEventSemesterDto();
+						userEventSemesterDto.setUserName(user.getName());
+						userEventSemesterDto.setStudentId(user.getStudentId());
+						
+						Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(event.getId(), user.getId());
+						if (memberEventOp.isPresent()) {
+							MemberEvent memberEvent = memberEventOp.get();
+							if (memberEvent.isRegisterStatus()) {
+								userEventSemesterDto.setJoin(true);
+							}
+							else {
+								userEventSemesterDto.setJoin(false);
+							}
+						}
+						else {
+							userEventSemesterDto.setJoin(false);
+						}
+						
+						EventDto eventDto = new EventDto();
+						LocalDate endDate = getEndDate(event.getId());
+						if(LocalDate.now().isBefore(startDate)) {
+							eventDto.setStatus("Chưa diễn ra");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+							eventDto.setTotalAmount(event.getTotalAmountEstimated());
+						}else if(LocalDate.now().isAfter(endDate)) {
+							eventDto.setStatus("Đã kết thúc");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterActual());
+							eventDto.setTotalAmount(event.getTotalAmountActual());
+						}else {
+							eventDto.setStatus("Đang diễn ra");
+							eventDto.setAmountPerMemberRegister(event.getAmountPerRegisterEstimated());
+							eventDto.setTotalAmount(event.getTotalAmountEstimated());
+						}
+						eventDto.setMaxQuantityComitee(event.getMaxQuantityComitee());
+						eventDto.setAmountFromClub(event.getAmountFromClub());
+						eventDto.setStartDate(startDate);
+						eventDto.setName(event.getName());
+						eventDto.setId(event.getId());
+						eventDto.setDescription(event.getDescription());
+						eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
+						eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
+						
+						userEventSemesterDto.setEventDto(eventDto);
+						userEventsSemesterDto.add(userEventSemesterDto);
+					}
+				}
+			}
+			Collections.sort(userEventsSemesterDto);
+			List<UserEventSemesterDto> getUserEventPageable = pageableUserEvent(userEventsSemesterDto, pageNo, pageSize);
+			responseMessage.setData(getUserEventPageable);
+			responseMessage.setMessage(Constant.MSG_063 + " tháng " + month + " kỳ " + semester);
+			responseMessage.setTotalResult(userEventsSemesterDto.size());
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
+	public List<UserEventSemesterDto> pageableUserEvent(List<UserEventSemesterDto> currentList, int pageNo, int pageSize) {
+		List<UserEventSemesterDto> result = new ArrayList<UserEventSemesterDto>();
 		for(int i = pageNo * pageSize; i < (pageNo + 1) * pageSize && i < currentList.size(); i++) {
 			result.add(currentList.get(i));
 		}
