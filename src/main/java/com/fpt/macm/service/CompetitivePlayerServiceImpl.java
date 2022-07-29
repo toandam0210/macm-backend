@@ -228,15 +228,27 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<User> userJoined= new ArrayList<User>();
-			//List<User> listActive = 
-			//List<TournamentPlayer> listPlayers = tournamentPlayerRepository.getPlayerByTournamentId(tournamentId);
-//			for (TournamentPlayer tournamentPlayer : listPlayers) {
-//				User getUser = tournamentPlayer.getUser();
-//			}
+			List<User> listActive = userRepository.findAllActiveUser();
+			List<TournamentPlayer> listPlayers = tournamentPlayerRepository.getPlayerByTournamentId(tournamentId);
+			for (TournamentPlayer tournamentPlayer : listPlayers) {
+				Optional<CompetitivePlayer> getCompetitivePlayerOp = competitivePlayerRepository.findByTournamentPlayerId(tournamentPlayer.getId());
+				if(getCompetitivePlayerOp.isPresent()) {
+					User getUser = tournamentPlayer.getUser();
+					userJoined.add(getUser);
+				}
+			}
+			List<User> userNotJoined= new ArrayList<User>();
+			for (User user : listActive) {
+				if(!userJoined.contains(user)) {
+					userNotJoined.add(user);
+				}
+			}
+			responseMessage.setData(userNotJoined);
+			responseMessage.setMessage("Danh sách thành viên chưa đăng ký tham gia thi đấu đối kháng");
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
-		return null;
+		return responseMessage;
 	}
 	
 }
