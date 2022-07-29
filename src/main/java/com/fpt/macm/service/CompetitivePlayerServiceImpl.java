@@ -1,6 +1,7 @@
 package com.fpt.macm.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import com.fpt.macm.model.entity.CompetitivePlayerBracket;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentPlayer;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
@@ -216,6 +218,35 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage listUserNotJoinCompetitive(int tournamentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<User> userJoined= new ArrayList<User>();
+			List<User> listActive = userRepository.findAllActiveUser();
+			List<TournamentPlayer> listPlayers = tournamentPlayerRepository.getPlayerByTournamentId(tournamentId);
+			for (TournamentPlayer tournamentPlayer : listPlayers) {
+				Optional<CompetitivePlayer> getCompetitivePlayerOp = competitivePlayerRepository.findByTournamentPlayerId(tournamentPlayer.getId());
+				if(getCompetitivePlayerOp.isPresent()) {
+					User getUser = tournamentPlayer.getUser();
+					userJoined.add(getUser);
+				}
+			}
+			List<User> userNotJoined= new ArrayList<User>();
+			for (User user : listActive) {
+				if(!userJoined.contains(user)) {
+					userNotJoined.add(user);
+				}
+			}
+			responseMessage.setData(userNotJoined);
+			responseMessage.setMessage("Danh sách thành viên chưa đăng ký tham gia thi đấu đối kháng");
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 		return responseMessage;
 	}
