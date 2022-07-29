@@ -12,7 +12,7 @@ import com.fpt.macm.model.entity.TournamentSchedule;
 
 @Repository
 public interface TournamentScheduleRepository extends JpaRepository<TournamentSchedule, Integer> {
-	@Query(value = "select * from tournament_schedule where tournament_id = ?1",nativeQuery = true)
+	@Query(value = "select * from tournament_schedule where tournament_id = ?1 order by date",nativeQuery = true)
 	List<TournamentSchedule> findByTournamentId(int tournamentId);
 	
 	Optional<TournamentSchedule> findByDate(LocalDate date);

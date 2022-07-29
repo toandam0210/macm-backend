@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.UserNotificationDto;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MembershipInfo;
@@ -67,30 +69,52 @@ public class NotificationServiceImpl implements NotificationService {
 
 	@Autowired
 	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
-
+	
 	@Override
-	public ResponseMessage getAllNotification(int pageNo, int pageSize, String sortBy) {
-		// TODO Auto-generated method stub
+	public ResponseMessage getAllNotificationByStudentId(String studentId, int pageNo, int pageSize, String sortBy) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			
 			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
-			Page<Notification> pageResponse = notificationRepository.findAll(paging);
-			List<Notification> notifications = new ArrayList<Notification>();
-
+			Page<NotificationToUser> pageResponse = notificationToUserRepository.findByUserId(user.getId(), paging);
+			List<NotificationToUser> notificationsToUser = new ArrayList<NotificationToUser>();
+			List<UserNotificationDto> userNotificationsDto = new ArrayList<UserNotificationDto>();
+			List<NotificationToUser> unreadNotifications = notificationToUserRepository.findAllUnreadNotificationByUser(user.getId());
 			if (pageResponse != null && pageResponse.hasContent()) {
-				notifications = pageResponse.getContent();
-				responseMessage.setData(notifications);
+				notificationsToUser = pageResponse.getContent();
+				for (NotificationToUser notificationToUser : notificationsToUser) {
+					UserNotificationDto userNotificationDto = convertToUserNotificationDto(notificationToUser);
+					userNotificationsDto.add(userNotificationDto);
+				}
+				responseMessage.setData(userNotificationsDto);
+				responseMessage.setMessage(Constant.MSG_016);
+				responseMessage.setTotalResult(userNotificationsDto.size());
 				responseMessage.setPageNo(pageNo);
 				responseMessage.setPageSize(pageSize);
 				responseMessage.setTotalPage(pageResponse.getTotalPages());
-				responseMessage.setMessage(Constant.MSG_016);
+				// count số lượng chưa đọc
+				responseMessage.setTotalDeactive(unreadNotifications.size());
+			} else {
+				responseMessage.setMessage("Không có thông báo nào!");
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
-
 		return responseMessage;
+	}
+	
+	private UserNotificationDto convertToUserNotificationDto(NotificationToUser notificationToUser) {
+		UserNotificationDto userNotificationDto = new UserNotificationDto();
+		userNotificationDto.setId(notificationToUser.getNotification().getId());
+		userNotificationDto.setMessage(notificationToUser.getNotification().getMessage());
+		userNotificationDto.setNotificationType(notificationToUser.getNotification().getNotificationType());
+		userNotificationDto.setNotificationTypeId(notificationToUser.getNotification().getNotificationTypeId());
+		userNotificationDto.setCreatedOn(notificationToUser.getNotification().getCreatedOn());
+		userNotificationDto.setRead(notificationToUser.isRead());
+		userNotificationDto.setUserName(notificationToUser.getUser().getName());
+		userNotificationDto.setStudentId(notificationToUser.getUser().getStudentId());
+		return userNotificationDto;
 	}
 
 	@Override
@@ -159,6 +183,12 @@ public class NotificationServiceImpl implements NotificationService {
 			notification.setNotificationTypeId(tournamentId);
 			notification.setCreatedOn(LocalDateTime.now());
 			notificationRepository.save(notification);
+			
+			Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+			List<Notification> notifications = IterableUtils.toList(notificationIterable);
+			Notification newNotification = notifications.get(0);
+			
+			sendNotificationToAllUser(newNotification);
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
@@ -173,6 +203,12 @@ public class NotificationServiceImpl implements NotificationService {
 			notification.setNotificationTypeId(eventId);
 			notification.setCreatedOn(LocalDateTime.now());
 			notificationRepository.save(notification);
+			
+			Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+			List<Notification> notifications = IterableUtils.toList(notificationIterable);
+			Notification newNotification = notifications.get(0);
+			
+			sendNotificationToAllUser(newNotification);
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.out.println(e.getMessage());
@@ -186,6 +222,12 @@ public class NotificationServiceImpl implements NotificationService {
 		notification.setNotificationTypeId(0);
 		notification.setCreatedOn(LocalDateTime.now());
 		notificationRepository.save(notification);
+		
+		Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+		List<Notification> notifications = IterableUtils.toList(notificationIterable);
+		Notification newNotification = notifications.get(0);
+		
+		sendNotificationToAllUser(newNotification);
 	}
 
 	public void createTrainingSessionUpdateNotification(LocalDate date, LocalTime newStartTime, LocalTime newEndTime) {
@@ -196,6 +238,12 @@ public class NotificationServiceImpl implements NotificationService {
 		notification.setNotificationTypeId(0);
 		notification.setCreatedOn(LocalDateTime.now());
 		notificationRepository.save(notification);
+		
+		Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+		List<Notification> notifications = IterableUtils.toList(notificationIterable);
+		Notification newNotification = notifications.get(0);
+		
+		sendNotificationToAllUser(newNotification);
 	}
 
 	public void createTrainingSessionDeleteNotification(LocalDate date) {
@@ -205,6 +253,12 @@ public class NotificationServiceImpl implements NotificationService {
 		notification.setNotificationTypeId(0);
 		notification.setCreatedOn(LocalDateTime.now());
 		notificationRepository.save(notification);
+		
+		Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+		List<Notification> notifications = IterableUtils.toList(notificationIterable);
+		Notification newNotification = notifications.get(0);
+		
+		sendNotificationToAllUser(newNotification);
 	}
 
 	@Override
@@ -222,7 +276,7 @@ public class NotificationServiceImpl implements NotificationService {
 				MembershipStatus membershipStatus = membershipStatusRepository
 						.findByMemberShipInfoIdAndUserId(membershipInfo.getId(), user.getId()).get();
 				if (!membershipStatus.isStatus()) {
-					String message = "Số tiền membership bạn cần đóng kỳ " + semester.getName() + ": "
+					String message = "Membership kỳ " + semester.getName() + ": "
 							+ membershipInfo.getAmount() + " VND";
 					messages.add(message);
 				}
@@ -238,18 +292,18 @@ public class NotificationServiceImpl implements NotificationService {
 					if (amountPerRegisterEstimate != 0) {
 						if (amountPerRegisterActual == 0) {
 							if (memberEvent.getPaymentValue() == 0) {
-								String message = "Số tiền bạn cần phải đóng cho sự kiện " + event.getName() + ": "
+								String message = "Sự kiện " + event.getName() + ": "
 										+ amountPerRegisterEstimate + " VND";
 								messages.add(message);
 							}
 						} else {
 							if (memberEvent.getPaymentValue() == 0) {
-								String message = "Số tiền bạn cần phải đóng cho sự kiện " + event.getName() + ": "
+								String message = "Sự kiện " + event.getName() + ": "
 										+ amountPerRegisterActual + " VND";
 								messages.add(message);
 							} else if (amountPerRegisterActual > amountPerRegisterEstimate) {
 								if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
-									String message = "Số tiền bạn cần phải đóng thêm cho sự kiện " + event.getName()
+									String message = "Sự kiện " + event.getName()
 											+ ": " + (amountPerRegisterActual - amountPerRegisterEstimate) + " VND";
 									messages.add(message);
 								}
@@ -264,7 +318,7 @@ public class NotificationServiceImpl implements NotificationService {
 			if (!tournamentOrganizingCommittees.isEmpty()) {
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
 					if (!tournamentOrganizingCommittee.isPaymentStatus()) {
-						String message = "Số tiền bạn cần phải đóng cho giải đấu "
+						String message = "Giải đấu "
 								+ tournamentOrganizingCommittee.getTournament().getName() + ": "
 								+ tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay() + " VND";
 						messages.add(message);
@@ -278,7 +332,7 @@ public class NotificationServiceImpl implements NotificationService {
 				for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
 					if (studentId.equals(tournamentPlayer.getUser().getStudentId())
 							&& !tournamentPlayer.isPaymentStatus()) {
-						String message = "Số tiền bạn cần phải đóng cho giải đấu " + tournament.getName() + ": "
+						String message = "Giải đấu " + tournament.getName() + ": "
 								+ tournament.getFeePlayerPay() + " VND";
 						messages.add(message);
 					}
@@ -290,6 +344,48 @@ public class NotificationServiceImpl implements NotificationService {
 					"Lấy trạng thái đóng tiền của " + user.getName() + " - " + user.getStudentId() + " thành công");
 		} catch (Exception e) {
 			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage markNotificationAsRead(int notificationId, String studentId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			Optional<NotificationToUser> notificationToUserOp = notificationToUserRepository.findByUserIdAndNotificationId(user.getId(), notificationId);
+			if (notificationToUserOp.isPresent()) {
+				NotificationToUser notificationToUser = notificationToUserOp.get();
+				notificationToUser.setRead(true);
+				notificationToUserRepository.save(notificationToUser);
+				UserNotificationDto userNotificationDto = convertToUserNotificationDto(notificationToUser);
+				responseMessage.setData(Arrays.asList(userNotificationDto));
+				responseMessage.setMessage("Đánh dấu là đã đọc thành công");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage markAllNotificationAsRead(String studentId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			List<NotificationToUser> notificationsToUser = notificationToUserRepository.findAllUnreadNotificationByUser(user.getId());
+			List<UserNotificationDto> userNotificationsDto = new ArrayList<UserNotificationDto>();
+			for (NotificationToUser notificationToUser : notificationsToUser) {
+				notificationToUser.setRead(true);
+				UserNotificationDto userNotificationDto = convertToUserNotificationDto(notificationToUser);
+				userNotificationsDto.add(userNotificationDto);
+			}
+			notificationToUserRepository.saveAll(notificationsToUser);
+			
+			responseMessage.setData(userNotificationsDto);
+			responseMessage.setMessage("Đánh dấu tất là đã đọc thành công");
+		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;

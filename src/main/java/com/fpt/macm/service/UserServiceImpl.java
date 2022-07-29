@@ -798,17 +798,31 @@ public class UserServiceImpl implements UserService {
 					if (memberEventOp.isPresent()) {
 						MemberEvent memberEvent = memberEventOp.get();
 						if (memberEvent.isRegisterStatus()) {
-							AttendanceEvent attendanceEvent = attendanceEventRepository.findByEventIdAndMemberEventId(eventSchedule.getEvent().getId(), memberEvent.getId()).get();
-							UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
-							userAttendanceStatusDto.setUserName(user.getName());
-							userAttendanceStatusDto.setStudentId(user.getStudentId());
-							userAttendanceStatusDto.setStatus(attendanceEvent.getStatus());
-							userAttendanceStatusDto.setDate(eventSchedule.getDate());
-							userAttendanceStatusDto.setStartTime(eventSchedule.getStartTime());
-							userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
-							userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
-							userAttendanceStatusDto.setType(1);
-							listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+							Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository.findByEventIdAndMemberEventId(eventSchedule.getEvent().getId(), memberEvent.getId());
+							if(attendanceEventOp.isPresent()) {
+								AttendanceEvent attendanceEvent = attendanceEventOp.get();
+								UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+								userAttendanceStatusDto.setUserName(user.getName());
+								userAttendanceStatusDto.setStudentId(user.getStudentId());
+								userAttendanceStatusDto.setStatus(attendanceEvent.getStatus());
+								userAttendanceStatusDto.setDate(eventSchedule.getDate());
+								userAttendanceStatusDto.setStartTime(eventSchedule.getStartTime());
+								userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
+								userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
+								userAttendanceStatusDto.setType(1);
+								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+							} else {
+								UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+								userAttendanceStatusDto.setUserName(user.getName());
+								userAttendanceStatusDto.setStudentId(user.getStudentId());
+								userAttendanceStatusDto.setStatus(2);
+								userAttendanceStatusDto.setDate(eventSchedule.getDate());
+								userAttendanceStatusDto.setStartTime(eventSchedule.getStartTime());
+								userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
+								userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
+								userAttendanceStatusDto.setType(1);
+								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+							}
 						}
 						else {
 							UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();

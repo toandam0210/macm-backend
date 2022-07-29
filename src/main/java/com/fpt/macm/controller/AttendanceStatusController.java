@@ -18,18 +18,29 @@ import com.fpt.macm.service.AttendanceStatusService;
 public class AttendanceStatusController {
 	@Autowired
 	AttendanceStatusService attendanceStatusService;
-	
+
 	@PutMapping("/takeattendance/{studentId}")
-	ResponseEntity<ResponseMessage> takeAttendanceByStudentId(@PathVariable(name = "studentId") String studentId, @RequestParam int status) {
-		return new ResponseEntity<ResponseMessage>(attendanceStatusService.takeAttendanceByStudentId(studentId, status), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> takeAttendanceByStudentId(@PathVariable(name = "studentId") String studentId,
+			@RequestParam int status) {
+		return new ResponseEntity<ResponseMessage>(attendanceStatusService.takeAttendanceByStudentId(studentId, status),
+				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/checkattendance/{trainingScheduleId}")
-	ResponseEntity<ResponseMessage> checkAttendanceByStudentId(@PathVariable(name = "trainingScheduleId") int trainingScheduleId) {
-		return new ResponseEntity<ResponseMessage>(attendanceStatusService.checkAttendanceStatusByTrainingSchedule(trainingScheduleId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> checkAttendanceByStudentId(
+			@PathVariable(name = "trainingScheduleId") int trainingScheduleId) {
+		return new ResponseEntity<ResponseMessage>(
+				attendanceStatusService.checkAttendanceStatusByTrainingSchedule(trainingScheduleId), HttpStatus.OK);
 	}
+
 	@GetMapping("/checkattendance/report")
 	ResponseEntity<ResponseMessage> userAttendanceReportBySemester(@RequestParam String semester) {
-		return new ResponseEntity<ResponseMessage>(attendanceStatusService.attendanceTrainingReport(semester), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(attendanceStatusService.attendanceTrainingReport(semester),
+				HttpStatus.OK);
+	}
+	
+	@GetMapping("/getallattendancestatusbystudentidandsemester/{studentId}")
+	ResponseEntity<ResponseMessage> getAllAttendanceStatusByStudentIdAndSemester(@PathVariable(name = "studentId") String studentId, @RequestParam String semester){
+		return new ResponseEntity<ResponseMessage>(attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester(studentId, semester), HttpStatus.OK);
 	}
 }
