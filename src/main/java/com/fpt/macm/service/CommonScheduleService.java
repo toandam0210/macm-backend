@@ -8,6 +8,6 @@ import com.fpt.macm.model.response.ResponseMessage;
 public interface CommonScheduleService {
 	CommonSchedule getCommonSessionByDate(LocalDate date);
 	ResponseMessage getCommonSchedule();
-	ResponseMessage getCommonSessionByDate(String date);
+	ResponseMessage getCommonScheduleByDate(String date);
 	ResponseMessage getCommonScheduleBySemester(int semesterId);
 }
