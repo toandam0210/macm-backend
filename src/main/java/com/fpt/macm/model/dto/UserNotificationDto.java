@@ -2,7 +2,7 @@ package com.fpt.macm.model.dto;
 
 import java.time.LocalDateTime;
 
-public class UserNotificationDto {
+public class UserNotificationDto implements Comparable<UserNotificationDto>{
 
 	private int id;
 	private String message;
@@ -75,6 +75,12 @@ public class UserNotificationDto {
 
 	public void setStudentId(String studentId) {
 		this.studentId = studentId;
+	}
+
+	@Override
+	public int compareTo(UserNotificationDto o) {
+		
+		return o.getCreatedOn().compareTo(this.getCreatedOn());
 	}
 
 }
