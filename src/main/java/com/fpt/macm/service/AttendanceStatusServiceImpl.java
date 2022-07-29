@@ -30,7 +30,7 @@ import com.fpt.macm.utils.Utils;
 @Service
 public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	@Autowired
-	TrainingScheduleServiceImpl trainingScheduleServiceImpl;
+	TrainingScheduleService trainingScheduleService;
 
 	@Autowired
 	AttendanceStatusRepository attendanceStatusRepository;
@@ -48,7 +48,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	public ResponseMessage takeAttendanceByStudentId(String studentId, int status) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			TrainingSchedule trainingSchedule = trainingScheduleServiceImpl.getTrainingScheduleByDate(LocalDate.now());
+			TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
 			if (trainingSchedule != null) {
 				Optional<User> userOp = userRepository.findByStudentId(studentId);
 				User user = userOp.get();
