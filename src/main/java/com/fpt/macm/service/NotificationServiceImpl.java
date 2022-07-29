@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -87,6 +89,7 @@ public class NotificationServiceImpl implements NotificationService {
 					UserNotificationDto userNotificationDto = convertToUserNotificationDto(notificationToUser);
 					userNotificationsDto.add(userNotificationDto);
 				}
+				Collections.sort(userNotificationsDto);
 				responseMessage.setData(userNotificationsDto);
 				responseMessage.setMessage(Constant.MSG_016);
 				responseMessage.setTotalResult(userNotificationsDto.size());
