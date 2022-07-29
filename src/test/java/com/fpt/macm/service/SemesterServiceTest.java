@@ -34,13 +34,7 @@ public class SemesterServiceTest {
 		semester.setEndDate(LocalDate.of(2022, 9, 1));
 		return semester;
 	}
-	private List<Integer> months(){
-		List<Integer> months = new ArrayList<Integer>();
-		Integer [] list = {5, 6, 7, 8};
-		months = Arrays.asList(list);
-		return months;
-	}
-	
+
 	@Test
 	public void testGetCurrentSemester() {
 		when(semesterRepository.findAll()).thenReturn(Arrays.asList(semester()));
