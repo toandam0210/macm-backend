@@ -235,20 +235,20 @@ public class EventServiceImpl implements EventService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			if(finishDate.compareTo(LocalDate.now()) < 0) {
+			if(finishDate.compareTo(startDate) < 0) {
 				responseMessage.setMessage(Constant.MSG_072);
 			} else {
 				List<EventDto> eventDtos = new ArrayList<EventDto>();
 				List<Event> eventList = new ArrayList<Event>();
 				while(startDate.compareTo(finishDate) <= 0) {
-					EventSchedule getEventSession = eventScheduleService.getEventSessionByDate(startDate);
+					EventSchedule getEventSession = eventScheduleService.getEventScheduleByDate(startDate);
 					if(getEventSession != null) {
 						Event getEvent = getEventSession.getEvent();
 						if(!eventList.contains(getEvent)) {
 							eventList.add(getEvent);
 						}
 					}
-					startDate.plusDays(1);
+					startDate = startDate.plusDays(1);
 				}
 				if(eventList.size() > 0) {
 					for (Event event : eventList) {

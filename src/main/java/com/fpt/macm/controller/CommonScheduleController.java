@@ -26,7 +26,7 @@ public class CommonScheduleController {
 	
 	@GetMapping("/getcommonsessionbydate")
 	ResponseEntity<ResponseMessage> getCommonSessionByDate(@RequestParam String date) {
-			return new ResponseEntity<ResponseMessage>(commonScheduleService.getCommonSessionByDate(date), HttpStatus.OK);
+			return new ResponseEntity<ResponseMessage>(commonScheduleService.getCommonScheduleByDate(date), HttpStatus.OK);
 	}
 	
 	@GetMapping("/getcommonschedulebysemester/{semesterId}")

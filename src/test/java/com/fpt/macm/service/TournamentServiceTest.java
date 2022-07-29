@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -990,9 +989,6 @@ public class TournamentServiceTest {
 
 	@Test
 	public void testRegisterToJoinTournamentCompetitiveTypeCaseAlreadyRegister() {
-		Set<CompetitiveType> competitiveTypes = competitiveTypes();
-		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
-		CompetitiveType competitiveType = listCompetitive.get(0);
 		CompetitivePlayer competitivePlayer = competitivePlayer();
 		competitivePlayer.setWeight(58);
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));

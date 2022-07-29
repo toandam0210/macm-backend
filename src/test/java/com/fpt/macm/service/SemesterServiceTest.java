@@ -33,8 +33,7 @@ public class SemesterServiceTest {
 		semester.setStartDate(LocalDate.of(2022, 5, 1));
 		semester.setEndDate(LocalDate.of(2022, 9, 1));
 		return semester;
-	}
-
+	}	
 	@Test
 	public void testGetCurrentSemester() {
 		when(semesterRepository.findAll()).thenReturn(Arrays.asList(semester()));

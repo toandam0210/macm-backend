@@ -358,7 +358,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	}
 
 	@Override
-	public EventSchedule getEventSessionByDate(LocalDate date) {
+	public EventSchedule getEventScheduleByDate(LocalDate date) {
 		// TODO Auto-generated method stub
 		try {
 			Optional<EventSchedule> getEventSessionOp = eventScheduleRepository.findByDate(date);

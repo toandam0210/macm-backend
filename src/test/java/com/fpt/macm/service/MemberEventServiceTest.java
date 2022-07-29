@@ -80,7 +80,7 @@ public class MemberEventServiceTest {
 		event.setSemester("Summer2022");
 		event.setTotalAmountActual(0);
 		event.setTotalAmountEstimated(100000);
-		LocalDateTime dateTimeRegistrationDeadline = LocalDateTime.of(2022, 7, 29, 0, 0);
+		LocalDateTime dateTimeRegistrationDeadline = LocalDateTime.of(2022, 10, 30, 0, 0);
 		event.setRegistrationMemberDeadline(dateTimeRegistrationDeadline);
 		event.setRegistrationOrganizingCommitteeDeadline(dateTimeRegistrationDeadline);
 		Optional<Event> eventOp = Optional.of(event);
@@ -101,7 +101,7 @@ public class MemberEventServiceTest {
 		event.setSemester("Summer2022");
 		event.setTotalAmountActual(200000);
 		event.setTotalAmountEstimated(100000);
-		LocalDateTime dateTimeRegistrationDeadline = LocalDateTime.of(2022, 7, 29, 0, 0);
+		LocalDateTime dateTimeRegistrationDeadline = LocalDateTime.of(2022, 10, 30, 0, 0);
 		event.setRegistrationMemberDeadline(dateTimeRegistrationDeadline);
 		event.setRegistrationOrganizingCommitteeDeadline(dateTimeRegistrationDeadline);
 		Optional<Event> eventOp = Optional.of(event);
@@ -122,7 +122,7 @@ public class MemberEventServiceTest {
 		event.setSemester("Summer2022");
 		event.setTotalAmountActual(100000);
 		event.setTotalAmountEstimated(100000);
-		LocalDateTime dateTimeRegistrationDeadline = LocalDateTime.of(2022, 7, 29, 0, 0);
+		LocalDateTime dateTimeRegistrationDeadline = LocalDateTime.of(2022, 10, 30, 0, 0);
 		event.setRegistrationMemberDeadline(dateTimeRegistrationDeadline);
 		event.setRegistrationOrganizingCommitteeDeadline(dateTimeRegistrationDeadline);
 		Optional<Event> eventOp = Optional.of(event);
