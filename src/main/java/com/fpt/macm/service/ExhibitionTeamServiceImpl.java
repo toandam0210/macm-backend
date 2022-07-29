@@ -60,7 +60,7 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			ExhibitionType getType = exhibitionTypeRepository.getById(exhibitionTypeId);
+			ExhibitionType getType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
 			ExhibitionTeam newTeam = new ExhibitionTeam();
 			newTeam.setTeamName(name);
 			Set<ExhibitionPlayer> listMembers = new HashSet<>();
@@ -111,10 +111,12 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService{
 						newTournamentPlayer.setCreatedOn(LocalDateTime.now());
 						newTournamentPlayer.setUpdatedBy("LinhLHN");
 						newTournamentPlayer.setUpdatedOn(LocalDateTime.now());
+						tournamentPlayerRepository.save(newTournamentPlayer);
 						Tournament getTournament = tournamentRepository.getById(exhibitionTypeRepository.findTournamentOfType(exhibitionTypeId));
 						Set<TournamentPlayer> getTournamentPlayers = getTournament.getTournamentPlayers();
 						getTournamentPlayers.add(newTournamentPlayer);
 						getTournament.setTournamentPlayers(getTournamentPlayers);
+						tournamentRepository.save(getTournament);
 						TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(getUser.getId(), exhibitionTypeRepository.findTournamentOfType(exhibitionTypeId)).get();
 						ExhibitionPlayer newExhibitionPlayer = new ExhibitionPlayer();
 						newExhibitionPlayer.setTournamentPlayer(getTournamentPlayer);
@@ -123,6 +125,15 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService{
 					}
 				}
 				newTeam.setExhibitionPlayers(listMembers);
+				newTeam.setCreatedBy("LinhLHN");
+				newTeam.setCreatedOn(LocalDateTime.now());
+				newTeam.setUpdatedBy("LinhLHN");
+				newTeam.setUpdatedOn(LocalDateTime.now());
+				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
+				getTeams.add(newTeam);
+				getType.setExhibitionTeams(getTeams);
+				exhibitionTeamRepository.save(newTeam);
+				exhibitionTypeRepository.save(getType);
 				responseMessage.setData(Arrays.asList(newTeam));
 				responseMessage.setMessage("Đăng ký thành công");
 			}

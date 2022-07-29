@@ -102,4 +102,9 @@ public class CompetitiveController {
 	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
 	}
+	
+	@GetMapping("/headclub/listusernotjoincompetitive/{tournamentId}")
+	ResponseEntity<ResponseMessage> listUserNotJoinCompetitive (@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(competitivePlayerService.listUserNotJoinCompetitive(tournamentId), HttpStatus.OK);
+	}
 }
