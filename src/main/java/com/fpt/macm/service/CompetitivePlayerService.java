@@ -6,4 +6,5 @@ public interface CompetitivePlayerService {
 	ResponseMessage addNewCompetitivePlayer (int userId, int tournamentId, double weight);
 	ResponseMessage updateWeightForCompetitivePlayer (int competitivePlayerId, double weight);
 	ResponseMessage deleteCompetitivePlayer (int competitivePlayerId);
+	ResponseMessage listUserNotJoinCompetitive(int tournamentId);
 }

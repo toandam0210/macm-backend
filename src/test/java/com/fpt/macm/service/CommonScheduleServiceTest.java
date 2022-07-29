@@ -64,20 +64,20 @@ public class CommonScheduleServiceTest {
 	@Test
 	public void testGetCommonSessionByDate() {
 		when(commonScheduleRepository.findByDate(any())).thenReturn(Optional.of(commonSchedule()));
-		ResponseMessage responseMessage = commonScheduleService.getCommonSessionByDate("28/07/2022");
+		ResponseMessage responseMessage = commonScheduleService.getCommonScheduleByDate("28/07/2022");
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
 	@Test
 	public void testGetCommonSessionByDateCaseEmpty() {
 		when(commonScheduleRepository.findByDate(any())).thenReturn(null);
-		ResponseMessage responseMessage = commonScheduleService.getCommonSessionByDate("28/07/2022");
+		ResponseMessage responseMessage = commonScheduleService.getCommonScheduleByDate("28/07/2022");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 	@Test
 	public void testGetCommonSessionByDateCaseException() {
-		ResponseMessage responseMessage = commonScheduleService.getCommonSessionByDate("abc");
+		ResponseMessage responseMessage = commonScheduleService.getCommonScheduleByDate("abc");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
