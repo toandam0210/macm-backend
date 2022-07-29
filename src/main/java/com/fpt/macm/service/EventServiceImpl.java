@@ -241,14 +241,14 @@ public class EventServiceImpl implements EventService{
 				List<EventDto> eventDtos = new ArrayList<EventDto>();
 				List<Event> eventList = new ArrayList<Event>();
 				while(startDate.compareTo(finishDate) <= 0) {
-					EventSchedule getEventSession = eventScheduleService.getEventSessionByDate(startDate);
+					EventSchedule getEventSession = eventScheduleService.getEventScheduleByDate(startDate);
 					if(getEventSession != null) {
 						Event getEvent = getEventSession.getEvent();
 						if(!eventList.contains(getEvent)) {
 							eventList.add(getEvent);
 						}
 					}
-					startDate.plusDays(1);
+					startDate = startDate.plusDays(1);
 				}
 				if(eventList.size() > 0) {
 					for (Event event : eventList) {

@@ -280,7 +280,7 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 2 0 * * *")
 	public void addListMemberEventAttendanceStatus() {
-		EventSchedule eventSchedule = eventScheduleService.getEventSessionByDate(LocalDate.now());
+		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
 		if (eventSchedule != null) {
 			Event event = eventSchedule.getEvent();
 			LocalDate startDate = (LocalDate) eventService.getStartDateOfEvent(event.getId()).getData().get(0);
@@ -502,7 +502,7 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 59 23 * * *")
 	public void changeStatusAttendanceEvent() {
-		EventSchedule eventSchedule = eventScheduleService.getEventSessionByDate(LocalDate.now());
+		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
 		if (eventSchedule != null) {
 			List<AttendanceEvent> listAttendanceEvent = attendanceEventRepository
 					.findByEventId(eventSchedule.getEvent().getId());
