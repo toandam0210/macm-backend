@@ -70,7 +70,7 @@ public class CommonScheduleControllerTest {
 	public void getCommonScheduleByDateSuccessTest() throws Exception {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(commonSchedule()));
-		when(commonScheduleService.getCommonSessionByDate(anyString())).thenReturn(responseMessage);
+		when(commonScheduleService.getCommonScheduleByDate(anyString())).thenReturn(responseMessage);
 		this.mockMvc
 				.perform(get("/api/commonschedule/getcommonsessionbydate").param("date", "26/06/2022")
 						.contentType(MediaType.APPLICATION_JSON))
