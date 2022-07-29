@@ -235,7 +235,7 @@ public class EventServiceImpl implements EventService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			if(finishDate.compareTo(LocalDate.now()) < 0) {
+			if(finishDate.compareTo(startDate) < 0) {
 				responseMessage.setMessage(Constant.MSG_072);
 			} else {
 				List<EventDto> eventDtos = new ArrayList<EventDto>();
