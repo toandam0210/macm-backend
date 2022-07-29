@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,7 @@ import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
+import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
@@ -42,6 +44,9 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 
 	@Autowired
 	ExhibitionResultRepository exhibitionResultRepository;
+
+	@Autowired
+	ExhibitionTeamRepository exhibitionTeamRepository;
 
 	@Autowired
 	CompetitiveTypeService competitiveTypeService;
@@ -174,6 +179,25 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 			else {
 				responseMessage.setMessage("Không có trận nào");
 			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateExhibitionResult(int exhibitionTeamId, double score) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			ExhibitionResult getResult = exhibitionResultRepository.findByTeam(exhibitionTeamId).get();
+			getResult.setScore(score);
+			getResult.setUpdatedBy("LinhLHN");
+			getResult.setUpdatedOn(LocalDateTime.now());
+			exhibitionResultRepository.save(getResult);
+			responseMessage.setData(Arrays.asList(getResult));
+			responseMessage.setMessage("Cập nhật điểm cho đội " + exhibitionTeamRepository.findById(exhibitionTeamId).get().getTeamName());
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

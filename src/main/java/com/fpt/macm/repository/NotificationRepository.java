@@ -7,5 +7,5 @@ import com.fpt.macm.model.entity.Notification;
 
 @Repository
 public interface NotificationRepository extends PagingAndSortingRepository<Notification, Integer>{
-
+	
 }

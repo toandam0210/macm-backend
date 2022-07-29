@@ -56,7 +56,7 @@ public class Tournament {
 	@JoinColumn(name = "tournament_id")
 	private Set<ExhibitionType> exhibitionTypes;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "tournament_id")
 	private Set<TournamentPlayer> tournamentPlayers;
 
