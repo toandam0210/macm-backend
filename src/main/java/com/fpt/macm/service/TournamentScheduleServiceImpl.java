@@ -42,7 +42,7 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 	CommonScheduleRepository commonScheduleRepository;
 
 	@Autowired
-	NotificationServiceImpl notificationServiceImpl;
+	NotificationService notificationService;
 	
 	@Override
 	public ResponseMessage createPreviewTournamentSchedule(String tournamentName, String startDate, String finishDate,
@@ -182,7 +182,7 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 					responseMessage.setMessage(Constant.MSG_100);
 					responseMessage.setTotalResult(listTournamentSchedule.size());
 					
-					notificationServiceImpl.createTournamentNotification(tournamentId, tournament.getName());
+					notificationService.createTournamentNotification(tournamentId, tournament.getName());
 				}
 			}
 		} catch (Exception e) {
