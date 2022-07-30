@@ -8,22 +8,24 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Sort;
 
-import com.fpt.macm.model.dto.UserNotificationDto;
+import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Event;
+import com.fpt.macm.model.entity.ExhibitionPlayer;
+import com.fpt.macm.model.entity.ExhibitionTeam;
+import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MembershipInfo;
 import com.fpt.macm.model.entity.MembershipStatus;
@@ -32,6 +34,9 @@ import com.fpt.macm.model.entity.NotificationToUser;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.RoleEvent;
 import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
+import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.MemberEventRepository;
@@ -109,27 +114,6 @@ public class NotificationServiceTest {
 		notificationToUser.setCreatedOn(LocalDateTime.now());
 		return notificationToUser;
 	}
-
-	private UserNotificationDto userNotificationDto() {
-		UserNotificationDto userNotificationDto = new UserNotificationDto();
-		userNotificationDto.setId(1);
-		userNotificationDto.setMessage("Test");
-		userNotificationDto.setNotificationType(0);
-		userNotificationDto.setNotificationTypeId(1);
-		userNotificationDto.setCreatedOn(LocalDateTime.now());
-		userNotificationDto.setRead(false);
-		userNotificationDto.setUserName("dam van toan 01");
-		userNotificationDto.setStudentId("HE140855");
-		return userNotificationDto;
-	}
-
-	private List<String> messages() {
-		List<String> messages = new ArrayList<String>();
-		messages.add("Membership kỳ Summer2022: 50000VND");
-		messages.add("Membership kỳ Summer2022: 100000VND");
-		messages.add("Membership kỳ Summer2022: 200000VND");
-		return messages;
-	}
 	
 	public Semester semester() {
 		Semester semester = new Semester();
@@ -193,6 +177,103 @@ public class NotificationServiceTest {
 		return event;
 	}
 	
+	private Tournament tournament() {
+		Tournament tournament = new Tournament();
+		tournament.setCompetitiveTypes(competitiveTypes());
+		tournament.setDescription("abc");
+		tournament.setExhibitionTypes(exhibitionTypes());
+		tournament.setFeeOrganizingCommiteePay(100000);
+		tournament.setFeePlayerPay(100000);
+		tournament.setId(1);
+		tournament.setMaxQuantityComitee(10);
+		tournament.setName("FNC");
+		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
+		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
+		tournament.setSemester("Summer2022");
+		tournament.setStatus(1);
+		tournament.setTournamentPlayers(tournamentPlayers());
+		return tournament;
+	}
+	
+	private Set<CompetitiveType> competitiveTypes() {
+		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();
+		CompetitiveType competitiveType = new CompetitiveType();
+		competitiveType.setId(1);
+		competitiveType.setGender(true);
+		competitiveType.setWeightMax(60);
+		competitiveType.setWeightMin(57);
+		competitiveTypes.add(competitiveType);
+		return competitiveTypes;
+	}
+
+	private Set<ExhibitionType> exhibitionTypes() {
+		Set<ExhibitionType> exhibitionTypes = new HashSet<ExhibitionType>();
+		ExhibitionType exhibitionType = new ExhibitionType();
+		exhibitionType.setExhibitionTeams(exhibitionTeams());
+		exhibitionType.setId(1);
+		exhibitionType.setName("Long ho quyen");
+		exhibitionType.setNumberFemale(0);
+		exhibitionType.setNumberMale(1);
+		exhibitionTypes.add(exhibitionType);
+		return exhibitionTypes;
+	}
+
+	private Set<ExhibitionTeam> exhibitionTeams() {
+		Set<ExhibitionTeam> exhibitionTeams = new HashSet<ExhibitionTeam>();
+		ExhibitionTeam exhibitionTeam = new ExhibitionTeam();
+		exhibitionTeam.setExhibitionPlayers(exhibitionPlayers());
+		exhibitionTeam.setId(1);
+		exhibitionTeam.setTeamName("Team 1");
+		exhibitionTeams.add(exhibitionTeam);
+		return exhibitionTeams;
+	}
+
+	private Set<ExhibitionPlayer> exhibitionPlayers() {
+		Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
+		ExhibitionPlayer exhibitionPlayer = new ExhibitionPlayer();
+		exhibitionPlayer.setId(1);
+		exhibitionPlayer.setRoleInTeam(true);
+		exhibitionPlayer.setTournamentPlayer(tournamentPlayer());
+		exhibitionPlayers.add(exhibitionPlayer);
+		return exhibitionPlayers;
+	}
+
+	private TournamentPlayer tournamentPlayer() {
+		TournamentPlayer tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setId(1);
+		tournamentPlayer.setPaymentStatus(true);
+		tournamentPlayer.setUser(user());
+		return tournamentPlayer;
+	}
+
+	private Set<TournamentPlayer> tournamentPlayers() {
+		Set<TournamentPlayer> tournamentPlayers = new HashSet<TournamentPlayer>();
+		TournamentPlayer tournamentPlayer = new TournamentPlayer();
+		tournamentPlayer.setId(1);
+		tournamentPlayer.setPaymentStatus(true);
+		tournamentPlayer.setUser(user());
+		tournamentPlayers.add(tournamentPlayer);
+		return tournamentPlayers;
+	}
+	
+	private TournamentOrganizingCommittee tournamentOrganizingCommittee() {
+		TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
+		tournamentOrganizingCommittee.setId(1);
+		tournamentOrganizingCommittee.setPaymentStatus(false);
+		tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+		RoleEvent roleEvent = new RoleEvent();
+		roleEvent.setId(1);
+		roleEvent.setName("Ban truyen thong");
+		tournamentOrganizingCommittee.setRoleEvent(roleEvent);
+		tournamentOrganizingCommittee.setTournament(tournament());
+		tournamentOrganizingCommittee.setUser(user());
+		tournamentOrganizingCommittee.setCreatedBy("toandv");
+		tournamentOrganizingCommittee.setCreatedOn(LocalDateTime.now());
+		tournamentOrganizingCommittee.setUpdatedBy("toandv");
+		tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
+		return tournamentOrganizingCommittee;
+	}
+	
 	@Test
 	public void getAllNotificationByStudentIdCaseSuccess() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
@@ -242,9 +323,9 @@ public class NotificationServiceTest {
 		ResponseMessage responseMessage = notificationService.sendNotificationToAnUser(user(), notification());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
-	public void checkPaymentStatusCaseSuccess() {
+	public void checkPaymentStatusCaseMemberShipHasNotPaid() {
 		ResponseMessage currentSemeseter = new ResponseMessage();
 		currentSemeseter.setData(Arrays.asList(semester()));
 		
@@ -252,7 +333,295 @@ public class NotificationServiceTest {
 		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
 		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(Optional.of(membershipInfo()));
 		when(membershipStatusRepository.findByMemberShipInfoIdAndUserId(anyInt(), anyInt())).thenReturn(Optional.of(membershipStatus()));
-		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
-		when(tournamentOrganizingCommitteeRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(null));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 1);
 	}
+	
+	@Test
+	public void checkPaymentStatusCaseMemberShipHasPaid() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		MembershipStatus membershipStatus = membershipStatus();
+		membershipStatus.setStatus(true);
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(Optional.of(membershipInfo()));
+		when(membershipStatusRepository.findByMemberShipInfoIdAndUserId(anyInt(), anyInt())).thenReturn(Optional.of(membershipStatus));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseMemberShipInfoEmpty() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		MembershipStatus membershipStatus = membershipStatus();
+		membershipStatus.setStatus(true);
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(Optional.empty());
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseSuccessHaveNotPaidBeforeEventClose() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseSuccessHavePaidBeforeEventClose() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		MemberEvent memberEvent = memberEvent();
+		memberEvent.setPaymentValue(50000);;
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseNoFeeEvent() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		MemberEvent memberEvent = memberEvent();
+		memberEvent.getEvent().setAmountPerRegisterEstimated(0);
+		memberEvent.getEvent().setTotalAmountEstimated(0);
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseHaveNotPaidEventClosed() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		MemberEvent memberEvent = memberEvent();
+		memberEvent.getEvent().setAmountPerRegisterActual(100000);
+		memberEvent.getEvent().setTotalAmountActual(200000);
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseHaveNotPaidEnoughEventClosed() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		MemberEvent memberEvent = memberEvent();
+		memberEvent.getEvent().setAmountPerRegisterActual(100000);
+		memberEvent.getEvent().setTotalAmountActual(200000);
+		memberEvent.setPaidBeforeClosing(true);
+		memberEvent.setPaymentValue(50000);
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseHaveNoPaidMoreEventClosed() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		MemberEvent memberEvent = memberEvent();
+		memberEvent.getEvent().setAmountPerRegisterActual(50000);
+		memberEvent.getEvent().setTotalAmountActual(100000);
+		memberEvent.setPaidBeforeClosing(true);
+		memberEvent.setPaymentValue(50000);
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseException1() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		MemberEvent memberEvent = memberEvent();
+		memberEvent.getEvent().setAmountPerRegisterActual(100000);
+		memberEvent.getEvent().setTotalAmountActual(200000);
+		memberEvent.setPaidBeforeClosing(true);
+		memberEvent.setPaymentValue(45000);
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseSuccessCaseHaveNotPaidOrganizingCommitteeTournament() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(tournamentOrganizingCommitteeRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
+		when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament()));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseSuccessCaseHavePaidOrganizingCommitteeTournament() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommittee();
+		tournamentOrganizingCommittee.setPaymentStatus(true);
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(tournamentOrganizingCommitteeRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(tournamentOrganizingCommittee));
+		when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament()));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseSuccessCaseHavePaidTournamentPlayer() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament()));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseSuccessCaseHaveNotPaidTournamentPlayer() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		Tournament tournament = tournament();
+		for (TournamentPlayer tournamentPlayer : tournament.getTournamentPlayers()) {
+			tournamentPlayer.setPaymentStatus(false);
+		}
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseSuccessCaseNotJoinTournamentPlayer() {
+		ResponseMessage currentSemeseter = new ResponseMessage();
+		currentSemeseter.setData(Arrays.asList(semester()));
+		
+		Tournament tournament = tournament();
+		for (TournamentPlayer tournamentPlayer : tournament.getTournamentPlayers()) {
+			tournamentPlayer.getUser().setStudentId("HE140000");
+		}
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(semesterService.getCurrentSemester()).thenReturn(currentSemeseter);
+		when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament));
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void checkPaymentStatusCaseSuccessCaseException2() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(null);
+		
+		ResponseMessage responseMessage = notificationService.checkPaymentStatus("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void markNotificationAsReadCaseSuccess() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(notificationToUserRepository.findByUserIdAndNotificationId(anyInt(), anyInt())).thenReturn(Optional.of(notificationToUser()));
+		
+		ResponseMessage responseMessage = notificationService.markNotificationAsRead(1, "HE140855");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void markNotificationAsReadCaseNotificationEmpty() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(notificationToUserRepository.findByUserIdAndNotificationId(anyInt(), anyInt())).thenReturn(Optional.empty());
+		
+		ResponseMessage responseMessage = notificationService.markNotificationAsRead(1, "HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void markNotificationAsReadCaseException() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(null);
+		
+		ResponseMessage responseMessage = notificationService.markNotificationAsRead(1, "HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void markAllNotificationAsReadCaseSuccess() {
+		NotificationToUser notificationToUser = notificationToUser();
+		notificationToUser.setRead(false);
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(notificationToUserRepository.findAllUnreadNotificationByUser(anyInt())).thenReturn(Arrays.asList(notificationToUser));
+		
+		ResponseMessage responseMessage = notificationService.markAllNotificationAsRead("HE140855");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void markAllNotificationAsReadCaseException() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(null);
+		
+		ResponseMessage responseMessage = notificationService.markAllNotificationAsRead("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
 }
