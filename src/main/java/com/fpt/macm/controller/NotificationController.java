@@ -19,25 +19,30 @@ public class NotificationController {
 
 	@Autowired
 	NotificationService notificationService;
-	
+
 	@GetMapping("/getallnotificationbystudentid/{studentId}")
-	ResponseEntity<ResponseMessage> getAllNotificationByStudentId(@PathVariable(name = "studentId") String studentId,@RequestParam(defaultValue = "0") int pageNo,
-			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy){
-		return new ResponseEntity<ResponseMessage>(notificationService.getAllNotificationByStudentId(studentId, pageNo, pageSize, sortBy), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllNotificationByStudentId(@PathVariable(name = "studentId") String studentId,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(
+				notificationService.getAllNotificationByStudentId(studentId, pageNo, pageSize, sortBy), HttpStatus.OK);
 	}
 
 	@GetMapping("/checkpaymentstatus/{studentId}")
-	ResponseEntity<ResponseMessage> checkPaymentStatus(@PathVariable(name = "studentId") String studentId){
+	ResponseEntity<ResponseMessage> checkPaymentStatus(@PathVariable(name = "studentId") String studentId) {
 		return new ResponseEntity<ResponseMessage>(notificationService.checkPaymentStatus(studentId), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/marknotificationasread/{notificationId}/{studentId}")
-	ResponseEntity<ResponseMessage> markNotificationAsRead(@PathVariable(name = "notificationId") int notificationId, @PathVariable(name = "studentId") String studentId){
-		return new ResponseEntity<ResponseMessage>(notificationService.markNotificationAsRead(notificationId, studentId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> markNotificationAsRead(@PathVariable(name = "notificationId") int notificationId,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(
+				notificationService.markNotificationAsRead(notificationId, studentId), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/markallnotificationasread/{studentId}")
-	ResponseEntity<ResponseMessage> markAllNotificationAsRead(@PathVariable(name = "studentId") String studentId){
-		return new ResponseEntity<ResponseMessage>(notificationService.markAllNotificationAsRead(studentId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> markAllNotificationAsRead(@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(notificationService.markAllNotificationAsRead(studentId),
+				HttpStatus.OK);
 	}
 }

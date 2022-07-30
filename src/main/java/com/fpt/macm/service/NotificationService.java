@@ -1,5 +1,8 @@
 package com.fpt.macm.service;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import com.fpt.macm.model.entity.Notification;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
@@ -7,11 +10,14 @@ import com.fpt.macm.model.response.ResponseMessage;
 public interface NotificationService {
 
 	ResponseMessage getAllNotificationByStudentId(String studentId, int pageNo, int pageSize, String sortBy);
-	ResponseMessage createNotification(Notification notification);
-	void sendNotificationToAllUser(Notification notification);
-	void sendNotificationToAnUser(User user, Notification notification);
+	ResponseMessage sendNotificationToAllUser(Notification notification);
+	ResponseMessage sendNotificationToAnUser(User user, Notification notification);
 	ResponseMessage checkPaymentStatus(String studentId);
 	ResponseMessage markNotificationAsRead(int notificationId, String studentId);
 	ResponseMessage markAllNotificationAsRead(String studentId);
-	
+	ResponseMessage createTournamentNotification(int tournamentId, String tournamentName);
+	ResponseMessage createEventNotification(int eventId, String eventName);
+	ResponseMessage createTrainingSessionCreateNotification(LocalDate date);
+	ResponseMessage createTrainingSessionUpdateNotification(LocalDate date, LocalTime newStartTime, LocalTime newEndTime);
+	ResponseMessage createTrainingSessionDeleteNotification(LocalDate date);
 }

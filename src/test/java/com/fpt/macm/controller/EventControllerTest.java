@@ -296,7 +296,7 @@ public class EventControllerTest {
 		when(eventService.getEventsBySemesterAndStudentId(anyString(), anyString(), anyInt(), anyInt(), anyInt())).thenReturn(responseMessage);
 		
 		this.mockMvc
-		.perform(get("/api/event/geteventsbysemesterandstudentid/{studentId}", "1")
+		.perform(get("/api/event/geteventsbysemesterandstudentid/{studentId}", "HE140860")
 				.param("semester", "Summer2022")
 				.param("month", "0")
 				.param("pageNo", "0")
