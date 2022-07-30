@@ -24,7 +24,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,7 +40,6 @@ import com.fpt.macm.model.dto.UserDto;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
-import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.service.UserService;
 
 @SpringBootTest
@@ -49,8 +47,8 @@ public class UserControllerTest {
 	@MockBean
 	private UserService userService;
 
-	@Mock
-	private UserRepository userRepository;
+//	@Mock
+//	private UserRepository userRepository;
 
 	@Autowired
 	private WebApplicationContext context;
