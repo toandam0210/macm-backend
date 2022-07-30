@@ -12,6 +12,6 @@ import com.fpt.macm.model.entity.CompetitivePlayer;
 public interface CompetitivePlayerRepository extends JpaRepository<CompetitivePlayer, Integer>{
 	Optional<CompetitivePlayer> findByTournamentPlayerId(int tournamentPlayerId);
 	
-	@Query(value = "select * from competitive_player where tournament_player_id = ?1", nativeQuery = true)
+	@Query(value = "select * from competitive_player where player_id = ?1", nativeQuery = true)
 	Optional<CompetitivePlayer> findCompetitivePlayerByTournamentPlayerId(int tournamentPlayerId);
 }
