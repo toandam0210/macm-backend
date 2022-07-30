@@ -233,8 +233,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 		try {
 			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
 			Optional<TrainingSchedule> getTrainingSessionOp = trainingScheduleRepository.findByDate(getDate);
-			TrainingSchedule getTrainingSession = getTrainingSessionOp.get();
-			if(getTrainingSession != null) {
+			if(getTrainingSessionOp.isPresent()) {
+				TrainingSchedule getTrainingSession = getTrainingSessionOp.get();
 				responseMessage.setData(Arrays.asList(getTrainingSession));
 			}
 			else {
