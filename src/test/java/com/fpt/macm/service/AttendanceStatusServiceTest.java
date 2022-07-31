@@ -181,4 +181,34 @@ public class AttendanceStatusServiceTest {
 		assertEquals(responseMessage.getData().size(), 0);
 	}	
 
+	@Test
+	public void getAllAttendanceStatusByStudentIdAndSemesterCaseAttendanceStatusNotNull() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(semesterRepository.findByName(anyString())).thenReturn(Optional.of(semester()));
+		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
+		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(attendanceStatus());
+	
+		ResponseMessage responseMessage = attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester("HE140856", "Summer2022");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getAllAttendanceStatusByStudentIdAndSemesterCaseAttendanceStatusNull() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(semesterRepository.findByName(anyString())).thenReturn(Optional.of(semester()));
+		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
+		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(null);
+	
+		ResponseMessage responseMessage = attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester("HE140856", "Summer2022");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getAllAttendanceStatusByStudentIdAndSemesterCaseException() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(null);
+	
+		ResponseMessage responseMessage = attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester("HE140856", "Summer2022");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
 }

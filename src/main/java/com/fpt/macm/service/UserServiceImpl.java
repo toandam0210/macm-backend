@@ -208,6 +208,15 @@ public class UserServiceImpl implements UserService {
 					userRepository.save(user);
 					responseMessage.setData(Arrays.asList(user));
 					responseMessage.setMessage(Constant.MSG_005);
+					
+					Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+					Optional<AdminSemester> adminSemesterOp = adminSemesterRepository.findByUserId(user.getId(), semester.getName());
+					if (adminSemesterOp.isPresent()) {
+						AdminSemester adminSemester = adminSemesterOp.get();
+						adminSemester.setRole(roleOptional.get());
+						adminSemesterRepository.save(adminSemester);
+					}
+					
 				} else {
 					String messageError = "";
 					if (checkDuplicateStudentId) {

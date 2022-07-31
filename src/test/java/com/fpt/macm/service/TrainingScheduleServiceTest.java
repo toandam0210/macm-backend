@@ -2,6 +2,7 @@ package com.fpt.macm.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -9,6 +10,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.TrainingSchedule;
@@ -73,8 +76,18 @@ public class TrainingScheduleServiceTest {
 		commonSchedule.setDate(LocalDate.of(2022, 8, 29));
 		commonSchedule.setStartTime(LocalTime.of(8, 0));
 		commonSchedule.setFinishTime(LocalTime.of(9, 0));
-		commonSchedule.setType(1);
+		commonSchedule.setType(0);
 		return commonSchedule;
+	}
+	
+	private ScheduleDto scheduleDto() {
+		ScheduleDto scheduleDto = new ScheduleDto();
+		scheduleDto.setTitle("Lịch tập");
+		scheduleDto.setExisted(false);
+		scheduleDto.setDate(LocalDate.now());
+		scheduleDto.setStartTime(LocalTime.of(18, 0));
+		scheduleDto.setFinishTime(LocalTime.of(20, 0));
+		return scheduleDto;
 	}
 	
 	@Test
@@ -227,5 +240,122 @@ public class TrainingScheduleServiceTest {
 		ResponseMessage responseMessage = trainingScheduleService.getListTrainingSchedule();
 		assertEquals(responseMessage.getData().size(), 1);
 	}
+	
+	@Test
+	public void updateTrainingSessionTimeCaseScheduleInPast() {
+		ResponseMessage responseMessage = trainingScheduleService.updateTrainingSessionTime("01/01/2022", commonSchedule());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateTrainingSessionTimeCaseSuccess() {
+		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
+		when(trainingScheduleRepository.findByDate(any())).thenReturn(Optional.of(trainingSchedule()));
+		
+		ResponseMessage responseMessage = trainingScheduleService.updateTrainingSessionTime("30/08/2022", commonSchedule());
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void updateTrainingSessionTimeCaseTrainingScheduleNull() {
+		when(trainingScheduleRepository.findByDate(any())).thenReturn(null);
+		
+		ResponseMessage responseMessage = trainingScheduleService.updateTrainingSessionTime("30/08/2022", commonSchedule());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateTrainingSessionTimeCaseTrainingScheduleEmpty() {
+		when(trainingScheduleRepository.findByDate(any())).thenReturn(Optional.empty());
+		
+		ResponseMessage responseMessage = trainingScheduleService.updateTrainingSessionTime("30/08/2022", commonSchedule());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateTrainingSessionTimeCaseException() {
+		ResponseMessage responseMessage = trainingScheduleService.updateTrainingSessionTime(LocalDate.now().toString(), commonSchedule());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void deleteTrainingSessionCaseScheduleInPast() {
+		ResponseMessage responseMessage = trainingScheduleService.deleteTrainingSession("01/01/2022");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void deleteTrainingSessionCaseSuccess() {
+		when(trainingScheduleRepository.findByDate(any())).thenReturn(Optional.of(trainingSchedule()));
+		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
+		
+		ResponseMessage responseMessage = trainingScheduleService.deleteTrainingSession("30/08/2022");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
 
+	@Test
+	public void deleteTrainingSessionCaseException() {
+		ResponseMessage responseMessage = trainingScheduleService.deleteTrainingSession("01-01-2022");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getTrainingSessionByDateCaseSuccess() {
+		when(trainingScheduleRepository.findByDate(any())).thenReturn(Optional.of(trainingSchedule()));
+		
+		ResponseMessage responseMessage = trainingScheduleService.getTrainingSessionByDate("01/01/2022");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getTrainingSessionByDateCaseScheduleEmpty() {
+		when(trainingScheduleRepository.findByDate(any())).thenReturn(Optional.empty());
+		
+		ResponseMessage responseMessage = trainingScheduleService.getTrainingSessionByDate("01/01/2022");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getTrainingSessionByDateCaseScheduleException() {
+		ResponseMessage responseMessage = trainingScheduleService.getTrainingSessionByDate("01-01-2022");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createTrainingScheduleCaseSuccess() {
+		ResponseMessage responseMessage = trainingScheduleService.createTrainingSchedule(Arrays.asList(scheduleDto()));
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void createTrainingScheduleCaseScheduleExisted() {
+		ScheduleDto scheduleDto = scheduleDto();
+		scheduleDto.setExisted(true);
+		
+		ResponseMessage responseMessage = trainingScheduleService.createTrainingSchedule(Arrays.asList(scheduleDto));
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createTrainingScheduleCaseException() {
+		ResponseMessage responseMessage = trainingScheduleService.createTrainingSchedule(null);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getTraningScheduleBySemesterCaseSuccess() {
+		when(semesterRepository.findById(anyInt())).thenReturn(Optional.of(semester()));
+		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
+	
+		ResponseMessage responseMessage = trainingScheduleService.getTraningScheduleBySemester(1);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getTraningScheduleBySemesterCaseException() {
+		when(semesterRepository.findById(anyInt())).thenReturn(null);
+	
+		ResponseMessage responseMessage = trainingScheduleService.getTraningScheduleBySemester(1);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
 }
