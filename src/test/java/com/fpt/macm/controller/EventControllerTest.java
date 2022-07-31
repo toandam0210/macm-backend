@@ -219,8 +219,7 @@ public class EventControllerTest {
 				.param("finishDate", LocalDate.of(2022, 10, 31).toString())
 				.param("pageNo", "0")
 				.param("pageSize", "1000"))
-		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value(1));
+		.andExpect(status().isBadRequest());
 	}
 	
 	@Test
