@@ -120,25 +120,8 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	@Override
-	public ResponseMessage createNotification(Notification notification) {
-		// TODO Auto-generated method stub
+	public ResponseMessage sendNotificationToAllUser(Notification notification) {
 		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			notification.setCreatedOn(LocalDateTime.now());
-
-			notificationRepository.save(notification);
-			responseMessage.setData(Arrays.asList(notification));
-			responseMessage.setMessage(Constant.MSG_017);
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
-	public void sendNotificationToAllUser(Notification notification) {
-		// TODO Auto-generated method stub
 		try {
 			List<User> users = (List<User>) userRepository.findAll();
 
@@ -156,14 +139,18 @@ public class NotificationServiceImpl implements NotificationService {
 
 				notificationToUserRepository.save(notificationToUser);
 			}
+			
+			responseMessage.setData(notificationToUsers);
+			responseMessage.setMessage("Gửi thông báo đến tất cả người dùng thành công");
 		} catch (Exception e) {
-			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
 		}
+		return responseMessage;
 	}
 
 	@Override
-	public void sendNotificationToAnUser(User user, Notification notification) {
-		// TODO Auto-generated method stub
+	public ResponseMessage sendNotificationToAnUser(User user, Notification notification) {
+		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			NotificationToUser notificationToUser = new NotificationToUser();
 
@@ -172,12 +159,18 @@ public class NotificationServiceImpl implements NotificationService {
 			notificationToUser.setRead(false);
 			notificationToUser.setCreatedOn(LocalDateTime.now());
 			notificationToUserRepository.save(notificationToUser);
+			
+			responseMessage.setData(Arrays.asList(notificationToUser));
+			responseMessage.setMessage("Gửi thông báo đến người dùng thành công");
 		} catch (Exception e) {
-			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
 		}
+		return responseMessage;
 	}
 
-	public void createTournamentNotification(int tournamentId, String tournamentName) {
+	@Override
+	public ResponseMessage createTournamentNotification(int tournamentId, String tournamentName) {
+		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Notification notification = new Notification();
 			notification.setMessage("Sắp tới có giải đấu " + tournamentName + ".");
@@ -191,13 +184,18 @@ public class NotificationServiceImpl implements NotificationService {
 			Notification newNotification = notifications.get(0);
 			
 			sendNotificationToAllUser(newNotification);
+			
+			responseMessage.setData(Arrays.asList(notification));
+			responseMessage.setMessage("Tạo thông báo cho giải đấu thành công");
 		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println(e.getMessage());
+			responseMessage.setMessage(e.getMessage());
 		}
+		return responseMessage;
 	}
 
-	public void createEventNotification(int eventId, String eventName) {
+	@Override
+	public ResponseMessage createEventNotification(int eventId, String eventName) {
+		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Notification notification = new Notification();
 			notification.setMessage("Sắp tới có sự kiện " + eventName + ".");
@@ -211,56 +209,89 @@ public class NotificationServiceImpl implements NotificationService {
 			Notification newNotification = notifications.get(0);
 			
 			sendNotificationToAllUser(newNotification);
+			
+			responseMessage.setData(Arrays.asList(notification));
+			responseMessage.setMessage("Tạo thông báo cho sự kiện thành công");
 		} catch (Exception e) {
-			// TODO: handle exception
-			System.out.println(e.getMessage());
+			responseMessage.setMessage(e.getMessage());
 		}
+		return responseMessage;
 	}
 
-	public void createTrainingSessionCreateNotification(LocalDate date) {
-		Notification notification = new Notification();
-		notification.setMessage("Thông báo, có buổi tập mới vào ngày " + date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear() + ".");
-		notification.setNotificationType(2);
-		notification.setNotificationTypeId(0);
-		notification.setCreatedOn(LocalDateTime.now());
-		notificationRepository.save(notification);
-		
-		Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
-		List<Notification> notifications = IterableUtils.toList(notificationIterable);
-		Notification newNotification = notifications.get(0);
-		
-		sendNotificationToAllUser(newNotification);
+	@Override
+	public ResponseMessage createTrainingSessionCreateNotification(LocalDate date) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Notification notification = new Notification();
+			notification.setMessage("Thông báo, có buổi tập mới vào ngày " + date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear() + ".");
+			notification.setNotificationType(2);
+			notification.setNotificationTypeId(0);
+			notification.setCreatedOn(LocalDateTime.now());
+			notificationRepository.save(notification);
+			
+			Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+			List<Notification> notifications = IterableUtils.toList(notificationIterable);
+			Notification newNotification = notifications.get(0);
+			
+			sendNotificationToAllUser(newNotification);
+			
+			responseMessage.setData(Arrays.asList(notification));
+			responseMessage.setMessage("Tạo thông báo cho lịch tập thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 
-	public void createTrainingSessionUpdateNotification(LocalDate date, LocalTime newStartTime, LocalTime newEndTime) {
-		Notification notification = new Notification();
-		notification.setMessage(
-				"Buổi tập ngày " + date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear() + " thay đổi thời gian tập thành: " + newStartTime + " - " + newEndTime + ".");
-		notification.setNotificationType(2);
-		notification.setNotificationTypeId(0);
-		notification.setCreatedOn(LocalDateTime.now());
-		notificationRepository.save(notification);
-		
-		Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
-		List<Notification> notifications = IterableUtils.toList(notificationIterable);
-		Notification newNotification = notifications.get(0);
-		
-		sendNotificationToAllUser(newNotification);
+	@Override
+	public ResponseMessage createTrainingSessionUpdateNotification(LocalDate date, LocalTime newStartTime, LocalTime newEndTime) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Notification notification = new Notification();
+			notification.setMessage(
+					"Buổi tập ngày " + date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear() + " thay đổi thời gian tập thành: " + newStartTime + " - " + newEndTime + ".");
+			notification.setNotificationType(2);
+			notification.setNotificationTypeId(0);
+			notification.setCreatedOn(LocalDateTime.now());
+			notificationRepository.save(notification);
+			
+			Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+			List<Notification> notifications = IterableUtils.toList(notificationIterable);
+			Notification newNotification = notifications.get(0);
+			
+			sendNotificationToAllUser(newNotification);
+			
+			responseMessage.setData(Arrays.asList(notification));
+			responseMessage.setMessage("Tạo thông báo cho lịch tập thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 
-	public void createTrainingSessionDeleteNotification(LocalDate date) {
-		Notification notification = new Notification();
-		notification.setMessage("Thông báo, nghỉ tập ngày " + date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear() + ".");
-		notification.setNotificationType(2);
-		notification.setNotificationTypeId(0);
-		notification.setCreatedOn(LocalDateTime.now());
-		notificationRepository.save(notification);
-		
-		Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
-		List<Notification> notifications = IterableUtils.toList(notificationIterable);
-		Notification newNotification = notifications.get(0);
-		
-		sendNotificationToAllUser(newNotification);
+	@Override
+	public ResponseMessage createTrainingSessionDeleteNotification(LocalDate date) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Notification notification = new Notification();
+			notification.setMessage("Thông báo, nghỉ tập ngày " + date.getDayOfMonth() + "/" + date.getMonthValue() + "/" + date.getYear() + ".");
+			notification.setNotificationType(2);
+			notification.setNotificationTypeId(0);
+			notification.setCreatedOn(LocalDateTime.now());
+			notificationRepository.save(notification);
+			
+			Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+			List<Notification> notifications = IterableUtils.toList(notificationIterable);
+			Notification newNotification = notifications.get(0);
+			
+			sendNotificationToAllUser(newNotification);
+			
+			responseMessage.setData(Arrays.asList(notification));
+			responseMessage.setMessage("Tạo thông báo cho lịch tập thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 
 	@Override

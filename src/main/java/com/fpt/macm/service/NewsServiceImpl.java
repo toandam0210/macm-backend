@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.entity.News;
-import com.fpt.macm.model.entity.Notification;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.NewsRepository;
 
@@ -38,13 +37,13 @@ public class NewsServiceImpl implements NewsService{
 			news.setCreatedOn(LocalDateTime.now());
 			newsRepository.save(news);
 			
-			if(isSendNotification) {
-				Notification notification = new Notification();
-				notification.setMessage(news.getTitle());
-				
-				notificationService.createNotification(notification);
-				notificationService.sendNotificationToAllUser(notification);
-			}
+//			if(isSendNotification) {
+//				Notification notification = new Notification();
+//				notification.setMessage(news.getTitle());
+//				
+//				notificationService.createNotification(notification);
+//				notificationService.sendNotificationToAllUser(notification);
+//			}
 			
 			responseMessage.setData(Arrays.asList(news));
 			responseMessage.setMessage(Constant.MSG_012);

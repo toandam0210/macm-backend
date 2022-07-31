@@ -54,7 +54,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 	SemesterService semesterService;
 	
 	@Autowired
-	NotificationServiceImpl notificationServiceImpl;
+	NotificationService notificationService;
 	
 	@Override
 	public ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime) {
@@ -198,7 +198,7 @@ public class EventScheduleServiceImpl implements EventScheduleService{
 					responseMessage.setData(listEventSchedule);
 					responseMessage.setMessage(Constant.MSG_066);
 					
-					notificationServiceImpl.createEventNotification(eventId, event.getName());
+					notificationService.createEventNotification(eventId, event.getName());
 				}
 			}
 		} catch (Exception e) {

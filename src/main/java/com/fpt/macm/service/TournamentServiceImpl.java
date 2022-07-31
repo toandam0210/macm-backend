@@ -1116,7 +1116,7 @@ public class TournamentServiceImpl implements TournamentService {
 				CompetitiveType competitiveType = new CompetitiveType();
 				if (competitveTypeOp.isPresent()) {
 					competitiveType = competitveTypeOp.get();
-					if (user.isGender() == competitiveType.isGender()){
+					if (user.isGender() != competitiveType.isGender()){
 						responseMessage.setMessage("Giới tính của bạn không phù hợp cho hạng cân này");
 						return responseMessage;
 					}
@@ -1135,10 +1135,11 @@ public class TournamentServiceImpl implements TournamentService {
 
 				if (!tournamentPlayerOp.isPresent()) {
 					createTournamentPlayer(tournament, user);
+					tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(user.getId(),
+							tournament.getId());
 				}
 
-				TournamentPlayer tournamentPlayer = tournamentPlayerRepository
-						.getPlayerByUserIdAndTournamentId(user.getId(), tournament.getId()).get();
+				TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
 				Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository
 						.findByTournamentPlayerId(tournamentPlayer.getId());
 				if (!competitivePlayerOp.isPresent()) {
@@ -1154,7 +1155,7 @@ public class TournamentServiceImpl implements TournamentService {
 					responseMessage.setMessage("Đăng ký thành công");
 
 					CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository
-							.findByTournamentPlayerId(tournamentPlayer.getId()).get();
+							.findCompetitivePlayerByTournamentPlayerId(tournamentPlayer.getId()).get();
 					CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
 					newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
 					newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);

@@ -1,19 +1,23 @@
 package com.fpt.macm.controller;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +25,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -34,9 +39,15 @@ import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentSchedule;
+import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.service.TournamentScheduleService;
 
 @SpringBootTest
 public class TournamentScheduleControllerTest {
+	
+	@MockBean
+	TournamentScheduleService tournamentScheduleService;
+	
 	@Autowired
 	private WebApplicationContext context;
 
@@ -50,222 +61,9 @@ public class TournamentScheduleControllerTest {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.context).build();
 	}
 	
-	@Test
-	public void createTournamentSchedulePreviewSuccessTest() throws Exception {
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/createpreview").param("tournamentName", "Giải đấu cho thành viên FNC Summer2022")
-		.param("startDate", "01/08/2022").param("finishDate", "01/08/2022").param("startTime", "18:00:00").param("finishTime", "20:00:00"))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
-	
-	@Test
-	public void createTournamentSchedulePreviewFailTest() throws Exception {
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/createpreview").param("tournamentName", "Giải đấu cho thành viên FNC Summer2022")
-		.param("startDate", "02/08/2022").param("finishDate", "01/08/2022").param("startTime", "18:00:00").param("finishTime", "20:00:00"))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("0"));
-	}
-	
-	@Test
-	public void createTournamentSchedulePreviewFailTest1() throws Exception {
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/createpreview").param("tournamentName", "Giải đấu cho thành viên FNC Summer2022")
-		.param("startDate", "01/08/2022").param("finishDate", "01/08/2022").param("startTime", "18:00:00").param("finishTime", "15:00:00"))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("0"));
-	}
-	@Test
-	public void createTournamentSchedulePreviewFailTest2() throws Exception {
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/createpreview").param("tournamentName", "Giải đấu cho thành viên FNC Summer2022")
-		.param("startDate", "05/06/2022").param("finishDate", "01/08/2022").param("startTime", "18:00:00").param("finishTime", "20:00:00"))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("0"));
-	}
-	@Test
-	public void createTournamentSchedulePreviewFailTest3() throws Exception {
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/createpreview").param("tournamentName", "Giải đấu cho thành viên FNC Summer2022")
-		.param("startDate", "10/10/2022").param("finishDate", "10/10/2022").param("startTime", "18:00:00").param("finishTime", "20:00:00"))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("0"));
-	}
-	
-	@Test
-	public void createTournamentSchedulePreviewFailTest4() throws Exception {
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/createpreview").param("tournamentName", "Giải đấu cho thành viên FNC Summer2022")
-		.param("startDate", "05/07/2022").param("finishDate", "05/07/2022").param("startTime", "18:00:00").param("finishTime", "20:00:00"))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("0"));
-	}
-	
-	@Test
-	public void createTournamentScheduleSuccessTest() throws Exception {
-		List<ScheduleDto> scheduleDtos = new ArrayList<>();
-		ScheduleDto scheduleDto = new ScheduleDto();
-		String localDate = "2022-08-03";
-		LocalDate date = LocalDate.parse(localDate);
-		scheduleDto.setDate(date);
-		scheduleDto.setStartTime(LocalTime.parse("18:00:01"));
-		scheduleDto.setFinishTime(LocalTime.parse("20:00:01"));
-		scheduleDto.setExisted(false);
-		scheduleDto.setTitle("Giải đấu FNC Summer2022 update");
-		scheduleDtos.add(scheduleDto);
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/addnewschedule/{tournamentId}", 3).param("isOverwritten", "false").content(asJsonString(Arrays.asList(scheduleDto))).contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
-	
-	@Test
-	public void createTournamentScheduleSuccessTest1() throws Exception {
-		List<ScheduleDto> scheduleDtos = new ArrayList<>();
-		ScheduleDto scheduleDto = new ScheduleDto();
-		String localDate = "2022-08-28";
-		LocalDate date = LocalDate.parse(localDate);
-		scheduleDto.setDate(date);
-		scheduleDto.setStartTime(LocalTime.parse("18:00:01"));
-		scheduleDto.setFinishTime(LocalTime.parse("20:00:01"));
-		scheduleDto.setExisted(true);
-		scheduleDto.setTitle("Trùng với Lịch tập");
-		scheduleDtos.add(scheduleDto);
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/addnewschedule/{tournamentId}", 3).param("isOverwritten", "true").content(asJsonString(Arrays.asList(scheduleDto))).contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
-	
-	@Test
-	public void createTournamentScheduleSuccessTest2() throws Exception {
-		List<ScheduleDto> scheduleDtos = new ArrayList<>();
-		ScheduleDto scheduleDto = new ScheduleDto();
-		String localDate = "2022-07-05";
-		LocalDate date = LocalDate.parse(localDate);
-		scheduleDto.setDate(date);
-		scheduleDto.setStartTime(LocalTime.parse("18:00:01"));
-		scheduleDto.setFinishTime(LocalTime.parse("20:00:01"));
-		scheduleDto.setExisted(true);
-		scheduleDto.setTitle("Trùng với Giải đấu FNC mở rộng");
-		scheduleDtos.add(scheduleDto);
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/addnewschedule/{tournamentId}", 3).param("isOverwritten", "false").content(asJsonString(Arrays.asList(scheduleDto))).contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("0"));
-	}
-	
-	@Test
-	public void createTournamentScheduleSessionSuccessTest() throws Exception {
-		Tournament tournament = tournament();
-		TournamentSchedule tournamentSchedule = new TournamentSchedule();
-		String localDate = "2022-08-04";
-		LocalDate date = LocalDate.parse(localDate);
-		tournamentSchedule.setDate(date);
-		tournamentSchedule.setStartTime(LocalTime.parse("18:00:01"));
-		tournamentSchedule.setFinishTime(LocalTime.parse("20:00:01"));
-		tournamentSchedule.setTournament(tournament);
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/tournamentschedule/create/{tournamentId}", 3).param("isOverwritten", "false").content(asJsonString(tournamentSchedule)).contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
-	
-	@Test
-	public void createTournamentScheduleSessionFailTest() throws Exception {
-		Tournament tournament = tournament();
-		TournamentSchedule tournamentSchedule = new TournamentSchedule();
-		String localDate = "2022-06-02";
-		LocalDate date = LocalDate.parse(localDate);
-		tournamentSchedule.setDate(date);
-		tournamentSchedule.setStartTime(LocalTime.parse("18:00:01"));
-		tournamentSchedule.setFinishTime(LocalTime.parse("20:00:01"));
-		tournamentSchedule.setTournament(tournament);
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/tournamentschedule/create/{tournamentId}", 3).param("isOverwritten", "false").content(asJsonString(tournamentSchedule)).contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("0"));
-	}
-	
-	@Test
-	public void createTournamentScheduleSessionFailTest1() throws Exception {
-		Tournament tournament = tournament();
-		TournamentSchedule tournamentSchedule = new TournamentSchedule();
-		String localDate = "2022-08-28";
-		LocalDate date = LocalDate.parse(localDate);
-		tournamentSchedule.setDate(date);
-		tournamentSchedule.setStartTime(LocalTime.parse("18:00:01"));
-		tournamentSchedule.setFinishTime(LocalTime.parse("20:00:01"));
-		tournamentSchedule.setTournament(tournament);
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/tournamentschedule/create/{tournamentId}", 3).param("isOverwritten", "false").content(asJsonString(tournamentSchedule)).contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("0"));
-	}
-	
-	@Test
-	public void updateTournamentScheduleSessionSuccessTest1() throws Exception {
-		Tournament tournament = tournament();
-		TournamentSchedule tournamentSchedule = new TournamentSchedule();
-		String localDate = "2022-08-01";
-		LocalDate date = LocalDate.parse(localDate);
-		tournamentSchedule.setDate(date);
-		tournamentSchedule.setStartTime(LocalTime.parse("18:30:01"));
-		tournamentSchedule.setFinishTime(LocalTime.parse("20:30:01"));
-		tournamentSchedule.setTournament(tournament);
-		this.mockMvc.perform(put("/api/tournamentschedule/headclub/tournamentschedule/update/{tournamentSessionId}", 19).content(asJsonString(tournamentSchedule)).contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
-	
-	@Test
-	public void deleteTournamentScheduleSessionSuccessTest() throws Exception {
-		this.mockMvc.perform(delete("/api/tournamentschedule/headclub/tournamentschedule/delete/{tournamentSessionId}", 34))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
-	
-	@Test
-	public void getTournamentScheduleSessionSuccessTest() throws Exception {
-		this.mockMvc.perform(get("/api/tournamentschedule/headclub/tournamentschedule/{tournamentId}", 3))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
-	
-	
-	public static String asJsonString(final Object obj) {
-	    try {
-	    	ObjectMapper mapper = JsonMapper.builder()
-	    			   .addModule(new JavaTimeModule())
-	    			   .build();
-	    	String result = mapper.writeValueAsString(obj);
-
-	      return result;
-	    } catch (Exception e) {
-	      throw new RuntimeException(e);
-	    }
-	  }
-	public Tournament tournament() {
+	private Tournament tournament() {
 		Tournament tournament = new Tournament();
+		tournament.setId(1);
 		tournament.setName("Giải đấu FNC Summer2022");
 		tournament.setDescription("Giải đấu cho thành viên FNC Summer2022");
 		tournament.setMaxQuantityComitee(10);
@@ -289,4 +87,127 @@ public class TournamentScheduleControllerTest {
 		tournament.setFeePlayerPay(20000);
 		return tournament;
 	}
+	
+	private ScheduleDto scheduleDto() {
+		ScheduleDto scheduleDto = new ScheduleDto();
+		scheduleDto.setDate(LocalDate.now().plusMonths(1));
+		scheduleDto.setStartTime(LocalTime.of(18, 0));
+		scheduleDto.setFinishTime(LocalTime.of(20, 0));
+		scheduleDto.setExisted(false);
+		scheduleDto.setTitle("Giải đấu FNC Summer2022 update");
+		return scheduleDto;
+	}
+	
+	private TournamentSchedule tournamentSchedule() {
+		TournamentSchedule tournamentSchedule = new TournamentSchedule();
+		tournamentSchedule.setId(1);
+		tournamentSchedule.setDate(LocalDate.now().plusMonths(1));
+		tournamentSchedule.setStartTime(LocalTime.of(18, 0));
+		tournamentSchedule.setFinishTime(LocalTime.of(20, 0));
+		tournamentSchedule.setTournament(tournament());
+		return tournamentSchedule;
+	}
+	
+	@Test
+	public void createTournamentSchedulePreviewSuccessTest() throws Exception {
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(Arrays.asList(scheduleDto()));
+		
+		when(tournamentScheduleService.createPreviewTournamentSchedule(anyString(), anyString(), anyString(), anyString(), anyString())).thenReturn(responseMessage);
+		
+		this.mockMvc.perform(post("/api/tournamentschedule/headclub/createpreview")
+				.param("tournamentName", "Giải đấu cho thành viên FNC Summer2022")
+				.param("startDate", "01/08/2022")
+				.param("finishDate", "01/08/2022")
+				.param("startTime", "18:00:00")
+				.param("finishTime", "20:00:00"))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value("1"));
+	}
+	
+	@Test
+	public void createTournamentScheduleSuccessTest() throws Exception {
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(Arrays.asList(tournamentSchedule()));
+		
+		when(tournamentScheduleService.createTournamentSchedule(anyInt(), anyList(), anyBoolean())).thenReturn(responseMessage);
+		
+		this.mockMvc.perform(post("/api/tournamentschedule/headclub/addnewschedule/{tournamentId}", "1")
+				.param("isOverwritten", "false")
+				.content(asJsonString(Arrays.asList(scheduleDto()))).contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content()
+				.contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value("1"));
+	}
+	
+	@Test
+	public void createTournamentScheduleSessionSuccessTest() throws Exception {
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(Arrays.asList(tournamentSchedule()));
+		
+		when(tournamentScheduleService.createTournamentSession(anyInt(), any())).thenReturn(responseMessage);
+		
+		this.mockMvc.perform(post("/api/tournamentschedule/headclub/tournamentschedule/create/{tournamentId}", "1")
+				.param("isOverwritten", "false")
+				.content(asJsonString(tournamentSchedule())).contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value("1"));
+	}
+	
+	@Test
+	public void updateTournamentScheduleSessionSuccessTest() throws Exception {
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(Arrays.asList(tournamentSchedule()));
+		
+		when(tournamentScheduleService.updateTournamentSession(anyInt(), any())).thenReturn(responseMessage);
+		
+		this.mockMvc.perform(put("/api/tournamentschedule/headclub/tournamentschedule/update/{tournamentSessionId}", "1")
+				.content(asJsonString(tournamentSchedule())).contentType(MediaType.APPLICATION_JSON))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value("1"));
+	}
+	
+	@Test
+	public void deleteTournamentScheduleSessionSuccessTest() throws Exception {
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(Arrays.asList(tournamentSchedule()));
+		
+		when(tournamentScheduleService.deleteTournamentSession(anyInt())).thenReturn(responseMessage);
+		
+		this.mockMvc.perform(delete("/api/tournamentschedule/headclub/tournamentschedule/delete/{tournamentSessionId}", "1"))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value("1"));
+	}
+	
+	@Test
+	public void getTournamentScheduleSessionSuccessTest() throws Exception {
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(Arrays.asList(tournamentSchedule()));
+		
+		when(tournamentScheduleService.getListTournamentScheduleByTournament(anyInt())).thenReturn(responseMessage);
+		
+		this.mockMvc.perform(get("/api/tournamentschedule/headclub/tournamentschedule/{tournamentId}", "1"))
+		.andExpect(status().isOk())
+		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+		.andExpect(jsonPath("$.data.size()").value("1"));
+	}
+	
+	public static String asJsonString(final Object obj) {
+	    try {
+	    	ObjectMapper mapper = JsonMapper.builder()
+	    			   .addModule(new JavaTimeModule())
+	    			   .build();
+	    	String result = mapper.writeValueAsString(obj);
+
+	      return result;
+	    } catch (Exception e) {
+	      throw new RuntimeException(e);
+	    }
+	  }
+	
 }
