@@ -42,7 +42,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 	SemesterService semesterService;
 	
 	@Autowired
-	NotificationServiceImpl notificationServiceImpl;
+	NotificationService notificationService;
 	
 	@Override
 	public ResponseMessage createPreviewTrainingSchedule(String startDate, String finishDate, List<String> dayOfWeek, String startTime, String finishTime) {
@@ -131,7 +131,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 						commonSession.setType(0);
 						commonScheduleRepository.save(commonSession);
 						
-						notificationServiceImpl.createTrainingSessionCreateNotification(trainingSchedule.getDate());
+						notificationService.createTrainingSessionCreateNotification(trainingSchedule.getDate());
 					}
 					else {
 						responseMessage.setMessage(Constant.MSG_041);
@@ -185,7 +185,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					responseMessage.setData(Arrays.asList(getTrainingSession));
 					responseMessage.setMessage(Constant.MSG_042);
 					
-					notificationServiceImpl.createTrainingSessionUpdateNotification(getDate, updateCommonSession.getStartTime(), updateCommonSession.getFinishTime());
+					notificationService.createTrainingSessionUpdateNotification(getDate, updateCommonSession.getStartTime(), updateCommonSession.getFinishTime());
 				}
 			}
 			else {
@@ -213,7 +213,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 					responseMessage.setData(Arrays.asList(getTrainingSession));
 					responseMessage.setMessage(Constant.MSG_044);
 					
-					notificationServiceImpl.createTrainingSessionDeleteNotification(getDate);
+					notificationService.createTrainingSessionDeleteNotification(getDate);
 				}
 			}
 			else {
@@ -233,8 +233,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService{
 		try {
 			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
 			Optional<TrainingSchedule> getTrainingSessionOp = trainingScheduleRepository.findByDate(getDate);
-			TrainingSchedule getTrainingSession = getTrainingSessionOp.get();
-			if(getTrainingSession != null) {
+			if(getTrainingSessionOp.isPresent()) {
+				TrainingSchedule getTrainingSession = getTrainingSessionOp.get();
 				responseMessage.setData(Arrays.asList(getTrainingSession));
 			}
 			else {

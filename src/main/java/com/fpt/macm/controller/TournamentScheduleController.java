@@ -35,7 +35,7 @@ public class TournamentScheduleController {
 	@PostMapping("/headclub/addnewschedule/{tournamentId}")
 	ResponseEntity<ResponseMessage> createTournamentSchedule(@PathVariable(name = "tournamentId") int tournamentId, 
 			@RequestBody List<ScheduleDto> listPreview, @RequestParam boolean isOverwritten) {
-		return new ResponseEntity<ResponseMessage>(tournamentScheduleService.createTournamenttSchedule(tournamentId, listPreview, isOverwritten), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(tournamentScheduleService.createTournamentSchedule(tournamentId, listPreview, isOverwritten), HttpStatus.OK);
 	}
 	
 	@GetMapping("/headclub/tournamentschedule/{tournamentId}")
@@ -45,7 +45,7 @@ public class TournamentScheduleController {
 	
 	@PostMapping("/headclub/tournamentschedule/create/{tournamentId}")
 	ResponseEntity<ResponseMessage> createTournamentSession(@PathVariable(name = "tournamentId") int tournamentId,@RequestBody TournamentSchedule tournamentSchedule) {
-		return new ResponseEntity<ResponseMessage>(tournamentScheduleService.createTournamentSesstion(tournamentId,tournamentSchedule), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(tournamentScheduleService.createTournamentSession(tournamentId,tournamentSchedule), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headclub/tournamentschedule/update/{tournamentSessionId}")
