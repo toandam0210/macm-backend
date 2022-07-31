@@ -110,7 +110,7 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 	}
 
 	@Override
-	public ResponseMessage createTournamenttSchedule(int tournamentId, List<ScheduleDto> listPreview,
+	public ResponseMessage createTournamentSchedule(int tournamentId, List<ScheduleDto> listPreview,
 			Boolean isOverwritten) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -192,7 +192,7 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 	}
 
 	@Override
-	public ResponseMessage createTournamentSesstion(int tournamentId, TournamentSchedule tournamentSchedule) {
+	public ResponseMessage createTournamentSession(int tournamentId, TournamentSchedule tournamentSchedule) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			if(tournamentSchedule.getStartTime().compareTo(tournamentSchedule.getFinishTime()) >= 0) {
@@ -290,11 +290,10 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 		// TODO Auto-generated method stub
 		try {
 			Optional<TournamentSchedule> getTournamentSessionOp = tournamentScheduleRepository.findByDate(date);
-			TournamentSchedule getTournamentSession = getTournamentSessionOp.get();
-			if(getTournamentSession != null) {
+			if (getTournamentSessionOp.isPresent()) {
+				TournamentSchedule getTournamentSession = getTournamentSessionOp.get();
 				return getTournamentSession;
-			}
-			else {
+			} else {
 				return null;
 			}
 		} catch (Exception e) {
