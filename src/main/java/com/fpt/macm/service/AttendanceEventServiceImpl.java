@@ -25,9 +25,6 @@ import com.fpt.macm.repository.MemberEventRepository;
 public class AttendanceEventServiceImpl implements AttendanceEventService {
 
 	@Autowired
-	EventScheduleServiceImpl eventScheduleServiceImpl;
-
-	@Autowired
 	AttendanceEventRepository attendanceEventRepository;
 
 	@Autowired

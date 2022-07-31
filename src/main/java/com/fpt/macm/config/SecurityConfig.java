@@ -106,7 +106,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // Treasurer
                 .antMatchers("/api/admin/treasurer/**","/api/facility/treasurer/**","/api/event/treasurer/**","/api/tournament/treasurer/**","/api/admin/hr/getbystudentid/**","/api/admin/hr/updateuser/**","/api/admin/hr/users/search","/api/admin/hr/users/export","/api/admin/dashboard/**").hasAnyRole("Treasurer","HeadClub")
                 // HeadCulture
-                .antMatchers("/api/event/headculture/**","/api/eventschedule/headculture/**","/api/admin/hr/getbystudentid/**","/api/admin/hr/updateuser/**","/api/admin/hr/users/search","/api/admin/hr/users/export","/api/admin/dashboard/**").hasAnyRole("HeadCulture","ViceHeadCulture","HeadClub")
+                .antMatchers("/api/event/headculture/**","/api/eventschedule/headculture/**","/api/admin/hr/getbystudentid/**","/api/admin/hr/updateuser/**","/api/admin/hr/users/search","/api/admin/hr/users/export","/api/admin/dashboard/**").hasAnyRole("HeadCulture","HeadClub","ViceHeadCulture")
                 // HeadCommunication
                 .antMatchers("/api/contact/**","/api/news/**","/api/admin/hr/getbystudentid/**","/api/admin/hr/updateuser/**","/api/admin/hr/users/search","/api/admin/hr/users/export","/api/admin/dashboard/**").hasAnyRole("HeadCommunication","ViceHeadCommunication","HeadClub")
                 // HeadTechnique
