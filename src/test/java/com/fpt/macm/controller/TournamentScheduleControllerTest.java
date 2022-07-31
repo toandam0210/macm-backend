@@ -131,7 +131,7 @@ public class TournamentScheduleControllerTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(tournamentSchedule()));
 		
-		when(tournamentScheduleService.createTournamenttSchedule(anyInt(), anyList(), anyBoolean())).thenReturn(responseMessage);
+		when(tournamentScheduleService.createTournamentSchedule(anyInt(), anyList(), anyBoolean())).thenReturn(responseMessage);
 		
 		this.mockMvc.perform(post("/api/tournamentschedule/headclub/addnewschedule/{tournamentId}", "1")
 				.param("isOverwritten", "false")
@@ -147,7 +147,7 @@ public class TournamentScheduleControllerTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(tournamentSchedule()));
 		
-		when(tournamentScheduleService.createTournamentSesstion(anyInt(), any())).thenReturn(responseMessage);
+		when(tournamentScheduleService.createTournamentSession(anyInt(), any())).thenReturn(responseMessage);
 		
 		this.mockMvc.perform(post("/api/tournamentschedule/headclub/tournamentschedule/create/{tournamentId}", "1")
 				.param("isOverwritten", "false")
