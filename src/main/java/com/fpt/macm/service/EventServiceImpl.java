@@ -115,7 +115,7 @@ public class EventServiceImpl implements EventService{
 				getEvent.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
 				getEvent.setUpdatedBy("LinhLHN");
 				getEvent.setUpdatedOn(LocalDateTime.now());
-				List<EventSchedule> getEventSchedules = eventScheduleService.listEventScheduleByEvent(id);
+				List<EventSchedule> getEventSchedules = eventScheduleRepository.findByEventId(id);
 				for (EventSchedule eventSchedule : getEventSchedules) {
 					CommonSchedule getCommonSchedule = commonScheduleService.getCommonSessionByDate(eventSchedule.getDate());
 					getCommonSchedule.setTitle(event.getName());

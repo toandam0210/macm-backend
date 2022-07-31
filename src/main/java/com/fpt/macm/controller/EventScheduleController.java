@@ -8,14 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.ScheduleDto;
-import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.EventSchedule;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.EventScheduleService;
@@ -52,16 +50,6 @@ public class EventScheduleController {
 	ResponseEntity<ResponseMessage> createEventSchedule(@PathVariable(name = "eventId") int eventId, 
 			@RequestBody List<ScheduleDto> listPreview, @RequestParam Boolean isOverwritten) {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.createEventSchedule(eventId, listPreview, isOverwritten), HttpStatus.OK);
-	}
-	
-	@PutMapping("/headculture/updatesession/{eventScheduleId}")
-	ResponseEntity<ResponseMessage> updateEventSessionTime(@PathVariable(name = "eventscheduleId") int eventscheduleId, @RequestBody CommonSchedule commonSchedule) {
-		return new ResponseEntity<ResponseMessage>(eventScheduleService.updateEventSessionTime(eventscheduleId, commonSchedule), HttpStatus.OK);
-	}
-	
-	@PutMapping("/headculture/deletesession/{eventScheduleId}")
-	ResponseEntity<ResponseMessage> deleteEventSession(@PathVariable(name = "eventscheduleId") int eventscheduleId) {
-		return new ResponseEntity<ResponseMessage>(eventScheduleService.deleteEventSession(eventscheduleId), HttpStatus.OK);
 	}
 	
 	@GetMapping("/geteventsessionbydate")

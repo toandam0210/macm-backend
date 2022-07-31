@@ -3,6 +3,7 @@ package com.fpt.macm.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,9 +23,6 @@ import com.fpt.macm.repository.MemberEventRepository;
 
 @Service
 public class AttendanceEventServiceImpl implements AttendanceEventService {
-
-	@Autowired
-	EventScheduleServiceImpl eventScheduleServiceImpl;
 
 	@Autowired
 	AttendanceEventRepository attendanceEventRepository;
@@ -51,6 +49,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 			attendanceEvent.setUpdatedOn(LocalDateTime.now());
 			attendanceEventRepository.save(attendanceEvent);
 
+			responseMessage.setData(Arrays.asList(attendanceEvent));
 			responseMessage.setMessage(Constant.MSG_084);
 		} catch (Exception e) {
 			// TODO: handle exception

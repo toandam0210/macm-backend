@@ -196,7 +196,7 @@ public class EventServiceTest {
 	public void updateBeforeEventCaseSuccess() {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-		when(eventScheduleService.listEventScheduleByEvent(anyInt())).thenReturn(eventSchedules());
+		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedules().get(0));
 		
 		ResponseMessage responseMessage = eventService.updateBeforeEvent(1, event());
