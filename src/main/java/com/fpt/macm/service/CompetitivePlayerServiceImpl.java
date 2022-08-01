@@ -64,7 +64,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 				players.add(newTournamentPlayer);
 				getTounament.setTournamentPlayers(players);
 				tournamentRepository.save(getTounament);
-				TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(userId, tournamentId).get();
+				TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(userId, tournamentId).get();
 				CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
 				newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
 				if(weight != 0) {
@@ -114,7 +114,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 						List<CompetitiveType> listType = competitiveTypeRepository.findByTournamentAndGender(tournamentId, userRepository.findById(userId).get().isGender());
 						for (CompetitiveType competitiveType : listType) {
 							if(competitiveType.getWeightMin() < weight && weight <= competitiveType.getWeightMax()) {
-								CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId()).get();
+								CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository.findCompetitivePlayerByTournamentPlayerId(getTournamentPlayer.getId()).get();
 								CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
 								newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
 								newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
@@ -211,6 +211,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 				}
 				competitivePlayerRepository.delete(getCompetitivePlayer);
 				responseMessage.setMessage("Xóa tuyển thủ thành công");
+				responseMessage.setData(Arrays.asList(getCompetitivePlayer));
 			}
 			else {
 				responseMessage.setMessage("Không tồn tại tuyển thủ để xóa");

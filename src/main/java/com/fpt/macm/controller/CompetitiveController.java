@@ -83,11 +83,6 @@ public class CompetitiveController {
 		return new ResponseEntity<ResponseMessage>(competitiveMatchService.listMatchs(competitiveTypeId), HttpStatus.OK);
 	}
 	
-	@PostMapping("/headclub/previewmatchsplayer/{competitiveTypeId}")
-	ResponseEntity<ResponseMessage> previewMatchsPlayer (@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
-		return new ResponseEntity<ResponseMessage>(competitiveMatchService.previewMatchsPlayer(competitiveTypeId), HttpStatus.OK);
-	}
-	
 	@PutMapping("/headclub/updatelistmatchsplayer")
 	ResponseEntity<ResponseMessage> updateListMatchsPlayer (@RequestBody List<CompetitiveMatchDto> listUpdated) {
 		return new ResponseEntity<ResponseMessage>(competitiveMatchService.updateListMatchsPlayer(listUpdated), HttpStatus.OK);
