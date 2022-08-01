@@ -14,6 +14,9 @@ public interface TournamentPlayerRepository extends JpaRepository<TournamentPlay
 	@Query(value = "select * from tournament_player where user_id = ?1 and tournament_id = ?2", nativeQuery = true)
 	Optional<TournamentPlayer> getPlayerByUserIdAndTournamentId(int userId, int tournamentId);
 	
+	@Query(value = "select * from tournament_player where user_id = ?1 and tournament_id = ?2", nativeQuery = true)
+	Optional<TournamentPlayer> findPlayerByUserIdAndTournamentId(int userId, int tournamentId);
+	
 	@Query(value = "select * from tournament_player where tournament_id = ?1", nativeQuery = true)
 	List<TournamentPlayer> getPlayerByTournamentId(int tournamentId);
 }

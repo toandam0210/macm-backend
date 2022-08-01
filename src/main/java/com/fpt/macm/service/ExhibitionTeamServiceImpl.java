@@ -117,7 +117,7 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService{
 						getTournamentPlayers.add(newTournamentPlayer);
 						getTournament.setTournamentPlayers(getTournamentPlayers);
 						tournamentRepository.save(getTournament);
-						TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(getUser.getId(), exhibitionTypeRepository.findTournamentOfType(exhibitionTypeId)).get();
+						TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(getUser.getId(), exhibitionTypeRepository.findTournamentOfType(exhibitionTypeId)).get();
 						ExhibitionPlayer newExhibitionPlayer = new ExhibitionPlayer();
 						newExhibitionPlayer.setTournamentPlayer(getTournamentPlayer);
 						newExhibitionPlayer.setRoleInTeam(i == 0);
