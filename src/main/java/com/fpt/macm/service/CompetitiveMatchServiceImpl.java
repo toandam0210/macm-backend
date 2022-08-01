@@ -190,9 +190,6 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 			if (getTournament.getStatus() == 0) {
 				responseMessage.setMessage("Chưa có danh sách tuyển thủ thi đấu");
 				return responseMessage;
-			} else if (getTournament.getStatus() == 1) {
-				responseMessage.setMessage("Đã có danh sách thi đấu, có thể tạo trận đấu");
-				return responseMessage;
 			} else {
 				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByType(competitiveTypeId);
 				List<CompetitiveMatchDto> listMatchDto = new ArrayList<CompetitiveMatchDto>();
@@ -236,7 +233,11 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 				}
 				Collections.sort(listMatchDto);
 				responseMessage.setData(listMatchDto);
-				responseMessage.setMessage("Danh sách trận đấu");
+				if (getTournament.getStatus() == 1) {
+					responseMessage.setMessage("Danh sách trận đấu dự kiến");
+				} else {
+					responseMessage.setMessage("Danh sách trận đấu chính thức");
+				}
 				List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository
 						.listPlayersByType(competitiveTypeId);
 				responseMessage.setTotalResult(maxRound(listPlayers.size()) + 1);

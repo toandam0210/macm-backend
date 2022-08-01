@@ -519,12 +519,17 @@ public class TaskSchedule {
 	public void changeStatusTournamentForUpdatePlayer() {
 		List<Tournament> listTournaments = tournamentService
 				.listTournamentsByRegistrationPlayerDeadline(LocalDateTime.now());
-		for (Tournament tournament : listTournaments) {
-			if (tournament.getStatus() == 0) {
-				tournament.setStatus(1);
-				tournamentRepository.save(tournament);
-				logger.info("Chuyển thành 1");
+		if(listTournaments != null) {
+			for (Tournament tournament : listTournaments) {
+				if (tournament.getStatus() == 0) {
+					tournament.setStatus(1);
+					tournamentRepository.save(tournament);
+					logger.info("Chuyển thành 1");
+				}
 			}
+		}
+		else {
+			logger.info("Không có giải đấu");
 		}
 	}
 
@@ -536,6 +541,7 @@ public class TaskSchedule {
 			if (getTournament.getStatus() == 2) {
 				getTournament.setStatus(3);
 				tournamentRepository.save(getTournament);
+				logger.info("Chuyển thành 3");
 			}
 		}
 	}
