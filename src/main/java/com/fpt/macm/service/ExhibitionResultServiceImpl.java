@@ -133,6 +133,9 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 					if (index == listTypeNeedHeld.size()) {
 						isRunning = false;
 					}
+					else {
+						continue;
+					}
 					if (!isRunning) {
 						break;
 					}
