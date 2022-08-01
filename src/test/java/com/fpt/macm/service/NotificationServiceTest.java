@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Sort;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.entity.CompetitiveType;
@@ -621,6 +623,91 @@ public class NotificationServiceTest {
 		when(userRepository.findByStudentId(anyString())).thenReturn(null);
 		
 		ResponseMessage responseMessage = notificationService.markAllNotificationAsRead("HE140855");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createTournamentNotificationCaseSuccess() {
+		when(notificationRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(notification()));
+		when(userRepository.findAll()).thenReturn(Arrays.asList(user()));
+		
+		ResponseMessage responseMessage = notificationService.createTournamentNotification(1, "FNC");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void createTournamentNotificationCaseException() {
+		when(notificationRepository.findAll(any(Sort.class))).thenReturn(null);
+		
+		ResponseMessage responseMessage = notificationService.createTournamentNotification(1, "FNC");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createEventNotificationCaseSuccess() {
+		when(notificationRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(notification()));
+		when(userRepository.findAll()).thenReturn(Arrays.asList(user()));
+		
+		ResponseMessage responseMessage = notificationService.createEventNotification(1, "Test");
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void createEventNotificationCaseException() {
+		when(notificationRepository.findAll(any(Sort.class))).thenReturn(null);
+		
+		ResponseMessage responseMessage = notificationService.createEventNotification(1, "Test");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createTrainingSessionCreateNotificationCaseSuccess() {
+		when(notificationRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(notification()));
+		when(userRepository.findAll()).thenReturn(Arrays.asList(user()));
+		
+		ResponseMessage responseMessage = notificationService.createTrainingSessionCreateNotification(LocalDate.now());
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void createTrainingSessionCreateNotificationCaseException() {
+		when(notificationRepository.findAll(any(Sort.class))).thenReturn(null);
+		
+		ResponseMessage responseMessage = notificationService.createTrainingSessionCreateNotification(LocalDate.now());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createTrainingSessionUpdateNotificationCaseSuccess() {
+		when(notificationRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(notification()));
+		when(userRepository.findAll()).thenReturn(Arrays.asList(user()));
+		
+		ResponseMessage responseMessage = notificationService.createTrainingSessionUpdateNotification(LocalDate.now(), LocalTime.now(), LocalTime.now().plusHours(1));
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void createTrainingSessionUpdateNotificationCaseException() {
+		when(notificationRepository.findAll(any(Sort.class))).thenReturn(null);
+		
+		ResponseMessage responseMessage = notificationService.createTrainingSessionUpdateNotification(LocalDate.now(), LocalTime.now(), LocalTime.now().plusHours(1));
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createTrainingSessionDeleteNotificationCaseSuccess() {
+		when(notificationRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(notification()));
+		when(userRepository.findAll()).thenReturn(Arrays.asList(user()));
+		
+		ResponseMessage responseMessage = notificationService.createTrainingSessionDeleteNotification(LocalDate.now());
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void createTrainingSessionDeleteNotificationCaseException() {
+		when(notificationRepository.findAll(any(Sort.class))).thenReturn(null);
+		
+		ResponseMessage responseMessage = notificationService.createTrainingSessionDeleteNotification(LocalDate.now());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
