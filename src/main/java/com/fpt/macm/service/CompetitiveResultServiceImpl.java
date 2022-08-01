@@ -294,28 +294,4 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 		}
 		return responseMessage;
 	}
-
-	public Integer isEnoughTime(List<CompetitiveMatch> listMatch, List<TournamentSchedule> listTournamentSchedules) {
-		try {
-			int countMatchNeedHeld = 0;
-			for (CompetitiveMatch competitiveMatch : listMatch) {
-				if (competitiveMatch.getRound() == 1 && (competitiveMatch.getFirstStudentId() == null
-						|| competitiveMatch.getSecondStudentId() == null)) {
-					continue;
-				}
-				countMatchNeedHeld++;
-			}
-			int countMatchCanHeld = 0;
-			for (TournamentSchedule tournamentSchedule : listTournamentSchedules) {
-				LocalTime startTime = tournamentSchedule.getStartTime();
-				LocalTime finishTime = tournamentSchedule.getFinishTime();
-				countMatchCanHeld += ((finishTime.getHour() - startTime.getHour()) * 60 + finishTime.getMinute()
-						- startTime.getMinute()) / 10;
-			}
-			return countMatchCanHeld - countMatchNeedHeld;
-		} catch (Exception e) {
-			// TODO: handle exception
-			return null;
-		}
-	}
 }
