@@ -218,8 +218,8 @@ public class TournamentServiceTest {
 		tournament.setId(1);
 		tournament.setMaxQuantityComitee(10);
 		tournament.setName("FNC");
-		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
-		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
+		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.now().plusDays(10));
+		tournament.setRegistrationPlayerDeadline(LocalDateTime.now().plusDays(10));
 		tournament.setSemester("Summer2022");
 		tournament.setStatus(1);
 		tournament.setTournamentPlayers(tournamentPlayers());
