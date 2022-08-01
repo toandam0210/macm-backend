@@ -86,7 +86,7 @@ public class EventScheduleServiceTest {
 		eventSchedule.setEvent(event());
 		eventSchedule.setDate(LocalDate.now().plusMonths(1));
 		eventSchedule.setStartTime(LocalTime.now());
-		eventSchedule.setFinishTime(LocalTime.now().plusHours(8));
+		eventSchedule.setFinishTime(LocalTime.now().plusHours(1));
 		return eventSchedule;
 	}
 	
