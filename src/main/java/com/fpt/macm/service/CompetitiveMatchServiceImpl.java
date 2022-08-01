@@ -297,19 +297,6 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 	}
 
 	@Override
-	public ResponseMessage previewMatchsPlayer(int competitiveTypeId) {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
 	public ResponseMessage confirmListMatchsPlayer(int tournamentId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
