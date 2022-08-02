@@ -9,6 +9,7 @@ public class CompetitivePlayerDto {
 	private double weight;
 	private double weightMin;
 	private double weightMax;
+	private int competitiveTypeId;
 
 	public int getId() {
 		return id;
@@ -64,6 +65,14 @@ public class CompetitivePlayerDto {
 
 	public void setWeightMax(double weightMax) {
 		this.weightMax = weightMax;
+	}
+
+	public int getCompetitiveTypeId() {
+		return competitiveTypeId;
+	}
+
+	public void setCompetitiveTypeId(int competitiveTypeId) {
+		this.competitiveTypeId = competitiveTypeId;
 	}
 
 }
