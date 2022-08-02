@@ -27,6 +27,7 @@ import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteePaymentStatusReportDto;
 import com.fpt.macm.model.dto.TournamentPlayerDto;
 import com.fpt.macm.model.dto.TournamentPlayerPaymentStatusReportDto;
+import com.fpt.macm.model.dto.UserTournamentDto;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitivePlayerBracket;
@@ -1410,6 +1411,106 @@ public class TournamentServiceImpl implements TournamentService {
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllTournamentByStudentId(String studentId, String semester, int status) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			
+			if (semester == "") {
+				semester = semesterRepository.findTop3Semester().get(0).getName();
+			}
+			List<Tournament> tournaments = tournamentRepository.findBySemester(semester);
+			List<UserTournamentDto> userTournamentsDto = new ArrayList<UserTournamentDto>();
+			List<UserTournamentDto> listResult = new ArrayList<UserTournamentDto>();
+			for (Tournament tournament : tournaments) {
+				LocalDate startDate = getStartDate(tournament.getId());
+				UserTournamentDto userTournamentDto = new UserTournamentDto();
+				if (startDate != null) {
+					LocalDate endDate = getEndDate(tournament.getId());
+					if (LocalDate.now().isBefore(startDate)) {
+						userTournamentDto.setStatus(3); // chua dien ra
+					} else if (LocalDate.now().isAfter(endDate)) {
+						userTournamentDto.setStatus(1); // da ket thuc
+					} else {
+						userTournamentDto.setStatus(2);// dang dien ra
+					}
+				} else {
+					userTournamentDto.setStatus(3);// chua dien ra
+				}
+				
+				Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(tournament.getId(), user.getId());
+				if (tournamentOrganizingCommitteeOp.isPresent()) {
+					TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
+						userTournamentDto.setJoined(true);
+					}
+					else {
+						Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
+						if (tournamentPlayerOp.isPresent()) {
+							userTournamentDto.setJoined(true);
+						}
+						else {
+							userTournamentDto.setJoined(false);
+						}
+					}
+				} else {
+					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
+					if (tournamentPlayerOp.isPresent()) {
+						userTournamentDto.setJoined(true);
+					}
+					else {
+						userTournamentDto.setJoined(false);
+					}
+				}
+				
+				userTournamentDto.setFeeOrganizingCommiteePay(tournament.getFeeOrganizingCommiteePay());
+				userTournamentDto.setFeePlayerPay(tournament.getFeePlayerPay());
+				userTournamentDto.setMaxQuantityComitee(tournament.getMaxQuantityComitee());
+				userTournamentDto.setStartDate(startDate);
+				userTournamentDto.setTotalAmount(tournament.getTotalAmount());
+				userTournamentDto.setName(tournament.getName());
+				userTournamentDto.setId(tournament.getId());
+				userTournamentDto.setTotalAmountEstimate(tournament.getTotalAmountEstimate());
+				userTournamentDto.setTotalAmountFromClubActual(tournament.getTotalAmountFromClubActual());
+				userTournamentDto.setTotalAmountFromClubEstimate(tournament.getTotalAmountFromClubEstimate());
+				userTournamentDto.setRegistrationPlayerDeadline(tournament.getRegistrationPlayerDeadline());
+				userTournamentDto.setRegistrationOrganizingCommitteeDeadline(
+						tournament.getRegistrationOrganizingCommitteeDeadline());
+				userTournamentsDto.add(userTournamentDto);
+			}
+			if (status == 0) {
+				listResult.addAll(userTournamentsDto);
+			} else if (status == 1) {
+				for (UserTournamentDto userTournamentDto : userTournamentsDto) {
+					if (userTournamentDto.getStatus() == 1) {
+						listResult.add(userTournamentDto);
+					}
+				}
+			} else if (status == 2) {
+				for (UserTournamentDto userTournamentDto : userTournamentsDto) {
+					if (userTournamentDto.getStatus() == 2) {
+						listResult.add(userTournamentDto);
+					}
+				}
+			} else {
+				for (UserTournamentDto userTournamentDto : userTournamentsDto) {
+					if (userTournamentDto.getStatus() == 3) {
+						listResult.add(userTournamentDto);
+					}
+				}
+			}
+			Collections.sort(listResult);
+			responseMessage.setData(listResult);
+			responseMessage.setMessage("Lấy danh sách giải đấu thành công" + semester);
+			responseMessage.setTotalResult(listResult.size());
+
+		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
