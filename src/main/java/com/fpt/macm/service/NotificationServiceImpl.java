@@ -423,4 +423,37 @@ public class NotificationServiceImpl implements NotificationService {
 		}
 		return responseMessage;
 	}
+
+	@Override
+	public ResponseMessage getAllUnreadNotificationByStudentId(String studentId, int pageNo, int pageSize,
+			String sortBy) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
+			Page<NotificationToUser> pageResponse = notificationToUserRepository.findUnreadNotificationByUserId(user.getId(), paging);
+			List<NotificationToUser> notificationsToUser = new ArrayList<NotificationToUser>();
+			List<UserNotificationDto> userNotificationsDto = new ArrayList<UserNotificationDto>();
+			if (pageResponse != null && pageResponse.hasContent()) {
+				notificationsToUser = pageResponse.getContent();
+				for (NotificationToUser notificationToUser : notificationsToUser) {
+					UserNotificationDto userNotificationDto = convertToUserNotificationDto(notificationToUser);
+					userNotificationsDto.add(userNotificationDto);
+				}
+				Collections.sort(userNotificationsDto);
+				responseMessage.setData(userNotificationsDto);
+				responseMessage.setMessage("Lấy tất cả thông báo chưa đọc thành công");
+				responseMessage.setTotalResult(userNotificationsDto.size());
+				responseMessage.setPageNo(pageNo);
+				responseMessage.setPageSize(pageSize);
+				responseMessage.setTotalPage(pageResponse.getTotalPages());
+			} else {
+				responseMessage.setMessage("Không có thông báo nào!");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
 }

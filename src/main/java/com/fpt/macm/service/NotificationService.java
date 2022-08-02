@@ -20,4 +20,5 @@ public interface NotificationService {
 	ResponseMessage createTrainingSessionCreateNotification(LocalDate date);
 	ResponseMessage createTrainingSessionUpdateNotification(LocalDate date, LocalTime newStartTime, LocalTime newEndTime);
 	ResponseMessage createTrainingSessionDeleteNotification(LocalDate date);
+	ResponseMessage getAllUnreadNotificationByStudentId(String studentId, int pageNo, int pageSize, String sortBy);
 }

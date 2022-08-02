@@ -45,4 +45,12 @@ public class NotificationController {
 		return new ResponseEntity<ResponseMessage>(notificationService.markAllNotificationAsRead(studentId),
 				HttpStatus.OK);
 	}
+	
+	@GetMapping("/getallunreadnotificationbystudentid/{studentId}")
+	ResponseEntity<ResponseMessage> getAllUnreadNotificationByStudentId(@PathVariable(name = "studentId") String studentId,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
+			@RequestParam(defaultValue = "id") String sortBy) {
+		return new ResponseEntity<ResponseMessage>(
+				notificationService.getAllUnreadNotificationByStudentId(studentId, pageNo, pageSize, sortBy), HttpStatus.OK);
+	}
 }
