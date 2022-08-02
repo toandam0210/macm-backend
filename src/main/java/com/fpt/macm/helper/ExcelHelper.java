@@ -17,6 +17,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fpt.macm.model.dto.UserDto;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.utils.Utils;
@@ -36,7 +37,7 @@ public class ExcelHelper {
 	    return true;
 	  }
 
-	public static ByteArrayInputStream usersToExcel(List<User> users) {
+	public static ByteArrayInputStream usersToExcel(List<UserDto> users) {
 		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
 			Sheet sheet = workbook.createSheet(SHEET);
 			Row headerRow = sheet.createRow(0);
@@ -45,7 +46,7 @@ public class ExcelHelper {
 				cell.setCellValue(HEADERs[col]);
 			}
 			int rowIdx = 1;
-			for (User user : users) {
+			for (UserDto user : users) {
 				Row row = sheet.createRow(rowIdx++);
 
 				row.createCell(0).setCellValue(user.getStudentId());
@@ -63,7 +64,7 @@ public class ExcelHelper {
 				}else {
 					row.createCell(6).setCellValue("Không hoạt động");
 				}
-				row.createCell(7).setCellValue(Utils.convertRoleFromDbToExcel(user.getRole()));
+				row.createCell(7).setCellValue(user.getRoleName());
 				row.createCell(8).setCellValue(user.getCurrentAddress());
 				row.createCell(9).setCellValue(user.getGeneration());
 			}

@@ -478,7 +478,7 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
-	public ByteArrayInputStream exportUsersToExcel(List<User> users) {
+	public ByteArrayInputStream exportUsersToExcel(List<UserDto> users) {
 		ByteArrayInputStream in = ExcelHelper.usersToExcel(users);
 		return in;
 	}
