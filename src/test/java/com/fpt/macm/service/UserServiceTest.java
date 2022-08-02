@@ -320,14 +320,19 @@ public class UserServiceTest {
 		List<User> users = Arrays.asList(user);
 		Page<User> pages = new PageImpl<User>(users);
 		when(userRepository.findAdminForViceHeadClubByRoleId(any())).thenReturn(pages);
-		ResponseMessage responseMessage = userService.getAllAdminForViceHeadClub(0,10,"studentId");
+		ResponseMessage responseMessage = userService.getAllAdminForViceHeadClub(1,10,"studentId");
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
 	@Test
 	public void testGetAllAdminForViceHeadClubFail() {
-		when(userRepository.findAdminForViceHeadClubByRoleId(any())).thenReturn(null);
-		ResponseMessage responseMessage = userService.getAllAdminForViceHeadClub(0,10,"studentId");
+		ResponseMessage responseMessage = userService.getAllAdminForViceHeadClub(-1,10,"studentId");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testGetAllAdminForViceHeadClubFail2() {
+		ResponseMessage responseMessage = userService.getAllAdminForViceHeadClub(0,-10,"studentId");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
@@ -343,7 +348,13 @@ public class UserServiceTest {
 	
 	@Test
 	public void testGetAllAdminForHeadClubFail() {
-		ResponseMessage responseMessage = userService.getAllAdminForHeadClub(0,10,"studentId");
+		ResponseMessage responseMessage = userService.getAllAdminForHeadClub(-1,10,"studentId");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testGetAllAdminForHeadClubFail2() {
+		ResponseMessage responseMessage = userService.getAllAdminForHeadClub(0,-10,"studentId");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
