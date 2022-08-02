@@ -91,4 +91,32 @@ public class EventController {
 				eventService.getEventsBySemesterAndStudentId(semester, studentId, month, pageNo, pageSize),
 				HttpStatus.OK);
 	}
+
+	@GetMapping("/getalleventhasjoinedbystudentid/{studentId}")
+	ResponseEntity<ResponseMessage> getAllEventHasJoinedByStudentId(@PathVariable(name = "studentId") String studentId,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.getAllEventHasJoinedByStudentId(studentId, pageNo, pageSize), HttpStatus.OK);
+	}
+
+	@GetMapping("/getallupcomingevent")
+	ResponseEntity<ResponseMessage> getAllUpcomingEvent(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.getAllUpcomingEvent(pageNo, pageSize), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getallongoingevent")
+	ResponseEntity<ResponseMessage> getAllOngoingEvent(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.getAllOngoingEvent(pageNo, pageSize), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getallclosedevent")
+	ResponseEntity<ResponseMessage> getAllClosedEvent(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.getAllClosedEvent(pageNo, pageSize), HttpStatus.OK);
+	}
 }
