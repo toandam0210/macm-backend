@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fpt.macm.model.dto.InforInQrCode;
 import com.fpt.macm.model.dto.UserDto;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 
 public interface UserService {
@@ -21,7 +22,7 @@ public interface UserService {
 	ResponseMessage searchUserByStudentIdOrName(String inputSearch,int pageNo, int pageSize, String sortBy);
 //	ResponseMessage userLogin();
 	ResponseMessage addUsersFromExcel(MultipartFile file);
-	ByteArrayInputStream exportUsersToExcel();
+	ByteArrayInputStream exportUsersToExcel(List<User> users);
 	ResponseMessage findAllMember(int pageNo, int pageSize, String sortBy);
 	ResponseMessage getAllUser();
 	ResponseMessage getMembersBySemester(String semester);

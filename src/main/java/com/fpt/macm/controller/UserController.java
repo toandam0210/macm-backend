@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fpt.macm.model.dto.InforInQrCode;
 import com.fpt.macm.model.dto.UserDto;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.UserService;
 
@@ -92,9 +93,9 @@ public class UserController {
 	}
 
 	@GetMapping("/users/export")
-	public ResponseEntity<Resource> exportListUserToExcel() {
+	public ResponseEntity<Resource> exportListUserToExcel(@RequestBody List<User> users) {
 		String filename = "users.xlsx";
-		InputStreamResource file = new InputStreamResource(userService.exportUsersToExcel());
+		InputStreamResource file = new InputStreamResource(userService.exportUsersToExcel(users));
 
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
 				.contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(file);
