@@ -93,7 +93,7 @@ public class UserController {
 	}
 
 	@PostMapping("/users/export")
-	public ResponseEntity<Resource> exportListUserToExcel(@RequestBody List<User> users) {
+	public ResponseEntity<Resource> exportListUserToExcel(@RequestBody List<UserDto> users) {
 		String filename = "users.xlsx";
 		InputStreamResource file = new InputStreamResource(userService.exportUsersToExcel(users));
 
