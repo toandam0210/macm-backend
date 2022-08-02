@@ -92,7 +92,7 @@ public class UserController {
 		return new ResponseEntity<ResponseMessage>(userService.addUsersFromExcel(file), HttpStatus.OK);
 	}
 
-	@GetMapping("/users/export")
+	@PostMapping("/users/export")
 	public ResponseEntity<Resource> exportListUserToExcel(@RequestBody List<User> users) {
 		String filename = "users.xlsx";
 		InputStreamResource file = new InputStreamResource(userService.exportUsersToExcel(users));
