@@ -215,4 +215,11 @@ public class TournamentController {
 		return new ResponseEntity<ResponseMessage>(
 				tournamentService.getAllUserOrganizingCommittee(tournamentId, studentId), HttpStatus.OK);
 	}
+
+	@GetMapping("/getalltournamentbystudentid/{studentId}")
+	ResponseEntity<ResponseMessage> getAllTournamentByStudentId(@PathVariable(name = "studentId") String studentId,
+			@RequestParam String semester, @RequestParam int status) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllTournamentByStudentId(studentId, semester, status), HttpStatus.OK);
+	}
 }

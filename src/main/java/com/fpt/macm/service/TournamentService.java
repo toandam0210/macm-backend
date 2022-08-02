@@ -68,4 +68,6 @@ public interface TournamentService {
 	ResponseMessage getAllUserOrganizingCommittee(int tournamentId, String studentId);
 	
 	LocalDate getStartDate(int tournamentId);
+	
+	ResponseMessage getAllTournamentByStudentId(String studentId, String semester, int status);
 }
