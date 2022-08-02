@@ -542,8 +542,10 @@ public class EventServiceImpl implements EventService {
 			if (!memberEvents.isEmpty()) {
 				List<EventDto> eventsDto = new ArrayList<EventDto>();
 				for (MemberEvent memberEvent : memberEvents) {
-					Event event = memberEvent.getEvent();
-					eventsDto.add(convertToEventDto(event));
+					if (memberEvent.isRegisterStatus()) {
+						Event event = memberEvent.getEvent();
+						eventsDto.add(convertToEventDto(event));
+					}
 				}
 				Collections.sort(eventsDto);
 				List<EventDto> getEventPageable = pageableEvent(eventsDto, pageNo, pageSize);
