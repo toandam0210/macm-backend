@@ -256,74 +256,74 @@ public class EventServiceTest {
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
-	@Test
-	public void getEventsByNameCaseNotYet() {
-		Page<Event> page = new PageImpl<>(Arrays.asList(event()));
-		when(eventRepository.findByName(anyString(), any())).thenReturn(page);
-		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
-		
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void getEventsByNameCaseEnded() {
-		List<EventSchedule> eventSchedules = eventSchedules();
-		for (EventSchedule eventSchedule : eventSchedules) {
-			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
-		}
-		
-		Page<Event> page = new PageImpl<>(Arrays.asList(event()));
-		when(eventRepository.findByName(anyString(), any())).thenReturn(page);
-		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void getEventsByNameCaseOnGoing() {
-		List<EventSchedule> eventSchedules = eventSchedules();
-		for (EventSchedule eventSchedule : eventSchedules) {
-			eventSchedule.setDate(LocalDate.now());
-		}
-		
-		Page<Event> page = new PageImpl<>(Arrays.asList(event()));
-		when(eventRepository.findByName(anyString(), any())).thenReturn(page);
-		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void getEventsByNameCaseStartDateNull() {
-		List<EventSchedule> eventSchedules = new ArrayList<EventSchedule>();
-		
-		Page<Event> page = new PageImpl<>(Arrays.asList(event()));
-		when(eventRepository.findByName(anyString(), any())).thenReturn(page);
-		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void getEventsByNameCasePageResponseEmpty() {
-		Page<Event> page = Page.empty();
-		when(eventRepository.findByName(anyString(), any())).thenReturn(page);
-		
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void getEventsByNameCasePageResponseNull() {
-		when(eventRepository.findByName(anyString(), any())).thenReturn(null);
-		
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
-		assertEquals(responseMessage.getData().size(), 0);
-	}
+//	@Test
+//	public void getEventsByNameCaseNotYet() {
+//		Page<Event> page = new PageImpl<>(Arrays.asList(event()));
+//		when(eventRepository.findByName(anyString(), any())).thenReturn(page);
+//		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
+//		
+//		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
+//	
+//	@Test
+//	public void getEventsByNameCaseEnded() {
+//		List<EventSchedule> eventSchedules = eventSchedules();
+//		for (EventSchedule eventSchedule : eventSchedules) {
+//			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
+//		}
+//		
+//		Page<Event> page = new PageImpl<>(Arrays.asList(event()));
+//		when(eventRepository.findByName(anyString(), any())).thenReturn(page);
+//		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
+//		
+//		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
+//	
+//	@Test
+//	public void getEventsByNameCaseOnGoing() {
+//		List<EventSchedule> eventSchedules = eventSchedules();
+//		for (EventSchedule eventSchedule : eventSchedules) {
+//			eventSchedule.setDate(LocalDate.now());
+//		}
+//		
+//		Page<Event> page = new PageImpl<>(Arrays.asList(event()));
+//		when(eventRepository.findByName(anyString(), any())).thenReturn(page);
+//		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
+//		
+//		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
+//	
+//	@Test
+//	public void getEventsByNameCaseStartDateNull() {
+//		List<EventSchedule> eventSchedules = new ArrayList<EventSchedule>();
+//		
+//		Page<Event> page = new PageImpl<>(Arrays.asList(event()));
+//		when(eventRepository.findByName(anyString(), any())).thenReturn(page);
+//		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
+//		
+//		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
+//	
+//	@Test
+//	public void getEventsByNameCasePageResponseEmpty() {
+//		Page<Event> page = Page.empty();
+//		when(eventRepository.findByName(anyString(), any())).thenReturn(page);
+//		
+//		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+//		assertEquals(responseMessage.getData().size(), 0);
+//	}
+//	
+//	@Test
+//	public void getEventsByNameCasePageResponseNull() {
+//		when(eventRepository.findByName(anyString(), any())).thenReturn(null);
+//		
+//		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+//		assertEquals(responseMessage.getData().size(), 0);
+//	}
 	
 	@Test
 	public void getEventByIdCaseSuccess() {
