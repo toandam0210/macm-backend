@@ -318,27 +318,29 @@ public class NotificationServiceImpl implements NotificationService {
 			List<MemberEvent> membersEvent = memberEventRepository.findByUserId(user.getId());
 			if (!membersEvent.isEmpty()) {
 				for (MemberEvent memberEvent : membersEvent) {
-					Event event = memberEvent.getEvent();
-					double amountPerRegisterEstimate = event.getAmountPerRegisterEstimated();
-					double amountPerRegisterActual = event.getAmountPerRegisterActual();
+					if (memberEvent.isRegisterStatus()) {
+						Event event = memberEvent.getEvent();
+						double amountPerRegisterEstimate = event.getAmountPerRegisterEstimated();
+						double amountPerRegisterActual = event.getAmountPerRegisterActual();
 
-					if (amountPerRegisterEstimate != 0) {
-						if (amountPerRegisterActual == 0) {
-							if (memberEvent.getPaymentValue() == 0) {
-								String message = "Sự kiện " + event.getName() + ": "
-										+ amountPerRegisterEstimate + " VND";
-								messages.add(message);
-							}
-						} else {
-							if (memberEvent.getPaymentValue() == 0) {
-								String message = "Sự kiện " + event.getName() + ": "
-										+ amountPerRegisterActual + " VND";
-								messages.add(message);
-							} else if (amountPerRegisterActual > amountPerRegisterEstimate) {
-								if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
-									String message = "Sự kiện " + event.getName()
-											+ ": " + (amountPerRegisterActual - amountPerRegisterEstimate) + " VND";
+						if (amountPerRegisterEstimate != 0) {
+							if (amountPerRegisterActual == 0) {
+								if (memberEvent.getPaymentValue() == 0) {
+									String message = "Sự kiện " + event.getName() + ": "
+											+ amountPerRegisterEstimate + " VND";
 									messages.add(message);
+								}
+							} else {
+								if (memberEvent.getPaymentValue() == 0) {
+									String message = "Sự kiện " + event.getName() + ": "
+											+ amountPerRegisterActual + " VND";
+									messages.add(message);
+								} else if (amountPerRegisterActual > amountPerRegisterEstimate) {
+									if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
+										String message = "Sự kiện " + event.getName()
+												+ ": " + (amountPerRegisterActual - amountPerRegisterEstimate) + " VND";
+										messages.add(message);
+									}
 								}
 							}
 						}
