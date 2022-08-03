@@ -592,17 +592,24 @@ public class MemberEventServiceImpl implements MemberEventService {
 					}
 
 					if (countOrganizingCommittee < event.getMaxQuantityComitee()) {
+						Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(event.getId(), user.getId());
 						MemberEvent memberEvent = new MemberEvent();
-						memberEvent.setEvent(event);
-						memberEvent.setUser(user);
+						if (memberEventOp.isPresent()) {
+							memberEvent = memberEventOp.get();
+							memberEvent.setUpdatedBy(user.getName() + " - " + user.getStudentId());
+							memberEvent.setUpdatedOn(LocalDateTime.now());
+						}
+						else {
+							memberEvent.setEvent(event);
+							memberEvent.setUser(user);
+							memberEvent.setPaymentValue(0);
+							memberEvent.setPaidBeforeClosing(false);
+							memberEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
+							memberEvent.setCreatedOn(LocalDateTime.now());
+						}
 						memberEvent.setRegisterStatus(true);
-						memberEvent.setPaymentValue(0);
-						memberEvent.setPaidBeforeClosing(false);
 						memberEvent.setRoleEvent(roleEvent);
-						memberEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
-						memberEvent.setCreatedOn(LocalDateTime.now());
 						memberEventRepository.save(memberEvent);
-						
 						UserEventDto userEventDto = new UserEventDto();
 						userEventDto.setEventId(memberEvent.getEvent().getId());
 						userEventDto.setEventName(memberEvent.getEvent().getName());
