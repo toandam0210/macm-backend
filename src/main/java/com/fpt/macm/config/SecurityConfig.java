@@ -110,9 +110,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // HeadCommunication
                 .antMatchers("/api/contact/**","/api/admin/hr/getbystudentid/**","/api/admin/hr/updateuser/**","/api/admin/hr/users/search","/api/admin/hr/users/export","/api/admin/dashboard/**").hasAnyRole("HeadCommunication","ViceHeadCommunication","HeadClub")
                 // HeadTechnique
-                .antMatchers("/api/trainingschedule/**", "/api/admin/headtechnique/**","/api/admin/hr/getbystudentid/**","/api/admin/hr/updateuser/**","/api/admin/hr/users/search","/api/admin/hr/users/export","/api/admin/dashboard/**").hasAnyRole("HeadTechnique","ViceHeadTechnique","HeadClub")
+                .antMatchers("/api/trainingschedule/**", "/api/admin/headtechnique/**","/api/admin/hr/getbystudentid/**","/api/admin/hr/users/search","/api/admin/hr/users/export","/api/admin/dashboard/**").hasAnyRole("HeadTechnique","ViceHeadTechnique","HeadClub")
                 // Member & Collaborator
                 .antMatchers("/api/admin/hr/getbystudentid/**","/api/admin/hr/updateuser/**","/api/admin/hr/getallactivememberandcollaborator").hasAnyRole("MemberCommnication","MemberCulture","MemberTechnique","CollaboratorCommnunication","CollaboratorCulture","CollaboratorTechnique","HeadClub")
+                .antMatchers("/api/admin/headtechnique/takeattendance/**","/api/admin/headtechnique/checkattendance/**","/api/event/headculture/takeattendanceevent/**","/api/event/headculture/checkattendance/**").hasAnyRole("HeadClub","ViceHeadClub","Treasurer","HeadCulture","ViceHeadCulture","HeadCommunication","ViceHeadCommunication","HeadTechnique","ViceHeadTechnique")
                 .anyRequest()
                 .authenticated()
                 .and()
