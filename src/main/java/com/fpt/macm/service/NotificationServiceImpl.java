@@ -431,8 +431,8 @@ public class NotificationServiceImpl implements NotificationService {
 		try {
 			User user = userRepository.findByStudentId(studentId).get();
 			
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
-			Page<NotificationToUser> pageResponse = notificationToUserRepository.findUnreadNotificationByUserId(user.getId(), paging);
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Page<NotificationToUser> pageResponse = notificationToUserRepository.findByUserIdAndIsRead(user.getId(), false, paging);
 			List<NotificationToUser> notificationsToUser = new ArrayList<NotificationToUser>();
 			List<UserNotificationDto> userNotificationsDto = new ArrayList<UserNotificationDto>();
 			if (pageResponse != null && pageResponse.hasContent()) {
