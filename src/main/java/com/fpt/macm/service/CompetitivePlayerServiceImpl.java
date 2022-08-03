@@ -176,6 +176,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 					if(getCompetitiveType.getWeightMin() > weight || getCompetitiveType.getWeightMax() < weight) {
 						competitivePlayerBracketRepository.delete(getCompetitivePlayerBracket);
 						responseMessage.setMessage("Loại khỏi giải đấu vì đăng ký sai hạng cân");
+						return responseMessage;
 					}
 					getCompetitivePlayer.setWeight(weight);
 					getCompetitivePlayer.setCreatedBy("LinhLHN");
@@ -184,6 +185,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 					getCompetitivePlayer.setUpdatedOn(LocalDateTime.now());
 					competitivePlayerRepository.save(getCompetitivePlayer);
 					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
+					responseMessage.setMessage("Cập nhật cân nặng tuyển thủ thành công");
 				}
 			}
 			else {
