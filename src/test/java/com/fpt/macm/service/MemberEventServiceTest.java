@@ -2,6 +2,7 @@ package com.fpt.macm.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -462,7 +463,7 @@ public class MemberEventServiceTest {
 	
 	@Test
 	void getAllMemberCancelJoinEventSuccess() throws Exception {
-		when(memberEventRepository.findAllMemberCancelJoinEventByEventId(anyInt(), any())).thenReturn(createMemberCancelJoinEvent());
+		when(memberEventRepository.findByEventIdAndRegisterStatus(anyInt(), anyBoolean(),any())).thenReturn(createMemberCancelJoinEvent());
 		
 		ResponseMessage responseMessage = memberEventService.getAllMemberCancelJoinEvent(8, 0, 1000, "id");
 		assertEquals(responseMessage.getData().size(), 1);

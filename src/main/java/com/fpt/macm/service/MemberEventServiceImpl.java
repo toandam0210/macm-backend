@@ -90,7 +90,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<MemberEvent> pageResponse = memberEventRepository.findAllMemberCancelJoinEventByEventId(eventId,
+			Page<MemberEvent> pageResponse = memberEventRepository.findByEventIdAndRegisterStatus(eventId, false,
 					paging);
 			List<MemberEvent> membersEvent = new ArrayList<MemberEvent>();
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
