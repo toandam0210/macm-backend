@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -167,12 +168,7 @@ public class EventServiceImpl implements EventService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
-			Page<Event> pageResponse = eventRepository.findByName(name, paging);
-			List<Event> eventList = new ArrayList<Event>();
-			if (pageResponse != null && pageResponse.hasContent()) {
-				eventList = pageResponse.getContent();
-			}
+			List<Event> eventList = eventRepository.findByName(name);
 			List<EventDto> eventDtos = new ArrayList<EventDto>();
 			for (Event event : eventList) {
 				LocalDate startDate = getStartDate(event.getId());
@@ -205,7 +201,37 @@ public class EventServiceImpl implements EventService {
 				eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
 				eventDtos.add(eventDto);
 			}
-			responseMessage.setData(eventDtos);
+			switch (sortBy) {
+			case "id":
+				Collections.sort(eventDtos, new Comparator<EventDto>() {
+					@Override
+					public int compare(EventDto o1, EventDto o2) {
+						// TODO Auto-generated method stub
+						return o2.getId() - o1.getId();
+					}
+				});
+				break;
+			case "name":
+				Collections.sort(eventDtos, new Comparator<EventDto>() {
+					@Override
+					public int compare(EventDto o1, EventDto o2) {
+						// TODO Auto-generated method stub
+						return o1.getName().compareTo(o2.getName());
+					}
+				});
+				break;
+			default:
+				Collections.sort(eventDtos, new Comparator<EventDto>() {
+					@Override
+					public int compare(EventDto o1, EventDto o2) {
+						// TODO Auto-generated method stub
+						return o2.getStartDate().compareTo(o1.getStartDate());
+					}
+				});
+				break;
+			}
+			List<EventDto> listEventPaging = pageableEvent(eventDtos, pageNo, pageSize);
+			responseMessage.setData(listEventPaging);
 			responseMessage.setPageNo(pageNo);
 			responseMessage.setPageSize(pageSize);
 		} catch (Exception e) {
