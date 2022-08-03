@@ -352,7 +352,7 @@ public class NotificationServiceImpl implements NotificationService {
 					.findByUserId(user.getId());
 			if (!tournamentOrganizingCommittees.isEmpty()) {
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					if (!tournamentOrganizingCommittee.isPaymentStatus()) {
+					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED) && !tournamentOrganizingCommittee.isPaymentStatus()) {
 						String message = "Giải đấu "
 								+ tournamentOrganizingCommittee.getTournament().getName() + ": "
 								+ tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay() + " VND";
@@ -370,6 +370,7 @@ public class NotificationServiceImpl implements NotificationService {
 						String message = "Giải đấu " + tournament.getName() + ": "
 								+ tournament.getFeePlayerPay() + " VND";
 						messages.add(message);
+						break;
 					}
 				}
 			}
