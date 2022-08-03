@@ -283,7 +283,7 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 				} else {
 					responseMessage.setMessage("Chưa tổ chức trận đấu");
 				}
-				return responseMessage;
+				return responseMessage;	
 			} else {
 				responseMessage.setMessage("Trận đấu này đã có tỉ số chính thức");
 				return responseMessage;
