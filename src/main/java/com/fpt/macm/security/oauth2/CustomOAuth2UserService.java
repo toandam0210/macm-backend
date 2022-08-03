@@ -52,6 +52,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user = new User();
         if(userOptional.isPresent()) {
             user = userOptional.get();
+            user.setImage(oAuth2UserInfo.getImageUrl());
+            userRepository.save(user);
         }else {
         	throw new OAuth2AuthenticationProcessingException("khong cho m dang nhap dau");
         }
