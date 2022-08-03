@@ -2,11 +2,12 @@ package com.fpt.macm.model.dto;
 
 import java.util.Set;
 
-public class ExhibitionTeamDto implements Comparable<ExhibitionTeamDto>{
+public class ExhibitionTeamDto implements Comparable<ExhibitionTeamDto> {
 
 	private int id;
 	private String teamName;
 	private Set<ExhibitionPlayerDto> exhibitionPlayersDto;
+	private int exhibitionTypeId;
 	private String exhibitionTypeName;
 	private Double score;
 
@@ -50,11 +51,21 @@ public class ExhibitionTeamDto implements Comparable<ExhibitionTeamDto>{
 		this.score = score;
 	}
 
+	public int getExhibitionTypeId() {
+		return exhibitionTypeId;
+	}
+
+	public void setExhibitionTypeId(int exhibitionTypeId) {
+		this.exhibitionTypeId = exhibitionTypeId;
+	}
+
 	@Override
 	public int compareTo(ExhibitionTeamDto o) {
 		// TODO Auto-generated method stub
-		if(o.getScore() - this.getScore() > 0) return 1;
-		if(o.getScore() - this.getScore() < 0) return -1;
+		if (o.getScore() - this.getScore() > 0)
+			return 1;
+		if (o.getScore() - this.getScore() < 0)
+			return -1;
 		return 0;
 	}
 
