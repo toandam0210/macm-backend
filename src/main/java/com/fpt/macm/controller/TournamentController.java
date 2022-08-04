@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,6 +34,7 @@ public class TournamentController {
 	CompetitiveTypeService competitiveTypeService;
 
 	@PostMapping("/headclub/createtournament")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> createTournament(@RequestBody Tournament tournament) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.createTournament(tournament), HttpStatus.OK);
 	}
@@ -45,6 +47,7 @@ public class TournamentController {
 	}
 
 	@PutMapping("/headclub/updatetournamentorganizingcommitteerole")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> updateTournamentOrganizingCommitteeRole(
 			@RequestBody List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto) {
 		return new ResponseEntity<ResponseMessage>(
@@ -53,6 +56,7 @@ public class TournamentController {
 	}
 
 	@PutMapping("/headclub/update/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> updateTournament(@PathVariable(name = "tournamentId") int tournamentId,
 			@RequestBody TournamentDto tournamentDto) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.updateTournament(tournamentId, tournamentDto),
@@ -60,6 +64,7 @@ public class TournamentController {
 	}
 
 	@DeleteMapping("/headclub/delete/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> delete(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.deleteTournamentById(tournamentId), HttpStatus.OK);
 	}
@@ -70,6 +75,7 @@ public class TournamentController {
 	}
 
 	@GetMapping("/headclub/tournament/getall")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> getAllTournamentBySemester(@RequestParam String semester,
 			@RequestParam int status) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentBySemester(semester, status),
@@ -84,6 +90,7 @@ public class TournamentController {
 	}
 
 	@GetMapping("/headclub/getallcompetitiveplayerbytype/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> getAllCompetitivePlayerByType(@PathVariable(name = "tournamentId") int tournamentId,
 			@RequestParam(defaultValue = "0") int competitiveTypeId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -108,6 +115,7 @@ public class TournamentController {
 	}
 
 	@PutMapping("/headclub/acceptrequesttojoinorganizingcommittee/{organizingCommitteeId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> acceptRequestToJoinOrganizingCommittee(
 			@PathVariable(name = "organizingCommitteeId") int organizingCommitteeId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -115,6 +123,7 @@ public class TournamentController {
 	}
 
 	@PutMapping("/headclub/declinerequesttojoinorganizingcommittee/{organizingCommitteeId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> declineRequestToJoinOrganizingCommittee(
 			@PathVariable(name = "organizingCommitteeId") int organizingCommitteeId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -122,6 +131,7 @@ public class TournamentController {
 	}
 
 	@GetMapping("/treasurer/getalltournamentplayerpaymentstatus/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> getAllTournamentPlayerPaymentStatus(
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentPlayerPaymentStatus(tournamentId),
@@ -129,6 +139,7 @@ public class TournamentController {
 	}
 
 	@GetMapping("/treasurer/getalltournamentorganizingcommitteepaymentstatus/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> getAllTournamentOrganizingCommitteePaymentStatus(
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -136,6 +147,7 @@ public class TournamentController {
 	}
 
 	@PutMapping("/treasurer/updatetournamentorganizingcommitteepaymentstatus/{tournamentOrganizingCommitteeId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> updateTournamentOrganizingCommitteePaymentStatus(
 			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -144,6 +156,7 @@ public class TournamentController {
 	}
 
 	@GetMapping("/treasurer/getalltournamentorganizingcommitteepaymentstatusreport/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> getAllTournamentOrganizingCommitteePaymentStatusReport(
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -151,6 +164,7 @@ public class TournamentController {
 	}
 
 	@PutMapping("/treasurer/updatetournamentplayerpaymentstatus/{tournamentPlayerId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> updateTournamentPlayerPaymentStatus(
 			@PathVariable(name = "tournamentPlayerId") int tournamentPlayerId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -158,6 +172,7 @@ public class TournamentController {
 	}
 
 	@GetMapping("/treasurer/getalltournamentplayerpaymentstatusreport/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> getAllTournamentPlayerPaymentStatusReport(
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(

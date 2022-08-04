@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,32 +28,38 @@ public class TrainingScheduleController {
 	TrainingScheduleService trainingScheduleService;
 	
 	@GetMapping("/gettrainingschedule")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> getTrainingSchedule(){
 			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getListTrainingSchedule(), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headtechnique/addnewsession")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> createTrainingSession(@RequestBody TrainingSchedule trainingSchedule) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSession(trainingSchedule), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headtechnique/createpreview")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> createPreview(@RequestParam String startDate, @RequestParam String finishDate, 
 			@RequestBody List<String> dayOfWeek, @RequestParam String startTime, @RequestParam String finishTime) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createPreviewTrainingSchedule(startDate, finishDate, dayOfWeek, startTime, finishTime), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headtechnique/addnewschedule")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> createTrainingSchedule(@RequestBody List<ScheduleDto> listPreview) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.createTrainingSchedule(listPreview), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headtechnique/updatesession")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> updateTrainingSessionTime(@RequestParam String date, @RequestBody CommonSchedule commonSchedule) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.updateTrainingSessionTime(date, commonSchedule), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headtechnique/deletesession")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> deleteTrainingSession(@RequestParam String date) {
 		return new ResponseEntity<ResponseMessage>(trainingScheduleService.deleteTrainingSession(date), HttpStatus.OK);
 	}
