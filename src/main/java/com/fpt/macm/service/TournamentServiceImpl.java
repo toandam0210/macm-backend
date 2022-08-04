@@ -1591,6 +1591,7 @@ public class TournamentServiceImpl implements TournamentService {
 						if (!tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
 							RoleEvent roleEvent = roleEventRepository.findById(userToJoin.getRoleId()).get();
 							tournamentOrganizingCommittee.setRoleEvent(roleEvent);
+							tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 							tournamentOrganizingCommittee.setUpdatedBy(user.getName() + " - " + user.getStudentId());
 							tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
 						}
