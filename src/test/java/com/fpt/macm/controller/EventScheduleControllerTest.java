@@ -1,6 +1,5 @@
 package com.fpt.macm.controller;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -104,20 +103,6 @@ public class EventScheduleControllerTest {
 	}
 
 	@Test
-	public void getEventScheduleSuccess() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(eventSchedule()));
-		
-		when(eventScheduleService.getListEventSchedule()).thenReturn(responseMessage);
-		
-		this.mockMvc
-		.perform(get("/api/eventschedule/geteventschedule"))
-		.andExpect(status().isOk())
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value(1));
-	}
-	
-	@Test
 	public void getEventScheduleByEventSuccess() throws Exception {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(eventSchedule()));
@@ -131,20 +116,6 @@ public class EventScheduleControllerTest {
 		.andExpect(jsonPath("$.data.size()").value(1));
 	}
 	
-	@Test
-	public void createEventSessionSuccess() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(eventSchedule()));
-		
-		when(eventScheduleService.createEventSession(anyInt(), any())).thenReturn(responseMessage);
-		
-		this.mockMvc
-		.perform(post("/api/eventschedule/headculture/addnewsession/{eventId}", "1")
-				.content(asJsonString(eventSchedule())).contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value(1));
-	}
 	
 	@Test
 	public void createPreviewEventScheduleSuccess() throws Exception {
@@ -225,20 +196,6 @@ public class EventScheduleControllerTest {
 		.perform(post("/api/eventschedule/headculture/updateschedule/{eventId}", "1")
 				.content(asJsonString(Arrays.asList(scheduleDto()))).contentType(MediaType.APPLICATION_JSON)
 				.param("isOverwritten", "true"))
-		.andExpect(status().isOk())
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value(1));
-	}
-	
-	@Test
-	public void getPeriodTimeOfEventSuccess() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(eventSchedule()));
-		
-		when(eventScheduleService.getPeriodTimeOfEvent(anyInt())).thenReturn(responseMessage);
-		
-		this.mockMvc
-		.perform(get("/api/eventschedule/headculture/getperiodtimeofevent/{eventId}", "1"))
 		.andExpect(status().isOk())
 		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
 		.andExpect(jsonPath("$.data.size()").value(1));

@@ -10,6 +10,8 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.dto.CompetitivePlayerBracketDto;
+import com.fpt.macm.model.dto.UserDto;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitivePlayerBracket;
 import com.fpt.macm.model.entity.CompetitiveType;
@@ -46,91 +48,61 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 	CompetitivePlayerBracketRepository competitivePlayerBracketRepository;
 	
 	@Override
-	public ResponseMessage addNewCompetitivePlayer(int userId, int tournamentId, double weight) {
+	public ResponseMessage addNewCompetitivePlayer(List<User> users, int competitiveTypeId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(userId, tournamentId);
-			if(!tournamentPlayerOp.isPresent()) {
+			Optional<CompetitiveType> getCompetitiveTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
+			if (getCompetitiveTypeOp.isPresent()) {
+				CompetitiveType getType = getCompetitiveTypeOp.get();
+				int tournamentId = competitiveTypeRepository.findTournamentOfType(competitiveTypeId);
 				Tournament getTounament = tournamentRepository.findById(tournamentId).get();
-				Set<TournamentPlayer> players = getTounament.getTournamentPlayers();
-				TournamentPlayer newTournamentPlayer = new TournamentPlayer();
-				newTournamentPlayer.setUser(userRepository.findById(userId).get());
-				newTournamentPlayer.setPaymentStatus(false);
-				newTournamentPlayer.setCreatedBy("LinhLHN");
-				newTournamentPlayer.setCreatedOn(LocalDateTime.now());
-				newTournamentPlayer.setUpdatedBy("LinhLHN");
-				newTournamentPlayer.setUpdatedOn(LocalDateTime.now());
-				players.add(newTournamentPlayer);
-				getTounament.setTournamentPlayers(players);
-				tournamentRepository.save(getTounament);
-				TournamentPlayer getTournamentPlayer = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(userId, tournamentId).get();
-				CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
-				newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
-				if(weight != 0) {
-					newCompetitivePlayer.setWeight(weight);
-				}
-				newCompetitivePlayer.setCreatedBy("LinhLHN");
-				newCompetitivePlayer.setCreatedOn(LocalDateTime.now());
-				newCompetitivePlayer.setUpdatedBy("LinhLHN");
-				newCompetitivePlayer.setUpdatedOn(LocalDateTime.now());
-				competitivePlayerRepository.save(newCompetitivePlayer);
-				responseMessage.setData(Arrays.asList(newCompetitivePlayer));
-				responseMessage.setMessage("Đăng ký thành công");
-				if(weight != 0) {
-					List<CompetitiveType> listType = competitiveTypeRepository.findByTournamentAndGender(tournamentId,userRepository.findById(userId).get().isGender());
-					for (CompetitiveType competitiveType : listType) {
-						if(competitiveType.getWeightMin() < weight && weight <= competitiveType.getWeightMax()) {
-							CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId()).get();
-							CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
-							newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
-							newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
-							newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
-							newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
-							newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
-							newCompetitivePlayerBracket.setUpdatedOn(LocalDateTime.now());
-							competitivePlayerBracketRepository.save(newCompetitivePlayerBracket);
-							break;
+				List<String> listUsers = new ArrayList<String>();
+				for (User user : users) {
+					if(user.isGender() == getType.isGender()) {
+						TournamentPlayer getTournamentPlayer = new TournamentPlayer();
+						Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(user.getId(), tournamentId);
+						if(!tournamentPlayerOp.isPresent()) {
+							Set<TournamentPlayer> players = getTounament.getTournamentPlayers();
+							TournamentPlayer newTournamentPlayer = new TournamentPlayer();
+							newTournamentPlayer.setUser(userRepository.findById(user.getId()).get());
+							newTournamentPlayer.setPaymentStatus(false);
+							newTournamentPlayer.setCreatedBy("LinhLHN");
+							newTournamentPlayer.setCreatedOn(LocalDateTime.now());
+							newTournamentPlayer.setUpdatedBy("LinhLHN");
+							newTournamentPlayer.setUpdatedOn(LocalDateTime.now());
+							players.add(newTournamentPlayer);
+							getTounament.setTournamentPlayers(players);
+							tournamentRepository.save(getTounament);
+							getTournamentPlayer = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(user.getId(), tournamentId).get();
+						} else {
+							getTournamentPlayer = tournamentPlayerOp.get();
 						}
+						CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
+						newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
+						newCompetitivePlayer.setWeight(0);
+						newCompetitivePlayer.setCreatedBy("LinhLHN");
+						newCompetitivePlayer.setCreatedOn(LocalDateTime.now());
+						newCompetitivePlayer.setUpdatedBy("LinhLHN");
+						newCompetitivePlayer.setUpdatedOn(LocalDateTime.now());
+						competitivePlayerRepository.save(newCompetitivePlayer);
+						CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository.findCompetitivePlayerByTournamentPlayerId(getTournamentPlayer.getId()).get();
+						CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
+						newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
+						newCompetitivePlayerBracket.setCompetitiveType(getType);
+						newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
+						newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
+						newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
+						newCompetitivePlayerBracket.setUpdatedOn(LocalDateTime.now());
+						competitivePlayerBracketRepository.save(newCompetitivePlayerBracket);
+						listUsers.add(user.getName() + " - " + user.getStudentId());
 					}
 				}
-			} else {
-				TournamentPlayer getTournamentPlayer = tournamentPlayerOp.get();
-				Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findByTournamentPlayerId(getTournamentPlayer.getId());
-				if(!competitivePlayerOp.isPresent()) {
-					CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
-					newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
-					if(weight != 0) {
-						newCompetitivePlayer.setWeight(weight);
-					}
-					newCompetitivePlayer.setCreatedBy("LinhLHN");
-					newCompetitivePlayer.setCreatedOn(LocalDateTime.now());
-					newCompetitivePlayer.setUpdatedBy("LinhLHN");
-					newCompetitivePlayer.setUpdatedOn(LocalDateTime.now());
-					competitivePlayerRepository.save(newCompetitivePlayer);
-					responseMessage.setData(Arrays.asList(newCompetitivePlayer));
-					responseMessage.setMessage("Đăng ký thành công");
-					if(weight != 0) {
-						List<CompetitiveType> listType = competitiveTypeRepository.findByTournamentAndGender(tournamentId, userRepository.findById(userId).get().isGender());
-						for (CompetitiveType competitiveType : listType) {
-							if(competitiveType.getWeightMin() < weight && weight <= competitiveType.getWeightMax()) {
-								CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository.findCompetitivePlayerByTournamentPlayerId(getTournamentPlayer.getId()).get();
-								CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
-								newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
-								newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
-								newCompetitivePlayerBracket.setCreatedBy("LinhLHN");
-								newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
-								newCompetitivePlayerBracket.setUpdatedBy("LinhLHN");
-								newCompetitivePlayerBracket.setUpdatedOn(LocalDateTime.now());
-								competitivePlayerBracketRepository.save(newCompetitivePlayerBracket);
-								break;
-							}
-						}
-					}
-				}
-				else {
-					responseMessage.setMessage("Đã đăng ký vào giải này rồi");
-				}
+				responseMessage.setData(listUsers);
+				responseMessage.setMessage("Danh sách đăng ký tham gia thi đấu thể thức " + (getType.isGender()? "Nam: " : "Nữ: ") + getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
+			}
+			else {
+				responseMessage.setMessage("Không tìm thấy thể thức thi đấu");
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -250,6 +222,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 			responseMessage.setMessage("Danh sách thành viên chưa đăng ký tham gia thi đấu đối kháng");
 		} catch (Exception e) {
 			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
 	}

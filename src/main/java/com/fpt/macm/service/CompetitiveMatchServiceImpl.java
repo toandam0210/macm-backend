@@ -279,8 +279,14 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 					if (matchDto.getFirstPlayer() != null) {
 						getMatch.setFirstStudentId(matchDto.getFirstPlayer().getStudentId());
 					}
+					else {
+						getMatch.setFirstStudentId(null);
+					}
 					if (matchDto.getSecondPlayer() != null) {
 						getMatch.setSecondStudentId(matchDto.getSecondPlayer().getStudentId());
+					}
+					else {
+						getMatch.setSecondStudentId(null);
 					}
 					getMatch.setUpdatedBy("LinhLHN");
 					getMatch.setUpdatedOn(LocalDateTime.now());
