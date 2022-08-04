@@ -130,4 +130,11 @@ public class CompetitiveController {
 				competitivePlayerBracketService.getListNotJoinCompetitive(competitiveTypeId), HttpStatus.OK);
 
 	}
+	
+	@GetMapping("/getResult/{competitiveTypeId}")
+	ResponseEntity<ResponseMessage> getResultByType(
+			@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(
+				competitiveResultService.getResultByType(competitiveTypeId), HttpStatus.OK);
+	}
 }
