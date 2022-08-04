@@ -11,7 +11,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
@@ -35,6 +37,7 @@ import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
+import com.fpt.macm.model.entity.Notification;
 import com.fpt.macm.model.entity.RoleEvent;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
@@ -53,6 +56,7 @@ import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
+import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.RoleEventRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteePaymentStatusReportRepository;
@@ -120,6 +124,12 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	CompetitivePlayerBracketRepository competitivePlayerBracketRepository;
+	
+	@Autowired
+	NotificationRepository notificationRepository;
+	
+	@Autowired
+	NotificationService notificationService;
 
 	@Override
 	public ResponseMessage createTournament(Tournament tournament) {
@@ -704,6 +714,25 @@ public class TournamentServiceImpl implements TournamentService {
 					tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
 					TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertTournamentOrganizingCommitteeToTournamentOrganizingCommitteeDto(
 							tournamentOrganizingCommittee);
+					
+					RoleEventDto roleEventDto = new RoleEventDto();
+					roleEventDto.setId(tournamentOrganizingCommittee.getRoleEvent().getId());
+					roleEventDto.setName(tournamentOrganizingCommittee.getRoleEvent().getName());
+					Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(), roleEventDto);
+					
+					Notification notification = new Notification();
+					notification.setMessage("Bạn đã được chấp nhận trở thành " + roleEventDto.getName() + " của giải đấu " + tournament.getName());
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(0);
+					notification.setNotificationTypeId(tournament.getId());
+					notificationRepository.save(notification);
+
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
+					
+					notificationService.sendNotificationToAnUser(tournamentOrganizingCommittee.getUser(), newNotification);
 
 					responseMessage.setData(Arrays.asList(tournamentOrganizingCommitteeDto));
 					responseMessage.setMessage(Constant.MSG_118);
@@ -733,6 +762,26 @@ public class TournamentServiceImpl implements TournamentService {
 				tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
 				TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertTournamentOrganizingCommitteeToTournamentOrganizingCommitteeDto(
 						tournamentOrganizingCommittee);
+				
+				RoleEventDto roleEventDto = new RoleEventDto();
+				roleEventDto.setId(tournamentOrganizingCommittee.getRoleEvent().getId());
+				roleEventDto.setName(tournamentOrganizingCommittee.getRoleEvent().getName());
+				Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(), roleEventDto);
+				
+				Notification notification = new Notification();
+				notification.setMessage("Bạn không được chấp nhận trở thành " + roleEventDto.getName() + " của giải đấu " + tournamentOrganizingCommittee.getTournament().getName());
+				notification.setCreatedOn(LocalDateTime.now());
+				notification.setNotificationType(0);
+				notification.setNotificationTypeId(tournamentOrganizingCommittee.getTournament().getId());
+				notificationRepository.save(notification);
+
+				Iterable<Notification> notificationIterable = notificationRepository
+						.findAll(Sort.by("id").descending());
+				List<Notification> notifications = IterableUtils.toList(notificationIterable);
+				Notification newNotification = notifications.get(0);
+				
+				notificationService.sendNotificationToAnUser(tournamentOrganizingCommittee.getUser(), newNotification);
+				
 				responseMessage.setData(Arrays.asList(tournamentOrganizingCommitteeDto));
 				responseMessage.setMessage(Constant.MSG_119);
 			}
