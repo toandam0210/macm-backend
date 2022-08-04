@@ -1458,6 +1458,10 @@ public class TournamentServiceImpl implements TournamentService {
 					}
 					responseMessage.setData(tournamentOrganizingCommitteesDto);
 					responseMessage.setMessage("Lấy danh sách ban tổ chức giải đấu cho người dùng thành công");
+				} else if (userTournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+					responseMessage.setMessage("Đang chờ duyệt");
+				} else {
+					responseMessage.setMessage("Đã bị từ chối");
 				}
 			}
 		} catch (Exception e) {
