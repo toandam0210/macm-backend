@@ -108,13 +108,11 @@ public class TournamentController {
 	}
 
 	@GetMapping("/headclub/getallorganizingcommitteerole")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> getAllOrginizingCommitteeRole() {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllOrganizingCommitteeRole(), HttpStatus.OK);
 	}
 
 	@GetMapping("/headclub/getallexhibitiontype/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> getAllExhibitionType(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllExhibitionType(tournamentId), HttpStatus.OK);
 	}
@@ -185,7 +183,6 @@ public class TournamentController {
 	}
 
 	@GetMapping("/treasurer/getallcompetitivetype/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> getAllCompetitiveType(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(competitiveTypeService.getAllType(tournamentId), HttpStatus.OK);
 	}
