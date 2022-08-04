@@ -17,7 +17,9 @@ import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentSchedule;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
@@ -26,6 +28,7 @@ import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
+import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
 import com.fpt.macm.repository.UserRepository;
 
@@ -61,6 +64,9 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 
 	@Autowired
 	CompetitiveTypeService competitiveTypeService;
+
+	@Autowired
+	TournamentRepository tournamentRepository;
 
 	@Override
 	public ResponseMessage spawnTimeAndArea(int tournamentId) {
@@ -283,10 +289,60 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 				} else {
 					responseMessage.setMessage("Chưa tổ chức trận đấu");
 				}
-				return responseMessage;	
+				return responseMessage;
 			} else {
 				responseMessage.setMessage("Trận đấu này đã có tỉ số chính thức");
 				return responseMessage;
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getResultByType(int competitiveTypeId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			CompetitiveType getType = competitiveTypeRepository.findById(competitiveTypeId).get();
+			User getUser = new User();
+			User[] listResult = new User[3];
+			Tournament getTournament = tournamentRepository
+					.findById(competitiveTypeRepository.findTournamentOfType(competitiveTypeId)).get();
+			if (getTournament.getStatus() == 3) {
+				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
+				CompetitiveResult getResult = competitiveResultRepository.findByMatchId(listMatchs.get(1).getId()).get();
+				if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
+					responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
+					return responseMessage;
+				} else {
+					getUser = userRepository.findByStudentId(getResult.getFirstPoint() > getResult.getSecondPoint()
+							? listMatchs.get(0).getFirstStudentId()
+							: listMatchs.get(0).getSecondStudentId()).get();
+					listResult[2] = getUser;
+				}
+				getResult = competitiveResultRepository.findByMatchId(listMatchs.get(0).getId()).get();
+				if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
+					responseMessage.setMessage("Trận chung kết chưa diễn ra");
+					return responseMessage;
+				} else {
+					if(getResult.getFirstPoint() > getResult.getSecondPoint()) {
+						getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
+						listResult[0] = getUser;
+						getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
+						listResult[1] = getUser;
+					}
+					else {
+						getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
+						listResult[1] = getUser;
+						getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
+						listResult[0] = getUser;
+					}
+				}
+				responseMessage.setData(Arrays.asList(listResult));
+				responseMessage.setMessage("Kết quả thi đấu ở thể thức " + (getType.isGender()? "Nam: " : "Nữ: ") + getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
