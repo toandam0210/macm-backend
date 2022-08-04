@@ -105,6 +105,7 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 						listPreview.add(eventSessionDto);
 					}
 					responseMessage.setData(listPreview);
+					responseMessage.setMessage("Lịch trình sự kiện dự kiến");
 				}
 			}
 		} catch (Exception e) {
@@ -125,30 +126,11 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
 			Boolean isInterrupted = false;
 			String title = "";
-			Event event = eventRepository.findById(eventId).get();
-			for (ScheduleDto scheduleDto : listPreview) {
-				if (!scheduleDto.getExisted()) {
-					EventSchedule eventSchedule = new EventSchedule();
-					eventSchedule.setEvent(eventRepository.findById(eventId).get());
-					eventSchedule.setDate(scheduleDto.getDate());
-					eventSchedule.setStartTime(scheduleDto.getStartTime());
-					eventSchedule.setFinishTime(scheduleDto.getFinishTime());
-					eventSchedule.setCreatedBy("LinhLHN");
-					eventSchedule.setCreatedOn(LocalDateTime.now());
-					eventSchedule.setUpdatedBy("LinhLHN");
-					eventSchedule.setUpdatedOn(LocalDateTime.now());
-					listEventSchedule.add(eventSchedule);
-					CommonSchedule commonSession = new CommonSchedule();
-					commonSession.setTitle(eventSchedule.getEvent().getName());
-					commonSession.setDate(scheduleDto.getDate());
-					commonSession.setStartTime(scheduleDto.getStartTime());
-					commonSession.setFinishTime(scheduleDto.getFinishTime());
-					commonSession.setCreatedOn(LocalDateTime.now());
-					commonSession.setUpdatedOn(LocalDateTime.now());
-					commonSession.setType(1);
-					listCommon.add(commonSession);
-				} else {
-					if (isOverwritten && scheduleDto.getTitle().toString().equals("Trùng với Lịch tập")) {
+			Optional<Event> eventOp = eventRepository.findById(eventId);
+			if (eventOp.isPresent()) {
+				Event event = eventOp.get();
+				for (ScheduleDto scheduleDto : listPreview) {
+					if (!scheduleDto.getExisted()) {
 						EventSchedule eventSchedule = new EventSchedule();
 						eventSchedule.setEvent(eventRepository.findById(eventId).get());
 						eventSchedule.setDate(scheduleDto.getDate());
@@ -168,24 +150,42 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 						commonSession.setUpdatedOn(LocalDateTime.now());
 						commonSession.setType(1);
 						listCommon.add(commonSession);
-						CommonSchedule getCommonSession = commonScheduleService
-								.getCommonSessionByDate(scheduleDto.getDate());
-						listCommonOverwritten.add(getCommonSession);
-						TrainingSchedule getTrainingSession = trainingScheduleService
-								.getTrainingScheduleByDate(scheduleDto.getDate());
-						listTrainingOverwritten.add(getTrainingSession);
 					} else {
-						isInterrupted = true;
-						title = scheduleDto.getTitle();
-						break;
+						if (isOverwritten && scheduleDto.getTitle().toString().equals("Trùng với Lịch tập")) {
+							EventSchedule eventSchedule = new EventSchedule();
+							eventSchedule.setEvent(eventRepository.findById(eventId).get());
+							eventSchedule.setDate(scheduleDto.getDate());
+							eventSchedule.setStartTime(scheduleDto.getStartTime());
+							eventSchedule.setFinishTime(scheduleDto.getFinishTime());
+							eventSchedule.setCreatedBy("LinhLHN");
+							eventSchedule.setCreatedOn(LocalDateTime.now());
+							eventSchedule.setUpdatedBy("LinhLHN");
+							eventSchedule.setUpdatedOn(LocalDateTime.now());
+							listEventSchedule.add(eventSchedule);
+							CommonSchedule commonSession = new CommonSchedule();
+							commonSession.setTitle(eventSchedule.getEvent().getName());
+							commonSession.setDate(scheduleDto.getDate());
+							commonSession.setStartTime(scheduleDto.getStartTime());
+							commonSession.setFinishTime(scheduleDto.getFinishTime());
+							commonSession.setCreatedOn(LocalDateTime.now());
+							commonSession.setUpdatedOn(LocalDateTime.now());
+							commonSession.setType(1);
+							listCommon.add(commonSession);
+							CommonSchedule getCommonSession = commonScheduleService
+									.getCommonSessionByDate(scheduleDto.getDate());
+							listCommonOverwritten.add(getCommonSession);
+							TrainingSchedule getTrainingSession = trainingScheduleService
+									.getTrainingScheduleByDate(scheduleDto.getDate());
+							listTrainingOverwritten.add(getTrainingSession);
+						} else {
+							isInterrupted = true;
+							title = scheduleDto.getTitle();
+							break;
+						}
 					}
 				}
-			}
-			if (isInterrupted) {
-				responseMessage.setMessage(Constant.MSG_093 + title);
-			} else {
-				if (listEventSchedule.isEmpty()) {
-					responseMessage.setMessage(Constant.MSG_040);
+				if (isInterrupted) {
+					responseMessage.setMessage(Constant.MSG_093 + title);
 				} else {
 					eventScheduleRepository.saveAll(listEventSchedule);
 					commonScheduleRepository.deleteAll(listCommonOverwritten);
@@ -193,66 +193,11 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 					commonScheduleRepository.saveAll(listCommon);
 					responseMessage.setData(listEventSchedule);
 					responseMessage.setMessage(Constant.MSG_066);
-
 					notificationService.createEventNotification(eventId, event.getName());
 				}
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
-	public ResponseMessage createEventSession(int eventId, EventSchedule eventSchedule) {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			if (eventSchedule.getStartTime().compareTo(eventSchedule.getFinishTime()) >= 0) {
-				responseMessage.setMessage(Constant.MSG_038);
 			} else {
-				if (eventSchedule.getDate().compareTo(LocalDate.now()) > 0) {
-					if (commonScheduleService.getCommonSessionByDate(eventSchedule.getDate()) == null) {
-						eventSchedule.setEvent(eventRepository.findById(eventId).get());
-						eventSchedule.setCreatedBy("LinhLHN");
-						eventSchedule.setCreatedOn(LocalDateTime.now());
-						eventSchedule.setUpdatedBy("LinhLHN");
-						eventSchedule.setUpdatedOn(LocalDateTime.now());
-						eventScheduleRepository.save(eventSchedule);
-						responseMessage.setData(Arrays.asList(eventSchedule));
-						responseMessage.setMessage(Constant.MSG_067);
-						CommonSchedule commonSession = new CommonSchedule();
-						commonSession.setTitle(eventSchedule.getEvent().getName());
-						commonSession.setDate(eventSchedule.getDate());
-						commonSession.setStartTime(eventSchedule.getStartTime());
-						commonSession.setFinishTime(eventSchedule.getFinishTime());
-						commonSession.setCreatedOn(LocalDateTime.now());
-						commonSession.setUpdatedOn(LocalDateTime.now());
-						commonSession.setType(1);
-						commonScheduleRepository.save(commonSession);
-					} else {
-						responseMessage.setMessage(Constant.MSG_041);
-					}
-				} else {
-					responseMessage.setMessage(Constant.MSG_065);
-				}
+				responseMessage.setMessage("Không tìm thấy sự kiện");
 			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
-	public ResponseMessage getListEventSchedule() {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<EventSchedule> listSchedule = eventScheduleRepository.findAll();
-			responseMessage.setData(listSchedule);
-			responseMessage.setMessage("Danh sách lịch sự kiện");
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -265,10 +210,19 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
-			responseMessage.setData(listSchedule);
-			responseMessage
-					.setMessage("Danh sách lịch của sự kiện " + eventRepository.findById(eventId).get().getName());
+			Optional<Event> getEventOp = eventRepository.findById(eventId);
+			if (getEventOp.isPresent()) {
+				Event event = getEventOp.get();
+				List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
+				if (listSchedule.size() == 0) {
+					responseMessage.setMessage("Sự kiện " + event.getName() + " chưa có lịch trình");
+				} else {
+					responseMessage.setData(listSchedule);
+					responseMessage.setMessage("Danh sách lịch trình của sự kiện " + event.getName());
+				}
+			} else {
+				responseMessage.setMessage("Không tìm thấy sự kiện");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -286,6 +240,7 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 			if (getEventSessionOp.isPresent()) {
 				EventSchedule getEventSession = getEventSessionOp.get();
 				responseMessage.setData(Arrays.asList(getEventSession));
+				responseMessage.setMessage("Ngày " + date + " thuộc lịch trình của sự kiện " + getEventSession.getEvent().getName());
 			} else {
 				responseMessage.setMessage(Constant.MSG_071);
 			}
@@ -472,24 +427,4 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 		return responseMessage;
 	}
 
-	@Override
-	public ResponseMessage getPeriodTimeOfEvent(int eventId) {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<EventSchedule> getEventSchedules = eventScheduleRepository.findByEventId(eventId);
-			String[] result = new String[4];
-			result[0] = getEventSchedules.get(0).getDate().toString();
-			result[1] = getEventSchedules.get(getEventSchedules.size() - 1).getDate().toString();
-			result[2] = getEventSchedules.get(0).getStartTime().toString();
-			result[3] = getEventSchedules.get(getEventSchedules.size() - 1).getFinishTime().toString();
-			responseMessage.setData(Arrays.asList(result));
-			responseMessage.setMessage("Lấy thông tin thời gian sự kiện thành công");
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-	
 }
