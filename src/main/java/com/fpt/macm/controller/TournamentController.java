@@ -83,7 +83,6 @@ public class TournamentController {
 	}
 
 	@GetMapping("/headclub/getallcompetitiveplayer/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> getAllCompetitivePlayer(@PathVariable(name = "tournamentId") int tournamentId,
 			@RequestParam(defaultValue = "0") double weightMin, @RequestParam(defaultValue = "0") double weightMax) {
 		return new ResponseEntity<ResponseMessage>(
