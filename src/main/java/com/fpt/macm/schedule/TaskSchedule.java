@@ -146,14 +146,11 @@ public class TaskSchedule {
 	public void updateCollaboratorRole() {
 		List<User> listCollaborator = userRepository.findCollaborator();
 		Role role = new Role();
-		CollaboratorReport collaboratorReport = new CollaboratorReport();
 		int countPassed = 0;
 		int countNotPassed = 0;
 		int countMale = 0;
 		int countFemale = 0;
 		Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-		collaboratorReport.setNumberJoin(listCollaborator.size());
-		collaboratorReport.setSemester(semester.getName());
 		for (User collaborator : listCollaborator) {
 			if (LocalDate.now().compareTo(collaborator.getCreatedOn().plusMonths(1).plusDays(1)) == 0) {
 				if (collaborator.isGender()) {
@@ -175,12 +172,6 @@ public class TaskSchedule {
 					stautsSemesterRepository.save(statusSemester);
 				} else {
 					countNotPassed++;
-					List<AttendanceStatus> attendanceStatus = attendanceStatusRepository
-							.findByUserId(collaborator.getId());
-					for (AttendanceStatus user : attendanceStatus) {
-						attendanceStatusRepository.delete(user);
-					}
-					userRepository.delete(collaborator);
 				}
 			}
 		}
@@ -192,11 +183,29 @@ public class TaskSchedule {
 					.setTotalNumberUserInSemester(userStatusReport.getTotalNumberUserInSemester() + countPassed);
 			userStatusReportRepository.save(userStatusReport);
 		}
-		collaboratorReport.setNumberPassed(countPassed);
-		collaboratorReport.setNumberNotPassed(countNotPassed);
-		collaboratorReport.setNumberMale(countMale);
-		collaboratorReport.setNumberFemale(countFemale);
-		collaboratorReportRepository.save(collaboratorReport);
+		
+		Optional<CollaboratorReport> colOptional = collaboratorReportRepository.findBySemester(semester.getName());
+		if (colOptional.isPresent()) {
+			CollaboratorReport collaboratorReport = colOptional.get();
+			collaboratorReport.setNumberJoin(listCollaborator.size());
+			collaboratorReport.setSemester(semester.getName());
+			collaboratorReport = colOptional.get();
+			collaboratorReport.setNumberPassed(countPassed);
+			collaboratorReport.setNumberNotPassed(countNotPassed);
+			collaboratorReport.setNumberMale(countMale);
+			collaboratorReport.setNumberFemale(countFemale);
+			collaboratorReportRepository.save(collaboratorReport);
+		}else {
+			CollaboratorReport collaboratorReportNew = new CollaboratorReport();
+			collaboratorReportNew.setNumberJoin(listCollaborator.size());
+			collaboratorReportNew.setSemester(semester.getName());
+			collaboratorReportNew.setNumberPassed(countPassed);
+			collaboratorReportNew.setNumberNotPassed(countNotPassed);
+			collaboratorReportNew.setNumberMale(countMale);
+			collaboratorReportNew.setNumberFemale(countFemale);
+			collaboratorReportNew.setNumberJoin(countFemale);
+			collaboratorReportRepository.save(collaboratorReportNew);
+		}
 		logger.info("report oke");
 	}
 
