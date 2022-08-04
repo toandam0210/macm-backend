@@ -7,4 +7,5 @@ public interface CompetitiveResultService {
 	ResponseMessage updateTimeAndArea(int matchId, CompetitiveResult newResult);
 	ResponseMessage updateResultMatch(int matchId, int firstPoint, int secondPoint);
 	ResponseMessage spawnTimeAndArea(int tournamentId);
+	ResponseMessage getResultByType(int competitiveTypeId);
 }
