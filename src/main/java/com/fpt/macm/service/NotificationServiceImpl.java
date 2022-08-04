@@ -306,13 +306,17 @@ public class NotificationServiceImpl implements NotificationService {
 					.findBySemester(semester.getName());
 			if (membershipInfoOp.isPresent()) {
 				MembershipInfo membershipInfo = membershipInfoOp.get();
-				MembershipStatus membershipStatus = membershipStatusRepository
-						.findByMemberShipInfoIdAndUserId(membershipInfo.getId(), user.getId()).get();
-				if (!membershipStatus.isStatus()) {
-					String message = "Membership kỳ " + semester.getName() + ": "
-							+ membershipInfo.getAmount() + " VND";
-					messages.add(message);
+				Optional<MembershipStatus> membershipStatusOp = membershipStatusRepository
+						.findByMemberShipInfoIdAndUserId(membershipInfo.getId(), user.getId());
+				if(membershipStatusOp.isPresent()) {
+					MembershipStatus membershipStatus = membershipStatusOp.get();
+					if (!membershipStatus.isStatus()) {
+						String message = "Membership kỳ " + semester.getName() + ": "
+								+ membershipInfo.getAmount() + " VND";
+						messages.add(message);
+					}
 				}
+				
 			}
 
 			List<MemberEvent> membersEvent = memberEventRepository.findByUserId(user.getId());
@@ -434,7 +438,7 @@ public class NotificationServiceImpl implements NotificationService {
 		try {
 			User user = userRepository.findByStudentId(studentId).get();
 			
-			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
+			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy).descending());
 			Page<NotificationToUser> pageResponse = notificationToUserRepository.findByUserIdAndIsRead(user.getId(), false, paging);
 			List<NotificationToUser> notificationsToUser = new ArrayList<NotificationToUser>();
 			List<UserNotificationDto> userNotificationsDto = new ArrayList<UserNotificationDto>();
