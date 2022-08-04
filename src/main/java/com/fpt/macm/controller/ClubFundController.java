@@ -3,6 +3,7 @@ package com.fpt.macm.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,21 +22,25 @@ public class ClubFundController {
 	ClubFundService clubFundService;
 	
 	@GetMapping("/getclubfund")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')") 
 	ResponseEntity<ResponseMessage> getClubFund(){
 		return new ResponseEntity<ResponseMessage>(clubFundService.getClubFund(), HttpStatus.OK);
 	}
 	
 	@PutMapping("/deposittoclubfund/{amount}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')") 
 	ResponseEntity<ResponseMessage> depositToClubFund(@PathVariable(name = "amount") int amount, @RequestParam(defaultValue = "") String note){
 		return new ResponseEntity<ResponseMessage>(clubFundService.depositToClubFund(amount, note), HttpStatus.OK);
 	}
 	
 	@PutMapping("/withdrawfromclubfund/{amount}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')") 
 	ResponseEntity<ResponseMessage> withdrawFromClubFund(@PathVariable(name = "amount") int amount, @RequestParam(defaultValue = "") String note){
 		return new ResponseEntity<ResponseMessage>(clubFundService.withdrawFromClubFund(amount, note), HttpStatus.OK);
 	}
 	
 	@GetMapping("/getclubfundreport")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')") 
 	ResponseEntity<ResponseMessage> getClubFundReport(){
 		return new ResponseEntity<ResponseMessage>(clubFundService.getClubFundReport(), HttpStatus.OK);
 	}
