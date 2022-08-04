@@ -30,6 +30,7 @@ import com.fpt.macm.model.dto.TournamentOrganizingCommitteePaymentStatusReportDt
 import com.fpt.macm.model.dto.TournamentPlayerDto;
 import com.fpt.macm.model.dto.TournamentPlayerPaymentStatusReportDto;
 import com.fpt.macm.model.dto.UserTournamentDto;
+import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitivePlayerBracket;
@@ -1565,6 +1566,89 @@ public class TournamentServiceImpl implements TournamentService {
 			responseMessage.setMessage("Lấy danh sách giải đấu thành công" + semester);
 			responseMessage.setTotalResult(listResult.size());
 
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage addListTournamentOrganizingCommittee(String studentId, List<UserTournamentOrganizingCommitteeDto> users, int tournamentId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			Tournament tournament = tournamentRepository.findById(tournamentId).get();
+			
+			List<UserTournamentOrganizingCommitteeDto> usersNotAdd = new ArrayList<UserTournamentOrganizingCommitteeDto>();
+			
+			for (UserTournamentOrganizingCommitteeDto userToJoin : users) {
+				if (!isJoinTournament(userToJoin.getUser().getId(), tournamentId)) {
+					TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
+					
+					Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(tournamentId, userToJoin.getUser().getId());
+					if(tournamentOrganizingCommitteeOp.isPresent()) {
+						tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+						if (!tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
+							RoleEvent roleEvent = roleEventRepository.findById(userToJoin.getRoleId()).get();
+							tournamentOrganizingCommittee.setRoleEvent(roleEvent);
+							tournamentOrganizingCommittee.setUpdatedBy(user.getName() + " - " + user.getStudentId());
+							tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
+						}
+					} else {
+						tournamentOrganizingCommittee.setUser(userToJoin.getUser());
+						RoleEvent roleEvent = roleEventRepository.findById(userToJoin.getRoleId()).get();
+						tournamentOrganizingCommittee.setRoleEvent(roleEvent);
+						tournamentOrganizingCommittee.setTournament(tournament);
+						tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+						tournamentOrganizingCommittee.setPaymentStatus(false);
+						tournamentOrganizingCommittee.setCreatedBy(user.getName() + " - " + user.getStudentId());
+						tournamentOrganizingCommittee.setCreatedOn(LocalDateTime.now());
+					}
+					tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
+				}
+				else {
+					usersNotAdd.add(userToJoin);
+				}
+			}
+			responseMessage.setData(usersNotAdd);
+			responseMessage.setMessage("Thêm thành viên vào ban tổ chức thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
+	private boolean isJoinTournament(int userId, int tournamentId) {
+		Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(userId, tournamentId);
+		if (tournamentPlayerOp.isPresent()) {
+			return true;
+		}
+		
+		Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(tournamentId, userId);
+		if(tournamentOrganizingCommitteeOp.isPresent()) {
+			TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+			if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+
+	@Override
+	public ResponseMessage getAllUserNotJoinTournament(int tournamentId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Tournament tournament = tournamentRepository.findById(tournamentId).get();
+			List<User> users = userRepository.findAllActiveUser();
+			List<User> userNotJoin = new ArrayList<User>();
+			for (User user : users) {
+				if (!isJoinTournament(user.getId(), tournament.getId())) {
+					userNotJoin.add(user);
+				}
+			}
+			responseMessage.setData(userNotJoin);
+			responseMessage.setMessage("Lấy danh sách thành viên chưa tham gia giải đấu thành công");
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
