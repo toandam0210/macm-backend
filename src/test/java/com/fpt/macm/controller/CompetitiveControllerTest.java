@@ -190,19 +190,19 @@ public class CompetitiveControllerTest {
 		return competitiveMatch;
 	}
 
-	@Test
-	public void testAddNewCompetitivePlayer() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(competitivePlayer()));
-		when(competitivePlayerService.addNewCompetitivePlayer(anyInt(), anyInt(), anyDouble()))
-				.thenReturn(responseMessage);
-		this.mockMvc
-				.perform(post("/api/competitive/headclub/addnewcompetitiveplayer/{tournamentId}", 1).param("userId", "1")
-						.param("weight", "50"))
-				.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.data.size()").value("1"));
-
-	}
+//	@Test
+//	public void testAddNewCompetitivePlayer() throws Exception {
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		responseMessage.setData(Arrays.asList(competitivePlayer()));
+//		when(competitivePlayerService.addNewCompetitivePlayer(anyInt(), anyInt(), anyDouble()))
+//				.thenReturn(responseMessage);
+//		this.mockMvc
+//				.perform(post("/api/competitive/headclub/addnewcompetitiveplayer/{tournamentId}", 1).param("userId", "1")
+//						.param("weight", "50"))
+//				.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//				.andExpect(jsonPath("$.data.size()").value("1"));
+//
+//	}
 	
 	@Test
 	public void testUpdateWeightForCompetitivePlayer() throws Exception{

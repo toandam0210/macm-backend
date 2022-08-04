@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.fpt.macm.model.dto.InforInQrCode;
 import com.fpt.macm.model.dto.UserDto;
-import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.UserService;
 

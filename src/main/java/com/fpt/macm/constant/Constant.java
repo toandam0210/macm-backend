@@ -46,7 +46,7 @@ public class Constant {
 	public static final String MSG_035 = "Không thể cập nhật chức vụ của chủ nhiệm";
 	public static final String MSG_036 = "Thêm lịch tập thành công";
 	public static final String MSG_037 = "Thêm buổi tập thành công";
-	public static final String MSG_038 = "Không thành công. Thời gian bắt đầu phải nhỏ hơn thời gian kết thúc";
+	public static final String MSG_038 = "Không thành công. Sự kiện diễn ra trong ngày thì thời gian bắt đầu phải nhỏ hơn thời gian kết thúc";
 	public static final String MSG_039 = "Không thành công. Không thể thêm lịch tập vào quá khứ";
 	public static final String MSG_040 = "Không thành công. Không có ngày nào đạt yêu cầu";
 	public static final String MSG_041 = "Không thành công. Đã có lịch tập trong ngày này";

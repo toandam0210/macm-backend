@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.ScheduleDto;
-import com.fpt.macm.model.entity.EventSchedule;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.EventScheduleService;
 
@@ -25,20 +24,12 @@ public class EventScheduleController {
 	@Autowired
 	EventScheduleService eventScheduleService;
 	
-	@GetMapping("/geteventschedule")
-	ResponseEntity<ResponseMessage> getEventSchedule(){
-			return new ResponseEntity<ResponseMessage>(eventScheduleService.getListEventSchedule(), HttpStatus.OK);
-	}
 	
 	@GetMapping("/geteventschedulebyevent/{eventId}")
 	ResponseEntity<ResponseMessage> getEventScheduleByEvent(@PathVariable(name = "eventId") int eventId){
 			return new ResponseEntity<ResponseMessage>(eventScheduleService.getListEventScheduleByEvent(eventId), HttpStatus.OK);
 	}
 	
-	@PostMapping("/headculture/addnewsession/{eventId}")
-	ResponseEntity<ResponseMessage> createEventSession(@PathVariable(name = "eventId") int eventId, @RequestBody EventSchedule eventSchedule) {
-		return new ResponseEntity<ResponseMessage>(eventScheduleService.createEventSession(eventId, eventSchedule), HttpStatus.OK);
-	}
 	
 	@PostMapping("/headculture/createpreview")
 	ResponseEntity<ResponseMessage> createPreviewEventSchedule(@RequestParam String eventName, @RequestParam String startDate, 
@@ -67,10 +58,5 @@ public class EventScheduleController {
 	ResponseEntity<ResponseMessage> updateEventSchedule(@PathVariable(name = "eventId") int eventId, 
 			@RequestBody List<ScheduleDto> listPreview, @RequestParam Boolean isOverwritten) {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.updateEventSchedule(eventId, listPreview, isOverwritten), HttpStatus.OK);
-	}
-	
-	@GetMapping("/headculture/getperiodtimeofevent/{eventId}")
-	ResponseEntity<ResponseMessage> getPeriodTimeOfEvent(@PathVariable(name = "eventId") int eventId){
-			return new ResponseEntity<ResponseMessage>(eventScheduleService.getPeriodTimeOfEvent(eventId), HttpStatus.OK);
 	}
 }

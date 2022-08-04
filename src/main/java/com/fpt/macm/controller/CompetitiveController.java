@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.CompetitiveMatchDto;
 import com.fpt.macm.model.entity.CompetitiveResult;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.CompetitiveMatchService;
 import com.fpt.macm.service.CompetitivePlayerBracketService;
@@ -40,10 +41,10 @@ public class CompetitiveController {
 	@Autowired
 	CompetitiveResultService competitiveResultService;
 	
-	@PostMapping("/headclub/addnewcompetitiveplayer/{tournamentId}")
-	ResponseEntity<ResponseMessage> addNewCompetitivePlayer (@PathVariable(name = "tournamentId") int tournamentId,
-			@RequestParam int userId, @RequestParam (defaultValue = "0") double weight) {
-		return new ResponseEntity<ResponseMessage>(competitivePlayerService.addNewCompetitivePlayer(userId, tournamentId, weight), HttpStatus.OK);
+	@PostMapping("/headclub/addnewcompetitiveplayer/{competitiveTypeId}")
+	ResponseEntity<ResponseMessage> addNewCompetitivePlayer (@PathVariable(name = "competitiveTypeId") int competitiveTypeId,
+			@RequestBody List<User> users) {
+		return new ResponseEntity<ResponseMessage>(competitivePlayerService.addNewCompetitivePlayer(users, competitiveTypeId), HttpStatus.OK);
 	}
 	
 	@PutMapping("/headclub/updateweightplayer/{competitivePlayerId}")
@@ -98,8 +99,8 @@ public class CompetitiveController {
 		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
 	}
 	
-	@GetMapping("/headclub/listusernotjoincompetitive/{tournamentId}")
-	ResponseEntity<ResponseMessage> listUserNotJoinCompetitive (@PathVariable(name = "tournamentId") int tournamentId) {
-		return new ResponseEntity<ResponseMessage>(competitivePlayerService.listUserNotJoinCompetitive(tournamentId), HttpStatus.OK);
+	@GetMapping("/headclub/listusernotjoincompetitive/{competitiveTypeId}")
+	ResponseEntity<ResponseMessage> listUserNotJoinCompetitive (@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(competitivePlayerBracketService.getListNotJoinCompetitive(competitiveTypeId), HttpStatus.OK);
 	}
 }
