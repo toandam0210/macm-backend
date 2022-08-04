@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -41,6 +42,7 @@ public class CompetitiveController {
 	CompetitiveResultService competitiveResultService;
 	
 	@PostMapping("/headclub/addnewcompetitiveplayer/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> addNewCompetitivePlayer (@PathVariable(name = "tournamentId") int tournamentId,
 			@RequestParam int userId, @RequestParam (defaultValue = "0") double weight) {
 		return new ResponseEntity<ResponseMessage>(competitivePlayerService.addNewCompetitivePlayer(userId, tournamentId, weight), HttpStatus.OK);

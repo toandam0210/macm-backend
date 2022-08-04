@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -113,6 +114,7 @@ public class UserController {
 	}
 	
 	@GetMapping("/viceheadclub/getmembers/semester")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_HeadCommunication')") 
 	ResponseEntity<ResponseMessage> getMembersBySemester(@RequestParam String semester) {
 		return new ResponseEntity<ResponseMessage>(userService.getMembersBySemester(semester), HttpStatus.OK);
 	}
