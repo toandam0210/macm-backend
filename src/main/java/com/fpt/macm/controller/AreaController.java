@@ -22,13 +22,13 @@ public class AreaController {
 	AreaService areaService;
 	
 	@GetMapping("/headclub/getallarea")
-	@PreAuthorize("hasRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> getAllArea () {
 		return new ResponseEntity<ResponseMessage>(areaService.getAllArea(), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headclub/addnewarea")
-	@PreAuthorize("hasRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> addNewArea (@RequestBody Area area) {
 		return new ResponseEntity<ResponseMessage>(areaService.addNewArea(area), HttpStatus.OK);
 	}
