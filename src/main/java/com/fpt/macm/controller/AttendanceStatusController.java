@@ -3,6 +3,7 @@ package com.fpt.macm.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,6 +21,7 @@ public class AttendanceStatusController {
 	AttendanceStatusService attendanceStatusService;
 
 	@PutMapping("/takeattendance/{studentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')") 
 	ResponseEntity<ResponseMessage> takeAttendanceByStudentId(@PathVariable(name = "studentId") String studentId,
 			@RequestParam int status) {
 		return new ResponseEntity<ResponseMessage>(attendanceStatusService.takeAttendanceByStudentId(studentId, status),
@@ -27,6 +29,7 @@ public class AttendanceStatusController {
 	}
 
 	@GetMapping("/checkattendance/{trainingScheduleId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')") 
 	ResponseEntity<ResponseMessage> checkAttendanceByStudentId(
 			@PathVariable(name = "trainingScheduleId") int trainingScheduleId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -34,6 +37,7 @@ public class AttendanceStatusController {
 	}
 
 	@GetMapping("/checkattendance/report")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')") 
 	ResponseEntity<ResponseMessage> userAttendanceReportBySemester(@RequestParam String semester) {
 		return new ResponseEntity<ResponseMessage>(attendanceStatusService.attendanceTrainingReport(semester),
 				HttpStatus.OK);
