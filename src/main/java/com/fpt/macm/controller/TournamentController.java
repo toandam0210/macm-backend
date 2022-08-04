@@ -40,7 +40,6 @@ public class TournamentController {
 	}
 
 	@GetMapping("/headclub/getalltournamentorganizingcommittee/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> getAllTournamentOrganizingCommittee(
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(
