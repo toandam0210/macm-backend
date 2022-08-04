@@ -42,7 +42,6 @@ public class TournamentScheduleController {
 	}
 	
 	@GetMapping("/headclub/tournamentschedule/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> getTournamentSchedule(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentScheduleService.getListTournamentScheduleByTournament(tournamentId), HttpStatus.OK);
 	}
