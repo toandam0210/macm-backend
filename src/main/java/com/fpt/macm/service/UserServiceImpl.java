@@ -69,33 +69,33 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	SemesterService semesterService;
-	
+
 	@Autowired
 	TrainingScheduleService trainingScheduleService;
-	
+
 	@Autowired
 	CollaboratorReportRepository collaboratorReportRepository;
-	
+
 	@Autowired
 	AttendanceStatusRepository attendanceStatusRepository;
-	
+
 	@Autowired
 	TrainingScheduleRepository trainingScheduleRepository;
-	
+
 	@Autowired
 	EventScheduleRepository eventScheduleRepository;
-	
+
 	@Autowired
 	AttendanceEventRepository attendanceEventRepository;
-	
+
 	@Autowired
 	MemberEventRepository memberEventRepository;
-	
+
 	@Autowired
 	TournamentScheduleRepository tournamentScheduleRepository;
-	
+
 	private static final int ORDER_QR_CODE_SIZE_WIDTH = 300;
-    private static final int ORDER_QR_CODE_SIZE_HEIGHT = 300;
+	private static final int ORDER_QR_CODE_SIZE_HEIGHT = 300;
 
 	@Override
 	public ResponseMessage getUserByStudentId(String studentId) {
@@ -208,15 +208,16 @@ public class UserServiceImpl implements UserService {
 					userRepository.save(user);
 					responseMessage.setData(Arrays.asList(user));
 					responseMessage.setMessage(Constant.MSG_005);
-					
+
 					Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-					Optional<AdminSemester> adminSemesterOp = adminSemesterRepository.findByUserId(user.getId(), semester.getName());
+					Optional<AdminSemester> adminSemesterOp = adminSemesterRepository.findByUserId(user.getId(),
+							semester.getName());
 					if (adminSemesterOp.isPresent()) {
 						AdminSemester adminSemester = adminSemesterOp.get();
 						adminSemester.setRole(roleOptional.get());
 						adminSemesterRepository.save(adminSemester);
 					}
-					
+
 				} else {
 					String messageError = "";
 					if (checkDuplicateStudentId) {
@@ -435,43 +436,39 @@ public class UserServiceImpl implements UserService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<User> usersFromExcel = ExcelHelper.excelToUsers(file.getInputStream());
-			List<User> users = (List<User>) userRepository.findAll();
-			boolean checkDuplicateEmail = false;
-			boolean checkDuplicateStudentId = false;
-			String messageError = "";
+			List<UserDto> usersDto = new ArrayList<UserDto>();
 			for (User userFromExcel : usersFromExcel) {
-				for (User user : users) {
-					if (userFromExcel.getStudentId().equals(user.getStudentId())) {
-						checkDuplicateStudentId = true;
-					}
-					if (userFromExcel.getEmail().equals(user.getEmail())) {
-						checkDuplicateEmail = true;
-					}
-				}
-				if (!checkDuplicateEmail && !checkDuplicateStudentId) {
+				Optional<User> userStudentId = userRepository.findByStudentId(userFromExcel.getStudentId());
+				Optional<User> userEmail = userRepository.findByEmail(userFromExcel.getEmail());
+				if (userStudentId.isPresent() || userEmail.isPresent()) {
+					usersDto.add(convertUserToUserDto(userFromExcel));
+				} else {
 					userFromExcel.setCreatedOn(LocalDate.now());
 					userFromExcel.setCreatedBy("toandv");
 					userRepository.saveAll(usersFromExcel);
-					MemberSemester memberSemester = new MemberSemester();
-					memberSemester.setUser(userFromExcel);
-					memberSemester.setStatus(true);
-					Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-					memberSemester.setSemester(currentSemester.getName());
-					memberSemesterRepository.save(memberSemester);
-					responseMessage.setData(usersFromExcel);
-					responseMessage.setMessage(Constant.MSG_006);
-				} else {
-					if (checkDuplicateStudentId) {
-						messageError += Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
+
+					if (userFromExcel.getRole().getId() > 9 && userFromExcel.getRole().getId() < 13) {
+						MemberSemester memberSemester = new MemberSemester();
+						memberSemester.setUser(userFromExcel);
+						memberSemester.setStatus(true);
+						Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+						memberSemester.setSemester(currentSemester.getName());
+						memberSemesterRepository.save(memberSemester);
 					}
-					if (checkDuplicateEmail) {
-						messageError += Constant.MSG_049 + userFromExcel.getEmail() + Constant.MSG_050;
+
+					if (userFromExcel.getRole().getId() > 0 && userFromExcel.getRole().getId() < 10) {
+						AdminSemester adminSemester = new AdminSemester();
+						adminSemester.setUser(userFromExcel);
+						adminSemester.setRole(userFromExcel.getRole());
+						Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+						adminSemester.setSemester(currentSemester.getName());
+						adminSemesterRepository.save(adminSemester);
 					}
 				}
-				responseMessage.setMessage(messageError);
-				responseMessage.setCode(400);
 			}
-
+			responseMessage.setData(usersDto);
+			responseMessage.setMessage(Constant.MSG_006);
+			responseMessage.setTotalResult(usersDto.size());
 			return responseMessage;
 		} catch (IOException e) {
 			throw new RuntimeException("fail to store excel data: " + e.getMessage());
@@ -691,17 +688,18 @@ public class UserServiceImpl implements UserService {
 			inforInQrCode.setDate(LocalDate.now().toString());
 			if (trainingSchedule != null) {
 				User user = userRepository.findByStudentId(inforInQrCode.getStudentId()).get();
-				AttendanceStatus attendanceStatus = attendanceStatusRepository.findByUserIdAndTrainingScheduleId(user.getId(),trainingSchedule.getId());
-				if(attendanceStatus == null) {
+				AttendanceStatus attendanceStatus = attendanceStatusRepository
+						.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+				if (attendanceStatus == null) {
 					inforInQrCode.setStatus(false);
-				}else {
-					if(attendanceStatus.getStatus() == 0 || attendanceStatus.getStatus() == 2) {
+				} else {
+					if (attendanceStatus.getStatus() == 0 || attendanceStatus.getStatus() == 2) {
 						inforInQrCode.setStatus(false);
-					}else {
+					} else {
 						inforInQrCode.setStatus(true);
 					}
 				}
-			}else {
+			} else {
 				inforInQrCode.setStatus(false);
 			}
 			String prettyData = Utils.prettyObject(inforInQrCode);
@@ -759,20 +757,20 @@ public class UserServiceImpl implements UserService {
 					userAttendanceStatusDto.setType(0);
 					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 				} else {
-					AttendanceStatus attendanceStatus = attendanceStatusRepository.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+					AttendanceStatus attendanceStatus = attendanceStatusRepository
+							.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
 					if (attendanceStatus == null) {
 						UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
 						userAttendanceStatusDto.setUserName(user.getName());
 						userAttendanceStatusDto.setStudentId(user.getStudentId());
-						userAttendanceStatusDto.setStatus(0);
+						userAttendanceStatusDto.setStatus(2);
 						userAttendanceStatusDto.setDate(trainingSchedule.getDate());
 						userAttendanceStatusDto.setStartTime(trainingSchedule.getStartTime());
 						userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
 						userAttendanceStatusDto.setTitle("Lịch tập");
 						userAttendanceStatusDto.setType(0);
 						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
-					}
-					else {
+					} else {
 						UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
 						userAttendanceStatusDto.setUserName(user.getName());
 						userAttendanceStatusDto.setStudentId(user.getStudentId());
@@ -786,7 +784,7 @@ public class UserServiceImpl implements UserService {
 					}
 				}
 			}
-			
+
 			List<EventSchedule> listEventSchedule = eventScheduleRepository.findAll();
 			for (EventSchedule eventSchedule : listEventSchedule) {
 				if (LocalDate.now().isBefore(eventSchedule.getDate())) {
@@ -800,14 +798,16 @@ public class UserServiceImpl implements UserService {
 					userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 					userAttendanceStatusDto.setType(1);
 					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
-				}
-				else {
-					Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventSchedule.getEvent().getId(), user.getId());
+				} else {
+					Optional<MemberEvent> memberEventOp = memberEventRepository
+							.findMemberEventByEventAndUser(eventSchedule.getEvent().getId(), user.getId());
 					if (memberEventOp.isPresent()) {
 						MemberEvent memberEvent = memberEventOp.get();
 						if (memberEvent.isRegisterStatus()) {
-							Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository.findByEventIdAndMemberEventId(eventSchedule.getEvent().getId(), memberEvent.getId());
-							if(attendanceEventOp.isPresent()) {
+							Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
+									.findByEventIdAndMemberEventId(eventSchedule.getEvent().getId(),
+											memberEvent.getId());
+							if (attendanceEventOp.isPresent()) {
 								AttendanceEvent attendanceEvent = attendanceEventOp.get();
 								UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
 								userAttendanceStatusDto.setUserName(user.getName());
@@ -831,8 +831,7 @@ public class UserServiceImpl implements UserService {
 								userAttendanceStatusDto.setType(1);
 								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 							}
-						}
-						else {
+						} else {
 							UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
 							userAttendanceStatusDto.setUserName(user.getName());
 							userAttendanceStatusDto.setStudentId(user.getStudentId());
@@ -844,8 +843,7 @@ public class UserServiceImpl implements UserService {
 							userAttendanceStatusDto.setType(1);
 							listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 						}
-					}
-					else {
+					} else {
 						UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
 						userAttendanceStatusDto.setUserName(user.getName());
 						userAttendanceStatusDto.setStudentId(user.getStudentId());
@@ -859,7 +857,7 @@ public class UserServiceImpl implements UserService {
 					}
 				}
 			}
-			
+
 			List<TournamentSchedule> listTournamentSchedule = tournamentScheduleRepository.findAll();
 			for (TournamentSchedule tournamentSchedule : listTournamentSchedule) {
 				UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
@@ -873,9 +871,10 @@ public class UserServiceImpl implements UserService {
 				userAttendanceStatusDto.setType(2);
 				listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 			}
-			
+
 			responseMessage.setData(listUserAttendanceStatusDto);
-			responseMessage.setMessage("Lấy dữ liệu điểm danh của " + user.getName() + " - " + user.getStudentId() + " thành công");
+			responseMessage.setMessage(
+					"Lấy dữ liệu điểm danh của " + user.getName() + " - " + user.getStudentId() + " thành công");
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
