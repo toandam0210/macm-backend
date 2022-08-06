@@ -190,9 +190,6 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 			if (getTournament.getStatus() == 0) {
 				responseMessage.setMessage("Chưa có danh sách tuyển thủ thi đấu");
 				return responseMessage;
-			} else if (getTournament.getStatus() == 1) {
-				responseMessage.setMessage("Đã có danh sách thi đấu, có thể tạo trận đấu");
-				return responseMessage;
 			} else {
 				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByType(competitiveTypeId);
 				List<CompetitiveMatchDto> listMatchDto = new ArrayList<CompetitiveMatchDto>();
@@ -236,10 +233,14 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 				}
 				Collections.sort(listMatchDto);
 				responseMessage.setData(listMatchDto);
-				responseMessage.setMessage("Danh sách trận đấu");
+				if (getTournament.getStatus() == 1) {
+					responseMessage.setMessage("Danh sách trận đấu dự kiến");
+				} else {
+					responseMessage.setMessage("Danh sách trận đấu chính thức");
+				}
 				List<CompetitivePlayerBracket> listPlayers = competitivePlayerBracketRepository
 						.listPlayersByType(competitiveTypeId);
-				responseMessage.setTotalResult(maxRound(listPlayers.size()));
+				responseMessage.setTotalResult(maxRound(listPlayers.size()) + 1);
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -278,8 +279,14 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 					if (matchDto.getFirstPlayer() != null) {
 						getMatch.setFirstStudentId(matchDto.getFirstPlayer().getStudentId());
 					}
+					else {
+						getMatch.setFirstStudentId(null);
+					}
 					if (matchDto.getSecondPlayer() != null) {
 						getMatch.setSecondStudentId(matchDto.getSecondPlayer().getStudentId());
+					}
+					else {
+						getMatch.setSecondStudentId(null);
 					}
 					getMatch.setUpdatedBy("LinhLHN");
 					getMatch.setUpdatedOn(LocalDateTime.now());
@@ -289,19 +296,6 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 			}
 			responseMessage.setData(listMatchUpdated);
 			responseMessage.setMessage("Danh sách trận đấu chính thức");
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
-	public ResponseMessage previewMatchsPlayer(int competitiveTypeId) {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

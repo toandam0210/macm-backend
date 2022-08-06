@@ -21,7 +21,7 @@ public interface UserService {
 	ResponseMessage searchUserByStudentIdOrName(String inputSearch,int pageNo, int pageSize, String sortBy);
 //	ResponseMessage userLogin();
 	ResponseMessage addUsersFromExcel(MultipartFile file);
-	ByteArrayInputStream exportUsersToExcel();
+	ByteArrayInputStream exportUsersToExcel(List<UserDto> users);
 	ResponseMessage findAllMember(int pageNo, int pageSize, String sortBy);
 	ResponseMessage getAllUser();
 	ResponseMessage getMembersBySemester(String semester);
@@ -29,4 +29,5 @@ public interface UserService {
 	ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email, String gender, Integer generation, Integer roleId, String isActive, String dateFrom, String dateTo);
 	ResponseMessage generateQrCode(InforInQrCode inforInQrCode);
 	ResponseMessage getAllActiveMemberAndCollaborator();
+	ResponseMessage getAllUserAttendanceStatus(String studentId);
 }

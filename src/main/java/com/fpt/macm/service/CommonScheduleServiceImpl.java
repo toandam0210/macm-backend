@@ -30,7 +30,7 @@ public class CommonScheduleServiceImpl implements CommonScheduleService{
 		// TODO Auto-generated method stub
 		try {
 			Optional<CommonSchedule> getSessionOp = commonScheduleRepository.findByDate(date);
-			if(getSessionOp != null) {
+			if(getSessionOp.isPresent()) {
 				return getSessionOp.get();
 			}
 		} catch (Exception e) {
@@ -55,7 +55,7 @@ public class CommonScheduleServiceImpl implements CommonScheduleService{
 	}
 
 	@Override
-	public ResponseMessage getCommonSessionByDate(String date) {
+	public ResponseMessage getCommonScheduleByDate(String date) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {

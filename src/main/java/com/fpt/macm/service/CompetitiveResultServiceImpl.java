@@ -17,7 +17,9 @@ import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentSchedule;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
@@ -26,6 +28,7 @@ import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
+import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
 import com.fpt.macm.repository.UserRepository;
 
@@ -62,6 +65,9 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 	@Autowired
 	CompetitiveTypeService competitiveTypeService;
 
+	@Autowired
+	TournamentRepository tournamentRepository;
+
 	@Override
 	public ResponseMessage spawnTimeAndArea(int tournamentId) {
 		// TODO Auto-generated method stub
@@ -95,16 +101,30 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 			}
 			if (countMatchCanHeld >= countMatchNeedHeld) {
 				boolean isRunning = true;
+				int matchEveryDay = countMatchNeedHeld / listTournamentSchedules.size();
+				int matchSurplus = countMatchNeedHeld % listTournamentSchedules.size();
 				int index = 0;
 				CompetitiveResult oldResult = new CompetitiveResult();
+				int countSchedule = 0;
+				boolean isJumpDay;
 				for (TournamentSchedule tournamentSchedule : listTournamentSchedules) {
+					isJumpDay = false;
+					countSchedule++;
+					int countMatchEveryDay = 0;
 					if (isRunning) {
 						LocalDate date = tournamentSchedule.getDate();
 						LocalTime startTime = tournamentSchedule.getStartTime();
 						LocalTime finishTime = tournamentSchedule.getFinishTime();
 						while (startTime.isBefore(finishTime)) {
+							if (isJumpDay) {
+								startTime = startTime.plusMinutes(10);
+								continue;
+							}
 							if (isRunning) {
 								for (Area area : listArea) {
+									if (isJumpDay) {
+										continue;
+									}
 									LocalDateTime timeMatch = LocalDateTime.of(date, startTime);
 									if (isRunning) {
 										CompetitiveResult newResult = new CompetitiveResult();
@@ -124,7 +144,17 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 										competitiveResultRepository.save(newResult);
 										listResult.add(newResult);
 										oldResult = newResult;
+										countMatchEveryDay++;
 										index++;
+										if (countSchedule > matchSurplus) {
+											if (countMatchEveryDay == matchEveryDay) {
+												isJumpDay = true;
+											}
+										} else {
+											if (countMatchEveryDay == matchEveryDay + 1) {
+												isJumpDay = true;
+											}
+										}
 										if (index == listMatch.size()) {
 											isRunning = false;
 										}
@@ -159,26 +189,34 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			LocalDate getDate = LocalDate.of(newResult.getTime().getYear(), newResult.getTime().getMonthValue(),
+					newResult.getTime().getDayOfMonth());
 			List<CompetitiveResult> listResult = competitiveResultRepository
 					.listResultByAreaOrderTime(newResult.getArea().getId());
+			List<CompetitiveResult> listResultAtDate = new ArrayList<CompetitiveResult>();
+			for (CompetitiveResult competitiveResult : listResult) {
+				LocalDate currentDate = competitiveResult.getTime().toLocalDate();
+				if (getDate.equals(currentDate)) {
+					listResultAtDate.add(competitiveResult);
+				}
+			}
 			int checkExisted = -1;
-			for (int i = 0; i < listResult.size(); i++) {
-				if(i == listResult.size() - 1) {
-					if(listResult.get(i).getTime().compareTo(newResult.getTime()) <= 0
-							&& listResult.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
-							&& !listResult.get(i).getMatch().equals(newResult.getMatch())) {
+			for (int i = 0; i < listResultAtDate.size(); i++) {
+				if (i == listResultAtDate.size() - 1) {
+					if (listResultAtDate.get(i).getTime().compareTo(newResult.getTime()) <= 0
+							&& listResultAtDate.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
+							&& !listResultAtDate.get(i).getMatch().equals(newResult.getMatch())) {
 						checkExisted = i;
 						break;
 					}
 				}
-				if (listResult.get(i).getTime().compareTo(newResult.getTime()) <= 0
-						&& listResult.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
-						&& listResult.get(i + 1).getTime().compareTo(newResult.getTime().plusMinutes(10)) < 0) {
-					if(listResult.get(i).getMatch().equals(newResult.getMatch())) {
+				if (listResultAtDate.get(i).getTime().compareTo(newResult.getTime()) <= 0
+						&& listResultAtDate.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
+						&& listResultAtDate.get(i + 1).getTime().compareTo(newResult.getTime().plusMinutes(10)) < 0) {
+					if (listResultAtDate.get(i).getMatch().equals(newResult.getMatch())) {
 						checkExisted = i + 1;
 						break;
-					}
-					else {
+					} else {
 						checkExisted = i;
 						break;
 					}
@@ -193,9 +231,9 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 				competitiveResultRepository.save(getResult);
 				responseMessage.setData(Arrays.asList(getResult));
 				responseMessage.setMessage("Cập nhật thời gian và địa điểm thành công");
-			}
-			else {
-				responseMessage.setMessage("Bị trùng với trận khác diễn ra trên cùng sân vào lúc " + listResult.get(checkExisted).getTime());
+			} else {
+				responseMessage.setMessage("Bị trùng với trận khác diễn ra trên cùng sân vào lúc "
+						+ listResultAtDate.get(checkExisted).getTime());
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -263,27 +301,53 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 		return responseMessage;
 	}
 
-	public Integer isEnoughTime(List<CompetitiveMatch> listMatch, List<TournamentSchedule> listTournamentSchedules) {
+	@Override
+	public ResponseMessage getResultByType(int competitiveTypeId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			int countMatchNeedHeld = 0;
-			for (CompetitiveMatch competitiveMatch : listMatch) {
-				if (competitiveMatch.getRound() == 1 && (competitiveMatch.getFirstStudentId() == null
-						|| competitiveMatch.getSecondStudentId() == null)) {
-					continue;
+			CompetitiveType getType = competitiveTypeRepository.findById(competitiveTypeId).get();
+			User getUser = new User();
+			User[] listResult = new User[3];
+			Tournament getTournament = tournamentRepository
+					.findById(competitiveTypeRepository.findTournamentOfType(competitiveTypeId)).get();
+			if (getTournament.getStatus() == 3) {
+				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
+				CompetitiveResult getResult = competitiveResultRepository.findByMatchId(listMatchs.get(1).getId()).get();
+				if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
+					responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
+					return responseMessage;
+				} else {
+					getUser = userRepository.findByStudentId(getResult.getFirstPoint() > getResult.getSecondPoint()
+							? listMatchs.get(0).getFirstStudentId()
+							: listMatchs.get(0).getSecondStudentId()).get();
+					listResult[2] = getUser;
 				}
-				countMatchNeedHeld++;
+				getResult = competitiveResultRepository.findByMatchId(listMatchs.get(0).getId()).get();
+				if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
+					responseMessage.setMessage("Trận chung kết chưa diễn ra");
+					return responseMessage;
+				} else {
+					if(getResult.getFirstPoint() > getResult.getSecondPoint()) {
+						getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
+						listResult[0] = getUser;
+						getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
+						listResult[1] = getUser;
+					}
+					else {
+						getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
+						listResult[1] = getUser;
+						getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
+						listResult[0] = getUser;
+					}
+				}
+				responseMessage.setData(Arrays.asList(listResult));
+				responseMessage.setMessage("Kết quả thi đấu ở thể thức " + (getType.isGender()? "Nam: " : "Nữ: ") + getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
 			}
-			int countMatchCanHeld = 0;
-			for (TournamentSchedule tournamentSchedule : listTournamentSchedules) {
-				LocalTime startTime = tournamentSchedule.getStartTime();
-				LocalTime finishTime = tournamentSchedule.getFinishTime();
-				countMatchCanHeld += ((finishTime.getHour() - startTime.getHour()) * 60 + finishTime.getMinute()
-						- startTime.getMinute()) / 10;
-			}
-			return countMatchCanHeld - countMatchNeedHeld;
 		} catch (Exception e) {
 			// TODO: handle exception
-			return null;
+			responseMessage.setMessage(e.getMessage());
 		}
+		return responseMessage;
 	}
 }

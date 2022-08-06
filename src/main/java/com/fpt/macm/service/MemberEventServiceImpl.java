@@ -18,6 +18,7 @@ import com.fpt.macm.model.dto.EventPaymentStatusReportDto;
 import com.fpt.macm.model.dto.MemberEventDto;
 import com.fpt.macm.model.dto.MemberNotJoinEventDto;
 import com.fpt.macm.model.dto.RoleEventDto;
+import com.fpt.macm.model.dto.UserEventDto;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventPaymentStatusReport;
@@ -89,7 +90,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Pageable paging = PageRequest.of(pageNo, pageSize, Sort.by(sortBy));
-			Page<MemberEvent> pageResponse = memberEventRepository.findAllMemberCancelJoinEventByEventId(eventId,
+			Page<MemberEvent> pageResponse = memberEventRepository.findByEventIdAndRegisterStatus(eventId, false,
 					paging);
 			List<MemberEvent> membersEvent = new ArrayList<MemberEvent>();
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
@@ -510,7 +511,19 @@ public class MemberEventServiceImpl implements MemberEventService {
 							memberHasRegisteredToEvent.setUpdatedBy(user.getName() + " - " + user.getStudentId());
 							memberHasRegisteredToEvent.setUpdatedOn(LocalDateTime.now());
 							memberEventRepository.save(memberHasRegisteredToEvent);
-							responseMessage.setData(Arrays.asList(memberHasRegisteredToEvent));
+							
+							UserEventDto userEventDto = new UserEventDto();
+							userEventDto.setEventId(memberHasRegisteredToEvent.getEvent().getId());
+							userEventDto.setEventName(memberHasRegisteredToEvent.getEvent().getName());
+							userEventDto.setUserName(user.getName());
+							userEventDto.setUserStudentId(user.getStudentId());
+							RoleEventDto roleEventDto = new RoleEventDto();
+							roleEventDto.setId(memberHasRegisteredToEvent.getRoleEvent().getId());
+							roleEventDto.setName(memberHasRegisteredToEvent.getRoleEvent().getName());
+							userEventDto.setRoleEventDto(roleEventDto);
+							Utils.convertNameOfEventRole(memberHasRegisteredToEvent.getRoleEvent(), userEventDto.getRoleEventDto());
+							
+							responseMessage.setData(Arrays.asList(userEventDto));
 							responseMessage.setMessage("Đăng ký tham gia sự kiện thành công");
 							return responseMessage;
 						}
@@ -529,7 +542,19 @@ public class MemberEventServiceImpl implements MemberEventService {
 				memberEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
 				memberEvent.setCreatedOn(LocalDateTime.now());
 				memberEventRepository.save(memberEvent);
-				responseMessage.setData(Arrays.asList(memberEvent));
+				
+				UserEventDto userEventDto = new UserEventDto();
+				userEventDto.setEventId(memberEvent.getEvent().getId());
+				userEventDto.setEventName(memberEvent.getEvent().getName());
+				userEventDto.setUserName(user.getName());
+				userEventDto.setUserStudentId(user.getStudentId());
+				RoleEventDto roleEventDto = new RoleEventDto();
+				roleEventDto.setId(memberEvent.getRoleEvent().getId());
+				roleEventDto.setName(memberEvent.getRoleEvent().getName());
+				userEventDto.setRoleEventDto(roleEventDto);
+				Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), userEventDto.getRoleEventDto());
+				
+				responseMessage.setData(Arrays.asList(userEventDto));
 				responseMessage.setMessage("Đăng ký tham gia sự kiện thành công");
 			} else {
 				responseMessage.setMessage(Constant.MSG_131);
@@ -567,17 +592,36 @@ public class MemberEventServiceImpl implements MemberEventService {
 					}
 
 					if (countOrganizingCommittee < event.getMaxQuantityComitee()) {
+						Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(event.getId(), user.getId());
 						MemberEvent memberEvent = new MemberEvent();
-						memberEvent.setEvent(event);
-						memberEvent.setUser(user);
+						if (memberEventOp.isPresent()) {
+							memberEvent = memberEventOp.get();
+							memberEvent.setUpdatedBy(user.getName() + " - " + user.getStudentId());
+							memberEvent.setUpdatedOn(LocalDateTime.now());
+						}
+						else {
+							memberEvent.setEvent(event);
+							memberEvent.setUser(user);
+							memberEvent.setPaymentValue(0);
+							memberEvent.setPaidBeforeClosing(false);
+							memberEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
+							memberEvent.setCreatedOn(LocalDateTime.now());
+						}
 						memberEvent.setRegisterStatus(true);
-						memberEvent.setPaymentValue(0);
-						memberEvent.setPaidBeforeClosing(false);
 						memberEvent.setRoleEvent(roleEvent);
-						memberEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
-						memberEvent.setCreatedOn(LocalDateTime.now());
 						memberEventRepository.save(memberEvent);
-						responseMessage.setData(Arrays.asList(memberEvent));
+						UserEventDto userEventDto = new UserEventDto();
+						userEventDto.setEventId(memberEvent.getEvent().getId());
+						userEventDto.setEventName(memberEvent.getEvent().getName());
+						userEventDto.setUserName(user.getName());
+						userEventDto.setUserStudentId(user.getStudentId());
+						RoleEventDto roleEventDto = new RoleEventDto();
+						roleEventDto.setId(memberEvent.getRoleEvent().getId());
+						roleEventDto.setName(memberEvent.getRoleEvent().getName());
+						userEventDto.setRoleEventDto(roleEventDto);
+						Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), userEventDto.getRoleEventDto());
+						
+						responseMessage.setData(Arrays.asList(userEventDto));
 						responseMessage.setMessage("Đăng ký tham gia ban tổ chức sự kiện thành công");
 					} else {
 						responseMessage.setMessage("Sự kiện này đã đủ số lượng ban tổ chức");
@@ -622,6 +666,41 @@ public class MemberEventServiceImpl implements MemberEventService {
 			else {
 				responseMessage.setMessage("Đã hết hạn hủy đăng ký");
 			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllEventByStudentId(String studentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			List<MemberEvent> membersEvent = memberEventRepository.findByUserId(user.getId());
+			if (!membersEvent.isEmpty()) {
+				List<UserEventDto> userEventsDto = new ArrayList<UserEventDto>();
+				for (MemberEvent memberEvent : membersEvent) {
+					if (memberEvent.isRegisterStatus()) {
+						UserEventDto userEventDto = new UserEventDto();
+						userEventDto.setEventId(memberEvent.getEvent().getId());
+						userEventDto.setEventName(memberEvent.getEvent().getName());
+						userEventDto.setUserName(user.getName());
+						userEventDto.setUserStudentId(user.getStudentId());
+						RoleEventDto roleEventDto = new RoleEventDto();
+						roleEventDto.setId(memberEvent.getRoleEvent().getId());
+						roleEventDto.setName(memberEvent.getRoleEvent().getName());
+						userEventDto.setRoleEventDto(roleEventDto);
+						Utils.convertNameOfEventRole(memberEvent.getRoleEvent(), userEventDto.getRoleEventDto());
+						userEventsDto.add(userEventDto);
+					}
+				}
+				responseMessage.setData(userEventsDto);
+				responseMessage.setMessage("Lấy danh sách sự kiện đã tham gia của " + user.getName() + " - " + user.getStudentId() + " thành công");
+			}
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

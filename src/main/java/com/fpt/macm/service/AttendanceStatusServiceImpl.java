@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.AttendanceStatusDto;
+import com.fpt.macm.model.dto.UserAttendanceStatusDto;
 import com.fpt.macm.model.dto.UserAttendanceTrainingReportDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.Semester;
@@ -29,7 +30,7 @@ import com.fpt.macm.utils.Utils;
 @Service
 public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	@Autowired
-	TrainingScheduleServiceImpl trainingScheduleServiceImpl;
+	TrainingScheduleService trainingScheduleService;
 
 	@Autowired
 	AttendanceStatusRepository attendanceStatusRepository;
@@ -47,7 +48,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	public ResponseMessage takeAttendanceByStudentId(String studentId, int status) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			TrainingSchedule trainingSchedule = trainingScheduleServiceImpl.getTrainingSessionByDate(LocalDate.now());
+			TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
 			if (trainingSchedule != null) {
 				Optional<User> userOp = userRepository.findByStudentId(studentId);
 				User user = userOp.get();
@@ -93,7 +94,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				if (attendanceStatus.getStatus() == 1) {
 					attend++;
 				}
-				if(attendanceStatus.getStatus() == 0) {
+				if (attendanceStatus.getStatus() == 0) {
 					absent++;
 				}
 				attendanceStatusDto.setDate(attendanceStatus.getTrainingSchedule().getDate());
@@ -143,8 +144,10 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 							totalAbsent++;
 						}
 					}
-					attendanceTrainingReportDto.setTotalAbsent(totalAbsent + " buổi nghỉ trên tổng " + trainingSchedulesBySemester.size() + " buổi tập");
-					double percentAbsent = Math.ceil(((double)totalAbsent / (double)trainingSchedulesBySemester.size())*100) ;
+					attendanceTrainingReportDto.setTotalAbsent(
+							totalAbsent + " buổi nghỉ trên tổng " + trainingSchedulesBySemester.size() + " buổi tập");
+					double percentAbsent = Math
+							.ceil(((double) totalAbsent / (double) trainingSchedulesBySemester.size()) * 100);
 					attendanceTrainingReportDto.setPercentAbsent(percentAbsent);
 					attendanceTrainingReportsDto.add(attendanceTrainingReportDto);
 				}
@@ -152,6 +155,46 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(attendanceTrainingReportsDto.size());
 			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllAttendanceStatusByStudentIdAndSemester(String studentId, String semesterName) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+			Semester semester = semesterRepository.findByName(semesterName).get();
+			
+			List<UserAttendanceStatusDto> listUserAttendanceStatusDto = new ArrayList<UserAttendanceStatusDto>();
+			
+			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
+					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
+			for (TrainingSchedule trainingSchedule : trainingSchedules) {
+				UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+				userAttendanceStatusDto.setUserName(user.getName());
+				userAttendanceStatusDto.setStudentId(user.getStudentId());
+				userAttendanceStatusDto.setDate(trainingSchedule.getDate());
+				userAttendanceStatusDto.setStartTime(trainingSchedule.getStartTime());
+				userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
+				userAttendanceStatusDto.setTitle("Lịch tập");
+				userAttendanceStatusDto.setType(0);
+				
+				AttendanceStatus attendanceStatus = attendanceStatusRepository
+						.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+				if (attendanceStatus != null) {
+					userAttendanceStatusDto.setStatus(attendanceStatus.getStatus());
+				}
+				else {
+					userAttendanceStatusDto.setStatus(2);
+				}
+				listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+			}
+			
+			responseMessage.setData(listUserAttendanceStatusDto);
+			responseMessage.setMessage("Lấy báo cáo điểm danh cho " + user.getName() + " - " + user.getStudentId() + " thành công.");
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
