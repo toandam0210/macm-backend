@@ -307,7 +307,13 @@ public class UserServiceImpl implements UserService {
 					memberSemester.setSemester(semester.getName());
 					memberSemesterRepository.save(memberSemester);
 				}
-				responseMessage.setData(Arrays.asList(user));
+				
+				Optional<User> newUserOp = userRepository.findByStudentId(user.getStudentId());
+				if (newUserOp.isPresent()) {
+					User newUser = newUserOp.get();
+					UserDto newUserDto = convertUserToUserDto(newUser);
+					responseMessage.setData(Arrays.asList(newUserDto));
+				}
 				responseMessage.setMessage(Constant.MSG_007);
 			} else {
 				String messageError = "";
