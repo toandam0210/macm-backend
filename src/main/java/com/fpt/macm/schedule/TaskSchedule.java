@@ -225,7 +225,7 @@ public class TaskSchedule {
 				if (user.isActive()) {
 					numberUserActive++;
 					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository.findByUserIdAndSemester(user.getId(), semester.getName());
-					if (memberSemesterOp.isEmpty()) {
+					if (!memberSemesterOp.isPresent()) {
 						MemberSemester statusSemester = new MemberSemester();
 						statusSemester.setUser(user);
 						statusSemester.setSemester(semester.getName());
@@ -240,7 +240,7 @@ public class TaskSchedule {
 			for (User user : admins) {
 				numberUserActive++;
 				Optional<AdminSemester> adminSemesterOp = adminSemesterRepository.findByUserId(user.getId(), semester.getName());
-				if (adminSemesterOp.isEmpty()) {
+				if (!adminSemesterOp.isPresent()) {
 					AdminSemester adminSemester = new AdminSemester();
 					adminSemester.setUser(user);
 					adminSemester.setSemester(semester.getName());
