@@ -266,10 +266,13 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 2 0 * * *")
 	public void addListAttendanceStatus() {
+		logger.info("bat dau chay");
 		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
 		if (trainingSchedule != null) {
+			logger.info("Khac null");
 			List<User> users = (List<User>) userRepository.findAll();
 			for (User user : users) {
+				logger.info("vao for");
 				if (user.isActive()) {
 					AttendanceStatus attendanceStatus = new AttendanceStatus();
 					attendanceStatus.setUser(user);
@@ -282,6 +285,7 @@ public class TaskSchedule {
 				}
 			}
 		}
+		logger.info("Chay xong");
 	}
 
 	@Scheduled(cron = "1 2 0 * * *")
@@ -500,7 +504,7 @@ public class TaskSchedule {
 		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
 		if (trainingSchedule != null) {
 			List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
-					.findByTrainingScheduleId(trainingSchedule.getId());
+					.findByTrainingScheduleIdOrderByIdAsc(trainingSchedule.getId());
 			for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
 				if (attendanceStatus.getStatus() == 2) {
 					attendanceStatus.setStatus(0);
