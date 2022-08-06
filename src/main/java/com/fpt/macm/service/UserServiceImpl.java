@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -529,7 +530,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage getMembersBySemester(String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberSemester> statusSemesters = memberSemesterRepository.findBySemester(semester);
+			List<MemberSemester> statusSemesters = memberSemesterRepository.findBySemesterOrderByIdDesc(semester);
 			Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			List<User> collaborators = userRepository.findCollaborator();
 			List<UserDto> usersDto = new ArrayList<UserDto>();
@@ -556,6 +557,7 @@ public class UserServiceImpl implements UserService {
 					UserDto userDto = convertUserToUserDto(user);
 					usersDto.add(userDto);
 				}
+				Collections.sort(usersDto);
 				responseMessage.setData(usersDto);
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(usersDto.size());
@@ -585,6 +587,7 @@ public class UserServiceImpl implements UserService {
 					UserDto userDto = convertUserToUserDto(user);
 					usersDto.add(userDto);
 				}
+				Collections.sort(usersDto);
 				responseMessage.setData(usersDto);
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(usersDto.size());
