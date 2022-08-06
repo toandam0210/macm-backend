@@ -33,7 +33,6 @@ import com.fpt.macm.model.dto.UserTournamentDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CompetitivePlayer;
-import com.fpt.macm.model.entity.CompetitivePlayerBracket;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionTeam;
@@ -51,7 +50,6 @@ import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
-import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
@@ -124,9 +122,6 @@ public class TournamentServiceImpl implements TournamentService {
 	UserRepository userRepository;
 
 	@Autowired
-	CompetitivePlayerBracketRepository competitivePlayerBracketRepository;
-	
-	@Autowired
 	NotificationRepository notificationRepository;
 	
 	@Autowired
@@ -138,7 +133,7 @@ public class TournamentServiceImpl implements TournamentService {
 		try {
 			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			tournament.setSemester(semester.getName());
-			tournament.setStatus(0);
+			//tournament.setStatus(0);
 			tournament.setCreatedBy("toandv");
 			tournament.setCreatedOn(LocalDateTime.now());
 			tournament.setTotalAmount(0);
@@ -146,10 +141,12 @@ public class TournamentServiceImpl implements TournamentService {
 			Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 			Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
 			for (CompetitiveType competitiveType : competitiveTypes) {
+				competitiveType.setStatus(0);
 				competitiveType.setCreatedBy("toandv");
 				competitiveType.setCreatedOn(LocalDateTime.now());
 			}
 			for (ExhibitionType exhibitionType : exhibitionTypes) {
+				exhibitionType.setStatus(0);
 				exhibitionType.setCreatedBy("toandv");
 				exhibitionType.setCreatedOn(LocalDateTime.now());
 			}
@@ -1197,23 +1194,14 @@ public class TournamentServiceImpl implements TournamentService {
 				if (!competitivePlayerOp.isPresent()) {
 					CompetitivePlayer competitivePlayer = new CompetitivePlayer();
 					competitivePlayer.setTournamentPlayer(tournamentPlayer);
-
 					competitivePlayer.setWeight(weight);
-
+					competitivePlayer.setCompetitiveType(competitiveType);
+					competitivePlayer.setIsEligible(true);
 					competitivePlayer.setCreatedBy(user.getName() + " - " + user.getStudentId());
 					competitivePlayer.setCreatedOn(LocalDateTime.now());
 					competitivePlayerRepository.save(competitivePlayer);
 					responseMessage.setData(Arrays.asList(competitivePlayer));
 					responseMessage.setMessage("Đăng ký thành công");
-
-					CompetitivePlayer getCompetitivePlayer = competitivePlayerRepository
-							.findCompetitivePlayerByTournamentPlayerId(tournamentPlayer.getId()).get();
-					CompetitivePlayerBracket newCompetitivePlayerBracket = new CompetitivePlayerBracket();
-					newCompetitivePlayerBracket.setCompetitiveType(competitiveType);
-					newCompetitivePlayerBracket.setCompetitivePlayer(getCompetitivePlayer);
-					newCompetitivePlayerBracket.setCreatedBy(user.getName() + " - " + user.getStudentId());
-					newCompetitivePlayerBracket.setCreatedOn(LocalDateTime.now());
-					competitivePlayerBracketRepository.save(newCompetitivePlayerBracket);
 
 				} else {
 					responseMessage.setMessage("Bạn đã đăng ký vào giải này rồi");
@@ -1364,14 +1352,11 @@ public class TournamentServiceImpl implements TournamentService {
 						.findByTournamentPlayerId(tournamentPlayer.getId());
 				if (competitivePlayerOp.isPresent()) {
 					List<CompetitivePlayerDto> competitivePlayersDto = new ArrayList<CompetitivePlayerDto>();
-					CompetitivePlayerBracket competitivePlayerBracket = competitivePlayerBracketRepository
-							.findByPlayerId(competitivePlayerOp.get().getId()).get();
-					CompetitiveType competitiveType = competitivePlayerBracket.getCompetitiveType();
-					List<CompetitivePlayerBracket> competitivePlayersBracket = competitivePlayerBracketRepository
-							.listPlayersByType(competitiveType.getId());
-					for (CompetitivePlayerBracket competitivePlayerBracket2 : competitivePlayersBracket) {
-						CompetitivePlayerDto competitivePlayerDto = convertToCompetitivePlayerDto(
-								competitivePlayerBracket2.getCompetitivePlayer());
+					CompetitivePlayer getCompetitivePlayer = competitivePlayerOp.get();
+					CompetitiveType competitiveType = getCompetitivePlayer.getCompetitiveType();
+					List<CompetitivePlayer> competitivePlayers = competitivePlayerRepository.findByCompetitiveTypeId(competitiveType.getId());
+					for (CompetitivePlayer competitivePlayer : competitivePlayers) {
+						CompetitivePlayerDto competitivePlayerDto = convertToCompetitivePlayerDto(competitivePlayer);
 						competitivePlayerDto.setWeightMin(competitiveType.getWeightMin());
 						competitivePlayerDto.setWeightMax(competitiveType.getWeightMax());
 						competitivePlayerDto.setCompetitiveTypeId(competitiveType.getId());

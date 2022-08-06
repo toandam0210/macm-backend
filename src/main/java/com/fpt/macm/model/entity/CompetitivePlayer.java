@@ -9,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -23,6 +24,10 @@ public class CompetitivePlayer {
 	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "player_id", referencedColumnName = "id")
     private TournamentPlayer tournamentPlayer;
+	
+	@ManyToOne(optional = false)
+	@JoinColumn(name = "competitiveTypeId")
+	private CompetitiveType competitiveType;
 
 	@Column(nullable = true)
 	private double weight;
@@ -38,6 +43,9 @@ public class CompetitivePlayer {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
+	@Column
+	private Boolean isEligible;
 
 	public int getId() {
 		return id;
@@ -93,6 +101,22 @@ public class CompetitivePlayer {
 
 	public void setTournamentPlayer(TournamentPlayer tournamentPlayer) {
 		this.tournamentPlayer = tournamentPlayer;
+	}
+
+	public Boolean getIsEligible() {
+		return isEligible;
+	}
+
+	public void setIsEligible(Boolean isEligible) {
+		this.isEligible = isEligible;
+	}
+
+	public CompetitiveType getCompetitiveType() {
+		return competitiveType;
+	}
+
+	public void setCompetitiveType(CompetitiveType competitiveType) {
+		this.competitiveType = competitiveType;
 	}
 
 }

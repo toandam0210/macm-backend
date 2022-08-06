@@ -19,8 +19,10 @@ import com.fpt.macm.model.entity.AdminSemester;
 import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CollaboratorReport;
+import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventSchedule;
+import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MemberSemester;
 import com.fpt.macm.model.entity.MembershipInfo;
@@ -136,7 +138,7 @@ public class TaskSchedule {
 
 	@Autowired
 	TrainingScheduleRepository trainingScheduleRepository;
-	
+
 	@Autowired
 	NotificationToUserRepository notificationToUserRepository;
 
@@ -183,7 +185,7 @@ public class TaskSchedule {
 					.setTotalNumberUserInSemester(userStatusReport.getTotalNumberUserInSemester() + countPassed);
 			userStatusReportRepository.save(userStatusReport);
 		}
-		
+
 		Optional<CollaboratorReport> colOptional = collaboratorReportRepository.findBySemester(semester.getName());
 		if (colOptional.isPresent()) {
 			CollaboratorReport collaboratorReport = colOptional.get();
@@ -195,7 +197,7 @@ public class TaskSchedule {
 			collaboratorReport.setNumberMale(countMale);
 			collaboratorReport.setNumberFemale(countFemale);
 			collaboratorReportRepository.save(collaboratorReport);
-		}else {
+		} else {
 			CollaboratorReport collaboratorReportNew = new CollaboratorReport();
 			collaboratorReportNew.setNumberJoin(listCollaborator.size());
 			collaboratorReportNew.setSemester(semester.getName());
@@ -395,8 +397,7 @@ public class TaskSchedule {
 				break;
 			}
 		}
-		
-		
+
 	}
 
 	@Scheduled(cron = "1 2 0 * * *")
@@ -407,7 +408,8 @@ public class TaskSchedule {
 			logger.info(getStartDate.toString());
 			if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
 				Notification notification = new Notification();
-				notification.setMessage("Giải đấu " + tournament.getName() + " sẽ bắt đầu sau 1 ngày nữa, chuẩn bị chiến nào !!");
+				notification.setMessage(
+						"Giải đấu " + tournament.getName() + " sẽ bắt đầu sau 1 ngày nữa, chuẩn bị chiến nào !!");
 				notification.setCreatedOn(LocalDateTime.now());
 				notification.setNotificationType(0);
 				notification.setNotificationTypeId(tournament.getId());
@@ -432,7 +434,7 @@ public class TaskSchedule {
 
 					notificationService.sendNotificationToAnUser(user, newNotification);
 				}
-				
+
 				logger.info("okeeeeee");
 
 				break;
@@ -448,7 +450,7 @@ public class TaskSchedule {
 			if (hasSentNotificationWarningAbsent(user, semester)) {
 				continue;
 			}
-			
+
 			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 			int totalAbsent = 0;
@@ -469,18 +471,18 @@ public class TaskSchedule {
 				notification.setNotificationType(3);
 				notification.setNotificationTypeId(0);
 				notificationRepository.save(notification);
-				
+
 				Iterable<Notification> notificationIterable = notificationRepository
 						.findAll(Sort.by("id").descending());
 				List<Notification> notifications = IterableUtils.toList(notificationIterable);
 				Notification newNotification = notifications.get(0);
-				
+
 				notificationService.sendNotificationToAnUser(user, newNotification);
 			}
 
 		}
 	}
-	
+
 	public boolean hasSentNotificationWarningAbsent(User user, Semester semester) {
 		List<NotificationToUser> notificationsToUser = notificationToUserRepository.findAllByUserId(user.getId());
 		for (NotificationToUser notificationToUser : notificationsToUser) {
@@ -528,16 +530,32 @@ public class TaskSchedule {
 	public void changeStatusTournamentForUpdatePlayer() {
 		List<Tournament> listTournaments = tournamentService
 				.listTournamentsByRegistrationPlayerDeadline(LocalDateTime.now());
-		if(listTournaments != null) {
+		if (listTournaments != null) {
 			for (Tournament tournament : listTournaments) {
-				if (tournament.getStatus() == 0) {
-					tournament.setStatus(1);
-					tournamentRepository.save(tournament);
-					logger.info("Chuyển thành 1");
+				logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
+				Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
+				for (CompetitiveType competitiveType : listCompetitiveTypes) {
+					if (competitiveType.getStatus() == 0) {
+						competitiveType.setStatus(1);
+						logger.info("Trạng thái của " + (competitiveType.isGender() ? "Nam " : "Nữ ")
+								+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
+								+ " thay đổi từ 0 thành 1");
+					}
 				}
+				tournament.setCompetitiveTypes(listCompetitiveTypes);
+				Set<ExhibitionType> listExhibitionTypes = tournament.getExhibitionTypes();
+				for (ExhibitionType exhibitionType : listExhibitionTypes) {
+					if (exhibitionType.getStatus() == 0) {
+						exhibitionType.setStatus(1);
+						logger.info("Trạng thái của " + exhibitionType.getName() + " thay đổi từ 0 thành 1");
+					}
+				}
+				tournament.setExhibitionTypes(listExhibitionTypes);
+
+				logger.info("Dừng thay đổi trạng thái của giải đấu " + tournament.getName());
+				tournamentRepository.save(tournament);
 			}
-		}
-		else {
+		} else {
 			logger.info("Không có giải đấu");
 		}
 	}
@@ -546,12 +564,31 @@ public class TaskSchedule {
 	public void changeStatusTournamentForUpdateResult() {
 		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now());
 		if (tournamentSchedule != null) {
-			Tournament getTournament = tournamentSchedule.getTournament();
-			if (getTournament.getStatus() == 2) {
-				getTournament.setStatus(3);
-				tournamentRepository.save(getTournament);
-				logger.info("Chuyển thành 3");
+			Tournament tournament = tournamentSchedule.getTournament();
+			logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
+			Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
+			for (CompetitiveType competitiveType : listCompetitiveTypes) {
+				if (competitiveType.getStatus() == 2) {
+					competitiveType.setStatus(3);
+					logger.info("Trạng thái của " + (competitiveType.isGender() ? "Nam " : "Nữ ")
+							+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
+							+ " thay đổi từ 2 thành 3");
+				}
 			}
+			tournament.setCompetitiveTypes(listCompetitiveTypes);
+			Set<ExhibitionType> listExhibitionTypes = tournament.getExhibitionTypes();
+			for (ExhibitionType exhibitionType : listExhibitionTypes) {
+				if (exhibitionType.getStatus() == 0) {
+					exhibitionType.setStatus(1);
+					logger.info("Trạng thái của " + exhibitionType.getName() + " thay đổi từ 2 thành 3");
+				}
+			}
+			tournament.setExhibitionTypes(listExhibitionTypes);
+
+			logger.info("Dừng thay đổi trạng thái của giải đấu " + tournament.getName());
+			tournamentRepository.save(tournament);
+		} else {
+			logger.info("Không có giải đấu");
 		}
 	}
 }

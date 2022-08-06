@@ -10,4 +10,6 @@ public interface CompetitivePlayerService {
 	ResponseMessage updateWeightForCompetitivePlayer (int competitivePlayerId, double weight);
 	ResponseMessage deleteCompetitivePlayer (int competitivePlayerId);
 	ResponseMessage listUserNotJoinCompetitive(int tournamentId);
+	ResponseMessage getListPlayer(int competitiveTypeId);
+	
 }

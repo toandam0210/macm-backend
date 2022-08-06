@@ -17,13 +17,11 @@ import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
-import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
-import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
@@ -55,9 +53,6 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 
 	@Autowired
 	CompetitivePlayerRepository competitivePlayerRepository;
-
-	@Autowired
-	CompetitivePlayerBracketRepository competitivePlayerBracketRepository;
 
 	@Autowired
 	TournamentScheduleRepository tournamentScheduleRepository;
@@ -309,9 +304,7 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 			CompetitiveType getType = competitiveTypeRepository.findById(competitiveTypeId).get();
 			User getUser = new User();
 			User[] listResult = new User[3];
-			Tournament getTournament = tournamentRepository
-					.findById(competitiveTypeRepository.findTournamentOfType(competitiveTypeId)).get();
-			if (getTournament.getStatus() == 3) {
+			if (getType.getStatus() == 3) {
 				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
 				CompetitiveResult getResult = competitiveResultRepository.findByMatchId(listMatchs.get(1).getId()).get();
 				if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {

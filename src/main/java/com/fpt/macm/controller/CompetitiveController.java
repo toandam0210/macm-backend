@@ -20,9 +20,9 @@ import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.CompetitiveMatchService;
-import com.fpt.macm.service.CompetitivePlayerBracketService;
 import com.fpt.macm.service.CompetitivePlayerService;
 import com.fpt.macm.service.CompetitiveResultService;
+import com.fpt.macm.service.CompetitiveTypeService;
 
 @RestController
 @RequestMapping("/api/competitive")
@@ -33,9 +33,9 @@ public class CompetitiveController {
 
 	@Autowired
 	CompetitiveMatchService competitiveMatchService;
-
+	
 	@Autowired
-	CompetitivePlayerBracketService competitivePlayerBracketService;
+	CompetitiveTypeService competitiveTypeService;
 
 	@Autowired
 	CompetitiveResultService competitiveResultService;
@@ -69,12 +69,12 @@ public class CompetitiveController {
 	ResponseEntity<ResponseMessage> getListPlayerBracket(
 			@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
 		return new ResponseEntity<ResponseMessage>(
-				competitivePlayerBracketService.getListPlayerBracket(competitiveTypeId), HttpStatus.OK);
+				competitivePlayerService.getListPlayer(competitiveTypeId), HttpStatus.OK);
 	}
-
+	
 	@PostMapping("/headclub/spawnmatchs/{competitiveTypeId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
-	ResponseEntity<ResponseMessage> spawnMatchs(@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+	ResponseEntity<ResponseMessage> spawnMatchsV2(@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
 		return new ResponseEntity<ResponseMessage>(competitiveMatchService.spawnMatchs(competitiveTypeId),
 				HttpStatus.OK);
 	}
@@ -127,8 +127,7 @@ public class CompetitiveController {
 	ResponseEntity<ResponseMessage> listUserNotJoinCompetitive(
 			@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
 		return new ResponseEntity<ResponseMessage>(
-				competitivePlayerBracketService.getListNotJoinCompetitive(competitiveTypeId), HttpStatus.OK);
-
+				competitiveTypeService.getListNotJoinCompetitive(competitiveTypeId), HttpStatus.OK);
 	}
 	
 	@GetMapping("/getResult/{competitiveTypeId}")
