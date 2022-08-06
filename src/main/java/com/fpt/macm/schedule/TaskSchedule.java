@@ -249,10 +249,17 @@ public class TaskSchedule {
 					logger.info("add admin oke");
 				}
 			}
+			
+			Optional<UserStatusReport> userStatusReportOp = userStatusReportRepository.findBySemester(semester.getName());
+			if (userStatusReportOp.isPresent()) {
+				userStatusReport = userStatusReportOp.get();
+			}
+			
 			userStatusReport.setNumberActiveInSemester(numberUserActive);
 			userStatusReport.setNumberDeactiveInSemester(numberUserDeactive);
 			userStatusReport.setTotalNumberUserInSemester(numberUserActive + numberUserDeactive);
 			userStatusReportRepository.save(userStatusReport);
+			
 			logger.info("loi roi");
 		}
 	}
