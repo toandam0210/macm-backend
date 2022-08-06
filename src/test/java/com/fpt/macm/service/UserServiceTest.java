@@ -668,7 +668,7 @@ public class UserServiceTest {
 		List<Semester> semesters = Arrays.asList(semester());
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
-		when(memberSemesterRepository.findBySemester(anyString())).thenReturn(Arrays.asList(memberSemester()));
+		when(memberSemesterRepository.findBySemesterOrderByIdDesc(anyString())).thenReturn(Arrays.asList(memberSemester()));
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		when(userRepository.findCollaborator()).thenReturn(Arrays.asList(createUser()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
@@ -681,7 +681,7 @@ public class UserServiceTest {
 		List<Semester> semesters = new ArrayList<Semester>();
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
-		when(memberSemesterRepository.findBySemester(anyString())).thenReturn(Arrays.asList(memberSemester()));
+		when(memberSemesterRepository.findBySemesterOrderByIdDesc(anyString())).thenReturn(Arrays.asList(memberSemester()));
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		ResponseMessage response = userService.getMembersBySemester("Summer2022");
 		assertEquals(response.getData().size(), 0);
@@ -694,7 +694,7 @@ public class UserServiceTest {
 		responseMessage.setData(semesters);
 		User user = createUser();
 		user.setActive(false);
-		when(memberSemesterRepository.findBySemester(anyString())).thenReturn(Arrays.asList(memberSemester()));
+		when(memberSemesterRepository.findBySemesterOrderByIdDesc(anyString())).thenReturn(Arrays.asList(memberSemester()));
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		when(userRepository.findCollaborator()).thenReturn(Arrays.asList(user));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
@@ -710,7 +710,7 @@ public class UserServiceTest {
 		responseMessage.setData(semesters);
 		User user = createUser();
 		user.setActive(false);
-		when(memberSemesterRepository.findBySemester(anyString())).thenReturn(memberSemesters);
+		when(memberSemesterRepository.findBySemesterOrderByIdDesc(anyString())).thenReturn(memberSemesters);
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		when(userRepository.findCollaborator()).thenReturn(Arrays.asList(user));
 		ResponseMessage response = userService.getMembersBySemester("Summer2022");
@@ -725,7 +725,7 @@ public class UserServiceTest {
 		User user = createUser();
 		user.setActive(false);
 		List<User> users = new ArrayList<User>();
-		when(memberSemesterRepository.findBySemester(anyString())).thenReturn(Arrays.asList(memberSemester()));
+		when(memberSemesterRepository.findBySemesterOrderByIdDesc(anyString())).thenReturn(Arrays.asList(memberSemester()));
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		when(userRepository.findCollaborator()).thenReturn(users);
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));

@@ -74,7 +74,7 @@ public class TaskSchedule {
 	MemberEventRepository memberEventRepository;
 
 	@Autowired
-	MemberSemesterRepository stautsSemesterRepository;
+	MemberSemesterRepository memberSemesterRepository;
 
 	@Autowired
 	AdminSemesterRepository adminSemesterRepository;
@@ -171,7 +171,7 @@ public class TaskSchedule {
 					statusSemester.setUser(collaborator);
 					statusSemester.setSemester(semester.getName());
 					statusSemester.setStatus(collaborator.isActive());
-					stautsSemesterRepository.save(statusSemester);
+					memberSemesterRepository.save(statusSemester);
 				} else {
 					countNotPassed++;
 				}
@@ -226,55 +226,55 @@ public class TaskSchedule {
 			for (User user : members) {
 				if (user.isActive()) {
 					numberUserActive++;
-					MemberSemester statusSemester = new MemberSemester();
-					statusSemester.setUser(user);
-					if (LocalDate.now().getMonthValue() == 1) {
-						statusSemester.setSemester("Spring" + LocalDate.now().getYear());
+					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository.findByUserIdAndSemester(user.getId(), semester.getName());
+					if (!memberSemesterOp.isPresent()) {
+						MemberSemester statusSemester = new MemberSemester();
+						statusSemester.setUser(user);
+						statusSemester.setSemester(semester.getName());
+						statusSemester.setStatus(user.isActive());
+						memberSemesterRepository.save(statusSemester);
+						logger.info("add member oke");
 					}
-					if (LocalDate.now().getMonthValue() == 5) {
-						statusSemester.setSemester("Summer" + LocalDate.now().getYear());
-					}
-					if (LocalDate.now().getMonthValue() == 9) {
-						statusSemester.setSemester("Fall" + LocalDate.now().getYear());
-					}
-					statusSemester.setStatus(user.isActive());
-					stautsSemesterRepository.save(statusSemester);
-					logger.info("add member oke");
 				} else {
 					numberUserDeactive++;
 				}
 			}
 			for (User user : admins) {
 				numberUserActive++;
-				AdminSemester adminSemester = new AdminSemester();
-				adminSemester.setUser(user);
-				if (LocalDate.now().getMonthValue() == 1) {
-					adminSemester.setSemester("Spring" + LocalDate.now().getYear());
+				Optional<AdminSemester> adminSemesterOp = adminSemesterRepository.findByUserId(user.getId(), semester.getName());
+				if (!adminSemesterOp.isPresent()) {
+					AdminSemester adminSemester = new AdminSemester();
+					adminSemester.setUser(user);
+					adminSemester.setSemester(semester.getName());
+					adminSemester.setRole(user.getRole());
+					adminSemesterRepository.save(adminSemester);
+					logger.info("add admin oke");
 				}
-				if (LocalDate.now().getMonthValue() == 5) {
-					adminSemester.setSemester("Summer" + LocalDate.now().getYear());
-				}
-				if (LocalDate.now().getMonthValue() == 9) {
-					adminSemester.setSemester("Fall" + LocalDate.now().getYear());
-				}
-				adminSemester.setRole(user.getRole());
-				adminSemesterRepository.save(adminSemester);
-				logger.info("add admin oke");
 			}
+			
+			Optional<UserStatusReport> userStatusReportOp = userStatusReportRepository.findBySemester(semester.getName());
+			if (userStatusReportOp.isPresent()) {
+				userStatusReport = userStatusReportOp.get();
+			}
+			
 			userStatusReport.setNumberActiveInSemester(numberUserActive);
 			userStatusReport.setNumberDeactiveInSemester(numberUserDeactive);
 			userStatusReport.setTotalNumberUserInSemester(numberUserActive + numberUserDeactive);
 			userStatusReportRepository.save(userStatusReport);
+			
 			logger.info("loi roi");
 		}
 	}
 
 	@Scheduled(cron = "1 2 0 * * *")
 	public void addListAttendanceStatus() {
+		logger.info("bat dau chay");
 		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
 		if (trainingSchedule != null) {
+			logger.info("Khac null");
 			List<User> users = (List<User>) userRepository.findAll();
 			for (User user : users) {
+				logger.info("vao for");
 				if (user.isActive()) {
 					AttendanceStatus attendanceStatus = new AttendanceStatus();
 					attendanceStatus.setUser(user);
@@ -287,6 +287,7 @@ public class TaskSchedule {
 				}
 			}
 		}
+		logger.info("Chay xong");
 	}
 
 	@Scheduled(cron = "1 2 0 * * *")
@@ -372,29 +373,31 @@ public class TaskSchedule {
 		List<Event> listEvent = eventRepository.findAll();
 		for (Event event : listEvent) {
 			LocalDate getStartDate = eventService.getStartDate(event.getId());
-			if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
-				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository
-						.findByEventIdOrderByIdAsc(event.getId());
-				String message = Constant.messageEvent(event);
-				Notification notification = new Notification();
-				notification.setMessage(message);
-				notification.setCreatedOn(LocalDateTime.now());
-				notification.setNotificationType(1);
-				notification.setNotificationTypeId(event.getId());
-				notificationRepository.save(notification);
+			if (getStartDate != null) {
+				if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
+					List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository
+							.findByEventIdOrderByIdAsc(event.getId());
+					String message = Constant.messageEvent(event);
+					Notification notification = new Notification();
+					notification.setMessage(message);
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(1);
+					notification.setNotificationTypeId(event.getId());
+					notificationRepository.save(notification);
 
-				Iterable<Notification> notificationIterable = notificationRepository
-						.findAll(Sort.by("id").descending());
-				List<Notification> notifications = IterableUtils.toList(notificationIterable);
-				Notification newNotification = notifications.get(0);
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
 
-				for (MemberEvent member : membersEvent) {
-					if (member.isRegisterStatus()) {
-						User user = member.getUser();
-						notificationService.sendNotificationToAnUser(user, newNotification);
+					for (MemberEvent member : membersEvent) {
+						if (member.isRegisterStatus()) {
+							User user = member.getUser();
+							notificationService.sendNotificationToAnUser(user, newNotification);
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
 
@@ -405,39 +408,42 @@ public class TaskSchedule {
 		List<Tournament> tournaments = tournamentRepository.findAll();
 		for (Tournament tournament : tournaments) {
 			LocalDate getStartDate = tournamentService.getStartDate(tournament.getId());
-			logger.info(getStartDate.toString());
-			if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
-				Notification notification = new Notification();
-				notification.setMessage(
-						"Giải đấu " + tournament.getName() + " sẽ bắt đầu sau 1 ngày nữa, chuẩn bị chiến nào !!");
-				notification.setCreatedOn(LocalDateTime.now());
-				notification.setNotificationType(0);
-				notification.setNotificationTypeId(tournament.getId());
-				notificationRepository.save(notification);
 
-				Iterable<Notification> notificationIterable = notificationRepository
-						.findAll(Sort.by("id").descending());
-				List<Notification> notifications = IterableUtils.toList(notificationIterable);
-				Notification newNotification = notifications.get(0);
+			if (getStartDate != null) {
+				logger.info(getStartDate.toString());
+				if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
+					Notification notification = new Notification();
+					notification.setMessage(
+							"Giải đấu " + tournament.getName() + " sẽ bắt đầu sau 1 ngày nữa, chuẩn bị chiến nào !!");
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(0);
+					notification.setNotificationTypeId(tournament.getId());
+					notificationRepository.save(notification);
 
-				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-						.findByTournamentId(tournament.getId());
-				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					User user = tournamentOrganizingCommittee.getUser();
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
 
-					notificationService.sendNotificationToAnUser(user, newNotification);
+					List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+							.findByTournamentId(tournament.getId());
+					for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+						User user = tournamentOrganizingCommittee.getUser();
+
+						notificationService.sendNotificationToAnUser(user, newNotification);
+					}
+
+					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+						User user = tournamentPlayer.getUser();
+
+						notificationService.sendNotificationToAnUser(user, newNotification);
+					}
+
+					logger.info("okeeeeee");
+
+					break;
 				}
-
-				Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
-				for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
-					User user = tournamentPlayer.getUser();
-
-					notificationService.sendNotificationToAnUser(user, newNotification);
-				}
-
-				logger.info("okeeeeee");
-
-				break;
 			}
 		}
 	}
@@ -501,7 +507,7 @@ public class TaskSchedule {
 		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
 		if (trainingSchedule != null) {
 			List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
-					.findByTrainingScheduleId(trainingSchedule.getId());
+					.findByTrainingScheduleIdOrderByIdAsc(trainingSchedule.getId());
 			for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
 				if (attendanceStatus.getStatus() == 2) {
 					attendanceStatus.setStatus(0);

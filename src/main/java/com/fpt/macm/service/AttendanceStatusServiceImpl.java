@@ -53,7 +53,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				Optional<User> userOp = userRepository.findByStudentId(studentId);
 				User user = userOp.get();
 				List<AttendanceStatus> attendancesStatus = attendanceStatusRepository
-						.findByTrainingScheduleId(trainingSchedule.getId());
+						.findByTrainingScheduleIdOrderByIdAsc(trainingSchedule.getId());
 				AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
 				attendanceStatusDto.setName(user.getName());
 				attendanceStatusDto.setStudentId(studentId);
@@ -82,7 +82,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<AttendanceStatus> attendancesStatus = attendanceStatusRepository
-					.findByTrainingScheduleId(trainingScheduleId);
+					.findByTrainingScheduleIdOrderByIdAsc(trainingScheduleId);
 			List<AttendanceStatusDto> attendanceStatusDtos = new ArrayList<AttendanceStatusDto>();
 			int attend = 0;
 			int absent = 0;
