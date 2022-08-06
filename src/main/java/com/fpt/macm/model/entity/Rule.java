@@ -16,7 +16,7 @@ public class Rule {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@Column
+	@Column(columnDefinition="TEXT")
 	private String description;
 	
 	@Column
