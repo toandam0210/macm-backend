@@ -136,7 +136,7 @@ public class TaskSchedule {
 
 	@Autowired
 	TrainingScheduleRepository trainingScheduleRepository;
-	
+
 	@Autowired
 	NotificationToUserRepository notificationToUserRepository;
 
@@ -183,7 +183,7 @@ public class TaskSchedule {
 					.setTotalNumberUserInSemester(userStatusReport.getTotalNumberUserInSemester() + countPassed);
 			userStatusReportRepository.save(userStatusReport);
 		}
-		
+
 		Optional<CollaboratorReport> colOptional = collaboratorReportRepository.findBySemester(semester.getName());
 		if (colOptional.isPresent()) {
 			CollaboratorReport collaboratorReport = colOptional.get();
@@ -195,7 +195,7 @@ public class TaskSchedule {
 			collaboratorReport.setNumberMale(countMale);
 			collaboratorReport.setNumberFemale(countFemale);
 			collaboratorReportRepository.save(collaboratorReport);
-		}else {
+		} else {
 			CollaboratorReport collaboratorReportNew = new CollaboratorReport();
 			collaboratorReportNew.setNumberJoin(listCollaborator.size());
 			collaboratorReportNew.setSemester(semester.getName());
@@ -370,33 +370,34 @@ public class TaskSchedule {
 		List<Event> listEvent = eventRepository.findAll();
 		for (Event event : listEvent) {
 			LocalDate getStartDate = eventService.getStartDate(event.getId());
-			if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
-				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository
-						.findByEventIdOrderByIdAsc(event.getId());
-				String message = Constant.messageEvent(event);
-				Notification notification = new Notification();
-				notification.setMessage(message);
-				notification.setCreatedOn(LocalDateTime.now());
-				notification.setNotificationType(1);
-				notification.setNotificationTypeId(event.getId());
-				notificationRepository.save(notification);
+			if (getStartDate != null) {
+				if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
+					List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository
+							.findByEventIdOrderByIdAsc(event.getId());
+					String message = Constant.messageEvent(event);
+					Notification notification = new Notification();
+					notification.setMessage(message);
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(1);
+					notification.setNotificationTypeId(event.getId());
+					notificationRepository.save(notification);
 
-				Iterable<Notification> notificationIterable = notificationRepository
-						.findAll(Sort.by("id").descending());
-				List<Notification> notifications = IterableUtils.toList(notificationIterable);
-				Notification newNotification = notifications.get(0);
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
 
-				for (MemberEvent member : membersEvent) {
-					if (member.isRegisterStatus()) {
-						User user = member.getUser();
-						notificationService.sendNotificationToAnUser(user, newNotification);
+					for (MemberEvent member : membersEvent) {
+						if (member.isRegisterStatus()) {
+							User user = member.getUser();
+							notificationService.sendNotificationToAnUser(user, newNotification);
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
-		
-		
+
 	}
 
 	@Scheduled(cron = "1 2 0 * * *")
@@ -404,38 +405,41 @@ public class TaskSchedule {
 		List<Tournament> tournaments = tournamentRepository.findAll();
 		for (Tournament tournament : tournaments) {
 			LocalDate getStartDate = tournamentService.getStartDate(tournament.getId());
-			logger.info(getStartDate.toString());
-			if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
-				Notification notification = new Notification();
-				notification.setMessage("Giải đấu " + tournament.getName() + " sẽ bắt đầu sau 1 ngày nữa, chuẩn bị chiến nào !!");
-				notification.setCreatedOn(LocalDateTime.now());
-				notification.setNotificationType(0);
-				notification.setNotificationTypeId(tournament.getId());
-				notificationRepository.save(notification);
+			if (getStartDate != null) {
+				logger.info(getStartDate.toString());
+				if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
+					Notification notification = new Notification();
+					notification.setMessage(
+							"Giải đấu " + tournament.getName() + " sẽ bắt đầu sau 1 ngày nữa, chuẩn bị chiến nào !!");
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(0);
+					notification.setNotificationTypeId(tournament.getId());
+					notificationRepository.save(notification);
 
-				Iterable<Notification> notificationIterable = notificationRepository
-						.findAll(Sort.by("id").descending());
-				List<Notification> notifications = IterableUtils.toList(notificationIterable);
-				Notification newNotification = notifications.get(0);
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
 
-				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-						.findByTournamentId(tournament.getId());
-				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					User user = tournamentOrganizingCommittee.getUser();
+					List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+							.findByTournamentId(tournament.getId());
+					for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+						User user = tournamentOrganizingCommittee.getUser();
 
-					notificationService.sendNotificationToAnUser(user, newNotification);
+						notificationService.sendNotificationToAnUser(user, newNotification);
+					}
+
+					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+						User user = tournamentPlayer.getUser();
+
+						notificationService.sendNotificationToAnUser(user, newNotification);
+					}
+
+					logger.info("okeeeeee");
+
+					break;
 				}
-
-				Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
-				for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
-					User user = tournamentPlayer.getUser();
-
-					notificationService.sendNotificationToAnUser(user, newNotification);
-				}
-				
-				logger.info("okeeeeee");
-
-				break;
 			}
 		}
 	}
@@ -448,7 +452,7 @@ public class TaskSchedule {
 			if (hasSentNotificationWarningAbsent(user, semester)) {
 				continue;
 			}
-			
+
 			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 			int totalAbsent = 0;
@@ -469,18 +473,18 @@ public class TaskSchedule {
 				notification.setNotificationType(3);
 				notification.setNotificationTypeId(0);
 				notificationRepository.save(notification);
-				
+
 				Iterable<Notification> notificationIterable = notificationRepository
 						.findAll(Sort.by("id").descending());
 				List<Notification> notifications = IterableUtils.toList(notificationIterable);
 				Notification newNotification = notifications.get(0);
-				
+
 				notificationService.sendNotificationToAnUser(user, newNotification);
 			}
 
 		}
 	}
-	
+
 	public boolean hasSentNotificationWarningAbsent(User user, Semester semester) {
 		List<NotificationToUser> notificationsToUser = notificationToUserRepository.findAllByUserId(user.getId());
 		for (NotificationToUser notificationToUser : notificationsToUser) {
@@ -528,7 +532,7 @@ public class TaskSchedule {
 	public void changeStatusTournamentForUpdatePlayer() {
 		List<Tournament> listTournaments = tournamentService
 				.listTournamentsByRegistrationPlayerDeadline(LocalDateTime.now());
-		if(listTournaments != null) {
+		if (listTournaments != null) {
 			for (Tournament tournament : listTournaments) {
 				if (tournament.getStatus() == 0) {
 					tournament.setStatus(1);
@@ -536,8 +540,7 @@ public class TaskSchedule {
 					logger.info("Chuyển thành 1");
 				}
 			}
-		}
-		else {
+		} else {
 			logger.info("Không có giải đấu");
 		}
 	}
