@@ -21,7 +21,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fpt.macm.model.entity.CompetitivePlayer;
-import com.fpt.macm.model.entity.CompetitivePlayerBracket;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionTeam;
@@ -31,7 +30,6 @@ import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
-import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
@@ -57,9 +55,9 @@ public class CompetitivePlayerServiceTest {
 	
 	@Mock
 	CompetitiveTypeRepository competitiveTypeRepository;
-	
-	@Mock
-	CompetitivePlayerBracketRepository competitivePlayerBracketRepository;
+//	
+//	@Mock
+//	CompetitivePlayerBracketRepository competitivePlayerBracketRepository;
 	
 	private Tournament tournament() {
 		Tournament tournament = new Tournament();
@@ -74,7 +72,6 @@ public class CompetitivePlayerServiceTest {
 		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setSemester("Summer2022");
-		tournament.setStatus(1);
 		tournament.setTournamentPlayers(tournamentPlayers());
 		return tournament;
 	}
@@ -170,17 +167,17 @@ public class CompetitivePlayerServiceTest {
 		return competitivePlayer;
 	}
 	
-	private CompetitivePlayerBracket competitivePlayerBracket() {
-		Set<CompetitiveType> competitiveTypes = competitiveTypes();
-		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
-		CompetitiveType competitiveType = listCompetitive.get(0);
-		CompetitivePlayerBracket competitivePlayerBracket = new CompetitivePlayerBracket();
-		competitivePlayerBracket.setCompetitivePlayer(competitivePlayer());
-		competitivePlayerBracket.setCompetitiveType(competitiveType);
-		competitivePlayerBracket.setId(1);
-		competitivePlayerBracket.setNumericalOrderId(1);
-		return competitivePlayerBracket;
-	}
+//	private CompetitivePlayerBracket competitivePlayerBracket() {
+//		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+//		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+//		CompetitiveType competitiveType = listCompetitive.get(0);
+//		CompetitivePlayerBracket competitivePlayerBracket = new CompetitivePlayerBracket();
+//		competitivePlayerBracket.setCompetitivePlayer(competitivePlayer());
+//		competitivePlayerBracket.setCompetitiveType(competitiveType);
+//		competitivePlayerBracket.setId(1);
+//		competitivePlayerBracket.setNumericalOrderId(1);
+//		return competitivePlayerBracket;
+//	}
 	
 //	@Test
 //	public void testAddNewCompetitivePlayer() {
@@ -273,7 +270,6 @@ public class CompetitivePlayerServiceTest {
 		competitivePlayer.setWeight(0);
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
 		when(competitiveTypeRepository.findByTournamentAndGender(anyInt(), anyBoolean())).thenReturn(listCompetitive);
-		when(competitiveTypeRepository.findTournamentByCompetitivePlayerId(anyInt())).thenReturn(1);
 		ResponseMessage response = competitivePlayerService.updateWeightForCompetitivePlayer(1, 58);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -281,7 +277,6 @@ public class CompetitivePlayerServiceTest {
 	@Test 
 	public void testUpdateWeightForCompetitivePlayer() {
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer()));
-		when(competitivePlayerBracketRepository.findByPlayerId(anyInt())).thenReturn(Optional.of(competitivePlayerBracket()));
 		ResponseMessage response = competitivePlayerService.updateWeightForCompetitivePlayer(1, 50);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -303,7 +298,6 @@ public class CompetitivePlayerServiceTest {
 	@Test
 	public void testDeleteCompetitivePlayer() {
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer()));
-		when(competitivePlayerBracketRepository.findByPlayerId(anyInt())).thenReturn(Optional.of(competitivePlayerBracket()));
 		ResponseMessage response = competitivePlayerService.deleteCompetitivePlayer(1);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -318,7 +312,6 @@ public class CompetitivePlayerServiceTest {
 	@Test
 	public void testDeleteCompetitivePlayerCaseBracketEmpty() {
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer()));
-		when(competitivePlayerBracketRepository.findByPlayerId(anyInt())).thenReturn(Optional.empty());
 		ResponseMessage response = competitivePlayerService.deleteCompetitivePlayer(1);
 		assertEquals(response.getData().size(), 1);
 	}

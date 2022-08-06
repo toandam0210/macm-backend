@@ -38,7 +38,6 @@ import com.fpt.macm.model.dto.PlayerMatchDto;
 import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
-import com.fpt.macm.model.entity.CompetitivePlayerBracket;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Role;
@@ -46,7 +45,6 @@ import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.CompetitiveMatchService;
-import com.fpt.macm.service.CompetitivePlayerBracketService;
 import com.fpt.macm.service.CompetitivePlayerService;
 import com.fpt.macm.service.CompetitiveResultService;
 
@@ -59,8 +57,8 @@ public class CompetitiveControllerTest {
 	@MockBean
 	CompetitiveMatchService competitiveMatchService;
 
-	@MockBean
-	CompetitivePlayerBracketService competitivePlayerBracketService;
+//	@MockBean
+//	CompetitivePlayerBracketService competitivePlayerBracketService;
 
 	@MockBean
 	CompetitiveResultService competitiveResultService;
@@ -116,17 +114,17 @@ public class CompetitiveControllerTest {
 		return user;
 	}
 	
-	private CompetitivePlayerBracket competitivePlayerBracket() {
-		Set<CompetitiveType> competitiveTypes = competitiveTypes();
-		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
-		CompetitiveType competitiveType = listCompetitive.get(0);
-		CompetitivePlayerBracket competitivePlayerBracket = new CompetitivePlayerBracket();
-		competitivePlayerBracket.setCompetitivePlayer(competitivePlayer());
-		competitivePlayerBracket.setCompetitiveType(competitiveType);
-		competitivePlayerBracket.setId(1);
-		competitivePlayerBracket.setNumericalOrderId(1);
-		return competitivePlayerBracket;
-	}
+//	private CompetitivePlayerBracket competitivePlayerBracket() {
+//		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+//		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+//		CompetitiveType competitiveType = listCompetitive.get(0);
+//		CompetitivePlayerBracket competitivePlayerBracket = new CompetitivePlayerBracket();
+//		competitivePlayerBracket.setCompetitivePlayer(competitivePlayer());
+//		competitivePlayerBracket.setCompetitiveType(competitiveType);
+//		competitivePlayerBracket.setId(1);
+//		competitivePlayerBracket.setNumericalOrderId(1);
+//		return competitivePlayerBracket;
+//	}
 	
 	private Set<CompetitiveType> competitiveTypes() {
 		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();
@@ -228,16 +226,16 @@ public class CompetitiveControllerTest {
 		.andExpect(jsonPath("$.data.size()").value("1"));
 	}
 	
-	@Test
-	public void testGetListPlayerBracket() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(competitivePlayerBracket()));
-		when(competitivePlayerBracketService.getListPlayerBracket(anyInt())).thenReturn(responseMessage);
-		this.mockMvc
-		.perform(get("/api/competitive/headclub/getlistplayerbracket/{competitivePlayerId}", 1))
-		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
+//	@Test
+//	public void testGetListPlayerBracket() throws Exception {
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		responseMessage.setData(Arrays.asList(competitivePlayerBracket()));
+//		when(competitivePlayerBracketService.getListPlayerBracket(anyInt())).thenReturn(responseMessage);
+//		this.mockMvc
+//		.perform(get("/api/competitive/headclub/getlistplayerbracket/{competitivePlayerId}", 1))
+//		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(jsonPath("$.data.size()").value("1"));
+//	}
 	
 	@Test 
 	public void testListUserNotJoinCompetitive() throws Exception {

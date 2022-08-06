@@ -333,7 +333,7 @@ public class DashboardSeviceTest {
 		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setSemester("Summer2022");
-		tournament.setStatus(1);
+		//tournament.setStatus(1);
 		tournament.setTournamentPlayers(tournamentPlayers());
 		return tournament;
 	}
