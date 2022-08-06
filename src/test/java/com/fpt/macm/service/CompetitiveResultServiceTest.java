@@ -25,7 +25,6 @@ import com.fpt.macm.model.dto.PlayerMatchDto;
 import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
-import com.fpt.macm.model.entity.CompetitivePlayerBracket;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
@@ -39,7 +38,6 @@ import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
-import com.fpt.macm.repository.CompetitivePlayerBracketRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
@@ -73,8 +71,8 @@ public class CompetitiveResultServiceTest {
 	@Mock
 	CompetitivePlayerRepository competitivePlayerRepository;
 
-	@Mock
-	CompetitivePlayerBracketRepository competitivePlayerBracketRepository;
+//	@Mock
+//	CompetitivePlayerBracketRepository competitivePlayerBracketRepository;
 
 	@Mock
 	TournamentScheduleRepository tournamentScheduleRepository;
@@ -95,7 +93,7 @@ public class CompetitiveResultServiceTest {
 		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setSemester("Summer2022");
-		tournament.setStatus(1);
+		//tournament.setStatus(1);
 		tournament.setTournamentPlayers(tournamentPlayers());
 		return tournament;
 	}
@@ -191,17 +189,17 @@ public class CompetitiveResultServiceTest {
 		return competitivePlayer;
 	}
 	
-	private CompetitivePlayerBracket competitivePlayerBracket() {
-		Set<CompetitiveType> competitiveTypes = competitiveTypes();
-		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
-		CompetitiveType competitiveType = listCompetitive.get(0);
-		CompetitivePlayerBracket competitivePlayerBracket = new CompetitivePlayerBracket();
-		competitivePlayerBracket.setCompetitivePlayer(competitivePlayer());
-		competitivePlayerBracket.setCompetitiveType(competitiveType);
-		competitivePlayerBracket.setId(1);
-		competitivePlayerBracket.setNumericalOrderId(1);
-		return competitivePlayerBracket;
-	}
+//	private CompetitivePlayerBracket competitivePlayerBracket() {
+//		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+//		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+//		CompetitiveType competitiveType = listCompetitive.get(0);
+//		CompetitivePlayerBracket competitivePlayerBracket = new CompetitivePlayerBracket();
+//		competitivePlayerBracket.setCompetitivePlayer(competitivePlayer());
+//		competitivePlayerBracket.setCompetitiveType(competitiveType);
+//		competitivePlayerBracket.setId(1);
+//		competitivePlayerBracket.setNumericalOrderId(1);
+//		return competitivePlayerBracket;
+//	}
 	
 	private CompetitiveMatch competitiveMatch() {
 		Set<CompetitiveType> competitiveTypes = competitiveTypes();
