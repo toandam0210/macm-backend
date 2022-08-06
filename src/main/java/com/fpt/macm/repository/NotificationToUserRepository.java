@@ -22,4 +22,6 @@ public interface NotificationToUserRepository extends PagingAndSortingRepository
 	
 	@Query(value = "Select * from notification_to_user where is_read = false and user_id = ?1", nativeQuery = true)
 	List<NotificationToUser> findAllUnreadNotificationByUser(int userId);
+	
+	Page<NotificationToUser> findByUserIdAndIsRead(int userId, boolean isRead, Pageable pageable);
 }

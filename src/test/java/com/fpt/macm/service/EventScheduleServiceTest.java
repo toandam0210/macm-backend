@@ -238,59 +238,6 @@ public class EventScheduleServiceTest {
 	}
 	
 	@Test
-	public void createEventSessionCaseStartTimeAfterFinishTime() {
-		EventSchedule eventSchedule = eventSchedule();
-		eventSchedule.setStartTime(LocalTime.now().plusHours(1));
-		eventSchedule.setFinishTime(LocalTime.now());
-		
-		ResponseMessage responseMessage = eventScheduleService.createEventSession(1, eventSchedule);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void createEventSessionCaseScheduleInPast() {
-		EventSchedule eventSchedule = eventSchedule();
-		eventSchedule.setDate(LocalDate.now().minusMonths(1));
-		
-		ResponseMessage responseMessage = eventScheduleService.createEventSession(1, eventSchedule);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void createEventSessionCaseCommonScheduleNotNull() {
-		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
-		
-		ResponseMessage responseMessage = eventScheduleService.createEventSession(1, eventSchedule());
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void createEventSessionCaseSuccess() {
-		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(null);
-		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-		
-		ResponseMessage responseMessage = eventScheduleService.createEventSession(1, eventSchedule());
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void createEventSessionCaseException() {
-		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(null);
-		when(eventRepository.findById(anyInt())).thenReturn(null);
-		
-		ResponseMessage responseMessage = eventScheduleService.createEventSession(1, eventSchedule());
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void getListEventScheduleCaseSuccess() {
-		when(eventScheduleRepository.findAll()).thenReturn(Arrays.asList(eventSchedule()));
-		
-		ResponseMessage responseMessage = eventScheduleService.getListEventSchedule();
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
 	public void getListEventScheduleByEventCaseSuccess() {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(Arrays.asList(eventSchedule()));
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
@@ -486,22 +433,6 @@ public class EventScheduleServiceTest {
 		when(eventRepository.findById(anyInt())).thenReturn(null);
 		
 		ResponseMessage responseMessage = eventScheduleService.updateEventSchedule(1, Arrays.asList(scheduleDto()), true);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void getPeriodTimeOfEventCaseSuccess() {
-		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(Arrays.asList(eventSchedule()));
-		
-		ResponseMessage responseMessage = eventScheduleService.getPeriodTimeOfEvent(1);
-		assertEquals(responseMessage.getData().size(), 4);
-	}
-	
-	@Test
-	public void getPeriodTimeOfEventCaseException() {
-		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(null);
-		
-		ResponseMessage responseMessage = eventScheduleService.getPeriodTimeOfEvent(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	

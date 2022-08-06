@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,90 +17,123 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.CompetitiveMatchDto;
 import com.fpt.macm.model.entity.CompetitiveResult;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.CompetitiveMatchService;
-import com.fpt.macm.service.CompetitivePlayerBracketService;
 import com.fpt.macm.service.CompetitivePlayerService;
 import com.fpt.macm.service.CompetitiveResultService;
-
-
+import com.fpt.macm.service.CompetitiveTypeService;
 
 @RestController
 @RequestMapping("/api/competitive")
 public class CompetitiveController {
-	
+
 	@Autowired
 	CompetitivePlayerService competitivePlayerService;
-	
+
 	@Autowired
 	CompetitiveMatchService competitiveMatchService;
 	
 	@Autowired
-	CompetitivePlayerBracketService competitivePlayerBracketService;
-	
+	CompetitiveTypeService competitiveTypeService;
+
 	@Autowired
 	CompetitiveResultService competitiveResultService;
-	
-	@PostMapping("/headclub/addnewcompetitiveplayer/{tournamentId}")
-	ResponseEntity<ResponseMessage> addNewCompetitivePlayer (@PathVariable(name = "tournamentId") int tournamentId,
-			@RequestParam int userId, @RequestParam (defaultValue = "0") double weight) {
-		return new ResponseEntity<ResponseMessage>(competitivePlayerService.addNewCompetitivePlayer(userId, tournamentId, weight), HttpStatus.OK);
+
+	@PostMapping("/headclub/addnewcompetitiveplayer/{competitiveTypeId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> addNewCompetitivePlayer(
+			@PathVariable(name = "competitiveTypeId") int competitiveTypeId, @RequestBody List<User> users) {
+		return new ResponseEntity<ResponseMessage>(
+				competitivePlayerService.addNewCompetitivePlayer(users, competitiveTypeId), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/updateweightplayer/{competitivePlayerId}")
-	ResponseEntity<ResponseMessage> updateWeightForCompetitivePlayer (@PathVariable(name = "competitivePlayerId") int competitivePlayerId,
-			@RequestParam double weight) {
-		return new ResponseEntity<ResponseMessage>(competitivePlayerService.updateWeightForCompetitivePlayer(competitivePlayerId, weight), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> updateWeightForCompetitivePlayer(
+			@PathVariable(name = "competitivePlayerId") int competitivePlayerId, @RequestParam double weight) {
+		return new ResponseEntity<ResponseMessage>(
+				competitivePlayerService.updateWeightForCompetitivePlayer(competitivePlayerId, weight), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/deletecompetitiveplayer/{competitivePlayerId}")
-	ResponseEntity<ResponseMessage> deleteCompetitivePlayer (@PathVariable(name = "competitivePlayerId") int competitivePlayerId) {
-		return new ResponseEntity<ResponseMessage>(competitivePlayerService.deleteCompetitivePlayer(competitivePlayerId), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> deleteCompetitivePlayer(
+			@PathVariable(name = "competitivePlayerId") int competitivePlayerId) {
+		return new ResponseEntity<ResponseMessage>(
+				competitivePlayerService.deleteCompetitivePlayer(competitivePlayerId), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headclub/getlistplayerbracket/{competitiveTypeId}")
-	ResponseEntity<ResponseMessage> getListPlayerBracket (@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
-		return new ResponseEntity<ResponseMessage>(competitivePlayerBracketService.getListPlayerBracket(competitiveTypeId), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> getListPlayerBracket(
+			@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(
+				competitivePlayerService.getListPlayer(competitiveTypeId), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headclub/spawnmatchs/{competitiveTypeId}")
-	ResponseEntity<ResponseMessage> spawnMatchs (@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
-		return new ResponseEntity<ResponseMessage>(competitiveMatchService.spawnMatchs(competitiveTypeId), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> spawnMatchsV2(@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(competitiveMatchService.spawnMatchs(competitiveTypeId),
+				HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/updatetimeandplacematch/{matchId}")
-	ResponseEntity<ResponseMessage> updateTimeAndPlaceMatch (@PathVariable(name = "matchId") int matchId,
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> updateTimeAndPlaceMatch(@PathVariable(name = "matchId") int matchId,
 			@RequestBody CompetitiveResult newResult) {
-		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateTimeAndArea(matchId, newResult), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateTimeAndArea(matchId, newResult),
+				HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/updateresultmatch/{matchId}")
-	ResponseEntity<ResponseMessage> updateResultMatch (@PathVariable(name = "matchId") int matchId, @RequestParam (defaultValue = "0") int firstPoint, @RequestParam (defaultValue = "0") int secondPoint) {
-		return new ResponseEntity<ResponseMessage>(competitiveResultService.updateResultMatch(matchId, firstPoint, secondPoint), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> updateResultMatch(@PathVariable(name = "matchId") int matchId,
+			@RequestParam(defaultValue = "0") int firstPoint, @RequestParam(defaultValue = "0") int secondPoint) {
+		return new ResponseEntity<ResponseMessage>(
+				competitiveResultService.updateResultMatch(matchId, firstPoint, secondPoint), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headclub/listmatchs/{competitiveTypeId}")
-	ResponseEntity<ResponseMessage> listMatchs (@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
-		return new ResponseEntity<ResponseMessage>(competitiveMatchService.listMatchs(competitiveTypeId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> listMatchs(@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(competitiveMatchService.listMatchs(competitiveTypeId),
+				HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/updatelistmatchsplayer")
-	ResponseEntity<ResponseMessage> updateListMatchsPlayer (@RequestBody List<CompetitiveMatchDto> listUpdated) {
-		return new ResponseEntity<ResponseMessage>(competitiveMatchService.updateListMatchsPlayer(listUpdated), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> updateListMatchsPlayer(@RequestBody List<CompetitiveMatchDto> listUpdated) {
+		return new ResponseEntity<ResponseMessage>(competitiveMatchService.updateListMatchsPlayer(listUpdated),
+				HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/confirmlistmatchsplayer/{tournamentId}")
-	ResponseEntity<ResponseMessage> confirmListMatchsPlayer (@PathVariable(name = "tournamentId") int tournamentId) {
-		return new ResponseEntity<ResponseMessage>(competitiveMatchService.confirmListMatchsPlayer(tournamentId), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> confirmListMatchsPlayer(@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(competitiveMatchService.confirmListMatchsPlayer(tournamentId),
+				HttpStatus.OK);
 	}
-	
+
 	@PostMapping("/headclub/spawntimeandarea/{tournamentId}")
-	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId) {
-		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> spawnTimeAndArea(@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(competitiveResultService.spawnTimeAndArea(tournamentId),
+				HttpStatus.OK);
+	}
+
+	@GetMapping("/headclub/listusernotjoincompetitive/{competitiveTypeId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> listUserNotJoinCompetitive(
+			@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(
+				competitiveTypeService.getListNotJoinCompetitive(competitiveTypeId), HttpStatus.OK);
 	}
 	
-	@GetMapping("/headclub/listusernotjoincompetitive/{tournamentId}")
-	ResponseEntity<ResponseMessage> listUserNotJoinCompetitive (@PathVariable(name = "tournamentId") int tournamentId) {
-		return new ResponseEntity<ResponseMessage>(competitivePlayerService.listUserNotJoinCompetitive(tournamentId), HttpStatus.OK);
+	@GetMapping("/getResult/{competitiveTypeId}")
+	ResponseEntity<ResponseMessage> getResultByType(
+			@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
+		return new ResponseEntity<ResponseMessage>(
+				competitiveResultService.getResultByType(competitiveTypeId), HttpStatus.OK);
 	}
 }

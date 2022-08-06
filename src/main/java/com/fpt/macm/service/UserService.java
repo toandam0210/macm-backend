@@ -21,7 +21,7 @@ public interface UserService {
 	ResponseMessage searchUserByStudentIdOrName(String inputSearch,int pageNo, int pageSize, String sortBy);
 //	ResponseMessage userLogin();
 	ResponseMessage addUsersFromExcel(MultipartFile file);
-	ByteArrayInputStream exportUsersToExcel();
+	ByteArrayInputStream exportUsersToExcel(List<UserDto> users);
 	ResponseMessage findAllMember(int pageNo, int pageSize, String sortBy);
 	ResponseMessage getAllUser();
 	ResponseMessage getMembersBySemester(String semester);

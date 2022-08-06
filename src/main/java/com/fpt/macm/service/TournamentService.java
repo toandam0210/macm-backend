@@ -7,6 +7,7 @@ import java.util.List;
 import com.fpt.macm.model.dto.ActiveUserDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
+import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.response.ResponseMessage;
 
@@ -68,4 +69,10 @@ public interface TournamentService {
 	ResponseMessage getAllUserOrganizingCommittee(int tournamentId, String studentId);
 	
 	LocalDate getStartDate(int tournamentId);
+	
+	ResponseMessage getAllTournamentByStudentId(String studentId, String semester, int status);
+	
+	ResponseMessage addListTournamentOrganizingCommittee(String studentId, List<UserTournamentOrganizingCommitteeDto> users, int tournamentId);
+	
+	ResponseMessage getAllUserNotJoinTournament(int tournamentId);
 }

@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,6 +27,7 @@ public class EventController {
 	EventService eventService;
 
 	@PostMapping("/headculture/createevent")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> createEvent(@RequestBody Event event) {
 		return new ResponseEntity<ResponseMessage>(eventService.createEvent(event), HttpStatus.OK);
 	}
@@ -39,12 +41,14 @@ public class EventController {
 	}
 
 	@PutMapping("/headculture/updatebeforeevent/{eventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> updateBeforeEvent(@PathVariable(name = "eventId") int id,
 			@RequestBody Event event) {
 		return new ResponseEntity<ResponseMessage>(eventService.updateBeforeEvent(id, event), HttpStatus.OK);
 	}
 
 	@PutMapping("/headculture/deleteevent/{eventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> deleteEvent(@PathVariable(name = "eventId") int id) {
 		return new ResponseEntity<ResponseMessage>(eventService.deleteEvent(id), HttpStatus.OK);
 	}
@@ -58,6 +62,7 @@ public class EventController {
 	}
 
 	@GetMapping("/headculture/getstartdate/{eventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> getStartDateOfEvent(@PathVariable(name = "eventId") int eventId) {
 		return new ResponseEntity<ResponseMessage>(eventService.getStartDateOfEvent(eventId), HttpStatus.OK);
 	}
@@ -71,6 +76,7 @@ public class EventController {
 	}
 
 	@PutMapping("/headculture/updateafterevent/{eventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> updateAfterEvent(@PathVariable(name = "eventId") int id, @RequestParam double money,
 			@RequestParam(defaultValue = "true") boolean isIncurred,
 			@RequestParam(defaultValue = "true") boolean isUseClubFund) {
@@ -90,5 +96,33 @@ public class EventController {
 		return new ResponseEntity<ResponseMessage>(
 				eventService.getEventsBySemesterAndStudentId(semester, studentId, month, pageNo, pageSize),
 				HttpStatus.OK);
+	}
+
+	@GetMapping("/getalleventhasjoinedbystudentid/{studentId}")
+	ResponseEntity<ResponseMessage> getAllEventHasJoinedByStudentId(@PathVariable(name = "studentId") String studentId,
+			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.getAllEventHasJoinedByStudentId(studentId, pageNo, pageSize), HttpStatus.OK);
+	}
+
+	@GetMapping("/getallupcomingevent")
+	ResponseEntity<ResponseMessage> getAllUpcomingEvent(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.getAllUpcomingEvent(pageNo, pageSize), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getallongoingevent")
+	ResponseEntity<ResponseMessage> getAllOngoingEvent(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.getAllOngoingEvent(pageNo, pageSize), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getallclosedevent")
+	ResponseEntity<ResponseMessage> getAllClosedEvent(@RequestParam(defaultValue = "0") int pageNo,
+			@RequestParam(defaultValue = "10") int pageSize) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.getAllClosedEvent(pageNo, pageSize), HttpStatus.OK);
 	}
 }

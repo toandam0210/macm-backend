@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
@@ -112,7 +113,7 @@ public class ClubFundServiceImpl implements ClubFundService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<ClubFundReport> clubFundReports = clubFundReportRepository.findAll();
+			List<ClubFundReport> clubFundReports = clubFundReportRepository.findAll(Sort.by("id").descending());
 			if (clubFundReports.size() > 0) {
 				responseMessage.setData(clubFundReports);
 				responseMessage.setMessage(Constant.MSG_095);

@@ -9,5 +9,5 @@ public interface CompetitiveMatchService {
 	ResponseMessage spawnMatchs(int competitiveTypeId);
 	ResponseMessage listMatchs(int competitiveTypeId);
 	ResponseMessage updateListMatchsPlayer(List<CompetitiveMatchDto> listUpdated);
-	ResponseMessage confirmListMatchsPlayer(int tournamentId);
+	ResponseMessage confirmListMatchsPlayer(int competitiveTypeId);
 }

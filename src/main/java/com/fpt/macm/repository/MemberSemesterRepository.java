@@ -12,7 +12,7 @@ import com.fpt.macm.model.entity.MemberSemester;
 @Repository
 public interface MemberSemesterRepository extends JpaRepository<MemberSemester, Integer> {
 	
-	List<MemberSemester> findBySemester(String semester);
+	List<MemberSemester> findBySemesterOrderByIdDesc(String semester);
 	
 	@Query(value = "select * from member_semester where user_id = ?1 and semester like CONCAT('%', ?2, '%')", nativeQuery = true)
 	Optional<MemberSemester> findByUserIdAndSemester(int userId, String semester);

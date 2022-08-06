@@ -9,4 +9,5 @@ import com.fpt.macm.model.response.ResponseMessage;
 public interface CompetitiveTypeService {
 	ResponseMessage getAllType(int tournamentId);
 	Set<CompetitiveType> getAllTypeByTournament(int tournamentId);
+	ResponseMessage getListNotJoinCompetitive(int competitiveTypeId);
 }

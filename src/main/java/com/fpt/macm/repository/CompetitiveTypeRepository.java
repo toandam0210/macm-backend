@@ -16,10 +16,4 @@ public interface CompetitiveTypeRepository extends JpaRepository<CompetitiveType
 	
 	@Query(value = "select tournament_id from competitive_type where id = ?1", nativeQuery = true)
 	int findTournamentOfType(int competitiveTypeId);
-	
-	@Query(value = "select ct.tournament_id from \r\n"
-			+ "competitive_player cp inner join competitive_player_bracket cpb on cp.id = cpb.player_id \r\n"
-			+ "                      inner join competitive_type ct on cpb.competitive_type_id = ct.id\r\n"
-			+ "where cp.id = ?1", nativeQuery =  true)
-	int findTournamentByCompetitivePlayerId(int competitivePlayerId);
 }

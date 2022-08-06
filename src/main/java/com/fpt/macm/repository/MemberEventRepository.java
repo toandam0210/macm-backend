@@ -13,9 +13,7 @@ import com.fpt.macm.model.entity.MemberEvent;
 
 @Repository
 public interface MemberEventRepository extends PagingAndSortingRepository<MemberEvent, Integer> {
-
-	@Query(value = "SELECT * FROM member_event WHERE event_id = ?1 AND register_status = false", nativeQuery = true)
-	Page<MemberEvent> findAllMemberCancelJoinEventByEventId(int eventId, Pageable pageable);
+	Page<MemberEvent> findByEventIdAndRegisterStatus(int eventId, boolean registerStatus, Pageable pageable);
 
 	List<MemberEvent> findByEventIdOrderByIdAsc(int eventId);
 	

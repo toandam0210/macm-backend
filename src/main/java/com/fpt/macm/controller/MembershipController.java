@@ -3,6 +3,7 @@ package com.fpt.macm.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,6 +22,7 @@ public class MembershipController {
 	MembershipService membershipService;
 
 	@GetMapping("/treasure/membership/{membershipInfoId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> getListMembershipStatus(
 			@PathVariable(name = "membershipInfoId") int membershipInfoId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -28,12 +30,14 @@ public class MembershipController {
 	}
 
 	@PutMapping("/treasure/membership/update/{id}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> updateMembershipStatus(@PathVariable(name = "id") int id) {
 		return new ResponseEntity<ResponseMessage>(membershipService.updateStatusPaymenMembershipById(id),
 				HttpStatus.OK);
 	}
 
 	@PutMapping("/treasure/membership/membershipinfo/{semester}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> updateMembershipInfo(@RequestParam double amount,
 			@PathVariable(name = "semester") String semester) {
 		return new ResponseEntity<ResponseMessage>(membershipService.updateMembershipBySemester(amount, semester),
@@ -41,12 +45,14 @@ public class MembershipController {
 	}
 
 	@GetMapping("/treasure/membership/membershipinfo/{semester}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> updateMembershipInfo(@PathVariable(name = "semester") String semester) {
 		return new ResponseEntity<ResponseMessage>(membershipService.getMembershipInfoBySemester(semester),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/treasure/membership/getreportmembershippaymentstatus/{membershipInfoId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
 	ResponseEntity<ResponseMessage> getReportMembershipPaymentStatus(
 			@PathVariable(name = "membershipInfoId") int membershipInfoId, @RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {

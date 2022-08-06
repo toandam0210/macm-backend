@@ -101,7 +101,7 @@ public class AttendanceStatusServiceTest {
 	public void testTakeAttendanceByStudentId() {
 		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
-		when(attendanceStatusRepository.findByTrainingScheduleId(anyInt())).thenReturn(Arrays.asList(attendanceStatus()));
+		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(attendanceStatus()));
 		ResponseMessage responseMessage = attendanceStatusService.takeAttendanceByStudentId("HE140855",1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
@@ -123,7 +123,7 @@ public class AttendanceStatusServiceTest {
 	
 	@Test
 	public void testCheckAttendanceStatusByTrainingSchedule() {
-		when(attendanceStatusRepository.findByTrainingScheduleId(anyInt())).thenReturn(Arrays.asList(attendanceStatus()));
+		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(attendanceStatus()));
 		ResponseMessage responseMessage = attendanceStatusService.checkAttendanceStatusByTrainingSchedule(1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
@@ -132,14 +132,14 @@ public class AttendanceStatusServiceTest {
 	public void testCheckAttendanceStatusByTrainingScheduleCaseAttent() {
 		AttendanceStatus attendanceStatus = attendanceStatus();
 		attendanceStatus.setStatus(1);
-		when(attendanceStatusRepository.findByTrainingScheduleId(anyInt())).thenReturn(Arrays.asList(attendanceStatus));
+		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(attendanceStatus));
 		ResponseMessage responseMessage = attendanceStatusService.checkAttendanceStatusByTrainingSchedule(1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
 	@Test
 	public void testCheckAttendanceStatusByTrainingScheduleCaseException() {
-		when(attendanceStatusRepository.findByTrainingScheduleId(anyInt())).thenReturn(null);
+		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt())).thenReturn(null);
 		ResponseMessage responseMessage = attendanceStatusService.checkAttendanceStatusByTrainingSchedule(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}

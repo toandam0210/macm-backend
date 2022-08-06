@@ -19,8 +19,10 @@ import com.fpt.macm.model.entity.AdminSemester;
 import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CollaboratorReport;
+import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventSchedule;
+import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MemberSemester;
 import com.fpt.macm.model.entity.MembershipInfo;
@@ -72,7 +74,7 @@ public class TaskSchedule {
 	MemberEventRepository memberEventRepository;
 
 	@Autowired
-	MemberSemesterRepository stautsSemesterRepository;
+	MemberSemesterRepository memberSemesterRepository;
 
 	@Autowired
 	AdminSemesterRepository adminSemesterRepository;
@@ -136,7 +138,7 @@ public class TaskSchedule {
 
 	@Autowired
 	TrainingScheduleRepository trainingScheduleRepository;
-	
+
 	@Autowired
 	NotificationToUserRepository notificationToUserRepository;
 
@@ -146,14 +148,11 @@ public class TaskSchedule {
 	public void updateCollaboratorRole() {
 		List<User> listCollaborator = userRepository.findCollaborator();
 		Role role = new Role();
-		CollaboratorReport collaboratorReport = new CollaboratorReport();
 		int countPassed = 0;
 		int countNotPassed = 0;
 		int countMale = 0;
 		int countFemale = 0;
 		Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-		collaboratorReport.setNumberJoin(listCollaborator.size());
-		collaboratorReport.setSemester(semester.getName());
 		for (User collaborator : listCollaborator) {
 			if (LocalDate.now().compareTo(collaborator.getCreatedOn().plusMonths(1).plusDays(1)) == 0) {
 				if (collaborator.isGender()) {
@@ -172,15 +171,9 @@ public class TaskSchedule {
 					statusSemester.setUser(collaborator);
 					statusSemester.setSemester(semester.getName());
 					statusSemester.setStatus(collaborator.isActive());
-					stautsSemesterRepository.save(statusSemester);
+					memberSemesterRepository.save(statusSemester);
 				} else {
 					countNotPassed++;
-					List<AttendanceStatus> attendanceStatus = attendanceStatusRepository
-							.findByUserId(collaborator.getId());
-					for (AttendanceStatus user : attendanceStatus) {
-						attendanceStatusRepository.delete(user);
-					}
-					userRepository.delete(collaborator);
 				}
 			}
 		}
@@ -192,11 +185,29 @@ public class TaskSchedule {
 					.setTotalNumberUserInSemester(userStatusReport.getTotalNumberUserInSemester() + countPassed);
 			userStatusReportRepository.save(userStatusReport);
 		}
-		collaboratorReport.setNumberPassed(countPassed);
-		collaboratorReport.setNumberNotPassed(countNotPassed);
-		collaboratorReport.setNumberMale(countMale);
-		collaboratorReport.setNumberFemale(countFemale);
-		collaboratorReportRepository.save(collaboratorReport);
+
+		Optional<CollaboratorReport> colOptional = collaboratorReportRepository.findBySemester(semester.getName());
+		if (colOptional.isPresent()) {
+			CollaboratorReport collaboratorReport = colOptional.get();
+			collaboratorReport.setNumberJoin(listCollaborator.size());
+			collaboratorReport.setSemester(semester.getName());
+			collaboratorReport = colOptional.get();
+			collaboratorReport.setNumberPassed(countPassed);
+			collaboratorReport.setNumberNotPassed(countNotPassed);
+			collaboratorReport.setNumberMale(countMale);
+			collaboratorReport.setNumberFemale(countFemale);
+			collaboratorReportRepository.save(collaboratorReport);
+		} else {
+			CollaboratorReport collaboratorReportNew = new CollaboratorReport();
+			collaboratorReportNew.setNumberJoin(listCollaborator.size());
+			collaboratorReportNew.setSemester(semester.getName());
+			collaboratorReportNew.setNumberPassed(countPassed);
+			collaboratorReportNew.setNumberNotPassed(countNotPassed);
+			collaboratorReportNew.setNumberMale(countMale);
+			collaboratorReportNew.setNumberFemale(countFemale);
+			collaboratorReportNew.setNumberJoin(countFemale);
+			collaboratorReportRepository.save(collaboratorReportNew);
+		}
 		logger.info("report oke");
 	}
 
@@ -215,55 +226,55 @@ public class TaskSchedule {
 			for (User user : members) {
 				if (user.isActive()) {
 					numberUserActive++;
-					MemberSemester statusSemester = new MemberSemester();
-					statusSemester.setUser(user);
-					if (LocalDate.now().getMonthValue() == 1) {
-						statusSemester.setSemester("Spring" + LocalDate.now().getYear());
+					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository.findByUserIdAndSemester(user.getId(), semester.getName());
+					if (!memberSemesterOp.isPresent()) {
+						MemberSemester statusSemester = new MemberSemester();
+						statusSemester.setUser(user);
+						statusSemester.setSemester(semester.getName());
+						statusSemester.setStatus(user.isActive());
+						memberSemesterRepository.save(statusSemester);
+						logger.info("add member oke");
 					}
-					if (LocalDate.now().getMonthValue() == 5) {
-						statusSemester.setSemester("Summer" + LocalDate.now().getYear());
-					}
-					if (LocalDate.now().getMonthValue() == 9) {
-						statusSemester.setSemester("Fall" + LocalDate.now().getYear());
-					}
-					statusSemester.setStatus(user.isActive());
-					stautsSemesterRepository.save(statusSemester);
-					logger.info("add member oke");
 				} else {
 					numberUserDeactive++;
 				}
 			}
 			for (User user : admins) {
 				numberUserActive++;
-				AdminSemester adminSemester = new AdminSemester();
-				adminSemester.setUser(user);
-				if (LocalDate.now().getMonthValue() == 1) {
-					adminSemester.setSemester("Spring" + LocalDate.now().getYear());
+				Optional<AdminSemester> adminSemesterOp = adminSemesterRepository.findByUserId(user.getId(), semester.getName());
+				if (!adminSemesterOp.isPresent()) {
+					AdminSemester adminSemester = new AdminSemester();
+					adminSemester.setUser(user);
+					adminSemester.setSemester(semester.getName());
+					adminSemester.setRole(user.getRole());
+					adminSemesterRepository.save(adminSemester);
+					logger.info("add admin oke");
 				}
-				if (LocalDate.now().getMonthValue() == 5) {
-					adminSemester.setSemester("Summer" + LocalDate.now().getYear());
-				}
-				if (LocalDate.now().getMonthValue() == 9) {
-					adminSemester.setSemester("Fall" + LocalDate.now().getYear());
-				}
-				adminSemester.setRole(user.getRole());
-				adminSemesterRepository.save(adminSemester);
-				logger.info("add admin oke");
 			}
+			
+			Optional<UserStatusReport> userStatusReportOp = userStatusReportRepository.findBySemester(semester.getName());
+			if (userStatusReportOp.isPresent()) {
+				userStatusReport = userStatusReportOp.get();
+			}
+			
 			userStatusReport.setNumberActiveInSemester(numberUserActive);
 			userStatusReport.setNumberDeactiveInSemester(numberUserDeactive);
 			userStatusReport.setTotalNumberUserInSemester(numberUserActive + numberUserDeactive);
 			userStatusReportRepository.save(userStatusReport);
+			
 			logger.info("loi roi");
 		}
 	}
 
 	@Scheduled(cron = "1 2 0 * * *")
 	public void addListAttendanceStatus() {
+		logger.info("bat dau chay");
 		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
 		if (trainingSchedule != null) {
+			logger.info("Khac null");
 			List<User> users = (List<User>) userRepository.findAll();
 			for (User user : users) {
+				logger.info("vao for");
 				if (user.isActive()) {
 					AttendanceStatus attendanceStatus = new AttendanceStatus();
 					attendanceStatus.setUser(user);
@@ -276,6 +287,7 @@ public class TaskSchedule {
 				}
 			}
 		}
+		logger.info("Chay xong");
 	}
 
 	@Scheduled(cron = "1 2 0 * * *")
@@ -361,33 +373,34 @@ public class TaskSchedule {
 		List<Event> listEvent = eventRepository.findAll();
 		for (Event event : listEvent) {
 			LocalDate getStartDate = eventService.getStartDate(event.getId());
-			if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
-				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository
-						.findByEventIdOrderByIdAsc(event.getId());
-				String message = Constant.messageEvent(event);
-				Notification notification = new Notification();
-				notification.setMessage(message);
-				notification.setCreatedOn(LocalDateTime.now());
-				notification.setNotificationType(1);
-				notification.setNotificationTypeId(event.getId());
-				notificationRepository.save(notification);
+			if (getStartDate != null) {
+				if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
+					List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository
+							.findByEventIdOrderByIdAsc(event.getId());
+					String message = Constant.messageEvent(event);
+					Notification notification = new Notification();
+					notification.setMessage(message);
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(1);
+					notification.setNotificationTypeId(event.getId());
+					notificationRepository.save(notification);
 
-				Iterable<Notification> notificationIterable = notificationRepository
-						.findAll(Sort.by("id").descending());
-				List<Notification> notifications = IterableUtils.toList(notificationIterable);
-				Notification newNotification = notifications.get(0);
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
 
-				for (MemberEvent member : membersEvent) {
-					if (member.isRegisterStatus()) {
-						User user = member.getUser();
-						notificationService.sendNotificationToAnUser(user, newNotification);
+					for (MemberEvent member : membersEvent) {
+						if (member.isRegisterStatus()) {
+							User user = member.getUser();
+							notificationService.sendNotificationToAnUser(user, newNotification);
+						}
 					}
+					break;
 				}
-				break;
 			}
 		}
-		
-		
+
 	}
 
 	@Scheduled(cron = "1 2 0 * * *")
@@ -395,38 +408,42 @@ public class TaskSchedule {
 		List<Tournament> tournaments = tournamentRepository.findAll();
 		for (Tournament tournament : tournaments) {
 			LocalDate getStartDate = tournamentService.getStartDate(tournament.getId());
-			logger.info(getStartDate.toString());
-			if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
-				Notification notification = new Notification();
-				notification.setMessage("Giải đấu " + tournament.getName() + " sẽ bắt đầu sau 1 ngày nữa, chuẩn bị chiến nào !!");
-				notification.setCreatedOn(LocalDateTime.now());
-				notification.setNotificationType(0);
-				notification.setNotificationTypeId(tournament.getId());
-				notificationRepository.save(notification);
 
-				Iterable<Notification> notificationIterable = notificationRepository
-						.findAll(Sort.by("id").descending());
-				List<Notification> notifications = IterableUtils.toList(notificationIterable);
-				Notification newNotification = notifications.get(0);
+			if (getStartDate != null) {
+				logger.info(getStartDate.toString());
+				if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
+					Notification notification = new Notification();
+					notification.setMessage(
+							"Giải đấu " + tournament.getName() + " sẽ bắt đầu sau 1 ngày nữa, chuẩn bị chiến nào !!");
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(0);
+					notification.setNotificationTypeId(tournament.getId());
+					notificationRepository.save(notification);
 
-				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-						.findByTournamentId(tournament.getId());
-				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					User user = tournamentOrganizingCommittee.getUser();
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
 
-					notificationService.sendNotificationToAnUser(user, newNotification);
+					List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+							.findByTournamentId(tournament.getId());
+					for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+						User user = tournamentOrganizingCommittee.getUser();
+
+						notificationService.sendNotificationToAnUser(user, newNotification);
+					}
+
+					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+						User user = tournamentPlayer.getUser();
+
+						notificationService.sendNotificationToAnUser(user, newNotification);
+					}
+
+					logger.info("okeeeeee");
+
+					break;
 				}
-
-				Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
-				for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
-					User user = tournamentPlayer.getUser();
-
-					notificationService.sendNotificationToAnUser(user, newNotification);
-				}
-				
-				logger.info("okeeeeee");
-
-				break;
 			}
 		}
 	}
@@ -439,7 +456,7 @@ public class TaskSchedule {
 			if (hasSentNotificationWarningAbsent(user, semester)) {
 				continue;
 			}
-			
+
 			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 			int totalAbsent = 0;
@@ -460,18 +477,18 @@ public class TaskSchedule {
 				notification.setNotificationType(3);
 				notification.setNotificationTypeId(0);
 				notificationRepository.save(notification);
-				
+
 				Iterable<Notification> notificationIterable = notificationRepository
 						.findAll(Sort.by("id").descending());
 				List<Notification> notifications = IterableUtils.toList(notificationIterable);
 				Notification newNotification = notifications.get(0);
-				
+
 				notificationService.sendNotificationToAnUser(user, newNotification);
 			}
 
 		}
 	}
-	
+
 	public boolean hasSentNotificationWarningAbsent(User user, Semester semester) {
 		List<NotificationToUser> notificationsToUser = notificationToUserRepository.findAllByUserId(user.getId());
 		for (NotificationToUser notificationToUser : notificationsToUser) {
@@ -490,7 +507,7 @@ public class TaskSchedule {
 		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
 		if (trainingSchedule != null) {
 			List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
-					.findByTrainingScheduleId(trainingSchedule.getId());
+					.findByTrainingScheduleIdOrderByIdAsc(trainingSchedule.getId());
 			for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
 				if (attendanceStatus.getStatus() == 2) {
 					attendanceStatus.setStatus(0);
@@ -519,16 +536,32 @@ public class TaskSchedule {
 	public void changeStatusTournamentForUpdatePlayer() {
 		List<Tournament> listTournaments = tournamentService
 				.listTournamentsByRegistrationPlayerDeadline(LocalDateTime.now());
-		if(listTournaments != null) {
+		if (listTournaments != null) {
 			for (Tournament tournament : listTournaments) {
-				if (tournament.getStatus() == 0) {
-					tournament.setStatus(1);
-					tournamentRepository.save(tournament);
-					logger.info("Chuyển thành 1");
+				logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
+				Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
+				for (CompetitiveType competitiveType : listCompetitiveTypes) {
+					if (competitiveType.getStatus() == 0) {
+						competitiveType.setStatus(1);
+						logger.info("Trạng thái của " + (competitiveType.isGender() ? "Nam " : "Nữ ")
+								+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
+								+ " thay đổi từ 0 thành 1");
+					}
 				}
+				tournament.setCompetitiveTypes(listCompetitiveTypes);
+				Set<ExhibitionType> listExhibitionTypes = tournament.getExhibitionTypes();
+				for (ExhibitionType exhibitionType : listExhibitionTypes) {
+					if (exhibitionType.getStatus() == 0) {
+						exhibitionType.setStatus(1);
+						logger.info("Trạng thái của " + exhibitionType.getName() + " thay đổi từ 0 thành 1");
+					}
+				}
+				tournament.setExhibitionTypes(listExhibitionTypes);
+
+				logger.info("Dừng thay đổi trạng thái của giải đấu " + tournament.getName());
+				tournamentRepository.save(tournament);
 			}
-		}
-		else {
+		} else {
 			logger.info("Không có giải đấu");
 		}
 	}
@@ -537,12 +570,31 @@ public class TaskSchedule {
 	public void changeStatusTournamentForUpdateResult() {
 		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now());
 		if (tournamentSchedule != null) {
-			Tournament getTournament = tournamentSchedule.getTournament();
-			if (getTournament.getStatus() == 2) {
-				getTournament.setStatus(3);
-				tournamentRepository.save(getTournament);
-				logger.info("Chuyển thành 3");
+			Tournament tournament = tournamentSchedule.getTournament();
+			logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
+			Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
+			for (CompetitiveType competitiveType : listCompetitiveTypes) {
+				if (competitiveType.getStatus() == 2) {
+					competitiveType.setStatus(3);
+					logger.info("Trạng thái của " + (competitiveType.isGender() ? "Nam " : "Nữ ")
+							+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
+							+ " thay đổi từ 2 thành 3");
+				}
 			}
+			tournament.setCompetitiveTypes(listCompetitiveTypes);
+			Set<ExhibitionType> listExhibitionTypes = tournament.getExhibitionTypes();
+			for (ExhibitionType exhibitionType : listExhibitionTypes) {
+				if (exhibitionType.getStatus() == 0) {
+					exhibitionType.setStatus(1);
+					logger.info("Trạng thái của " + exhibitionType.getName() + " thay đổi từ 2 thành 3");
+				}
+			}
+			tournament.setExhibitionTypes(listExhibitionTypes);
+
+			logger.info("Dừng thay đổi trạng thái của giải đấu " + tournament.getName());
+			tournamentRepository.save(tournament);
+		} else {
+			logger.info("Không có giải đấu");
 		}
 	}
 }
