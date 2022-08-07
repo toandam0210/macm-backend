@@ -510,15 +510,26 @@ public class UserServiceImpl implements UserService {
 			List<User> usersFromExcel = ExcelHelper.excelToUsers(file.getInputStream());
 			List<UserDto> usersDto = new ArrayList<UserDto>();
 			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository.findAllFutureTrainingSchedule(LocalDate.now());
+			int countAddSuccess = 0;
+			int countAddFail = 0;
 			for (User userFromExcel : usersFromExcel) {
 				Optional<User> userStudentId = userRepository.findByStudentId(userFromExcel.getStudentId());
 				Optional<User> userEmail = userRepository.findByEmail(userFromExcel.getEmail());
 				if (userStudentId.isPresent() || userEmail.isPresent()) {
-					usersDto.add(convertUserToUserDto(userFromExcel));
+					UserDto userDto = convertUserToUserDto(userFromExcel);
+					if (userStudentId.isPresent()) {
+						userDto.setMessageError(Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050);
+					} else {
+						userDto.setMessageError(Constant.MSG_049 + userFromExcel.getEmail() + Constant.MSG_050);
+					}
+					usersDto.add(userDto);
+					countAddFail++;
 				} else {
 					userFromExcel.setCreatedOn(LocalDate.now());
 					userFromExcel.setCreatedBy("toandv");
 					userRepository.saveAll(usersFromExcel);
+					
+					countAddSuccess++;
 
 					if (userFromExcel.getRole().getId() > 9 && userFromExcel.getRole().getId() < 13) {
 						MemberSemester memberSemester = new MemberSemester();
@@ -563,15 +574,24 @@ public class UserServiceImpl implements UserService {
 			}
 			responseMessage.setData(usersDto);
 			responseMessage.setMessage(Constant.MSG_006);
-			responseMessage.setTotalResult(usersDto.size());
+			responseMessage.setTotalResult(usersFromExcel.size());
+			responseMessage.setTotalActive(countAddSuccess);
+			responseMessage.setTotalDeactive(countAddFail);
 			return responseMessage;
 		} catch (IOException e) {
 			throw new RuntimeException("fail to store excel data: " + e.getMessage());
 		}
 	}
-
+	
+	@Override
 	public ByteArrayInputStream exportUsersToExcel(List<UserDto> users) {
 		ByteArrayInputStream in = ExcelHelper.usersToExcel(users);
+		return in;
+	}
+	
+	@Override
+	public ByteArrayInputStream exportUsersToExcelWithError(List<UserDto> users) {
+		ByteArrayInputStream in = ExcelHelper.usersToExcelWithErrorMessage(users);
 		return in;
 	}
 

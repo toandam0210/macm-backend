@@ -7,7 +7,10 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -17,6 +20,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionTeam;
@@ -26,7 +30,11 @@ import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.CompetitivePlayerRepository;
+import com.fpt.macm.repository.CompetitiveTypeRepository;
+import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
+import com.fpt.macm.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class CompetitiveTypeServiceTest {
@@ -36,6 +44,18 @@ public class CompetitiveTypeServiceTest {
 	
 	@Mock
 	TournamentRepository tournamentRepository;
+	
+	@Mock
+	CompetitiveTypeRepository competitiveTypeRepository;
+	
+	@Mock
+	UserRepository userRepository;
+	
+	@Mock
+	TournamentPlayerRepository tournamentPlayerRepository;
+	
+	@Mock
+	CompetitivePlayerRepository competitivePlayerRepository;
 	
 	private Tournament tournament() {
 		Tournament tournament = new Tournament();
@@ -138,6 +158,14 @@ public class CompetitiveTypeServiceTest {
 		return exhibitionPlayers;
 	}
 	
+	private CompetitivePlayer competitivePlayer() {
+		CompetitivePlayer competitivePlayer = new CompetitivePlayer();
+		competitivePlayer.setId(1);
+		competitivePlayer.setTournamentPlayer(tournamentPlayer());
+		competitivePlayer.setWeight(50);
+		return competitivePlayer;
+	}
+	
 	@Test
 	public void testGetAllType() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
@@ -164,6 +192,27 @@ public class CompetitiveTypeServiceTest {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
 		Set<CompetitiveType> competitiveTypes = competitiveTypeService.getAllTypeByTournament(1);
 		assertNull(competitiveTypes);
+	}
+	
+	@Test
+	public void testGetListNotJoinCompetitive() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> coms = new ArrayList<CompetitiveType>(competitiveTypes);
+		List<TournamentPlayer> tournamentPlayers = new ArrayList<TournamentPlayer>(tournamentPlayers());
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(coms.get(0)));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(createUser()));
+		when(tournamentPlayerRepository.getPlayerByTournamentId(anyInt())).thenReturn(tournamentPlayers);
+		when(competitivePlayerRepository.findByTournamentPlayerId(anyInt())).thenReturn(Optional.of(competitivePlayer()));
+		ResponseMessage response = competitiveTypeService.getListNotJoinCompetitive(1);
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGetListNotJoinCompetitiveCaseException() {
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(null);
+		ResponseMessage response = competitiveTypeService.getListNotJoinCompetitive(1);
+		assertEquals(response.getData().size(), 0);
 	}
 	
 	
