@@ -16,4 +16,7 @@ public interface TrainingScheduleRepository extends JpaRepository<TrainingSchedu
 	
 	@Query(value = "select * from training_schedule where date between ?1 and ?2 order by date", nativeQuery = true)
 	List<TrainingSchedule> listTrainingScheduleByTime(LocalDate startDate, LocalDate finishDate);
+	
+	@Query(value = "select * from training_schedule where date >= ?1", nativeQuery = true)
+	List<TrainingSchedule> findAllFutureTrainingSchedule(LocalDate date);
 }

@@ -219,14 +219,14 @@ public class UserServiceImpl implements UserService {
 						adminSemesterRepository.save(adminSemester);
 					}
 
-					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository.findByUserIdAndSemester(user.getId(), semester.getName());
+					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository
+							.findByUserIdAndSemester(user.getId(), semester.getName());
 					if (roleOptional.get().getId() > 12 && roleOptional.get().getId() < 16) {
 						if (memberSemesterOp.isPresent()) {
 							MemberSemester memberSemester = memberSemesterOp.get();
 							memberSemesterRepository.delete(memberSemester);
 						}
-					}
-					else if (roleOptional.get().getId() > 9 && roleOptional.get().getId() < 13){
+					} else if (roleOptional.get().getId() > 9 && roleOptional.get().getId() < 13) {
 						if (!memberSemesterOp.isPresent()) {
 							MemberSemester memberSemester = new MemberSemester();
 							memberSemester.setSemester(semester.getName());
@@ -331,6 +331,18 @@ public class UserServiceImpl implements UserService {
 					User newUser = newUserOp.get();
 					UserDto newUserDto = convertUserToUserDto(newUser);
 					responseMessage.setData(Arrays.asList(newUserDto));
+
+					List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
+							.findAllFutureTrainingSchedule(LocalDate.now());
+					for (TrainingSchedule trainingSchedule : trainingSchedules) {
+						AttendanceStatus attendanceStatus = new AttendanceStatus();
+						attendanceStatus.setUser(newUser);
+						attendanceStatus.setTrainingSchedule(trainingSchedule);
+						attendanceStatus.setCreatedOn(LocalDateTime.now());
+						attendanceStatus.setCreatedBy("toandv");
+						attendanceStatus.setStatus(2);
+						attendanceStatusRepository.save(attendanceStatus);
+					}
 				}
 				responseMessage.setMessage(Constant.MSG_007);
 			} else {
@@ -408,6 +420,29 @@ public class UserServiceImpl implements UserService {
 					memberSemesterRepository.save(memberSemester);
 				}
 				userRepository.save(user);
+
+				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
+						.findAllFutureTrainingSchedule(LocalDate.now());
+				// Thêm data điểm danh khi active user
+				if (user.isActive()) {
+					for (TrainingSchedule trainingSchedule : trainingSchedules) {
+						AttendanceStatus attendanceStatus = new AttendanceStatus();
+						attendanceStatus.setUser(user);
+						attendanceStatus.setTrainingSchedule(trainingSchedule);
+						attendanceStatus.setCreatedOn(LocalDateTime.now());
+						attendanceStatus.setCreatedBy("toandv");
+						attendanceStatus.setStatus(2);
+						attendanceStatusRepository.save(attendanceStatus);
+					}
+				}
+				// Xóa data điểm danh khi deactive user
+				else {
+					for (TrainingSchedule trainingSchedule : trainingSchedules) {
+						AttendanceStatus attendanceStatus = attendanceStatusRepository
+								.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+						attendanceStatusRepository.delete(attendanceStatus);
+					}
+				}
 			}
 			responseMessage.setData(Arrays.asList(user));
 			responseMessage.setMessage(Constant.MSG_005);
@@ -461,6 +496,7 @@ public class UserServiceImpl implements UserService {
 		try {
 			List<User> usersFromExcel = ExcelHelper.excelToUsers(file.getInputStream());
 			List<UserDto> usersDto = new ArrayList<UserDto>();
+			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository.findAllFutureTrainingSchedule(LocalDate.now());
 			for (User userFromExcel : usersFromExcel) {
 				Optional<User> userStudentId = userRepository.findByStudentId(userFromExcel.getStudentId());
 				Optional<User> userEmail = userRepository.findByEmail(userFromExcel.getEmail());
@@ -488,6 +524,24 @@ public class UserServiceImpl implements UserService {
 						adminSemester.setSemester(currentSemester.getName());
 						adminSemesterRepository.save(adminSemester);
 					}
+					
+					// Thêm data điểm danh khi user active
+					Optional<User> newUserOp = userRepository.findByStudentId(userFromExcel.getStudentId());
+					if (newUserOp.isPresent()) {
+						User newUser = newUserOp.get();
+						if (newUser.isActive()) {
+							for (TrainingSchedule trainingSchedule : trainingSchedules) {
+								AttendanceStatus attendanceStatus = new AttendanceStatus();
+								attendanceStatus.setUser(newUser);
+								attendanceStatus.setTrainingSchedule(trainingSchedule);
+								attendanceStatus.setCreatedOn(LocalDateTime.now());
+								attendanceStatus.setCreatedBy("toandv");
+								attendanceStatus.setStatus(2);
+								attendanceStatusRepository.save(attendanceStatus);
+							}
+						}
+					}
+
 				}
 			}
 			responseMessage.setData(usersDto);
