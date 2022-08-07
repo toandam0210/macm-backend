@@ -142,6 +142,7 @@ public class TournamentServiceImpl implements TournamentService {
 			Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
 			for (CompetitiveType competitiveType : competitiveTypes) {
 				competitiveType.setStatus(0);
+				competitiveType.setChanged(false);
 				competitiveType.setCreatedBy("toandv");
 				competitiveType.setCreatedOn(LocalDateTime.now());
 			}
@@ -1202,7 +1203,8 @@ public class TournamentServiceImpl implements TournamentService {
 					competitivePlayerRepository.save(competitivePlayer);
 					responseMessage.setData(Arrays.asList(competitivePlayer));
 					responseMessage.setMessage("Đăng ký thành công");
-
+					competitiveType.setChanged(true);
+					competitiveTypeRepository.save(competitiveType);
 				} else {
 					responseMessage.setMessage("Bạn đã đăng ký vào giải này rồi");
 				}

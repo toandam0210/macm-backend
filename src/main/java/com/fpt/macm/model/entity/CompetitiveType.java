@@ -40,6 +40,9 @@ public class CompetitiveType {
 	
 	@Column
 	private Integer status;
+	
+	@Column
+	private Boolean changed;
 
 	public int getId() {
 		return id;
@@ -111,6 +114,14 @@ public class CompetitiveType {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+
+	public Boolean isChanged() {
+		return changed;
+	}
+
+	public void setChanged(Boolean changed) {
+		this.changed = changed;
 	}
 	
 }
