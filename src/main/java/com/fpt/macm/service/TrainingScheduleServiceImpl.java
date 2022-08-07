@@ -13,13 +13,17 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.TrainingSchedule;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
+import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -42,6 +46,12 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 
 	@Autowired
 	NotificationService notificationService;
+
+	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
+	AttendanceStatusRepository attendanceStatusRepository;
 
 	@Override
 	public ResponseMessage createPreviewTrainingSchedule(String startDate, String finishDate, List<String> dayOfWeek,
@@ -128,6 +138,25 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 						commonSession.setType(0);
 						commonScheduleRepository.save(commonSession);
 
+						// Thêm data điểm danh
+						List<User> users = userRepository.findAllActiveUser();
+						if (!users.isEmpty()) {
+							Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository
+									.findByDate(trainingSchedule.getDate());
+							if (trainingScheduleOp.isPresent()) {
+								for (User user : users) {
+									AttendanceStatus attendanceStatus = new AttendanceStatus();
+									attendanceStatus.setUser(user);
+									attendanceStatus.setTrainingSchedule(trainingScheduleOp.get());
+									attendanceStatus.setCreatedOn(LocalDateTime.now());
+									attendanceStatus.setCreatedBy("toandv");
+									attendanceStatus.setStatus(2);
+									attendanceStatusRepository.save(attendanceStatus);
+								}
+							}
+						}
+
+						// Gửi thông báo đến cho user khi tạo 1 buổi tập mới
 						notificationService.createTrainingSessionCreateNotification(trainingSchedule.getDate());
 					} else {
 						responseMessage.setMessage(Constant.MSG_041);
@@ -278,6 +307,26 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 				commonScheduleRepository.saveAll(listCommon);
 				responseMessage.setData(listTraining);
 				responseMessage.setMessage(Constant.MSG_036);
+
+				// Thêm data điểm danh
+				List<User> users = userRepository.findAllActiveUser();
+				if (!users.isEmpty()) {
+					for (TrainingSchedule trainingSchedule : listTraining) {
+						Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository
+								.findByDate(trainingSchedule.getDate());
+						if (trainingScheduleOp.isPresent()) {
+							for (User user : users) {
+								AttendanceStatus attendanceStatus = new AttendanceStatus();
+								attendanceStatus.setUser(user);
+								attendanceStatus.setTrainingSchedule(trainingScheduleOp.get());
+								attendanceStatus.setCreatedOn(LocalDateTime.now());
+								attendanceStatus.setCreatedBy("toandv");
+								attendanceStatus.setStatus(2);
+								attendanceStatusRepository.save(attendanceStatus);
+							}
+						}
+					}
+				}
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
