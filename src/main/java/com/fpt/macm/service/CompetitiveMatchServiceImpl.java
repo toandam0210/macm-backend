@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.dto.CompetitiveMatchByTypeDto;
 import com.fpt.macm.model.dto.CompetitiveMatchDto;
 import com.fpt.macm.model.dto.PlayerMatchDto;
 import com.fpt.macm.model.entity.CompetitiveMatch;
@@ -104,7 +105,12 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 							listMatchDto.add(newCompetitiveMatchDto);
 						}
 						Collections.sort(listMatchDto);
-						responseMessage.setData(listMatchDto);
+						CompetitiveMatchByTypeDto competitiveMatchByTypeDto = new CompetitiveMatchByTypeDto();
+						competitiveMatchByTypeDto.setName((getType.isGender()? "Nam " : "Nữ ") + getType.getWeightMin() + " - " + getType.getWeightMax());
+						competitiveMatchByTypeDto.setChanged(getType.isChanged());
+						competitiveMatchByTypeDto.setStatus(getType.getStatus());
+						competitiveMatchByTypeDto.setListMatchDto(listMatchDto);
+						responseMessage.setData(Arrays.asList(competitiveMatchByTypeDto));
 						if (getType.getStatus() <= 1) {
 							responseMessage.setMessage("Danh sách trận đấu dự kiến");
 						} else {
@@ -262,20 +268,26 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 						for (int i = 0; i < freePlayer; i++) {
 							CompetitiveMatch getMatch = listMatch.get(currentMatch);
 							String studentId = listPlayers.get(i).getTournamentPlayer().getUser().getStudentId();
-							CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId())
-									.get();
-							if (getMatch.isNextIsFirst()) {
-								nextMatch.setFirstStudentId(studentId);
-								nextMatch.setUpdatedBy("LinhLHN");
-								nextMatch.setUpdatedOn(LocalDateTime.now());
-								competitiveMatchRepository.save(nextMatch);
-							} else {
-								nextMatch.setSecondStudentId(studentId);
-								nextMatch.setUpdatedBy("LinhLHN");
-								nextMatch.setUpdatedOn(LocalDateTime.now());
-								competitiveMatchRepository.save(nextMatch);
-							}
-							competitiveMatchRepository.delete(getMatch);
+							getMatch.setFirstStudentId(studentId);
+							getMatch.setUpdatedBy("LinhLHN");
+							getMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(getMatch);
+							Optional<CompetitiveMatch> nextMatchOp = competitiveMatchRepository.findById(getMatch.getNextMatchId());
+							if(nextMatchOp.isPresent()) {
+								CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId())
+										.get();
+								if (getMatch.isNextIsFirst()) {
+									nextMatch.setFirstStudentId(studentId);
+									nextMatch.setUpdatedBy("LinhLHN");
+									nextMatch.setUpdatedOn(LocalDateTime.now());
+									competitiveMatchRepository.save(nextMatch);
+								} else {
+									nextMatch.setSecondStudentId(studentId);
+									nextMatch.setUpdatedBy("LinhLHN");
+									nextMatch.setUpdatedOn(LocalDateTime.now());
+									competitiveMatchRepository.save(nextMatch);
+								}
+							}			
 							currentMatch++;
 						}
 						for (int i = freePlayer; i < numberPlayer; i += 2) {
@@ -313,6 +325,8 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 						}
 						responseMessage.setData(listMatchPreview);
 						responseMessage.setMessage("Danh sách trận đấu dự kiến");
+						getType.setChanged(false);
+						competitiveTypeRepository.save(getType);
 					}
 				} else {
 					responseMessage.setMessage("Đã qua giai đoạn tạo trận đấu");

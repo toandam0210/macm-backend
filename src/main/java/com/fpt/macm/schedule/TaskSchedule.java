@@ -266,29 +266,29 @@ public class TaskSchedule {
 		}
 	}
 
-	@Scheduled(cron = "1 2 0 * * *")
-	public void addListAttendanceStatus() {
-		logger.info("bat dau chay");
-		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
-		if (trainingSchedule != null) {
-			logger.info("Khac null");
-			List<User> users = (List<User>) userRepository.findAll();
-			for (User user : users) {
-				logger.info("vao for");
-				if (user.isActive()) {
-					AttendanceStatus attendanceStatus = new AttendanceStatus();
-					attendanceStatus.setUser(user);
-					attendanceStatus.setTrainingSchedule(trainingSchedule);
-					attendanceStatus.setCreatedOn(LocalDateTime.now());
-					attendanceStatus.setCreatedBy("toandv");
-					attendanceStatus.setStatus(2);
-					attendanceStatusRepository.save(attendanceStatus);
-					logger.info("atten oke");
-				}
-			}
-		}
-		logger.info("Chay xong");
-	}
+//	@Scheduled(cron = "1 2 0 * * *")
+//	public void addListAttendanceStatus() {
+//		logger.info("bat dau chay");
+//		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
+//		if (trainingSchedule != null) {
+//			logger.info("Khac null");
+//			List<User> users = (List<User>) userRepository.findAll();
+//			for (User user : users) {
+//				logger.info("vao for");
+//				if (user.isActive()) {
+//					AttendanceStatus attendanceStatus = new AttendanceStatus();
+//					attendanceStatus.setUser(user);
+//					attendanceStatus.setTrainingSchedule(trainingSchedule);
+//					attendanceStatus.setCreatedOn(LocalDateTime.now());
+//					attendanceStatus.setCreatedBy("toandv");
+//					attendanceStatus.setStatus(2);
+//					attendanceStatusRepository.save(attendanceStatus);
+//					logger.info("atten oke");
+//				}
+//			}
+//		}
+//		logger.info("Chay xong");
+//	}
 
 	@Scheduled(cron = "1 2 0 * * *")
 	public void addListMemberEventAttendanceStatus() {

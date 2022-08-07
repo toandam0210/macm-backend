@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,7 @@ import com.fpt.macm.utils.Utils;
 
 @Service
 public class AttendanceStatusServiceImpl implements AttendanceStatusService {
+
 	@Autowired
 	TrainingScheduleService trainingScheduleService;
 
@@ -44,30 +46,45 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	@Autowired
 	TrainingScheduleRepository trainingScheduleRepository;
 
+	@Autowired
+	SemesterService semesterService;
+
 	@Override
-	public ResponseMessage takeAttendanceByStudentId(String studentId, int status) {
+	public ResponseMessage takeAttendanceByStudentId(String studentId, int status, int trainingScheduleId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
-			if (trainingSchedule != null) {
-				Optional<User> userOp = userRepository.findByStudentId(studentId);
-				User user = userOp.get();
-				List<AttendanceStatus> attendancesStatus = attendanceStatusRepository
-						.findByTrainingScheduleIdOrderByIdAsc(trainingSchedule.getId());
-				AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
-				attendanceStatusDto.setName(user.getName());
-				attendanceStatusDto.setStudentId(studentId);
-				for (AttendanceStatus attendanceStatus : attendancesStatus) {
-					if (attendanceStatus.getUser().getId() == user.getId()) {
+			Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository.findById(trainingScheduleId);
+			if (trainingScheduleOp.isPresent()) {
+				TrainingSchedule trainingSchedule = trainingScheduleOp.get();
+				if (trainingSchedule.getDate().isBefore(LocalDate.now())
+						|| trainingSchedule.getDate().isEqual(LocalDate.now())) {
+					Optional<User> userOp = userRepository.findByStudentId(studentId);
+					User user = userOp.get();
+					AttendanceStatus attendanceStatus = attendanceStatusRepository
+							.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+					if (attendanceStatus != null) {
 						attendanceStatus.setStatus(status);
-						attendanceStatusDto.setStatus(status);
 						attendanceStatus.setUpdatedOn(LocalDateTime.now());
 						attendanceStatus.setUpdatedBy("toandv");
 						attendanceStatusRepository.save(attendanceStatus);
+
+						AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
+						attendanceStatusDto.setId(attendanceStatus.getId());
+						attendanceStatusDto.setName(user.getName());
+						attendanceStatusDto.setStudentId(studentId);
+						attendanceStatusDto.setStatus(status);
+						attendanceStatusDto.setTrainingScheduleId(trainingSchedule.getId());
+						attendanceStatusDto.setDate(trainingSchedule.getDate());
+
+						responseMessage.setData(Arrays.asList(attendanceStatusDto));
+						responseMessage.setMessage(Constant.MSG_055);
+					} else {
+						responseMessage.setMessage(
+								"Không có thông tin điểm danh của " + user.getName() + " - " + user.getStudentId());
 					}
+				} else {
+					responseMessage.setMessage("Không thành công vì chưa đến thời gian điểm danh");
 				}
-				responseMessage.setData(Arrays.asList(attendanceStatusDto));
-				responseMessage.setMessage(Constant.MSG_055);
 			} else {
 				responseMessage.setMessage(Constant.MSG_056);
 			}
@@ -88,9 +105,11 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			int absent = 0;
 			for (AttendanceStatus attendanceStatus : attendancesStatus) {
 				AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
+				attendanceStatusDto.setId(attendanceStatus.getId());
 				attendanceStatusDto.setName(attendanceStatus.getUser().getName());
 				attendanceStatusDto.setStudentId(attendanceStatus.getUser().getStudentId());
 				attendanceStatusDto.setStatus(attendanceStatus.getStatus());
+				attendanceStatusDto.setTrainingScheduleId(trainingScheduleId);
 				if (attendanceStatus.getStatus() == 1) {
 					attend++;
 				}
@@ -100,6 +119,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				attendanceStatusDto.setDate(attendanceStatus.getTrainingSchedule().getDate());
 				attendanceStatusDtos.add(attendanceStatusDto);
 			}
+			Collections.sort(attendanceStatusDtos);
 			responseMessage.setData(attendanceStatusDtos);
 			responseMessage.setMessage(Constant.MSG_057);
 			responseMessage.setTotalActive(attend);
@@ -167,9 +187,9 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 		try {
 			User user = userRepository.findByStudentId(studentId).get();
 			Semester semester = semesterRepository.findByName(semesterName).get();
-			
+
 			List<UserAttendanceStatusDto> listUserAttendanceStatusDto = new ArrayList<UserAttendanceStatusDto>();
-			
+
 			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 			for (TrainingSchedule trainingSchedule : trainingSchedules) {
@@ -181,20 +201,54 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
 				userAttendanceStatusDto.setTitle("Lịch tập");
 				userAttendanceStatusDto.setType(0);
-				
+
 				AttendanceStatus attendanceStatus = attendanceStatusRepository
 						.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
 				if (attendanceStatus != null) {
 					userAttendanceStatusDto.setStatus(attendanceStatus.getStatus());
-				}
-				else {
+				} else {
 					userAttendanceStatusDto.setStatus(2);
 				}
 				listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 			}
-			
+
 			responseMessage.setData(listUserAttendanceStatusDto);
-			responseMessage.setMessage("Lấy báo cáo điểm danh cho " + user.getName() + " - " + user.getStudentId() + " thành công.");
+			responseMessage.setMessage(
+					"Lấy báo cáo điểm danh cho " + user.getName() + " - " + user.getStudentId() + " thành công.");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getListOldTrainingScheduleToTakeAttendanceBySemester(String semesterName) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Semester semester = new Semester();
+			Optional<Semester> semesterOp = semesterRepository.findByName(semesterName);
+			if (semesterOp.isPresent()) {
+				semester = semesterOp.get();
+			} else {
+				semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+			}
+
+			List<TrainingSchedule> oldTrainingSchedules = new ArrayList<TrainingSchedule>();
+			
+			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
+					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
+			for (TrainingSchedule trainingSchedule : trainingSchedules) {
+				if (trainingSchedule.getDate().isBefore(LocalDate.now())) {
+					oldTrainingSchedules.add(trainingSchedule);
+				}
+			}
+			
+			if (!oldTrainingSchedules.isEmpty()) {
+				responseMessage.setData(oldTrainingSchedules);
+				responseMessage.setMessage("Lấy danh sách các buổi tập đã qua của kỳ "+ semesterName +" để điểm danh lại thành công");
+			} else {
+				responseMessage.setMessage("Không có buổi tập nào đã qua để điểm danh lại");
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
