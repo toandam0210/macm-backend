@@ -13,12 +13,14 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventSchedule;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
@@ -55,6 +57,9 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 
 	@Autowired
 	NotificationService notificationService;
+
+	@Autowired
+	AttendanceStatusRepository attendanceStatusRepository;
 
 	@Override
 	public ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate,
@@ -124,6 +129,7 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
 			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
 			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
+			List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
 			Boolean isInterrupted = false;
 			String title = "";
 			Optional<Event> eventOp = eventRepository.findById(eventId);
@@ -177,6 +183,11 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 							TrainingSchedule getTrainingSession = trainingScheduleService
 									.getTrainingScheduleByDate(scheduleDto.getDate());
 							listTrainingOverwritten.add(getTrainingSession);
+							List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
+									.findByTrainingScheduleIdOrderByIdAsc(getTrainingSession.getId());
+							for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
+								listAttendanceStatusOverwritten.add(attendanceStatus);
+							}
 						} else {
 							isInterrupted = true;
 							title = scheduleDto.getTitle();
@@ -189,6 +200,7 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 				} else {
 					eventScheduleRepository.saveAll(listEventSchedule);
 					commonScheduleRepository.deleteAll(listCommonOverwritten);
+					attendanceStatusRepository.deleteAll(listAttendanceStatusOverwritten);
 					trainingScheduleRepository.deleteAll(listTrainingOverwritten);
 					commonScheduleRepository.saveAll(listCommon);
 					responseMessage.setData(listEventSchedule);
@@ -240,7 +252,8 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 			if (getEventSessionOp.isPresent()) {
 				EventSchedule getEventSession = getEventSessionOp.get();
 				responseMessage.setData(Arrays.asList(getEventSession));
-				responseMessage.setMessage("Ngày " + date + " thuộc lịch trình của sự kiện " + getEventSession.getEvent().getName());
+				responseMessage.setMessage(
+						"Ngày " + date + " thuộc lịch trình của sự kiện " + getEventSession.getEvent().getName());
 			} else {
 				responseMessage.setMessage(Constant.MSG_071);
 			}
@@ -342,6 +355,7 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
 			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
 			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
+			List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
 			Boolean isInterrupted = false;
 			String title = "";
 			for (ScheduleDto scheduleDto : listPreview) {
@@ -392,6 +406,11 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 						TrainingSchedule getTrainingSession = trainingScheduleService
 								.getTrainingScheduleByDate(scheduleDto.getDate());
 						listTrainingOverwritten.add(getTrainingSession);
+						List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
+								.findByTrainingScheduleIdOrderByIdAsc(getTrainingSession.getId());
+						for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
+							listAttendanceStatusOverwritten.add(attendanceStatus);
+						}
 					} else {
 						isInterrupted = true;
 						title = scheduleDto.getTitle();
@@ -414,6 +433,7 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 					}
 					eventScheduleRepository.saveAll(listEventSchedule);
 					commonScheduleRepository.deleteAll(listCommonOverwritten);
+					attendanceStatusRepository.deleteAll(listAttendanceStatusOverwritten);
 					trainingScheduleRepository.deleteAll(listTrainingOverwritten);
 					commonScheduleRepository.saveAll(listCommon);
 					responseMessage.setData(listEventSchedule);
