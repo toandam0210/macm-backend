@@ -13,14 +13,18 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentSchedule;
+import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
+import com.fpt.macm.repository.TrainingScheduleRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -43,6 +47,15 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 
 	@Autowired
 	NotificationService notificationService;
+	
+	@Autowired
+	AttendanceStatusRepository attendanceStatusRepository;
+	
+	@Autowired
+	TrainingScheduleService trainingScheduleService;
+	
+	@Autowired
+	TrainingScheduleRepository trainingScheduleRepository;
 	
 	@Override
 	public ResponseMessage createPreviewTournamentSchedule(String tournamentName, String startDate, String finishDate,
@@ -117,6 +130,8 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 			List<TournamentSchedule> listTournamentSchedule = new ArrayList<TournamentSchedule>();
 			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
 			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
+			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
+			List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
 			Boolean isInterrupted = false;
 			String title = "";
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
@@ -161,6 +176,14 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 							CommonSchedule getCommonSession = commonScheduleService
 									.getCommonSessionByDate(scheduleDto.getDate());
 							listCommonOverwritten.add(getCommonSession);
+							TrainingSchedule getTrainingSession = trainingScheduleService
+									.getTrainingScheduleByDate(scheduleDto.getDate());
+							listTrainingOverwritten.add(getTrainingSession);
+							List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
+									.findByTrainingScheduleIdOrderByIdAsc(getTrainingSession.getId());
+							for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
+								listAttendanceStatusOverwritten.add(attendanceStatus);
+							}
 						} else {
 							isInterrupted = true;
 							title = scheduleDto.getTitle();
@@ -177,6 +200,8 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 				} else {
 					tournamentScheduleRepository.saveAll(listTournamentSchedule);
 					commonScheduleRepository.deleteAll(listCommonOverwritten);
+					attendanceStatusRepository.deleteAll(listAttendanceStatusOverwritten);
+					trainingScheduleRepository.deleteAll(listTrainingOverwritten);
 					commonScheduleRepository.saveAll(listCommon);
 					responseMessage.setData(listTournamentSchedule);
 					responseMessage.setMessage(Constant.MSG_100);

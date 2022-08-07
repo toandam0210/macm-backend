@@ -97,29 +97,29 @@ public class AttendanceStatusServiceTest {
 		return semester;
 	}
 	
-	@Test
-	public void testTakeAttendanceByStudentId() {
-		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
-		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
-		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(attendanceStatus()));
-		ResponseMessage responseMessage = attendanceStatusService.takeAttendanceByStudentId("HE140855",1);
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void testTakeAttendanceByStudentIdCaseTraningScheduleNull() {
-		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(null);
-		ResponseMessage responseMessage = attendanceStatusService.takeAttendanceByStudentId("HE140855",1);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void testTakeAttendanceByStudentIdCaseException() {
-		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
-		when(userRepository.findByStudentId(anyString())).thenReturn(null);
-		ResponseMessage responseMessage = attendanceStatusService.takeAttendanceByStudentId("HE140855",1);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
+//	@Test
+//	public void testTakeAttendanceByStudentId() {
+//		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
+//		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+//		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(attendanceStatus()));
+//		ResponseMessage responseMessage = attendanceStatusService.takeAttendanceByStudentId("HE140855",1);
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
+//	
+//	@Test
+//	public void testTakeAttendanceByStudentIdCaseTraningScheduleNull() {
+//		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(null);
+//		ResponseMessage responseMessage = attendanceStatusService.takeAttendanceByStudentId("HE140855",1);
+//		assertEquals(responseMessage.getData().size(), 0);
+//	}
+//	
+//	@Test
+//	public void testTakeAttendanceByStudentIdCaseException() {
+//		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
+//		when(userRepository.findByStudentId(anyString())).thenReturn(null);
+//		ResponseMessage responseMessage = attendanceStatusService.takeAttendanceByStudentId("HE140855",1);
+//		assertEquals(responseMessage.getData().size(), 0);
+//	}
 	
 	@Test
 	public void testCheckAttendanceStatusByTrainingSchedule() {

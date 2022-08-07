@@ -68,19 +68,19 @@ public class AttendanceStatusControllerTest {
 	}
 	
 	
-	@Test
-	public void takeAttendanceSuccessTest() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(attendanceStatusDto()));
-		responseMessage.setMessage(Constant.MSG_056);
-		when(attendanceStatusService.takeAttendanceByStudentId(anyString(), anyInt())).thenReturn(responseMessage);
-		this.mockMvc.perform(put("/api/admin/headtechnique/takeattendance/{studentId}", "HE140855").param("status", "1")
-		.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.message").value(Constant.MSG_056));
-	}
+//	@Test
+//	public void takeAttendanceSuccessTest() throws Exception {
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		responseMessage.setData(Arrays.asList(attendanceStatusDto()));
+//		responseMessage.setMessage(Constant.MSG_056);
+//		when(attendanceStatusService.takeAttendanceByStudentId(anyString(), anyInt())).thenReturn(responseMessage);
+//		this.mockMvc.perform(put("/api/admin/headtechnique/takeattendance/{studentId}", "HE140855").param("status", "1")
+//		.contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(status().isOk())
+//		.andExpect(content()
+//				.contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(jsonPath("$.message").value(Constant.MSG_056));
+//	}
 	
 	@Test
 	public void checkAttendanceSuccessTest() throws Exception {
