@@ -582,9 +582,16 @@ public class UserServiceImpl implements UserService {
 			throw new RuntimeException("fail to store excel data: " + e.getMessage());
 		}
 	}
-
+	
+	@Override
 	public ByteArrayInputStream exportUsersToExcel(List<UserDto> users) {
 		ByteArrayInputStream in = ExcelHelper.usersToExcel(users);
+		return in;
+	}
+	
+	@Override
+	public ByteArrayInputStream exportUsersToExcelWithError(List<UserDto> users) {
+		ByteArrayInputStream in = ExcelHelper.usersToExcelWithErrorMessage(users);
 		return in;
 	}
 

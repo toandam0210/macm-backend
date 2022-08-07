@@ -109,6 +109,16 @@ public class UserController {
 		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
 				.contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(file);
 	}
+	
+	@PostMapping("/users/exporterror")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub')")
+	public ResponseEntity<Resource> exportListUserToExcelWithError(@RequestBody List<UserDto> users) {
+		String filename = "users.xlsx";
+		InputStreamResource file = new InputStreamResource(userService.exportUsersToExcelWithError(users));
+
+		return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+				.contentType(MediaType.parseMediaType("application/vnd.ms-excel")).body(file);
+	}
 
 	@GetMapping("/viceheadclub/getallmembers")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
