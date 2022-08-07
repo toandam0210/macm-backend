@@ -16,6 +16,7 @@ public class UserDto implements Comparable<UserDto> {
 	private String name;
 	private int generation;
 	private String roleName;
+	private String messageError;
 
 	public String getStudentId() {
 		return studentId;
@@ -119,6 +120,14 @@ public class UserDto implements Comparable<UserDto> {
 
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
+	}
+
+	public String getMessageError() {
+		return messageError;
+	}
+
+	public void setMessageError(String messageError) {
+		this.messageError = messageError;
 	}
 
 	@Override
