@@ -75,9 +75,6 @@ public class Tournament {
 	@Column
 	private double totalAmountFromClubActual;
 	
-//	@Column 
-//	private Integer status;
-
 	@Column
 	private LocalDateTime registrationPlayerDeadline;
 
@@ -243,13 +240,4 @@ public class Tournament {
 	public void setRegistrationOrganizingCommitteeDeadline(LocalDateTime registrationOrganizingCommitteeDeadline) {
 		this.registrationOrganizingCommitteeDeadline = registrationOrganizingCommitteeDeadline;
 	}
-
-//	public Integer getStatus() {
-//		return status;
-//	}
-//
-//	public void setStatus(Integer status) {
-//		this.status = status;
-//	}
-	
 }	

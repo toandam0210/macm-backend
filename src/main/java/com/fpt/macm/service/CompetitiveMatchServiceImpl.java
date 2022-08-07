@@ -175,6 +175,7 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 				CompetitiveType getType = getTypeOp.get();
 				if (getType.getStatus() <= 1) {
 					getType.setStatus(2);
+					competitiveTypeRepository.save(getType);
 				}
 				responseMessage.setData(Arrays.asList(getType));
 				responseMessage.setMessage(
