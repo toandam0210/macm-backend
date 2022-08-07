@@ -10,6 +10,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.dto.CompetitiveMatchByTypeDto;
 import com.fpt.macm.model.dto.CompetitiveMatchDto;
 import com.fpt.macm.model.dto.PlayerMatchDto;
 import com.fpt.macm.model.entity.CompetitiveMatch;
@@ -104,7 +105,12 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 							listMatchDto.add(newCompetitiveMatchDto);
 						}
 						Collections.sort(listMatchDto);
-						responseMessage.setData(listMatchDto);
+						CompetitiveMatchByTypeDto competitiveMatchByTypeDto = new CompetitiveMatchByTypeDto();
+						competitiveMatchByTypeDto.setName((getType.isGender()? "Nam " : "Nữ ") + getType.getWeightMin() + " - " + getType.getWeightMax());
+						competitiveMatchByTypeDto.setChanged(getType.isChanged());
+						competitiveMatchByTypeDto.setStatus(getType.getStatus());
+						competitiveMatchByTypeDto.setListMatchDto(listMatchDto);
+						responseMessage.setData(Arrays.asList(competitiveMatchByTypeDto));
 						if (getType.getStatus() <= 1) {
 							responseMessage.setMessage("Danh sách trận đấu dự kiến");
 						} else {
@@ -313,6 +319,8 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 						}
 						responseMessage.setData(listMatchPreview);
 						responseMessage.setMessage("Danh sách trận đấu dự kiến");
+						getType.setChanged(false);
+						competitiveTypeRepository.save(getType);
 					}
 				} else {
 					responseMessage.setMessage("Đã qua giai đoạn tạo trận đấu");

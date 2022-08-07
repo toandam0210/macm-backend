@@ -10,6 +10,8 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.dto.CompetitiveMatchByTypeDto;
+import com.fpt.macm.model.dto.CompetitivePlayerByTypeDto;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Tournament;
@@ -83,8 +85,10 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 						newCompetitivePlayer.setUpdatedOn(LocalDateTime.now());
 						competitivePlayerRepository.save(newCompetitivePlayer);
 						listUsers.add(user.getName() + " - " + user.getStudentId());
+						getType.setChanged(true);
 					}
 				}
+				competitiveTypeRepository.save(getType);
 				responseMessage.setData(listUsers);
 				responseMessage.setMessage("Danh sách đăng ký tham gia thi đấu thể thức " + (getType.isGender()? "Nam: " : "Nữ: ") + getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
 			}
@@ -111,7 +115,14 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 					getCompetitivePlayer.setWeight(weight);
 					getCompetitivePlayer.setUpdatedBy("LinhLHN");
 					getCompetitivePlayer.setUpdatedOn(LocalDateTime.now());
-					getCompetitivePlayer.setIsEligible(weight >= getType.getWeightMin() && weight <= getType.getWeightMax());
+					if(weight >= getType.getWeightMin() && weight <= getType.getWeightMax()) {
+						getCompetitivePlayer.setIsEligible(true);
+					}
+					else {
+						getCompetitivePlayer.setIsEligible(false);
+						getType.setChanged(true);
+						competitiveTypeRepository.save(getType);
+					}
 				}
 			}
 			else {
@@ -137,6 +148,8 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 					competitivePlayerRepository.delete(getCompetitivePlayer);
 					responseMessage.setMessage("Xóa tuyển thủ thành công");
 					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
+					getType.setChanged(true);
+					competitiveTypeRepository.save(getType);
 				}
 				else {
 					if(getCompetitivePlayer.getIsEligible()) {
@@ -189,9 +202,21 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<CompetitivePlayer> listPlayers = competitivePlayerRepository.findByCompetitiveTypeId(competitiveTypeId);
-			responseMessage.setData(listPlayers);
-			responseMessage.setMessage("Danh sách tuyển thủ");
+			Optional<CompetitiveType> getTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
+			if(getTypeOp.isPresent()) {
+				CompetitiveType getType = getTypeOp.get();
+				List<CompetitivePlayer> listPlayers = competitivePlayerRepository.findByCompetitiveTypeId(competitiveTypeId);
+				CompetitivePlayerByTypeDto competitivePlayerByTypeDto = new CompetitivePlayerByTypeDto();
+				competitivePlayerByTypeDto.setName((getType.isGender()? "Nam " : "Nữ ") + getType.getWeightMin() + " - " + getType.getWeightMax());
+				competitivePlayerByTypeDto.setChanged(getType.isChanged());
+				competitivePlayerByTypeDto.setStatus(getType.getStatus());
+				competitivePlayerByTypeDto.setListPlayers(listPlayers);
+				responseMessage.setData(Arrays.asList(competitivePlayerByTypeDto));
+				responseMessage.setMessage("Danh sách tuyển thủ");
+			}
+			else {
+				responseMessage.setMessage("Không tìm thấy thể thức");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
