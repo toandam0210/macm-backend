@@ -268,20 +268,26 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 						for (int i = 0; i < freePlayer; i++) {
 							CompetitiveMatch getMatch = listMatch.get(currentMatch);
 							String studentId = listPlayers.get(i).getTournamentPlayer().getUser().getStudentId();
-							CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId())
-									.get();
-							if (getMatch.isNextIsFirst()) {
-								nextMatch.setFirstStudentId(studentId);
-								nextMatch.setUpdatedBy("LinhLHN");
-								nextMatch.setUpdatedOn(LocalDateTime.now());
-								competitiveMatchRepository.save(nextMatch);
-							} else {
-								nextMatch.setSecondStudentId(studentId);
-								nextMatch.setUpdatedBy("LinhLHN");
-								nextMatch.setUpdatedOn(LocalDateTime.now());
-								competitiveMatchRepository.save(nextMatch);
-							}
-							competitiveMatchRepository.delete(getMatch);
+							getMatch.setFirstStudentId(studentId);
+							getMatch.setUpdatedBy("LinhLHN");
+							getMatch.setUpdatedOn(LocalDateTime.now());
+							competitiveMatchRepository.save(getMatch);
+							Optional<CompetitiveMatch> nextMatchOp = competitiveMatchRepository.findById(getMatch.getNextMatchId());
+							if(nextMatchOp.isPresent()) {
+								CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId())
+										.get();
+								if (getMatch.isNextIsFirst()) {
+									nextMatch.setFirstStudentId(studentId);
+									nextMatch.setUpdatedBy("LinhLHN");
+									nextMatch.setUpdatedOn(LocalDateTime.now());
+									competitiveMatchRepository.save(nextMatch);
+								} else {
+									nextMatch.setSecondStudentId(studentId);
+									nextMatch.setUpdatedBy("LinhLHN");
+									nextMatch.setUpdatedOn(LocalDateTime.now());
+									competitiveMatchRepository.save(nextMatch);
+								}
+							}			
 							currentMatch++;
 						}
 						for (int i = freePlayer; i < numberPlayer; i += 2) {
