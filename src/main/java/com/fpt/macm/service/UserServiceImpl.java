@@ -219,6 +219,23 @@ public class UserServiceImpl implements UserService {
 						adminSemesterRepository.save(adminSemester);
 					}
 
+					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository.findByUserIdAndSemester(user.getId(), semester.getName());
+					if (roleOptional.get().getId() > 12 && roleOptional.get().getId() < 16) {
+						if (memberSemesterOp.isPresent()) {
+							MemberSemester memberSemester = memberSemesterOp.get();
+							memberSemesterRepository.delete(memberSemester);
+						}
+					}
+					else if (roleOptional.get().getId() > 9 && roleOptional.get().getId() < 13){
+						if (!memberSemesterOp.isPresent()) {
+							MemberSemester memberSemester = new MemberSemester();
+							memberSemester.setSemester(semester.getName());
+							memberSemester.setStatus(user.isActive());
+							memberSemester.setUser(user);
+							memberSemesterRepository.save(memberSemester);
+						}
+					}
+
 				} else {
 					String messageError = "";
 					if (checkDuplicateStudentId) {
@@ -308,7 +325,7 @@ public class UserServiceImpl implements UserService {
 					memberSemester.setSemester(semester.getName());
 					memberSemesterRepository.save(memberSemester);
 				}
-				
+
 				Optional<User> newUserOp = userRepository.findByStudentId(user.getStudentId());
 				if (newUserOp.isPresent()) {
 					User newUser = newUserOp.get();
