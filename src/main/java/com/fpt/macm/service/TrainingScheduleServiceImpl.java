@@ -139,6 +139,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 						commonScheduleRepository.save(commonSession);
 
 						// Thêm data điểm danh
+						List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
 						List<User> users = userRepository.findAllActiveUser();
 						if (!users.isEmpty()) {
 							Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository
@@ -151,9 +152,13 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 									attendanceStatus.setCreatedOn(LocalDateTime.now());
 									attendanceStatus.setCreatedBy("toandv");
 									attendanceStatus.setStatus(2);
-									attendanceStatusRepository.save(attendanceStatus);
+									listAttendanceStatus.add(attendanceStatus);
 								}
 							}
+						}
+						
+						if (!listAttendanceStatus.isEmpty()) {
+							attendanceStatusRepository.saveAll(listAttendanceStatus);
 						}
 
 						// Gửi thông báo đến cho user khi tạo 1 buổi tập mới
@@ -234,6 +239,11 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 				CommonSchedule commonSession = commonScheduleService
 						.getCommonSessionByDate(getTrainingSession.getDate());
 				if (getTrainingSession != null && commonSession.getType() == 0) {
+					List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(getTrainingSession.getId());
+					if (!listAttendanceStatus.isEmpty()) {
+						attendanceStatusRepository.deleteAll(listAttendanceStatus);
+					}
+							
 					trainingScheduleRepository.delete(getTrainingSession);
 					commonScheduleRepository.delete(commonSession);
 					responseMessage.setData(Arrays.asList(getTrainingSession));
@@ -310,6 +320,7 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 
 				// Thêm data điểm danh
 				List<User> users = userRepository.findAllActiveUser();
+				List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
 				if (!users.isEmpty()) {
 					for (TrainingSchedule trainingSchedule : listTraining) {
 						Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository
@@ -322,10 +333,14 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 								attendanceStatus.setCreatedOn(LocalDateTime.now());
 								attendanceStatus.setCreatedBy("toandv");
 								attendanceStatus.setStatus(2);
-								attendanceStatusRepository.save(attendanceStatus);
+								listAttendanceStatus.add(attendanceStatus);
 							}
 						}
 					}
+				}
+				
+				if (!listAttendanceStatus.isEmpty()) {
+					attendanceStatusRepository.saveAll(listAttendanceStatus);
 				}
 			}
 		} catch (Exception e) {

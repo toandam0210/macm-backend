@@ -327,6 +327,7 @@ public class UserServiceImpl implements UserService {
 				}
 
 				Optional<User> newUserOp = userRepository.findByStudentId(user.getStudentId());
+				List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
 				if (newUserOp.isPresent()) {
 					User newUser = newUserOp.get();
 					UserDto newUserDto = convertUserToUserDto(newUser);
@@ -341,9 +342,14 @@ public class UserServiceImpl implements UserService {
 						attendanceStatus.setCreatedOn(LocalDateTime.now());
 						attendanceStatus.setCreatedBy("toandv");
 						attendanceStatus.setStatus(2);
-						attendanceStatusRepository.save(attendanceStatus);
+						listAttendanceStatus.add(attendanceStatus);
 					}
 				}
+				
+				if (!listAttendanceStatus.isEmpty()) {
+					attendanceStatusRepository.saveAll(listAttendanceStatus);
+				}
+				
 				responseMessage.setMessage(Constant.MSG_007);
 			} else {
 				String messageError = "";
@@ -421,6 +427,7 @@ public class UserServiceImpl implements UserService {
 				}
 				userRepository.save(user);
 
+				List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
 				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 						.findAllFutureTrainingSchedule(LocalDate.now());
 				// Thêm data điểm danh khi active user
@@ -432,7 +439,10 @@ public class UserServiceImpl implements UserService {
 						attendanceStatus.setCreatedOn(LocalDateTime.now());
 						attendanceStatus.setCreatedBy("toandv");
 						attendanceStatus.setStatus(2);
-						attendanceStatusRepository.save(attendanceStatus);
+						listAttendanceStatus.add(attendanceStatus);
+					}
+					if (!listAttendanceStatus.isEmpty()) {
+						attendanceStatusRepository.saveAll(listAttendanceStatus);
 					}
 				}
 				// Xóa data điểm danh khi deactive user
@@ -440,7 +450,10 @@ public class UserServiceImpl implements UserService {
 					for (TrainingSchedule trainingSchedule : trainingSchedules) {
 						AttendanceStatus attendanceStatus = attendanceStatusRepository
 								.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
-						attendanceStatusRepository.delete(attendanceStatus);
+						listAttendanceStatus.add(attendanceStatus);
+					}
+					if (!listAttendanceStatus.isEmpty()) {
+						attendanceStatusRepository.deleteAll(listAttendanceStatus);
 					}
 				}
 			}
@@ -526,6 +539,7 @@ public class UserServiceImpl implements UserService {
 					}
 					
 					// Thêm data điểm danh khi user active
+					List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
 					Optional<User> newUserOp = userRepository.findByStudentId(userFromExcel.getStudentId());
 					if (newUserOp.isPresent()) {
 						User newUser = newUserOp.get();
@@ -537,7 +551,10 @@ public class UserServiceImpl implements UserService {
 								attendanceStatus.setCreatedOn(LocalDateTime.now());
 								attendanceStatus.setCreatedBy("toandv");
 								attendanceStatus.setStatus(2);
-								attendanceStatusRepository.save(attendanceStatus);
+								listAttendanceStatus.add(attendanceStatus);
+							}
+							if (!listAttendanceStatus.isEmpty()) {
+								attendanceStatusRepository.saveAll(listAttendanceStatus);
 							}
 						}
 					}
