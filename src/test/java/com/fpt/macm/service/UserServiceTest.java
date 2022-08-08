@@ -884,7 +884,7 @@ public class UserServiceTest {
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(),anyInt())).thenReturn(attendanceStatus());
 		when(eventScheduleRepository.findAll()).thenReturn(Arrays.asList(eventSchedule()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(),anyInt())).thenReturn(Optional.of(memberEvent()));
-		when(attendanceEventRepository.findByEventIdAndMemberEventId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
+		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
 		when(tournamentScheduleRepository.findAll()).thenReturn(Arrays.asList(tournamentSchedule()));
 		ResponseMessage response = userService.getAllUserAttendanceStatus("HE140855");
 		assertEquals(response.getData().size(), 3);
@@ -898,7 +898,7 @@ public class UserServiceTest {
 		when(trainingScheduleRepository.findAll()).thenReturn(Arrays.asList(trainingSchedule));
 		when(eventScheduleRepository.findAll()).thenReturn(Arrays.asList(eventSchedule()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(),anyInt())).thenReturn(Optional.of(memberEvent()));
-		when(attendanceEventRepository.findByEventIdAndMemberEventId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
+		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
 		when(tournamentScheduleRepository.findAll()).thenReturn(Arrays.asList(tournamentSchedule()));
 		ResponseMessage response = userService.getAllUserAttendanceStatus("HE140855");
 		assertEquals(response.getData().size(), 3);
@@ -911,7 +911,7 @@ public class UserServiceTest {
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(),anyInt())).thenReturn(null);
 		when(eventScheduleRepository.findAll()).thenReturn(Arrays.asList(eventSchedule()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(),anyInt())).thenReturn(Optional.of(memberEvent()));
-		when(attendanceEventRepository.findByEventIdAndMemberEventId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
+		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
 		when(tournamentScheduleRepository.findAll()).thenReturn(Arrays.asList(tournamentSchedule()));
 		ResponseMessage response = userService.getAllUserAttendanceStatus("HE140855");
 		assertEquals(response.getData().size(), 3);

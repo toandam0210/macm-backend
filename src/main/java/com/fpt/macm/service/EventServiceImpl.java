@@ -349,7 +349,7 @@ public class EventServiceImpl implements EventService {
 			if (semester == "") {
 				semester = semesterRepository.findTop3Semester().get(0).getName();
 			}
-			List<Event> events = eventRepository.findBySemester(semester);
+			List<Event> events = eventRepository.findBySemesterOrderByIdAsc(semester);
 			List<EventDto> eventDtos = new ArrayList<EventDto>();
 			for (Event event : events) {
 				LocalDate startDate = getStartDate(event.getId());
@@ -479,7 +479,7 @@ public class EventServiceImpl implements EventService {
 			if (semester == "") {
 				semester = semesterRepository.findTop3Semester().get(0).getName();
 			}
-			List<Event> events = eventRepository.findBySemester(semester);
+			List<Event> events = eventRepository.findBySemesterOrderByIdAsc(semester);
 
 			List<UserEventSemesterDto> userEventsSemesterDto = new ArrayList<UserEventSemesterDto>();
 

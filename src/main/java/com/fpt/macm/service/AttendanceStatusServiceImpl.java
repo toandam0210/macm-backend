@@ -234,7 +234,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			}
 
 			List<TrainingSchedule> oldTrainingSchedules = new ArrayList<TrainingSchedule>();
-			
+
 			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 			for (TrainingSchedule trainingSchedule : trainingSchedules) {
@@ -242,10 +242,11 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 					oldTrainingSchedules.add(trainingSchedule);
 				}
 			}
-			
+
 			if (!oldTrainingSchedules.isEmpty()) {
 				responseMessage.setData(oldTrainingSchedules);
-				responseMessage.setMessage("Lấy danh sách các buổi tập đã qua của kỳ "+ semesterName +" để điểm danh lại thành công");
+				responseMessage.setMessage(
+						"Lấy danh sách các buổi tập đã qua của kỳ " + semester.getName() + " để điểm danh lại thành công");
 			} else {
 				responseMessage.setMessage("Không có buổi tập nào đã qua để điểm danh lại");
 			}

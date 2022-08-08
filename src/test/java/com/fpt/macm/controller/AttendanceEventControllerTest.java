@@ -109,24 +109,24 @@ public class AttendanceEventControllerTest {
 		return memberEvent;
 	}
 	
-	public AttendanceEvent attendanceEvent() {
-		AttendanceEvent attendanceEvent = new AttendanceEvent();
-		attendanceEvent.setId(1);
-		attendanceEvent.setMemberEvent(memberEvent());
-		attendanceEvent.setEvent(event());
-		attendanceEvent.setStatus(2);
-		return attendanceEvent;
-	}
-	
-	public AttendanceEventDto attendanceEventDto() {
-		AttendanceEventDto attendanceEventDto = new AttendanceEventDto();
-		attendanceEventDto.setEventName(attendanceEvent().getEvent().getName());
-		attendanceEventDto.setName(attendanceEvent().getMemberEvent().getUser().getName());
-		attendanceEventDto.setStudentId(attendanceEvent().getMemberEvent().getUser().getStudentId());
-		attendanceEventDto.setStatus(attendanceEvent().getStatus());
-		attendanceEventDto.setDate(eventSchedule().getDate());
-		return attendanceEventDto;
-	}
+//	public AttendanceEvent attendanceEvent() {
+//		AttendanceEvent attendanceEvent = new AttendanceEvent();
+//		attendanceEvent.setId(1);
+//		attendanceEvent.setMemberEvent(memberEvent());
+//		attendanceEvent.setEvent(event());
+//		attendanceEvent.setStatus(2);
+//		return attendanceEvent;
+//	}
+//	
+//	public AttendanceEventDto attendanceEventDto() {
+//		AttendanceEventDto attendanceEventDto = new AttendanceEventDto();
+//		attendanceEventDto.setEventName(attendanceEvent().getEvent().getName());
+//		attendanceEventDto.setName(attendanceEvent().getMemberEvent().getUser().getName());
+//		attendanceEventDto.setStudentId(attendanceEvent().getMemberEvent().getUser().getStudentId());
+//		attendanceEventDto.setStatus(attendanceEvent().getStatus());
+//		attendanceEventDto.setDate(eventSchedule().getDate());
+//		return attendanceEventDto;
+//	}
 	
 	public EventSchedule eventSchedule() {
 		EventSchedule eventSchedule = new EventSchedule();
@@ -138,33 +138,33 @@ public class AttendanceEventControllerTest {
 		return eventSchedule;
 	}
 	
-	@Test
-	public void takeAttendanceEventSuccess() throws Exception {
-		AttendanceEvent attendanceEvent = attendanceEvent();
-		attendanceEvent.setStatus(1);
-		
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(attendanceEvent()));
-		
-		when(attendanceEventService.takeAttendanceByMemberEventId(anyInt(), anyInt())).thenReturn(responseMessage);
-		
-		this.mockMvc.perform(put("/api/event/headculture/takeattendanceevent/{memberEventId}", "1")
-				.param("status", "1"))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.data.size()").value("1"));
-	}
-	
-	@Test
-	public void checkAttendanceByEventIdSuccess() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(attendanceEventDto()));
-		
-		when(attendanceEventService.checkAttendanceStatusByEventId(anyInt())).thenReturn(responseMessage);
-		
-		this.mockMvc.perform(get("/api/event/headculture/checkattendance/{eventId}", "1"))
-				.andExpect(status().isOk())
-				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.data.size()").value("1"));
-	}
+//	@Test
+//	public void takeAttendanceEventSuccess() throws Exception {
+//		AttendanceEvent attendanceEvent = attendanceEvent();
+//		attendanceEvent.setStatus(1);
+//		
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		responseMessage.setData(Arrays.asList(attendanceEvent()));
+//		
+//		when(attendanceEventService.takeAttendanceByMemberEventId(anyInt(), anyInt())).thenReturn(responseMessage);
+//		
+//		this.mockMvc.perform(put("/api/event/headculture/takeattendanceevent/{memberEventId}", "1")
+//				.param("status", "1"))
+//				.andExpect(status().isOk())
+//				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//				.andExpect(jsonPath("$.data.size()").value("1"));
+//	}
+//	
+//	@Test
+//	public void checkAttendanceByEventIdSuccess() throws Exception {
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		responseMessage.setData(Arrays.asList(attendanceEventDto()));
+//		
+//		when(attendanceEventService.checkAttendanceStatusByEventId(anyInt())).thenReturn(responseMessage);
+//		
+//		this.mockMvc.perform(get("/api/event/headculture/checkattendance/{eventId}", "1"))
+//				.andExpect(status().isOk())
+//				.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//				.andExpect(jsonPath("$.data.size()").value("1"));
+//	}
 }

@@ -290,30 +290,30 @@ public class TaskSchedule {
 //		logger.info("Chay xong");
 //	}
 
-	@Scheduled(cron = "1 2 0 * * *")
-	public void addListMemberEventAttendanceStatus() {
-		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
-		if (eventSchedule != null) {
-			Event event = eventSchedule.getEvent();
-			LocalDate startDate = (LocalDate) eventService.getStartDateOfEvent(event.getId()).getData().get(0);
-			if (startDate.compareTo(LocalDate.now()) == 0) {
-				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository
-						.findByEventIdOrderByIdAsc(event.getId());
-				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.isRegisterStatus()) {
-						AttendanceEvent attendanceEvent = new AttendanceEvent();
-						attendanceEvent.setMemberEvent(memberEvent);
-						attendanceEvent.setEvent(event);
-						attendanceEvent.setCreatedOn(LocalDateTime.now());
-						attendanceEvent.setCreatedBy("toandv");
-						attendanceEvent.setStatus(2);
-						attendanceEventRepository.save(attendanceEvent);
-						logger.info("atten oke");
-					}
-				}
-			}
-		}
-	}
+//	@Scheduled(cron = "1 2 0 * * *")
+//	public void addListMemberEventAttendanceStatus() {
+//		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
+//		if (eventSchedule != null) {
+//			Event event = eventSchedule.getEvent();
+//			LocalDate startDate = (LocalDate) eventService.getStartDateOfEvent(event.getId()).getData().get(0);
+//			if (startDate.compareTo(LocalDate.now()) == 0) {
+//				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository
+//						.findByEventIdOrderByIdAsc(event.getId());
+//				for (MemberEvent memberEvent : membersEvent) {
+//					if (memberEvent.isRegisterStatus()) {
+//						AttendanceEvent attendanceEvent = new AttendanceEvent();
+//						attendanceEvent.setMemberEvent(memberEvent);
+//						attendanceEvent.setEvent(event);
+//						attendanceEvent.setCreatedOn(LocalDateTime.now());
+//						attendanceEvent.setCreatedBy("toandv");
+//						attendanceEvent.setStatus(2);
+//						attendanceEventRepository.save(attendanceEvent);
+//						logger.info("atten oke");
+//					}
+//				}
+//			}
+//		}
+//	}
 
 	@Scheduled(cron = "1 0 0 * * *")
 	public void addListMembershipStatus() {

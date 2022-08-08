@@ -922,8 +922,8 @@ public class UserServiceImpl implements UserService {
 						MemberEvent memberEvent = memberEventOp.get();
 						if (memberEvent.isRegisterStatus()) {
 							Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
-									.findByEventIdAndMemberEventId(eventSchedule.getEvent().getId(),
-											memberEvent.getId());
+									.findByEventIdAndUserId(eventSchedule.getEvent().getId(),
+											user.getId());
 							if (attendanceEventOp.isPresent()) {
 								AttendanceEvent attendanceEvent = attendanceEventOp.get();
 								UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();

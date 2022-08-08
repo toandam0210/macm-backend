@@ -24,8 +24,8 @@ public class AttendanceEvent {
 	private Event event;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "member_event_id")
-	private MemberEvent memberEvent;
+	@JoinColumn(name = "user_id")
+	private User user;
 
 	@Column
 	private int status;
@@ -58,12 +58,12 @@ public class AttendanceEvent {
 		this.event = event;
 	}
 
-	public MemberEvent getMemberEvent() {
-		return memberEvent;
+	public User getUser() {
+		return user;
 	}
 
-	public void setMemberEvent(MemberEvent memberEvent) {
-		this.memberEvent = memberEvent;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	public int getStatus() {
