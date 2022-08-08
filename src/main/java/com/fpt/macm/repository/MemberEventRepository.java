@@ -23,6 +23,6 @@ public interface MemberEventRepository extends JpaRepository<MemberEvent, Intege
 	
 	List<MemberEvent> findByUserId(int userId);
 	
-	@Query(value = "select * from member_event where event_id = ?1 and role_in_event != 1 and register_status = true", nativeQuery = true)
-	List<MemberEvent> findOrganizingCommitteeByEventId(int eventId);
+	@Query(value = "select * from member_event where event_id = ?1 and role_in_event = ?2 and register_status = true", nativeQuery = true)
+	List<MemberEvent> findOrganizingCommitteeByEventId(int eventId, int roleEventId);
 }
