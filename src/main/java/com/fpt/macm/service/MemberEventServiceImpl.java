@@ -386,7 +386,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 	}
 	
 	private int getAvailableQuantity(int eventId, EventRole eventRole) {
-		List<MemberEvent> organizingCommittees = memberEventRepository.findOrganizingCommitteeByEventId(eventId);
+		List<MemberEvent> organizingCommittees = memberEventRepository.findOrganizingCommitteeByEventId(eventId, eventRole.getRoleEvent().getId());
 		if (!organizingCommittees.isEmpty()) {
 			if (eventRole.getQuantity() - organizingCommittees.size() < 0) {
 				return 0;
@@ -649,18 +649,15 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 					List<MemberEvent> membersHasRegisteredToEvent = memberEventRepository
 							.findByEventIdOrderByIdAsc(eventId);
-					int countOrganizingCommittee = 0;
 					for (MemberEvent memberHasRegisteredToEvent : membersHasRegisteredToEvent) {
 						if (memberHasRegisteredToEvent.getUser().getId() == user.getId()
 								&& memberHasRegisteredToEvent.isRegisterStatus()) {
 							responseMessage.setMessage("Bạn đã đăng ký tham gia sự kiện này rồi");
 							return responseMessage;
-						} else if (memberHasRegisteredToEvent.getRoleEvent().getId() != 1) {
-							countOrganizingCommittee++;
 						}
 					}
-
-					if (countOrganizingCommittee < eventRole.getQuantity()) {
+					
+					if (getAvailableQuantity(event.getId(), eventRole) > 0) {
 						Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(event.getId(), user.getId());
 						MemberEvent memberEvent = new MemberEvent();
 						if (memberEventOp.isPresent()) {
