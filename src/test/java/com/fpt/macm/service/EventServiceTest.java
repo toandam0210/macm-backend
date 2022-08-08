@@ -332,7 +332,7 @@ public class EventServiceTest {
 	@Test
 	public void getEventsBySemesterCaseNotYet() {
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
-		when(eventRepository.findBySemester(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		
 		ResponseMessage responseMessage = eventService.getEventsBySemester("", 0, 0, 1000);
@@ -346,7 +346,7 @@ public class EventServiceTest {
 			eventSchedule.setDate(LocalDate.now());
 		}
 		
-		when(eventRepository.findBySemester(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		
 		ResponseMessage responseMessage = eventService.getEventsBySemester("Summer2022", 0, 0, 1000);
@@ -360,7 +360,7 @@ public class EventServiceTest {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
 		
-		when(eventRepository.findBySemester(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		
 		ResponseMessage responseMessage = eventService.getEventsBySemester("Summer2022", 0, 0, 1000);
@@ -370,7 +370,7 @@ public class EventServiceTest {
 	@Test
 	public void getEventsBySemesterCaseStartDateNull() {
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
-		when(eventRepository.findBySemester(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		
 		ResponseMessage responseMessage = eventService.getEventsBySemester("", 0, 0, 1000);
 		assertEquals(responseMessage.getData().size(), 0);
@@ -465,7 +465,7 @@ public class EventServiceTest {
 	public void getEventsBySemesterAndStudentIdCaseJoinEvent() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
-		when(eventRepository.findBySemester(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		
@@ -480,7 +480,7 @@ public class EventServiceTest {
 		
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
-		when(eventRepository.findBySemester(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		
@@ -492,7 +492,7 @@ public class EventServiceTest {
 	public void getEventsBySemesterAndStudentIdCaseNotJoinEvent() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
-		when(eventRepository.findBySemester(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		
@@ -508,7 +508,7 @@ public class EventServiceTest {
 		}
 		
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(eventRepository.findBySemester(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		
@@ -524,7 +524,7 @@ public class EventServiceTest {
 		}
 		
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(eventRepository.findBySemester(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		
