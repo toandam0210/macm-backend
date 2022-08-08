@@ -871,6 +871,13 @@ public class UserServiceTest {
 	}
 	
 	@Test
+	public void testGetAllActiveMemberAndCollaboratorCaseUserEmpty() {
+		when(userRepository.findActiveMembersAndCollaborators()).thenReturn(new ArrayList<User>());
+		ResponseMessage response = userService.getAllActiveMemberAndCollaborator();
+		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
 	public void testGetAllActiveMemberAndCollaboratorFail() {
 		when(userRepository.findActiveMembersAndCollaborators()).thenReturn(null);
 		ResponseMessage response = userService.getAllActiveMemberAndCollaborator();
