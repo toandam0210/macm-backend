@@ -239,8 +239,8 @@ public class TournamentServiceImpl implements TournamentService {
 		roleEventDto.setId(tournamentOrganizingCommittee.getRoleEvent().getId());
 		roleEventDto.setName(tournamentOrganizingCommittee.getRoleEvent().getName());
 		tournamentOrganizingCommitteeDto.setRoleTournamentDto(roleEventDto);
-		Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(),
-				tournamentOrganizingCommitteeDto.getRoleTournamentDto());
+//		Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(),
+//				tournamentOrganizingCommitteeDto.getRoleTournamentDto());
 
 		tournamentOrganizingCommitteeDto.setCreatedBy(tournamentOrganizingCommittee.getCreatedBy());
 		tournamentOrganizingCommitteeDto.setCreatedOn(tournamentOrganizingCommittee.getCreatedOn());
@@ -644,7 +644,7 @@ public class TournamentServiceImpl implements TournamentService {
 				RoleEventDto roleEventDto = new RoleEventDto();
 				roleEventDto.setId(roleEvent.getId());
 				roleEventDto.setName(roleEvent.getName());
-				Utils.convertNameOfEventRole(roleEvent, roleEventDto);
+//				Utils.convertNameOfEventRole(roleEvent, roleEventDto);
 				rolesEventDto.add(roleEventDto);
 			}
 			responseMessage.setData(rolesEventDto);
@@ -717,7 +717,7 @@ public class TournamentServiceImpl implements TournamentService {
 					RoleEventDto roleEventDto = new RoleEventDto();
 					roleEventDto.setId(tournamentOrganizingCommittee.getRoleEvent().getId());
 					roleEventDto.setName(tournamentOrganizingCommittee.getRoleEvent().getName());
-					Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(), roleEventDto);
+//					Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(), roleEventDto);
 					
 					Notification notification = new Notification();
 					notification.setMessage("Bạn đã được chấp nhận trở thành " + roleEventDto.getName() + " của giải đấu " + tournament.getName());
@@ -765,7 +765,7 @@ public class TournamentServiceImpl implements TournamentService {
 				RoleEventDto roleEventDto = new RoleEventDto();
 				roleEventDto.setId(tournamentOrganizingCommittee.getRoleEvent().getId());
 				roleEventDto.setName(tournamentOrganizingCommittee.getRoleEvent().getName());
-				Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(), roleEventDto);
+//				Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(), roleEventDto);
 				
 				Notification notification = new Notification();
 				notification.setMessage("Bạn không được chấp nhận trở thành " + roleEventDto.getName() + " của giải đấu " + tournamentOrganizingCommittee.getTournament().getName());
@@ -1439,8 +1439,8 @@ public class TournamentServiceImpl implements TournamentService {
 							roleEventDto.setId(tournamentOrganizingCommittee.getRoleEvent().getId());
 							roleEventDto.setName(tournamentOrganizingCommittee.getRoleEvent().getName());
 							tournamentOrganizingCommitteeDto.setRoleTournamentDto(roleEventDto);
-							Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(),
-									tournamentOrganizingCommitteeDto.getRoleTournamentDto());
+//							Utils.convertNameOfEventRole(tournamentOrganizingCommittee.getRoleEvent(),
+//									tournamentOrganizingCommitteeDto.getRoleTournamentDto());
 							tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
 						}
 					}
