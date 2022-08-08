@@ -14,9 +14,7 @@ import org.springframework.data.domain.Sort;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fpt.macm.constant.Constant;
-import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.entity.Role;
-import com.fpt.macm.model.entity.RoleEvent;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
@@ -225,28 +223,28 @@ public class Utils {
 		}
 	}
 
-	public static void convertNameOfEventRole(RoleEvent roleEvent, RoleEventDto roleEventDto) {
-		switch (roleEvent.getName()) {
-		case Constant.ROLE_EVENT_MEMBER:
-			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
-			break;
-		case Constant.ROLE_EVENT_MEMBER_COMMUNICATION:
-			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_COMMUNICATION_VN);
-			break;
-		case Constant.ROLE_EVENT_MEMBER_CULTURE:
-			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_CULTURE_VN);
-			break;
-		case Constant.ROLE_EVENT_MEMBER_LOGISTIC:
-			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_LOGISTIC_VN);
-			break;
-		case Constant.ROLE_EVENT_MEMBER_TAKE_CARE:
-			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_TAKE_CARE_VN);
-			break;
-		default:
-			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
-			break;
-		}
-	}
+//	public static void convertNameOfEventRole(RoleEvent roleEvent, RoleEventDto roleEventDto) {
+//		switch (roleEvent.getName()) {
+//		case Constant.ROLE_EVENT_MEMBER:
+//			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
+//			break;
+//		case Constant.ROLE_EVENT_MEMBER_COMMUNICATION:
+//			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_COMMUNICATION_VN);
+//			break;
+//		case Constant.ROLE_EVENT_MEMBER_CULTURE:
+//			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_CULTURE_VN);
+//			break;
+//		case Constant.ROLE_EVENT_MEMBER_LOGISTIC:
+//			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_LOGISTIC_VN);
+//			break;
+//		case Constant.ROLE_EVENT_MEMBER_TAKE_CARE:
+//			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_TAKE_CARE_VN);
+//			break;
+//		default:
+//			roleEventDto.setName(Constant.ROLE_EVENT_MEMBER_VN);
+//			break;
+//		}
+//	}
 	
 	public static String generateQrCode(String data, int wid, int hei) {
 		StringBuilder result = new StringBuilder();

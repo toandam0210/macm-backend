@@ -1,18 +1,21 @@
 package com.fpt.macm.service;
 
 import java.time.LocalDate;
+import java.util.List;
 
+import com.fpt.macm.model.dto.EventCreateDto;
+import com.fpt.macm.model.dto.RoleEventDto;
+import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.response.ResponseMessage;
 
 public interface EventService {
-	ResponseMessage createEvent(Event event);
+	ResponseMessage createEvent(EventCreateDto eventCreateDto, boolean isOverwritten);
 	ResponseMessage updateBeforeEvent(int id, Event event);
-	ResponseMessage deleteEvent(int id);
+	ResponseMessage deleteEvent(int eventId);
 	ResponseMessage getEventsByName(String name, int pageNo, int pageSize, String sortBy);
 	ResponseMessage getEventById(int id);
 	ResponseMessage getEventsByDate(LocalDate startDate, LocalDate finishDate, int pageNo, int pageSize);
-	ResponseMessage getStartDateOfEvent(int eventId);
 	ResponseMessage getEventsBySemester(String semester, int month, int pageNo, int pageSize);
 	ResponseMessage updateAfterEvent(int eventId, double money, boolean isIncurred, boolean isUseClubFund);
 	LocalDate getStartDate(int eventId);

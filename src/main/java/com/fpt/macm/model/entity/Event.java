@@ -15,16 +15,40 @@ public class Event {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@Column
 	private String name;
-	
+
 	@Column
 	private String description;
-	
+
 	@Column
-	private int maxQuantityComitee;
-	
+	private double totalAmountEstimated;
+
+	@Column
+	private double totalAmountActual;
+
+	@Column
+	private double amountFromClub;
+
+	@Column
+	private double amountPerRegisterEstimated;
+
+	@Column
+	private double amountPerRegisterActual;
+
+	@Column
+	private String semester;
+
+	@Column
+	private LocalDateTime registrationMemberDeadline;
+
+	@Column
+	private LocalDateTime registrationOrganizingCommitteeDeadline;
+
+	@Column
+	private boolean status;
+
 	@Column
 	private String createdBy;
 
@@ -36,30 +60,6 @@ public class Event {
 
 	@Column
 	private LocalDateTime updatedOn;
-	
-	@Column
-	private double totalAmountEstimated;
-	
-	@Column
-	private double totalAmountActual;
-	
-	@Column
-	private double amountFromClub;
-	
-	@Column
-	private double amountPerRegisterEstimated;
-	
-	@Column
-	private double amountPerRegisterActual;
-	
-	@Column
-	private String semester;
-	
-	@Column
-	private LocalDateTime registrationMemberDeadline;
-
-	@Column
-	private LocalDateTime registrationOrganizingCommitteeDeadline;
 
 	public double getAmountFromClub() {
 		return amountFromClub;
@@ -125,14 +125,6 @@ public class Event {
 		this.description = description;
 	}
 
-	public int getMaxQuantityComitee() {
-		return maxQuantityComitee;
-	}
-
-	public void setMaxQuantityComitee(int maxQuantityComitee) {
-		this.maxQuantityComitee = maxQuantityComitee;
-	}
-
 	public String getCreatedBy() {
 		return createdBy;
 	}
@@ -188,5 +180,13 @@ public class Event {
 	public void setRegistrationOrganizingCommitteeDeadline(LocalDateTime registrationOrganizingCommitteeDeadline) {
 		this.registrationOrganizingCommitteeDeadline = registrationOrganizingCommitteeDeadline;
 	}
-	
+
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+
 }

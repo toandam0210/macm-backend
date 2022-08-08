@@ -39,12 +39,12 @@ public class EventScheduleController {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.createPreviewEventSchedule(eventName, startDate, finishDate, startTime, finishTime), HttpStatus.OK);
 	}
 	
-	@PostMapping("/headculture/addnewschedule/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> createEventSchedule(@PathVariable(name = "eventId") int eventId, 
-			@RequestBody List<ScheduleDto> listPreview, @RequestParam Boolean isOverwritten) {
-		return new ResponseEntity<ResponseMessage>(eventScheduleService.createEventSchedule(eventId, listPreview, isOverwritten), HttpStatus.OK);
-	}
+//	@PostMapping("/headculture/addnewschedule/{eventId}")
+//	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+//	ResponseEntity<ResponseMessage> createEventSchedule(@PathVariable(name = "eventId") int eventId, 
+//			@RequestBody List<ScheduleDto> listPreview, @RequestParam Boolean isOverwritten) {
+//		return new ResponseEntity<ResponseMessage>(eventScheduleService.createEventSchedule(eventId, listPreview, isOverwritten), HttpStatus.OK);
+//	}
 	
 	@GetMapping("/geteventsessionbydate")
 	ResponseEntity<ResponseMessage> getEventSessionByDate(@RequestParam String date) {

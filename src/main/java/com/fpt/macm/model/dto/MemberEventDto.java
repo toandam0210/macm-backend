@@ -1,6 +1,6 @@
 package com.fpt.macm.model.dto;
 
-public class MemberEventDto {
+public class MemberEventDto implements Comparable<MemberEventDto>{
 
 	private int id;
 	private String userName;
@@ -91,6 +91,11 @@ public class MemberEventDto {
 
 	public void setAmountPerRegisterActual(double amountPerRegisterActual) {
 		this.amountPerRegisterActual = amountPerRegisterActual;
+	}
+
+	@Override
+	public int compareTo(MemberEventDto o) {
+		return o.getId() - this.getId();
 	}
 
 }

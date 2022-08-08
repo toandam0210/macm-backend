@@ -180,12 +180,12 @@ public class DashboardSeviceTest {
 		event.setAmountFromClub(0);
 		event.setAmountPerRegisterActual(0);
 		event.setAmountPerRegisterEstimated(50000);
-		event.setMaxQuantityComitee(12);
 		event.setSemester(semester().getName());
 		event.setTotalAmountActual(0);
 		event.setTotalAmountEstimated(100000);
 		event.setRegistrationMemberDeadline(LocalDateTime.now().plusMonths(1));
 		event.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.now().plusMonths(1));
+		event.setStatus(true);
 		return event;
 	}
 	
