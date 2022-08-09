@@ -175,6 +175,24 @@ public class TournamentServiceImpl implements TournamentService {
 				List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
 				List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
 				List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
+				
+				Double totalAmountEstimate = tournament.getTotalAmountEstimate();
+				Double totalAmountFromClubEstimate = tournament.getTotalAmountFromClubEstimate();
+				Double feeOrganizingCommiteePay = tournament.getFeeOrganizingCommiteePay();
+				Double feePlayerPay = tournament.getFeePlayerPay();
+				
+				if (totalAmountEstimate.equals(null)) {
+					tournament.setTotalAmountEstimate(0);
+				}
+				if (totalAmountFromClubEstimate.equals(null)) {
+					tournament.setTotalAmountFromClubEstimate(0);
+				}
+				if (feeOrganizingCommiteePay.equals(null)) {
+					tournament.setFeeOrganizingCommiteePay(0);
+				}
+				if (feePlayerPay.equals(null)) {
+					tournament.setFeePlayerPay(0);
+				}
 
 				tournament.setSemester(semester.getName());
 				tournament.setStatus(true);

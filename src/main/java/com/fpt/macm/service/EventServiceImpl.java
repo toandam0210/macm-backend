@@ -120,6 +120,19 @@ public class EventServiceImpl implements EventService {
 				List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
 
 				// Tạo sự kiện
+				Double amountPerRegisterEstimated = event.getAmountPerRegisterEstimated();
+				Double totalAmountEstimated = event.getTotalAmountEstimated();
+				Double amoutFromClub = event.getAmountFromClub();
+				if (amountPerRegisterEstimated.equals(null)) {
+					event.setAmountPerRegisterEstimated(0);
+				}
+				if (amoutFromClub.equals(null)) {
+					event.setAmountFromClub(0);
+				}
+				if (totalAmountEstimated.equals(null)) {
+					event.setTotalAmountEstimated(0);
+				}
+				
 				event.setAmountPerRegisterActual(0);
 				event.setTotalAmountActual(0);
 				event.setCreatedBy("LinhLHN");
