@@ -19,11 +19,16 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventSchedule;
+import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.TrainingSchedule;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
@@ -62,6 +67,23 @@ public class EventScheduleServiceTest {
 
 	@Mock
 	NotificationService notificationService;
+	
+	@Mock
+	AttendanceStatusRepository attendanceStatusRepository;
+	
+	private User user() {
+		User user = new User();
+		user.setStudentId("HE140860");
+		user.setId(15);
+		user.setName("dam van toan 06");
+		user.setActive(true);
+		Role role = new Role();
+		role.setId(8);
+		user.setRole(role);
+		user.setCreatedOn(LocalDate.now());
+		user.setCreatedBy("toandv");
+		return user;
+	}
 	
 	public Event event() {
 		Event event = new Event();
@@ -118,6 +140,24 @@ public class EventScheduleServiceTest {
 		commonSchedule.setStartTime(LocalTime.now());
 		commonSchedule.setFinishTime(LocalTime.now().plusHours(8));
 		return commonSchedule;
+	}
+	
+	private TrainingSchedule trainingSchedule() {
+		TrainingSchedule trainingSchedule = new TrainingSchedule();
+		trainingSchedule.setId(1);
+		trainingSchedule.setDate(LocalDate.now());
+		trainingSchedule.setStartTime(LocalTime.now().minusHours(1));
+		trainingSchedule.setFinishTime(LocalTime.now().plusHours(1));
+		return trainingSchedule;
+	}
+	
+	private AttendanceStatus attendanceStatus() {
+		AttendanceStatus attendanceStatus = new AttendanceStatus();
+		attendanceStatus.setId(1);
+		attendanceStatus.setTrainingSchedule(trainingSchedule());
+		attendanceStatus.setUser(user());
+		attendanceStatus.setStatus(2);
+		return attendanceStatus;
 	}
 	
 	@Test
@@ -177,66 +217,6 @@ public class EventScheduleServiceTest {
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
-//	@Test
-//	public void createEventScheduleCaseScheduleDtoNotExist() {
-//		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-//		
-//		ResponseMessage responseMessage = eventScheduleService.createEventSchedule(1, Arrays.asList(scheduleDto()), false);
-//		assertEquals(responseMessage.getData().size(), 1);
-//	}
-//	
-//	@Test
-//	public void createEventScheduleCaseScheduleDtoExistAndOverwrite() {
-//		ScheduleDto scheduleDto = scheduleDto();
-//		scheduleDto.setExisted(true);
-//		scheduleDto.setTitle("Trùng với Lịch tập");
-//		
-//		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-//		
-//		ResponseMessage responseMessage = eventScheduleService.createEventSchedule(1, Arrays.asList(scheduleDto), true);
-//		assertEquals(responseMessage.getData().size(), 1);
-//	}
-//	
-//	@Test
-//	public void createEventScheduleCaseScheduleDtoExistAndNotOverwrite() {
-//		ScheduleDto scheduleDto = scheduleDto();
-//		scheduleDto.setExisted(true);
-//		scheduleDto.setTitle("Trùng với Lịch tập");
-//		
-//		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-//		
-//		ResponseMessage responseMessage = eventScheduleService.createEventSchedule(1, Arrays.asList(scheduleDto), false);
-//		assertEquals(responseMessage.getData().size(), 0);
-//	}
-//	
-//	@Test
-//	public void createEventScheduleCaseScheduleDtoExistAndOverwriteAndInterupt() {
-//		ScheduleDto scheduleDto = scheduleDto();
-//		scheduleDto.setExisted(true);
-//		scheduleDto.setTitle("Trùng với ABC");
-//		
-//		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-//		
-//		ResponseMessage responseMessage = eventScheduleService.createEventSchedule(1, Arrays.asList(scheduleDto), true);
-//		assertEquals(responseMessage.getData().size(), 0);
-//	}
-//	
-//	@Test
-//	public void createEventScheduleCaseListScheduleEmpty() {
-//		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-//		
-//		ResponseMessage responseMessage = eventScheduleService.createEventSchedule(1, new ArrayList<ScheduleDto>(), true);
-//		assertEquals(responseMessage.getData().size(), 0);
-//	}
-//	
-//	@Test
-//	public void createEventScheduleCaseException() {
-//		when(eventRepository.findById(anyInt())).thenReturn(null);
-//		
-//		ResponseMessage responseMessage = eventScheduleService.createEventSchedule(1, new ArrayList<ScheduleDto>(), true);
-//		assertEquals(responseMessage.getData().size(), 0);
-//	}
-	
 	@Test
 	public void getListEventScheduleByEventCaseSuccess() {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(Arrays.asList(eventSchedule()));
@@ -247,7 +227,26 @@ public class EventScheduleServiceTest {
 	}
 	
 	@Test
+	public void getListEventScheduleByEventCaseListScheduleEmpty() {
+		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(new ArrayList<EventSchedule>());
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
+		
+		ResponseMessage responseMessage = eventScheduleService.getListEventScheduleByEvent(1);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getListEventScheduleByEventCaseEventEmpty() {
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.empty());
+		
+		ResponseMessage responseMessage = eventScheduleService.getListEventScheduleByEvent(1);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
 	public void getListEventScheduleByEventCaseException() {
+		when(eventRepository.findById(anyInt())).thenReturn(null);
+		
 		ResponseMessage responseMessage = eventScheduleService.getListEventScheduleByEvent(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
@@ -397,6 +396,8 @@ public class EventScheduleServiceTest {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(Arrays.asList(eventSchedule()));
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
+		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
+		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(attendanceStatus()));
 		
 		ResponseMessage responseMessage = eventScheduleService.updateEventSchedule(1, Arrays.asList(scheduleDto), true);
 		assertEquals(responseMessage.getData().size(), 1);
