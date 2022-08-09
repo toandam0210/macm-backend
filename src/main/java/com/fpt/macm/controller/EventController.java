@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.macm.model.dto.EventCreateDto;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.EventService;
@@ -28,8 +29,9 @@ public class EventController {
 
 	@PostMapping("/headculture/createevent")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> createEvent(@RequestBody Event event) {
-		return new ResponseEntity<ResponseMessage>(eventService.createEvent(event), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> createEvent(@RequestBody EventCreateDto eventCreateDto, @RequestParam boolean isOverwritten) {
+		return new ResponseEntity<ResponseMessage>(
+				eventService.createEvent(eventCreateDto, isOverwritten), HttpStatus.OK);
 	}
 
 	@GetMapping("/geteventsbyname")
@@ -59,12 +61,6 @@ public class EventController {
 			@RequestParam(defaultValue = "10") int pageSize) {
 		return new ResponseEntity<ResponseMessage>(
 				eventService.getEventsByDate(startDate, finishDate, pageNo, pageSize), HttpStatus.OK);
-	}
-
-	@GetMapping("/headculture/getstartdate/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> getStartDateOfEvent(@PathVariable(name = "eventId") int eventId) {
-		return new ResponseEntity<ResponseMessage>(eventService.getStartDateOfEvent(eventId), HttpStatus.OK);
 	}
 
 	@GetMapping("/geteventsbysemester")
@@ -108,21 +104,18 @@ public class EventController {
 	@GetMapping("/getallupcomingevent")
 	ResponseEntity<ResponseMessage> getAllUpcomingEvent(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize) {
-		return new ResponseEntity<ResponseMessage>(
-				eventService.getAllUpcomingEvent(pageNo, pageSize), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(eventService.getAllUpcomingEvent(pageNo, pageSize), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/getallongoingevent")
 	ResponseEntity<ResponseMessage> getAllOngoingEvent(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize) {
-		return new ResponseEntity<ResponseMessage>(
-				eventService.getAllOngoingEvent(pageNo, pageSize), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(eventService.getAllOngoingEvent(pageNo, pageSize), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/getallclosedevent")
 	ResponseEntity<ResponseMessage> getAllClosedEvent(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize) {
-		return new ResponseEntity<ResponseMessage>(
-				eventService.getAllClosedEvent(pageNo, pageSize), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(eventService.getAllClosedEvent(pageNo, pageSize), HttpStatus.OK);
 	}
 }

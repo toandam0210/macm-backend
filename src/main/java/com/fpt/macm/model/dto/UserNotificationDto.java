@@ -79,7 +79,6 @@ public class UserNotificationDto implements Comparable<UserNotificationDto>{
 
 	@Override
 	public int compareTo(UserNotificationDto o) {
-		
 		return o.getCreatedOn().compareTo(this.getCreatedOn());
 	}
 

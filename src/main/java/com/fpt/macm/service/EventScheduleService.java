@@ -9,7 +9,7 @@ import com.fpt.macm.model.response.ResponseMessage;
 
 public interface EventScheduleService {
 	ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate, String startTime, String finishTime);
-	ResponseMessage createEventSchedule(int eventId, List<ScheduleDto> listPreview, Boolean isOverwritten);
+//	ResponseMessage createEventSchedule(int eventId, List<ScheduleDto> listPreview, Boolean isOverwritten);
 	ResponseMessage getListEventScheduleByEvent(int eventId);
 	ResponseMessage getEventSessionByDate(String date);
 	EventSchedule getEventScheduleByDate(LocalDate date);

@@ -1,19 +1,12 @@
 package com.fpt.macm.model.dto;
 
-import java.time.LocalDateTime;
-
-public class TournamentOrganizingCommitteeDto {
+public class TournamentOrganizingCommitteeDto implements Comparable<TournamentOrganizingCommitteeDto>{
 
 	private int id;
 	private String userName;
 	private String userStudentId;
 	private RoleEventDto roleTournamentDto;
-	private String registerStatus;
 	private boolean paymentStatus;
-	private String createdBy;
-	private LocalDateTime createdOn;
-	private String updatedBy;
-	private LocalDateTime updatedOn;
 
 	public int getId() {
 		return id;
@@ -47,52 +40,17 @@ public class TournamentOrganizingCommitteeDto {
 		this.roleTournamentDto = roleTournamentDto;
 	}
 
-	public String getRegisterStatus() {
-		return registerStatus;
-	}
-
-	public void setRegisterStatus(String registerStatus) {
-		this.registerStatus = registerStatus;
-	}
-
-	public String getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	public LocalDateTime getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(LocalDateTime createdOn) {
-		this.createdOn = createdOn;
-	}
-
-	public String getUpdatedBy() {
-		return updatedBy;
-	}
-
-	public void setUpdatedBy(String updatedBy) {
-		this.updatedBy = updatedBy;
-	}
-
-	public LocalDateTime getUpdatedOn() {
-		return updatedOn;
-	}
-
-	public void setUpdatedOn(LocalDateTime updatedOn) {
-		this.updatedOn = updatedOn;
-	}
-
 	public boolean isPaymentStatus() {
 		return paymentStatus;
 	}
 
 	public void setPaymentStatus(boolean paymentStatus) {
 		this.paymentStatus = paymentStatus;
+	}
+
+	@Override
+	public int compareTo(TournamentOrganizingCommitteeDto o) {
+		return o.getId() - this.getId();
 	}
 
 }

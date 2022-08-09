@@ -14,10 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.AttendanceStatisticDto;
 import com.fpt.macm.model.dto.AttendanceStatusDto;
+import com.fpt.macm.model.dto.AttendanceTrainingDto;
+import com.fpt.macm.model.dto.TrainingScheduleDto;
 import com.fpt.macm.model.dto.UserAttendanceStatusDto;
 import com.fpt.macm.model.dto.UserAttendanceTrainingReportDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
+import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
@@ -233,13 +237,23 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			}
 
-			List<TrainingSchedule> oldTrainingSchedules = new ArrayList<TrainingSchedule>();
+			List<TrainingScheduleDto> oldTrainingSchedules = new ArrayList<TrainingScheduleDto>();
 
 			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 			for (TrainingSchedule trainingSchedule : trainingSchedules) {
 				if (trainingSchedule.getDate().isBefore(LocalDate.now())) {
-					oldTrainingSchedules.add(trainingSchedule);
+					List<AttendanceStatus> listAttendance = attendanceStatusRepository.findByTrainingScheduleIdAndStatus(trainingSchedule.getId(), 1);
+					List<AttendanceStatus> attendancesStatus = attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(trainingSchedule.getId());
+					
+					TrainingScheduleDto trainingScheduleDto = new TrainingScheduleDto();
+					trainingScheduleDto.setId(trainingSchedule.getId());
+					trainingScheduleDto.setDate(trainingSchedule.getDate());
+					trainingScheduleDto.setStartTime(trainingSchedule.getStartTime());
+					trainingScheduleDto.setFinishTime(trainingSchedule.getFinishTime());
+					trainingScheduleDto.setTotalAttend(listAttendance.size());
+					trainingScheduleDto.setTotalSize(attendancesStatus.size());
+					oldTrainingSchedules.add(trainingScheduleDto);
 				}
 			}
 
@@ -250,6 +264,74 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			} else {
 				responseMessage.setMessage("Không có buổi tập nào đã qua để điểm danh lại");
 			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAttendanceTrainingStatistic(String semesterName) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Semester semester = new Semester();
+			Optional<Semester> semesterOp = semesterRepository.findByName(semesterName);
+			if (semesterOp.isPresent()) {
+				semester = semesterOp.get();
+			} else {
+				semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+			}
+			
+			List<AttendanceStatisticDto> attendancesStatisticDto = new ArrayList<AttendanceStatisticDto>();
+			
+			List<User> users = userRepository.findAllActiveUser();
+			for (User user : users) {
+				AttendanceStatisticDto attendanceStatisticDto = new AttendanceStatisticDto();
+				attendanceStatisticDto.setUserId(user.getId());
+				attendanceStatisticDto.setUserName(user.getName());
+				attendanceStatisticDto.setUserStudentId(user.getStudentId());
+				Role role = user.getRole();
+				Utils.convertNameOfRole(role);
+				attendanceStatisticDto.setRoleInClub(role.getName());
+				
+				int totalAbsent = 0;
+				
+				List<AttendanceTrainingDto> listAttendanceTrainingDto = new ArrayList<AttendanceTrainingDto>();
+				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
+				for (TrainingSchedule trainingSchedule : trainingSchedules) {
+					AttendanceTrainingDto attendanceTrainingDto = new AttendanceTrainingDto();
+					attendanceTrainingDto.setTrainingScheduleId(trainingSchedule.getId());
+					attendanceTrainingDto.setDate(trainingSchedule.getDate());
+					attendanceTrainingDto.setStartTime(trainingSchedule.getStartTime());
+					attendanceTrainingDto.setFinishTime(trainingSchedule.getFinishTime());
+					
+					AttendanceStatus attendanceStatus = attendanceStatusRepository.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+					if (attendanceStatus != null) {
+						attendanceTrainingDto.setStatus(attendanceStatus.getStatus());
+						if (attendanceStatus.getStatus() == 0) {
+							totalAbsent++;
+						}
+					} else {
+						attendanceTrainingDto.setStatus(2);
+					}
+					
+					listAttendanceTrainingDto.add(attendanceTrainingDto);
+				}
+				
+				double percentAbsent = Math
+						.ceil(((double) totalAbsent / (double) trainingSchedules.size()) * 100);
+				
+				Collections.sort(listAttendanceTrainingDto);
+				attendanceStatisticDto.setAttendanceTrainingsDto(listAttendanceTrainingDto);
+				attendanceStatisticDto.setPercentAbsent(percentAbsent);
+				attendanceStatisticDto.setTotalAbsent(totalAbsent);
+				attendanceStatisticDto.setTotalSession(trainingSchedules.size());
+				
+				attendancesStatisticDto.add(attendanceStatisticDto);
+			}
+			
+			responseMessage.setData(attendancesStatisticDto);
+			responseMessage.setMessage("Lấy thống kê điểm danh thành công");
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
