@@ -17,7 +17,8 @@ public interface NotificationService {
 	ResponseMessage markAllNotificationAsRead(String studentId);
 	ResponseMessage createTournamentCreateNotification(int tournamentId, String tournamentName);
 	ResponseMessage createTournamentDeleteNotification(int tournamentId, String tournamentName);
-	ResponseMessage createEventNotification(int eventId, String eventName);
+	ResponseMessage createEventCreateNotification(int eventId, String eventName);
+	ResponseMessage createEventDeleteNotification(int eventId, String eventName);
 	ResponseMessage createTrainingSessionCreateNotification(LocalDate date);
 	ResponseMessage createTrainingSessionUpdateNotification(LocalDate date, LocalTime newStartTime, LocalTime newEndTime);
 	ResponseMessage createTrainingSessionDeleteNotification(LocalDate date);

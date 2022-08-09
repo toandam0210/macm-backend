@@ -646,7 +646,7 @@ public class NotificationServiceTest {
 		when(notificationRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(notification()));
 		when(userRepository.findAll()).thenReturn(Arrays.asList(user()));
 		
-		ResponseMessage responseMessage = notificationService.createEventNotification(1, "Test");
+		ResponseMessage responseMessage = notificationService.createEventCreateNotification(1, "Test");
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -654,7 +654,7 @@ public class NotificationServiceTest {
 	public void createEventNotificationCaseException() {
 		when(notificationRepository.findAll(any(Sort.class))).thenReturn(null);
 		
-		ResponseMessage responseMessage = notificationService.createEventNotification(1, "Test");
+		ResponseMessage responseMessage = notificationService.createEventCreateNotification(1, "Test");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	

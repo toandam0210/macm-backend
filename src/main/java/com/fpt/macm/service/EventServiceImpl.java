@@ -137,7 +137,7 @@ public class EventServiceImpl implements EventService {
 				Event newEvent = eventRepository.findAll(Sort.by("id").descending()).get(0);
 
 				// Gửi thông báo đến user
-				notificationService.createEventNotification(newEvent.getId(), newEvent.getName());
+				notificationService.createEventCreateNotification(newEvent.getId(), newEvent.getName());
 				
 				// Tạo role ban tổ chức cho event vs số lượng của từng role
 				for (RoleEventDto roleEventDto : rolesEventDto) {
@@ -303,6 +303,9 @@ public class EventServiceImpl implements EventService {
 					}
 					event.setStatus(false);
 					eventRepository.save(event);
+					
+					notificationService.createEventDeleteNotification(event.getId(), event.getName());
+					
 					responseMessage.setData(Arrays.asList(event));
 					responseMessage.setMessage("Xóa sự kiện thành công");
 				} else {
