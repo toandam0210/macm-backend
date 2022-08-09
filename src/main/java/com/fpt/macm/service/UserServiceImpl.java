@@ -221,7 +221,24 @@ public class UserServiceImpl implements UserService {
 
 					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository
 							.findByUserIdAndSemester(user.getId(), semester.getName());
-					if (roleOptional.get().getId() > 12 && roleOptional.get().getId() < 16) {
+					if(roleOptional.get().getId() == 1) {
+						if(adminSemesterOp.isPresent()) {
+							if(adminSemesterOp.get().getRole().getId() == 1) {
+								Role roleUpdate = roleRepository.getById(2);
+								adminSemesterOp.get().setRole(roleUpdate);
+								adminSemesterRepository.save(adminSemesterOp.get());
+								if(memberSemesterOp.isPresent()) {
+									memberSemesterRepository.delete(memberSemesterOp.get());
+									AdminSemester adminSemester = new AdminSemester();
+									adminSemester.setUser(user);
+									adminSemester.setRole(roleOptional.get());
+									adminSemester.setSemester(semester.getName());
+									adminSemesterRepository.save(adminSemester);
+								}
+							}
+						}
+					}
+					else if (roleOptional.get().getId() > 12 && roleOptional.get().getId() < 16) {
 						if (memberSemesterOp.isPresent()) {
 							MemberSemester memberSemester = memberSemesterOp.get();
 							memberSemesterRepository.delete(memberSemester);
