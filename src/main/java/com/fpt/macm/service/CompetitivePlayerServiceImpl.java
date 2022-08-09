@@ -123,6 +123,11 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 						getType.setChanged(true);
 						competitiveTypeRepository.save(getType);
 					}
+					competitivePlayerRepository.save(getCompetitivePlayer);
+					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
+					responseMessage.setMessage("Cập nhật cân nặng thành công. Tuyển thủ" + (getCompetitivePlayer.getIsEligible()? " " : " không ") + "phù hợp thi đấu hạng cân này");
+				} else {
+					responseMessage.setMessage("Quá thời gian cập nhật cân nặng");
 				}
 			}
 			else {
