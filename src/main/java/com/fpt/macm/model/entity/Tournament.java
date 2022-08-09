@@ -28,25 +28,7 @@ public class Tournament {
 	private String description;
 
 	@Column
-	private int maxQuantityComitee;
-
-	@Column
-	private double feeOrganizingCommiteePay;
-
-	@Column
 	private String semester;
-
-	@Column
-	private String createdBy;
-
-	@Column
-	private LocalDateTime createdOn;
-
-	@Column
-	private String updatedBy;
-
-	@Column
-	private LocalDateTime updatedOn;
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "tournament_id")
@@ -65,6 +47,9 @@ public class Tournament {
 
 	@Column
 	private double feePlayerPay;
+	
+	@Column
+	private double feeOrganizingCommiteePay;
 
 	@Column
 	private double totalAmountEstimate;
@@ -74,12 +59,27 @@ public class Tournament {
 
 	@Column
 	private double totalAmountFromClubActual;
-	
+
 	@Column
 	private LocalDateTime registrationPlayerDeadline;
 
 	@Column
 	private LocalDateTime registrationOrganizingCommitteeDeadline;
+	
+	@Column
+	private boolean status;
+	
+	@Column
+	private String createdBy;
+
+	@Column
+	private LocalDateTime createdOn;
+
+	@Column
+	private String updatedBy;
+
+	@Column
+	private LocalDateTime updatedOn;
 
 	public int getId() {
 		return id;
@@ -103,14 +103,6 @@ public class Tournament {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public int getMaxQuantityComitee() {
-		return maxQuantityComitee;
-	}
-
-	public void setMaxQuantityComitee(int maxQuantityComitee) {
-		this.maxQuantityComitee = maxQuantityComitee;
 	}
 
 	public String getCreatedBy() {
@@ -240,4 +232,13 @@ public class Tournament {
 	public void setRegistrationOrganizingCommitteeDeadline(LocalDateTime registrationOrganizingCommitteeDeadline) {
 		this.registrationOrganizingCommitteeDeadline = registrationOrganizingCommitteeDeadline;
 	}
-}	
+
+	public boolean isStatus() {
+		return status;
+	}
+
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
+
+}
