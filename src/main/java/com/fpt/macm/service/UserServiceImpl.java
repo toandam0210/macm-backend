@@ -238,6 +238,7 @@ public class UserServiceImpl implements UserService {
 						if(memberSemesterOp.isPresent()) {
 							memberSemesterRepository.delete(memberSemesterOp.get());
 							AdminSemester adminSemester = new AdminSemester();
+							adminSemester.setUser(user);
 							adminSemester.setRole(roleOptional.get());
 							adminSemester.setSemester(semester.getName());
 							adminSemesterRepository.save(adminSemester);
