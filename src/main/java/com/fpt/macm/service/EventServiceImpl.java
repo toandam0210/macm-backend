@@ -90,10 +90,10 @@ public class EventServiceImpl implements EventService {
 
 	@Autowired
 	NotificationService notificationService;
-	
+
 	@Autowired
 	RoleEventRepository roleEventRepository;
-	
+
 	@Autowired
 	EventRoleRepository eventRoleRepository;
 
@@ -104,12 +104,13 @@ public class EventServiceImpl implements EventService {
 			Event event = eventCreateDto.getEvent();
 			List<ScheduleDto> listPreview = eventCreateDto.getListPreview();
 			List<RoleEventDto> rolesEventDto = eventCreateDto.getRolesEventDto();
-			
-			if (event == null || listPreview == null || rolesEventDto == null || listPreview.isEmpty() || rolesEventDto.isEmpty()) {
+
+			if (event == null || listPreview == null || rolesEventDto == null || listPreview.isEmpty()
+					|| rolesEventDto.isEmpty()) {
 				responseMessage.setMessage("Không đc null");
 				return responseMessage;
 			}
-			
+
 			if (isAvailableToCreateEvent(listPreview, isOverwritten)) {
 				Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 
@@ -120,19 +121,6 @@ public class EventServiceImpl implements EventService {
 				List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
 
 				// Tạo sự kiện
-				Double amountPerRegisterEstimated = event.getAmountPerRegisterEstimated();
-				Double totalAmountEstimated = event.getTotalAmountEstimated();
-				Double amoutFromClub = event.getAmountFromClub();
-				if (amountPerRegisterEstimated.equals(null)) {
-					event.setAmountPerRegisterEstimated(0);
-				}
-				if (amoutFromClub.equals(null)) {
-					event.setAmountFromClub(0);
-				}
-				if (totalAmountEstimated.equals(null)) {
-					event.setTotalAmountEstimated(0);
-				}
-				
 				event.setAmountPerRegisterActual(0);
 				event.setTotalAmountActual(0);
 				event.setCreatedBy("LinhLHN");
@@ -151,13 +139,13 @@ public class EventServiceImpl implements EventService {
 
 				// Gửi thông báo đến user
 				notificationService.createEventCreateNotification(newEvent.getId(), newEvent.getName());
-				
+
 				// Tạo role ban tổ chức cho event vs số lượng của từng role
 				for (RoleEventDto roleEventDto : rolesEventDto) {
 					Optional<RoleEvent> roleEventOp = roleEventRepository.findByName(roleEventDto.getName());
 					if (roleEventOp.isPresent()) {
 						RoleEvent roleEvent = roleEventOp.get();
-						
+
 						EventRole eventRole = new EventRole();
 						eventRole.setEvent(newEvent);
 						eventRole.setQuantity(roleEventDto.getMaxQuantity());
@@ -167,9 +155,9 @@ public class EventServiceImpl implements EventService {
 						RoleEvent roleEvent = new RoleEvent();
 						roleEvent.setName(roleEventDto.getName());
 						roleEventRepository.save(roleEvent);
-						
+
 						RoleEvent newRoleEvent = roleEventRepository.findByName(roleEvent.getName()).get();
-						
+
 						EventRole eventRole = new EventRole();
 						eventRole.setEvent(newEvent);
 						eventRole.setQuantity(roleEventDto.getMaxQuantity());
@@ -207,12 +195,14 @@ public class EventServiceImpl implements EventService {
 					commonSession.setType(1);
 					listCommon.add(commonSession);
 
-					CommonSchedule oldCommonSchedule = commonScheduleService.getCommonSessionByDate(scheduleDto.getDate());
+					CommonSchedule oldCommonSchedule = commonScheduleService
+							.getCommonSessionByDate(scheduleDto.getDate());
 					if (oldCommonSchedule != null) {
 						listCommonOverwritten.add(oldCommonSchedule);
 					}
-					
-					TrainingSchedule oldTrainingSchedule = trainingScheduleService.getTrainingScheduleByDate(scheduleDto.getDate());
+
+					TrainingSchedule oldTrainingSchedule = trainingScheduleService
+							.getTrainingScheduleByDate(scheduleDto.getDate());
 					if (oldTrainingSchedule != null) {
 						listTrainingOverwritten.add(oldTrainingSchedule);
 						List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
@@ -221,11 +211,11 @@ public class EventServiceImpl implements EventService {
 							listAttendanceStatusOverwritten.add(attendanceStatus);
 						}
 					}
-					
+
 				}
 
 				eventScheduleRepository.saveAll(listEventSchedule);
-				
+
 				if (!listCommonOverwritten.isEmpty()) {
 					commonScheduleRepository.deleteAll(listCommonOverwritten);
 				}
@@ -235,7 +225,7 @@ public class EventServiceImpl implements EventService {
 				if (!listTrainingOverwritten.isEmpty()) {
 					trainingScheduleRepository.deleteAll(listTrainingOverwritten);
 				}
-				
+
 				commonScheduleRepository.saveAll(listCommon);
 
 				responseMessage.setData(Arrays.asList(newEvent));
@@ -305,24 +295,25 @@ public class EventServiceImpl implements EventService {
 			if (eventOp.isPresent()) {
 				Event event = eventOp.get();
 				LocalDate startDate = getStartDate(eventId);
-				if (startDate == null || startDate.isAfter(LocalDate.now())) {
+				if (startDate == null || LocalDate.now().isBefore(startDate)) {
 					List<EventSchedule> eventSchedules = eventScheduleRepository.findByEventId(eventId);
 					if (!eventSchedules.isEmpty()) {
 						for (EventSchedule eventSchedule : eventSchedules) {
-							CommonSchedule commonSchedule = commonScheduleRepository.findByDate(eventSchedule.getDate()).get();
+							CommonSchedule commonSchedule = commonScheduleRepository.findByDate(eventSchedule.getDate())
+									.get();
 							commonScheduleRepository.delete(commonSchedule);
 						}
 						eventScheduleRepository.deleteAll(eventSchedules);
 					}
 					event.setStatus(false);
 					eventRepository.save(event);
-					
+
 					notificationService.createEventDeleteNotification(event.getId(), event.getName());
-					
+
 					responseMessage.setData(Arrays.asList(event));
 					responseMessage.setMessage("Xóa sự kiện thành công");
 				} else {
-					responseMessage.setMessage("Không thể xóa sự kiện này vì chỉ còn 1 ngày nữa là sự kiện bắt đầu");
+					responseMessage.setMessage("Không thể xóa vì sự kiện đã bắt đầu");
 				}
 			} else {
 				responseMessage.setMessage("Không có sự kiện này");
@@ -367,7 +358,8 @@ public class EventServiceImpl implements EventService {
 					eventDto.setId(event.getId());
 					eventDto.setDescription(event.getDescription());
 					eventDto.setRegistrationMemberDeadline(event.getRegistrationMemberDeadline());
-					eventDto.setRegistrationOrganizingCommitteeDeadline(event.getRegistrationOrganizingCommitteeDeadline());
+					eventDto.setRegistrationOrganizingCommitteeDeadline(
+							event.getRegistrationOrganizingCommitteeDeadline());
 					eventDtos.add(eventDto);
 				}
 			}
