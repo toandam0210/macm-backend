@@ -885,18 +885,22 @@ public class TournamentServiceImpl implements TournamentService {
 			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
 			if (tournamentOp.isPresent()) {
 				Tournament tournament = tournamentOp.get();
-				Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
-				List<TournamentPlayerDto> tournamentPlayersDto = new ArrayList<TournamentPlayerDto>();
-				for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
-					TournamentPlayerDto tournamentPlayerDto = convertTournamentPlayer(tournamentPlayer);
-					tournamentPlayersDto.add(tournamentPlayerDto);
-				}
-				if (!tournamentPlayersDto.isEmpty()) {
-					Collections.sort(tournamentPlayersDto);
-					responseMessage.setData(tournamentPlayersDto);
-					responseMessage.setMessage(Constant.MSG_121);
+				if (tournament.getFeePlayerPay() > 0) {
+					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+					List<TournamentPlayerDto> tournamentPlayersDto = new ArrayList<TournamentPlayerDto>();
+					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+						TournamentPlayerDto tournamentPlayerDto = convertTournamentPlayer(tournamentPlayer);
+						tournamentPlayersDto.add(tournamentPlayerDto);
+					}
+					if (!tournamentPlayersDto.isEmpty()) {
+						Collections.sort(tournamentPlayersDto);
+						responseMessage.setData(tournamentPlayersDto);
+						responseMessage.setMessage(Constant.MSG_121);
+					} else {
+						responseMessage.setMessage("Chưa có danh sách đóng tiền của người chơi");
+					}
 				} else {
-					responseMessage.setMessage("Chưa có danh sách đóng tiền của người chơi");
+					responseMessage.setMessage("Giải đấu không yêu cầu người chơi đóng phí tham gia");
 				}
 			} else {
 				responseMessage.setMessage("Không có giải đấu này");
@@ -920,20 +924,30 @@ public class TournamentServiceImpl implements TournamentService {
 	public ResponseMessage getAllTournamentOrganizingCommitteePaymentStatus(int tournamentId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-					.findByTournamentId(tournamentId);
-			if (!tournamentOrganizingCommittees.isEmpty()) {
-				List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
-				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertToTournamentOrganizingCommitteeDto(
-							tournamentOrganizingCommittee);
-					tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			if (tournamentOp.isPresent()) {
+				Tournament tournament = tournamentOp.get();
+				if (tournament.getFeeOrganizingCommiteePay() > 0) {
+					List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+							.findByTournamentId(tournamentId);
+					if (!tournamentOrganizingCommittees.isEmpty()) {
+						List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
+						for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+							TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertToTournamentOrganizingCommitteeDto(
+									tournamentOrganizingCommittee);
+							tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
+						}
+						Collections.sort(tournamentOrganizingCommitteesDto);
+						responseMessage.setData(tournamentOrganizingCommitteesDto);
+						responseMessage.setMessage(Constant.MSG_122);
+					} else {
+						responseMessage.setMessage("Chưa có danh sách đóng tiền của thành viên ban tổ chức giải đấu");
+					}
+				} else {
+					responseMessage.setMessage("Giải đấu không yêu cầu ban tổ chức đóng phí tham gia");
 				}
-				Collections.sort(tournamentOrganizingCommitteesDto);
-				responseMessage.setData(tournamentOrganizingCommitteesDto);
-				responseMessage.setMessage(Constant.MSG_122);
 			} else {
-				responseMessage.setMessage("Chưa có danh sách đóng tiền của thành viên ban tổ chức giải đấu");
+				responseMessage.setMessage("Không có giải đấu này");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
