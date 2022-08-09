@@ -234,6 +234,14 @@ public class UserServiceImpl implements UserService {
 							memberSemester.setUser(user);
 							memberSemesterRepository.save(memberSemester);
 						}
+					}else {
+						if(memberSemesterOp.isPresent()) {
+							memberSemesterRepository.delete(memberSemesterOp.get());
+							AdminSemester adminSemester = new AdminSemester();
+							adminSemester.setRole(roleOptional.get());
+							adminSemester.setSemester(semester.getName());
+							adminSemesterRepository.save(adminSemester);
+						}
 					}
 
 				} else {
