@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.AttendanceStatusDto;
+import com.fpt.macm.model.dto.TrainingScheduleDto;
 import com.fpt.macm.model.dto.UserAttendanceStatusDto;
 import com.fpt.macm.model.dto.UserAttendanceTrainingReportDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
@@ -233,13 +234,23 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			}
 
-			List<TrainingSchedule> oldTrainingSchedules = new ArrayList<TrainingSchedule>();
+			List<TrainingScheduleDto> oldTrainingSchedules = new ArrayList<TrainingScheduleDto>();
 
 			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 			for (TrainingSchedule trainingSchedule : trainingSchedules) {
 				if (trainingSchedule.getDate().isBefore(LocalDate.now())) {
-					oldTrainingSchedules.add(trainingSchedule);
+					List<AttendanceStatus> listAttendance = attendanceStatusRepository.findByTrainingScheduleIdAndStatus(trainingSchedule.getId(), 1);
+					List<AttendanceStatus> attendancesStatus = attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(trainingSchedule.getId());
+					
+					TrainingScheduleDto trainingScheduleDto = new TrainingScheduleDto();
+					trainingScheduleDto.setId(trainingSchedule.getId());
+					trainingScheduleDto.setDate(trainingSchedule.getDate());
+					trainingScheduleDto.setStartTime(trainingSchedule.getStartTime());
+					trainingScheduleDto.setFinishTime(trainingSchedule.getFinishTime());
+					trainingScheduleDto.setTotalAttend(listAttendance.size());
+					trainingScheduleDto.setTotalSize(attendancesStatus.size());
+					oldTrainingSchedules.add(trainingScheduleDto);
 				}
 			}
 
