@@ -68,4 +68,6 @@ public interface TournamentService {
 	ResponseMessage addListTournamentOrganizingCommittee(String studentId, List<UserTournamentOrganizingCommitteeDto> users, int tournamentId);
 	
 	ResponseMessage getAllUserNotJoinTournament(int tournamentId);
+	
+	ResponseMessage deleteTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId);
 }

@@ -1632,4 +1632,27 @@ public class TournamentServiceImpl implements TournamentService {
 		}
 		return responseMessage;
 	}
+
+	@Override
+	public ResponseMessage deleteTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository.findById(tournamentOrganizingCommitteeId);
+			if (tournamentOrganizingCommitteeOp.isPresent()) {
+				TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+				if (!tournamentOrganizingCommittee.isPaymentStatus()) {
+					tournamentOrganizingCommitteeRepository.delete(tournamentOrganizingCommittee);
+					responseMessage.setData(Arrays.asList(tournamentOrganizingCommittee));
+					responseMessage.setMessage("Xóa thành viên ban tổ chức thành công");
+				} else {
+					responseMessage.setMessage("Thành viên này đã đóng phí tham gia, không thể xóa");
+				}
+			} else {
+				responseMessage.setMessage("Không có thành viên này");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
 }
