@@ -5,8 +5,8 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -166,12 +166,11 @@ public class ExhibitionControllerTest {
 		tournament.setFeeOrganizingCommiteePay(100000);
 		tournament.setFeePlayerPay(100000);
 		tournament.setId(1);
-		tournament.setMaxQuantityComitee(10);
 		tournament.setName("FNC");
 		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setSemester("Summer2022");
-		//tournament.setStatus(1);
+		tournament.setStatus(true);
 		tournament.setTournamentPlayers(tournamentPlayers());
 		return tournament;
 	}

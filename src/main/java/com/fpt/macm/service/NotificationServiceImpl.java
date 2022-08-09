@@ -365,8 +365,7 @@ public class NotificationServiceImpl implements NotificationService {
 					.findByUserId(user.getId());
 			if (!tournamentOrganizingCommittees.isEmpty()) {
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
-							&& !tournamentOrganizingCommittee.isPaymentStatus()) {
+					if (!tournamentOrganizingCommittee.isPaymentStatus()) {
 						String message = "Giải đấu " + tournamentOrganizingCommittee.getTournament().getName() + ": "
 								+ nf.format(tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay())
 								+ " VND";

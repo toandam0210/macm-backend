@@ -1,11 +1,8 @@
 package com.fpt.macm.service;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import com.fpt.macm.model.dto.EventCreateDto;
-import com.fpt.macm.model.dto.RoleEventDto;
-import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.response.ResponseMessage;
 
