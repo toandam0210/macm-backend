@@ -187,12 +187,11 @@ public class NotificationServiceTest {
 		tournament.setFeeOrganizingCommiteePay(100000);
 		tournament.setFeePlayerPay(100000);
 		tournament.setId(1);
-		tournament.setMaxQuantityComitee(10);
 		tournament.setName("FNC");
 		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setSemester("Summer2022");
-	//	tournament.setStatus(1);
+		tournament.setStatus(true);
 		tournament.setTournamentPlayers(tournamentPlayers());
 		return tournament;
 	}
@@ -262,7 +261,6 @@ public class NotificationServiceTest {
 		TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
 		tournamentOrganizingCommittee.setId(1);
 		tournamentOrganizingCommittee.setPaymentStatus(false);
-		tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 		RoleEvent roleEvent = new RoleEvent();
 		roleEvent.setId(1);
 		roleEvent.setName("Ban truyen thong");

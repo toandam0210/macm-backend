@@ -13,12 +13,9 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ScheduleDto;
-import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Semester;
-import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentSchedule;
-import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
@@ -122,99 +119,99 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 		return responseMessage;
 	}
 
-	@Override
-	public ResponseMessage createTournamentSchedule(int tournamentId, List<ScheduleDto> listPreview,
-			Boolean isOverwritten) {
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<TournamentSchedule> listTournamentSchedule = new ArrayList<TournamentSchedule>();
-			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
-			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
-			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
-			List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
-			Boolean isInterrupted = false;
-			String title = "";
-			Tournament tournament = tournamentRepository.findById(tournamentId).get();
-			for (ScheduleDto scheduleDto : listPreview) {
-				if (!scheduleDto.getExisted()) {
-					TournamentSchedule tournamentSchedule = new TournamentSchedule();
-					tournamentSchedule.setTournament(tournamentRepository.findById(tournamentId).get());
-					tournamentSchedule.setDate(scheduleDto.getDate());
-					tournamentSchedule.setStartTime(scheduleDto.getStartTime());
-					tournamentSchedule.setFinishTime(scheduleDto.getFinishTime());
-					tournamentSchedule.setCreatedBy("toandv");
-					tournamentSchedule.setCreatedOn(LocalDateTime.now());
-					listTournamentSchedule.add(tournamentSchedule);
-					CommonSchedule commonSession = new CommonSchedule();
-					commonSession.setTitle(tournamentSchedule.getTournament().getName());
-					commonSession.setDate(scheduleDto.getDate());
-					commonSession.setStartTime(scheduleDto.getStartTime());
-					commonSession.setFinishTime(scheduleDto.getFinishTime());
-					commonSession.setCreatedOn(LocalDateTime.now());
-					commonSession.setUpdatedOn(LocalDateTime.now());
-					commonSession.setType(2);
-					listCommon.add(commonSession);
-				} else {
-					if (isOverwritten) {
-						if (scheduleDto.getTitle().toString().equals("Trùng với Lịch tập")) {
-							TournamentSchedule tournamentSchedule = new TournamentSchedule();
-							tournamentSchedule.setTournament(tournamentRepository.findById(tournamentId).get());
-							tournamentSchedule.setDate(scheduleDto.getDate());
-							tournamentSchedule.setStartTime(scheduleDto.getStartTime());
-							tournamentSchedule.setFinishTime(scheduleDto.getFinishTime());
-							tournamentSchedule.setCreatedBy("toandv");
-							tournamentSchedule.setCreatedOn(LocalDateTime.now());
-							listTournamentSchedule.add(tournamentSchedule);
-							CommonSchedule commonSession = new CommonSchedule();
-							commonSession.setTitle(tournamentSchedule.getTournament().getName());
-							commonSession.setDate(scheduleDto.getDate());
-							commonSession.setStartTime(scheduleDto.getStartTime());
-							commonSession.setFinishTime(scheduleDto.getFinishTime());
-							commonSession.setCreatedOn(LocalDateTime.now());
-							commonSession.setUpdatedOn(LocalDateTime.now());
-							listCommon.add(commonSession);
-							CommonSchedule getCommonSession = commonScheduleService
-									.getCommonSessionByDate(scheduleDto.getDate());
-							listCommonOverwritten.add(getCommonSession);
-							TrainingSchedule getTrainingSession = trainingScheduleService
-									.getTrainingScheduleByDate(scheduleDto.getDate());
-							listTrainingOverwritten.add(getTrainingSession);
-							List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
-									.findByTrainingScheduleIdOrderByIdAsc(getTrainingSession.getId());
-							for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
-								listAttendanceStatusOverwritten.add(attendanceStatus);
-							}
-						} else {
-							isInterrupted = true;
-							title = scheduleDto.getTitle();
-							break;
-						}
-					}
-				}
-			}
-			if (isInterrupted) {
-				responseMessage.setMessage(Constant.MSG_093 + title);
-			} else {
-				if (listTournamentSchedule.isEmpty()) {
-					responseMessage.setMessage(Constant.MSG_040);
-				} else {
-					tournamentScheduleRepository.saveAll(listTournamentSchedule);
-					commonScheduleRepository.deleteAll(listCommonOverwritten);
-					attendanceStatusRepository.deleteAll(listAttendanceStatusOverwritten);
-					trainingScheduleRepository.deleteAll(listTrainingOverwritten);
-					commonScheduleRepository.saveAll(listCommon);
-					responseMessage.setData(listTournamentSchedule);
-					responseMessage.setMessage(Constant.MSG_100);
-					responseMessage.setTotalResult(listTournamentSchedule.size());
-					
-					notificationService.createTournamentNotification(tournamentId, tournament.getName());
-				}
-			}
-		} catch (Exception e) {
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
+//	@Override
+//	public ResponseMessage createTournamentSchedule(int tournamentId, List<ScheduleDto> listPreview,
+//			Boolean isOverwritten) {
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		try {
+//			List<TournamentSchedule> listTournamentSchedule = new ArrayList<TournamentSchedule>();
+//			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
+//			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
+//			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
+//			List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
+//			Boolean isInterrupted = false;
+//			String title = "";
+//			Tournament tournament = tournamentRepository.findById(tournamentId).get();
+//			for (ScheduleDto scheduleDto : listPreview) {
+//				if (!scheduleDto.getExisted()) {
+//					TournamentSchedule tournamentSchedule = new TournamentSchedule();
+//					tournamentSchedule.setTournament(tournamentRepository.findById(tournamentId).get());
+//					tournamentSchedule.setDate(scheduleDto.getDate());
+//					tournamentSchedule.setStartTime(scheduleDto.getStartTime());
+//					tournamentSchedule.setFinishTime(scheduleDto.getFinishTime());
+//					tournamentSchedule.setCreatedBy("toandv");
+//					tournamentSchedule.setCreatedOn(LocalDateTime.now());
+//					listTournamentSchedule.add(tournamentSchedule);
+//					CommonSchedule commonSession = new CommonSchedule();
+//					commonSession.setTitle(tournamentSchedule.getTournament().getName());
+//					commonSession.setDate(scheduleDto.getDate());
+//					commonSession.setStartTime(scheduleDto.getStartTime());
+//					commonSession.setFinishTime(scheduleDto.getFinishTime());
+//					commonSession.setCreatedOn(LocalDateTime.now());
+//					commonSession.setUpdatedOn(LocalDateTime.now());
+//					commonSession.setType(2);
+//					listCommon.add(commonSession);
+//				} else {
+//					if (isOverwritten) {
+//						if (scheduleDto.getTitle().toString().equals("Trùng với Lịch tập")) {
+//							TournamentSchedule tournamentSchedule = new TournamentSchedule();
+//							tournamentSchedule.setTournament(tournamentRepository.findById(tournamentId).get());
+//							tournamentSchedule.setDate(scheduleDto.getDate());
+//							tournamentSchedule.setStartTime(scheduleDto.getStartTime());
+//							tournamentSchedule.setFinishTime(scheduleDto.getFinishTime());
+//							tournamentSchedule.setCreatedBy("toandv");
+//							tournamentSchedule.setCreatedOn(LocalDateTime.now());
+//							listTournamentSchedule.add(tournamentSchedule);
+//							CommonSchedule commonSession = new CommonSchedule();
+//							commonSession.setTitle(tournamentSchedule.getTournament().getName());
+//							commonSession.setDate(scheduleDto.getDate());
+//							commonSession.setStartTime(scheduleDto.getStartTime());
+//							commonSession.setFinishTime(scheduleDto.getFinishTime());
+//							commonSession.setCreatedOn(LocalDateTime.now());
+//							commonSession.setUpdatedOn(LocalDateTime.now());
+//							listCommon.add(commonSession);
+//							CommonSchedule getCommonSession = commonScheduleService
+//									.getCommonSessionByDate(scheduleDto.getDate());
+//							listCommonOverwritten.add(getCommonSession);
+//							TrainingSchedule getTrainingSession = trainingScheduleService
+//									.getTrainingScheduleByDate(scheduleDto.getDate());
+//							listTrainingOverwritten.add(getTrainingSession);
+//							List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
+//									.findByTrainingScheduleIdOrderByIdAsc(getTrainingSession.getId());
+//							for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
+//								listAttendanceStatusOverwritten.add(attendanceStatus);
+//							}
+//						} else {
+//							isInterrupted = true;
+//							title = scheduleDto.getTitle();
+//							break;
+//						}
+//					}
+//				}
+//			}
+//			if (isInterrupted) {
+//				responseMessage.setMessage(Constant.MSG_093 + title);
+//			} else {
+//				if (listTournamentSchedule.isEmpty()) {
+//					responseMessage.setMessage(Constant.MSG_040);
+//				} else {
+//					tournamentScheduleRepository.saveAll(listTournamentSchedule);
+//					commonScheduleRepository.deleteAll(listCommonOverwritten);
+//					attendanceStatusRepository.deleteAll(listAttendanceStatusOverwritten);
+//					trainingScheduleRepository.deleteAll(listTrainingOverwritten);
+//					commonScheduleRepository.saveAll(listCommon);
+//					responseMessage.setData(listTournamentSchedule);
+//					responseMessage.setMessage(Constant.MSG_100);
+//					responseMessage.setTotalResult(listTournamentSchedule.size());
+//					
+//					notificationService.createTournamentNotification(tournamentId, tournament.getName());
+//				}
+//			}
+//		} catch (Exception e) {
+//			responseMessage.setMessage(e.getMessage());
+//		}
+//		return responseMessage;
+//	}
 
 	@Override
 	public ResponseMessage createTournamentSession(int tournamentId, TournamentSchedule tournamentSchedule) {

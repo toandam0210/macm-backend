@@ -2,7 +2,7 @@ package com.fpt.macm.model.dto;
 
 import java.time.LocalDateTime;
 
-public class TournamentOrganizingCommitteePaymentStatusReportDto {
+public class TournamentOrganizingCommitteePaymentStatusReportDto implements Comparable<TournamentOrganizingCommitteePaymentStatusReportDto>{
 
 	private int id;
 	private int tournamentId;
@@ -84,6 +84,11 @@ public class TournamentOrganizingCommitteePaymentStatusReportDto {
 
 	public void setCreatedOn(LocalDateTime createdOn) {
 		this.createdOn = createdOn;
+	}
+
+	@Override
+	public int compareTo(TournamentOrganizingCommitteePaymentStatusReportDto o) {
+		return o.getCreatedOn().compareTo(this.getCreatedOn());
 	}
 
 }

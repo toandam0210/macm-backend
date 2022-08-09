@@ -2,6 +2,7 @@ package com.fpt.macm.schedule;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -534,9 +535,17 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 0 0 * * *")
 	public void changeStatusTournamentForUpdatePlayer() {
-		List<Tournament> listTournaments = tournamentService
-				.listTournamentsByRegistrationPlayerDeadline(LocalDateTime.now());
-		if (listTournaments != null) {
+		
+		List<Tournament> tournaments = tournamentRepository.findAll();
+		List<Tournament> listTournaments = new ArrayList<Tournament>();
+		for (Tournament tournament : tournaments) {
+			if (tournament.getRegistrationPlayerDeadline().toLocalDate().isEqual(LocalDateTime.now().toLocalDate())
+					&& tournament.getRegistrationPlayerDeadline().getHour() == LocalDateTime.now().getHour()) {
+				listTournaments.add(tournament);
+			}
+		}
+		
+		if (!listTournaments.isEmpty()) {
 			for (Tournament tournament : listTournaments) {
 				logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
 				Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();

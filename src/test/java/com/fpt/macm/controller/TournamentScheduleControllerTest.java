@@ -66,7 +66,6 @@ public class TournamentScheduleControllerTest {
 		tournament.setId(1);
 		tournament.setName("Giải đấu FNC Summer2022");
 		tournament.setDescription("Giải đấu cho thành viên FNC Summer2022");
-		tournament.setMaxQuantityComitee(10);
 		tournament.setFeeOrganizingCommiteePay(100000);
 		tournament.setSemester("Summer2022");
 		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();
@@ -85,6 +84,7 @@ public class TournamentScheduleControllerTest {
 		tournament.setExhibitionTypes(exhibitionTypes);
 		tournament.setTotalAmount(500000);
 		tournament.setFeePlayerPay(20000);
+		tournament.setStatus(true);
 		return tournament;
 	}
 	
@@ -126,21 +126,21 @@ public class TournamentScheduleControllerTest {
 		.andExpect(jsonPath("$.data.size()").value("1"));
 	}
 	
-	@Test
-	public void createTournamentScheduleSuccessTest() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(tournamentSchedule()));
-		
-		when(tournamentScheduleService.createTournamentSchedule(anyInt(), anyList(), anyBoolean())).thenReturn(responseMessage);
-		
-		this.mockMvc.perform(post("/api/tournamentschedule/headclub/addnewschedule/{tournamentId}", "1")
-				.param("isOverwritten", "false")
-				.content(asJsonString(Arrays.asList(scheduleDto()))).contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
+//	@Test
+//	public void createTournamentScheduleSuccessTest() throws Exception {
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		responseMessage.setData(Arrays.asList(tournamentSchedule()));
+//		
+//		when(tournamentScheduleService.createTournamentSchedule(anyInt(), anyList(), anyBoolean())).thenReturn(responseMessage);
+//		
+//		this.mockMvc.perform(post("/api/tournamentschedule/headclub/addnewschedule/{tournamentId}", "1")
+//				.param("isOverwritten", "false")
+//				.content(asJsonString(Arrays.asList(scheduleDto()))).contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(status().isOk())
+//		.andExpect(content()
+//				.contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(jsonPath("$.data.size()").value("1"));
+//	}
 	
 	@Test
 	public void createTournamentScheduleSessionSuccessTest() throws Exception {
