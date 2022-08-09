@@ -206,7 +206,7 @@ public class TournamentServiceImpl implements TournamentService {
 				Tournament newTournament = tournamentRepository.findAll(Sort.by("id").descending()).get(0);
 
 				// Gửi thông báo đến user
-				notificationService.createTournamentNotification(newTournament.getId(), newTournament.getName());
+				notificationService.createTournamentCreateNotification(newTournament.getId(), newTournament.getName());
 
 				// Tạo role ban tổ chức cho giải đấu vs số lượng của từng role
 				for (RoleEventDto roleEventDto : rolesEventDto) {
@@ -498,6 +498,9 @@ public class TournamentServiceImpl implements TournamentService {
 					}
 					tournament.setStatus(false);
 					tournamentRepository.save(tournament);
+					
+					notificationService.createTournamentDeleteNotification(tournament.getId(), tournament.getName());
+					
 					responseMessage.setData(Arrays.asList(tournament));
 					responseMessage.setMessage(Constant.MSG_102);
 				} else {
@@ -518,8 +521,12 @@ public class TournamentServiceImpl implements TournamentService {
 			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
 			if (tournamentOp.isPresent()) {
 				Tournament tournament = tournamentOp.get();
-				responseMessage.setData(Arrays.asList(tournament));
-				responseMessage.setMessage(Constant.MSG_103);
+				if (tournament.isStatus()) {
+					responseMessage.setData(Arrays.asList(tournament));
+					responseMessage.setMessage(Constant.MSG_103);
+				} else {
+					responseMessage.setMessage("Giải đấu này đã hủy");
+				}
 			} else {
 				responseMessage.setMessage("Không có giải đấu này");
 			}

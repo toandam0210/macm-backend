@@ -172,11 +172,36 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	@Override
-	public ResponseMessage createTournamentNotification(int tournamentId, String tournamentName) {
+	public ResponseMessage createTournamentCreateNotification(int tournamentId, String tournamentName) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Notification notification = new Notification();
 			notification.setMessage("Sắp tới có giải đấu " + tournamentName + ".");
+			notification.setNotificationType(0);
+			notification.setNotificationTypeId(tournamentId);
+			notification.setCreatedOn(LocalDateTime.now());
+			notificationRepository.save(notification);
+
+			Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+			List<Notification> notifications = IterableUtils.toList(notificationIterable);
+			Notification newNotification = notifications.get(0);
+
+			sendNotificationToAllUser(newNotification);
+
+			responseMessage.setData(Arrays.asList(notification));
+			responseMessage.setMessage("Tạo thông báo cho giải đấu thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
+	@Override
+	public ResponseMessage createTournamentDeleteNotification(int tournamentId, String tournamentName) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Notification notification = new Notification();
+			notification.setMessage("Giải đấu " + tournamentName + " đã hủy.");
 			notification.setNotificationType(0);
 			notification.setNotificationTypeId(tournamentId);
 			notification.setCreatedOn(LocalDateTime.now());

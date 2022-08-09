@@ -629,7 +629,7 @@ public class NotificationServiceTest {
 		when(notificationRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(notification()));
 		when(userRepository.findAll()).thenReturn(Arrays.asList(user()));
 		
-		ResponseMessage responseMessage = notificationService.createTournamentNotification(1, "FNC");
+		ResponseMessage responseMessage = notificationService.createTournamentCreateNotification(1, "FNC");
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -637,7 +637,7 @@ public class NotificationServiceTest {
 	public void createTournamentNotificationCaseException() {
 		when(notificationRepository.findAll(any(Sort.class))).thenReturn(null);
 		
-		ResponseMessage responseMessage = notificationService.createTournamentNotification(1, "FNC");
+		ResponseMessage responseMessage = notificationService.createTournamentCreateNotification(1, "FNC");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
