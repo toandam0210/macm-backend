@@ -19,23 +19,34 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
+import com.fpt.macm.model.dto.EventCreateDto;
+import com.fpt.macm.model.dto.RoleEventDto;
+import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Event;
+import com.fpt.macm.model.entity.EventRole;
 import com.fpt.macm.model.entity.EventSchedule;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.RoleEvent;
 import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
+import com.fpt.macm.repository.EventRoleRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
+import com.fpt.macm.repository.RoleEventRepository;
 import com.fpt.macm.repository.SemesterRepository;
+import com.fpt.macm.repository.TrainingScheduleRepository;
 import com.fpt.macm.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -73,6 +84,24 @@ public class EventServiceTest {
 	
 	@Mock
 	UserRepository userRepository;
+	
+	@Mock
+	NotificationService notificationService;
+	
+	@Mock
+	RoleEventRepository roleEventRepository;
+	
+	@Mock
+	TrainingScheduleService trainingScheduleService;
+	
+	@Mock
+	AttendanceStatusRepository attendanceStatusRepository;
+	
+	@Mock
+	EventRoleRepository eventRoleRepository;
+	
+	@Mock
+	TrainingScheduleRepository trainingScheduleRepository;
 	
 	public Event event() {
 		Event event = new Event();
@@ -171,31 +200,177 @@ public class EventServiceTest {
 		return roleEvent;
 	}
 	
-//	@Test
-//	public void createEventCaseSuccess() {
-//		ResponseMessage responseMessage = new ResponseMessage();
-//		responseMessage.setData(Arrays.asList(semester()));
-//		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
-//		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
-//		
-//		ResponseMessage returnResponseMessage = eventService.createEvent(event());
-//		assertEquals(returnResponseMessage.getData().size(), 1);
-//	}
-//	
-//	@Test
-//	public void createEventCaseFail() {
-//		when(semesterService.getCurrentSemester()).thenReturn(null);
-//		
-//		ResponseMessage returnResponseMessage = eventService.createEvent(event());
-//		assertEquals(returnResponseMessage.getData().size(), 0);
-//	}
+	private ScheduleDto scheduleDto() {
+		ScheduleDto scheduleDto = new ScheduleDto();
+		scheduleDto.setTitle("Đi Đà Lạt");
+		scheduleDto.setDate(LocalDate.now().plusMonths(1));
+		scheduleDto.setStartTime(LocalTime.now());
+		scheduleDto.setFinishTime(LocalTime.now().plusHours(8));
+		scheduleDto.setExisted(false);
+		return scheduleDto;
+	}
 	
+	private EventRole eventRole() {
+		EventRole eventRole = new EventRole();
+		eventRole.setId(1);
+		eventRole.setEvent(event());
+		eventRole.setRoleEvent(roleEvent());
+		eventRole.setQuantity(10);
+		return eventRole;
+	}
+	
+	private RoleEventDto roleEventDto() {
+		RoleEventDto roleEventDto = new RoleEventDto();
+		roleEventDto.setId(roleEvent().getId());
+		roleEventDto.setName(roleEvent().getName());
+		roleEventDto.setMaxQuantity(eventRole().getQuantity());
+		roleEventDto.setAvailableQuantity(10);
+		return roleEventDto;
+	}
+	
+	private EventCreateDto eventCreateDto() {
+		EventCreateDto eventCreateDto = new EventCreateDto();
+		eventCreateDto.setEvent(event());
+		eventCreateDto.setListPreview(Arrays.asList(scheduleDto()));
+		eventCreateDto.setRolesEventDto(Arrays.asList(roleEventDto()));
+		return eventCreateDto;
+	}
+	
+	private TrainingSchedule trainingSchedule() {
+		TrainingSchedule trainingSchedule = new TrainingSchedule();
+		trainingSchedule.setId(1);
+		trainingSchedule.setDate(LocalDate.now());
+		trainingSchedule.setStartTime(LocalTime.now().minusHours(1));
+		trainingSchedule.setFinishTime(LocalTime.now().plusHours(1));
+		return trainingSchedule;
+	}
+	
+	private AttendanceStatus attendanceStatus() {
+		AttendanceStatus attendanceStatus = new AttendanceStatus();
+		attendanceStatus.setId(1);
+		attendanceStatus.setTrainingSchedule(trainingSchedule());
+		attendanceStatus.setUser(user());
+		attendanceStatus.setStatus(2);
+		return attendanceStatus;
+	}
+	 
+	@Test
+	public void createEventCaseSuccess() {
+		ResponseMessage semesterResponse = new ResponseMessage();
+		semesterResponse.setData(Arrays.asList(semester()));
+		
+		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
+		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(eventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(event()));
+		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.of(roleEvent()));
+		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
+		
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto(), false);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void createEventCaseDuplicateWithTrainingScheduleAndNotOverwrite() {
+		EventCreateDto eventCreateDto = eventCreateDto();
+		eventCreateDto.getListPreview().get(0).setExisted(true);
+		eventCreateDto.getListPreview().get(0).setTitle("Trùng với Lịch tập");
+		
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createEventCaseDuplicateWithTrainingScheduleAndOverwrite() {
+		EventCreateDto eventCreateDto = eventCreateDto();
+		eventCreateDto.getListPreview().get(0).setExisted(true);
+		eventCreateDto.getListPreview().get(0).setTitle("Trùng với Lịch tập");
+		
+		ResponseMessage semesterResponse = new ResponseMessage();
+		semesterResponse.setData(Arrays.asList(semester()));
+		
+		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
+		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(eventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(event()));
+		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.of(roleEvent()));
+		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
+		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedules().get(0));
+		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
+		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(attendanceStatus()));
+		
+		
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, true);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void createEventCaseNotDuplicateWithTrainingSchedule() {
+		EventCreateDto eventCreateDto = eventCreateDto();
+		eventCreateDto.getListPreview().get(0).setExisted(true);
+		eventCreateDto.getListPreview().get(0).setTitle("Trùng với Giải đấu");
+		
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createEventCaseEventNull() {
+		EventCreateDto eventCreateDto = eventCreateDto();
+		eventCreateDto.setEvent(null);
+		
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createEventCaseListPreviewNull() {
+		EventCreateDto eventCreateDto = eventCreateDto();
+		eventCreateDto.setListPreview(null);
+		
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createEventCaseRolesEventDtoNull() {
+		EventCreateDto eventCreateDto = eventCreateDto();
+		eventCreateDto.setRolesEventDto(null);
+		
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createEventCaseListPreviewEmpty() {
+		EventCreateDto eventCreateDto = eventCreateDto();
+		eventCreateDto.setListPreview(new ArrayList<ScheduleDto>());
+		
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createEventCaseRolesEventDtoEmpty() {
+		EventCreateDto eventCreateDto = eventCreateDto();
+		eventCreateDto.setRolesEventDto(new ArrayList<RoleEventDto>());
+		
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createEventCaseException() {
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto(), false);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+
 	@Test
 	public void updateBeforeEventCaseSuccess() {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedules().get(0));
+
 		
 		ResponseMessage responseMessage = eventService.updateBeforeEvent(1, event());
 		assertEquals(responseMessage.getData().size(), 1);
@@ -223,13 +398,20 @@ public class EventServiceTest {
 	
 	@Test
 	public void deleteEventCaseSuccess() {
-		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedules().get(0));
-		when(memberEventRepository.findByEventIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(memberEvent()));
+		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
+		when(commonScheduleRepository.findByDate(any())).thenReturn(Optional.of(commonSchedules().get(0)));
 		
 		ResponseMessage responseMessage = eventService.deleteEvent(1);
 		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void deleteEventCaseEventEmpty() {
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.empty());
+		
+		ResponseMessage responseMessage = eventService.deleteEvent(1);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 	@Test
@@ -239,6 +421,7 @@ public class EventServiceTest {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
 		
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		
 		ResponseMessage responseMessage = eventService.deleteEvent(1);
@@ -248,7 +431,17 @@ public class EventServiceTest {
 	@Test
 	public void deleteEventCaseEventScheduleEmpty() {
 		List<EventSchedule> eventSchedules = new ArrayList<EventSchedule>();
+		
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
+		
+		ResponseMessage responseMessage = eventService.deleteEvent(1);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void deleteEventCaseException() {
+		when(eventRepository.findById(anyInt())).thenReturn(null);
 		
 		ResponseMessage responseMessage = eventService.deleteEvent(1);
 		assertEquals(responseMessage.getData().size(), 0);
@@ -263,7 +456,26 @@ public class EventServiceTest {
 	}
 	
 	@Test
-	public void getEventByIdCaseFail() {
+	public void getEventByIdCaseStatusFalse() {
+		Event event = event();
+		event.setStatus(false);
+		
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event));
+		
+		ResponseMessage responseMessage = eventService.getEventById(1);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getEventByIdCaseEventEmpty() {
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.empty());
+		
+		ResponseMessage responseMessage = eventService.getEventById(1);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getEventByIdCaseException() {
 		when(eventRepository.findById(anyInt())).thenReturn(null);
 		
 		ResponseMessage responseMessage = eventService.getEventById(1);

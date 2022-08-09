@@ -3,8 +3,6 @@ package com.fpt.macm.model.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fpt.macm.model.entity.Role;
-
 public class AttendanceStatisticDto {
 
 	private int userId;
