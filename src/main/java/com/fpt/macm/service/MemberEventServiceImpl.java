@@ -524,7 +524,25 @@ public class MemberEventServiceImpl implements MemberEventService {
 			} else {
 				memberEventRepository.saveAll(listJoinEvent);
 				attendanceEventRepository.saveAll(attendancesEvent);
-				responseMessage.setData(listJoinEvent);
+				List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
+				for (MemberEvent memberEvent : listJoinEvent) {
+					MemberEventDto memberEventDto = new MemberEventDto();
+					memberEventDto.setId(memberEvent.getId());
+					memberEventDto.setUserName(memberEvent.getUser().getName());
+					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
+					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
+					memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
+					RoleEventDto roleEventDto = new RoleEventDto();
+					roleEventDto.setId(memberEvent.getRoleEvent().getId());
+					roleEventDto.setName(memberEvent.getRoleEvent().getName());
+					memberEventDto.setRoleEventDto(roleEventDto);
+					memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
+					memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
+					memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
+					memberEventDto.setAmountPerRegisterActual(memberEvent.getEvent().getAmountPerRegisterActual());
+					membersEventDto.add(memberEventDto);
+				}
+				responseMessage.setData(membersEventDto);
 				responseMessage.setMessage("Thêm thành viên thành công");
 			}
 		} catch (Exception e) {

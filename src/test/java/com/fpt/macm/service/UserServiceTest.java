@@ -604,28 +604,27 @@ public class UserServiceTest {
 	
 	@Test
 	public void addUserFromExcel() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
-		List<User> users = Arrays.asList(createUser());
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
 		List<Semester> semesters = Arrays.asList(semester());
-		Iterable<User> iterable = users;
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
-		when(userRepository.findAll()).thenReturn(iterable);
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 3);
+		assertEquals(response.getData().size(), 0);
 	}
 	
 	@Test
 	public void addUserFromExcelFail() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut-fail.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut-fail.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut-fail.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut-fail.xlsx")));
 		List<User> users = Arrays.asList(createUser());
 		users.get(0).setStudentId("HE140855");
 		users.get(0).setEmail("toandvhe140855@fpt.edu.vn");
-		Iterable<User> iterable = users;
-		when(userRepository.findAll()).thenReturn(iterable);
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 0);
+		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test

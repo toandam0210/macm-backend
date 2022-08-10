@@ -161,8 +161,7 @@ public class TournamentServiceImpl implements TournamentService {
 			List<RoleEventDto> rolesEventDto = tournamentCreateDto.getRolesEventDto();
 			List<ScheduleDto> listPreview = tournamentCreateDto.getListPreview();
 
-			if (tournament == null || listPreview == null || rolesEventDto == null || listPreview.isEmpty()
-					|| rolesEventDto.isEmpty()) {
+			if (tournament == null || listPreview == null || listPreview.isEmpty()) {
 				responseMessage.setMessage("Không đc null");
 				return responseMessage;
 			}
@@ -175,24 +174,6 @@ public class TournamentServiceImpl implements TournamentService {
 				List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
 				List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
 				List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
-				
-				Double totalAmountEstimate = tournament.getTotalAmountEstimate();
-				Double totalAmountFromClubEstimate = tournament.getTotalAmountFromClubEstimate();
-				Double feeOrganizingCommiteePay = tournament.getFeeOrganizingCommiteePay();
-				Double feePlayerPay = tournament.getFeePlayerPay();
-				
-				if (totalAmountEstimate.equals(null)) {
-					tournament.setTotalAmountEstimate(0);
-				}
-				if (totalAmountFromClubEstimate.equals(null)) {
-					tournament.setTotalAmountFromClubEstimate(0);
-				}
-				if (feeOrganizingCommiteePay.equals(null)) {
-					tournament.setFeeOrganizingCommiteePay(0);
-				}
-				if (feePlayerPay.equals(null)) {
-					tournament.setFeePlayerPay(0);
-				}
 
 				tournament.setSemester(semester.getName());
 				tournament.setStatus(true);
@@ -242,7 +223,8 @@ public class TournamentServiceImpl implements TournamentService {
 						roleEvent.setName(roleEventDto.getName());
 						roleEventRepository.save(roleEvent);
 
-						RoleEvent newRoleEvent = roleEventRepository.findByName(roleEvent.getName()).get();
+						List<RoleEvent> roleEvents = roleEventRepository.findAll(Sort.by("id").descending());
+						RoleEvent newRoleEvent = roleEvents.get(0);
 
 						TournamentRole tournamentRole = new TournamentRole();
 						tournamentRole.setTournament(newTournament);
@@ -503,7 +485,7 @@ public class TournamentServiceImpl implements TournamentService {
 			if (tournamentOp.isPresent()) {
 				Tournament tournament = tournamentOp.get();
 				LocalDate startDate = getStartDate(tournamentId);
-				if (startDate == null || startDate.isAfter(LocalDate.now())) {
+				if (startDate == null || LocalDate.now().isBefore(startDate)) {
 					List<TournamentSchedule> tournamentSchedules = tournamentScheduleRepository
 							.findByTournamentId(tournamentId);
 					if (!tournamentSchedules.isEmpty()) {
@@ -516,13 +498,13 @@ public class TournamentServiceImpl implements TournamentService {
 					}
 					tournament.setStatus(false);
 					tournamentRepository.save(tournament);
-					
+
 					notificationService.createTournamentDeleteNotification(tournament.getId(), tournament.getName());
-					
+
 					responseMessage.setData(Arrays.asList(tournament));
 					responseMessage.setMessage(Constant.MSG_102);
 				} else {
-					responseMessage.setMessage("Không thể xóa giải đấu này vì chỉ còn 1 ngày nữa là giải đấu bắt đầu");
+					responseMessage.setMessage("Không thể xóa vì giải đấu đã bắt đầu");
 				}
 			} else {
 				responseMessage.setMessage("Không có giải đấu này");
@@ -1265,7 +1247,7 @@ public class TournamentServiceImpl implements TournamentService {
 
 				if (!tournamentPlayerOp.isPresent()) {
 					createTournamentPlayer(tournament, user);
-					tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(user.getId(),
+					tournamentPlayerOp = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(user.getId(),
 							tournament.getId());
 				}
 
@@ -1605,7 +1587,8 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	@Override
-	public ResponseMessage addListTournamentOrganizingCommittee(String studentId, List<UserTournamentOrganizingCommitteeDto> users, int tournamentId) {
+	public ResponseMessage addListTournamentOrganizingCommittee(String studentId,
+			List<UserTournamentOrganizingCommitteeDto> users, int tournamentId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			User user = userRepository.findByStudentId(studentId).get();
@@ -1676,7 +1659,8 @@ public class TournamentServiceImpl implements TournamentService {
 	public ResponseMessage deleteTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository.findById(tournamentOrganizingCommitteeId);
+			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
+					.findById(tournamentOrganizingCommitteeId);
 			if (tournamentOrganizingCommitteeOp.isPresent()) {
 				TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
 				if (!tournamentOrganizingCommittee.isPaymentStatus()) {
