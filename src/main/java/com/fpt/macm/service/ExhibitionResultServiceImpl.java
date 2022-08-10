@@ -248,7 +248,7 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 					@Override
 					public int compare(ExhibitionTeamDto o1, ExhibitionTeamDto o2) {
 						// TODO Auto-generated method stub
-						return o1.getScore() - o2.getScore() > 0? 1 : (o1.getScore() - o2.getScore() < 0? -1 : 0);
+						return o1.getScore() - o2.getScore() < 0? 1 : (o1.getScore() - o2.getScore() > 0? -1 : 0);
 					}
 				});
 				exhibitionResultByTypeDto.setListResult(listResult);
