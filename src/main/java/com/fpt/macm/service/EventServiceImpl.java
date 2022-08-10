@@ -105,8 +105,7 @@ public class EventServiceImpl implements EventService {
 			List<ScheduleDto> listPreview = eventCreateDto.getListPreview();
 			List<RoleEventDto> rolesEventDto = eventCreateDto.getRolesEventDto();
 
-			if (event == null || listPreview == null || rolesEventDto == null || listPreview.isEmpty()
-					|| rolesEventDto.isEmpty()) {
+			if (event == null || listPreview == null || listPreview.isEmpty()) {
 				responseMessage.setMessage("Không đc null");
 				return responseMessage;
 			}
