@@ -31,6 +31,7 @@ import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteePaymentStatusReportDto;
 import com.fpt.macm.model.dto.TournamentPlayerDto;
 import com.fpt.macm.model.dto.TournamentPlayerPaymentStatusReportDto;
+import com.fpt.macm.model.dto.TournamentResultDto;
 import com.fpt.macm.model.dto.UserTournamentDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
@@ -152,9 +153,15 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	CommonScheduleRepository commonScheduleRepository;
-	
+
 	@Autowired
 	CompetitiveMatchService competitiveMatchService;
+
+	@Autowired
+	CompetitiveResultService competitiveResultService;
+
+	@Autowired
+	ExhibitionResultService exhibitionResultService;
 
 	@Override
 	public ResponseMessage createTournament(TournamentCreateDto tournamentCreateDto, boolean isOverwritten) {
@@ -1680,6 +1687,40 @@ public class TournamentServiceImpl implements TournamentService {
 				responseMessage.setMessage("Không có thành viên này");
 			}
 		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getResultOfTournament(int tournamentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> getTournamentOp = tournamentRepository.findById(tournamentId);
+			if (getTournamentOp.isPresent()) {
+				Tournament getTournament = getTournamentOp.get();
+				TournamentResultDto tournamentResultDto = new TournamentResultDto();
+				Set<CompetitiveType> getCompetitiveTypes = getTournament.getCompetitiveTypes();
+				List<ResponseMessage> listCompetitiveResult = new ArrayList<ResponseMessage>();
+				for (CompetitiveType competitiveType : getCompetitiveTypes) {
+					listCompetitiveResult.add(competitiveResultService.getResultByType(competitiveType.getId()));
+				}
+				Set<ExhibitionType> getExhibitionTypes = getTournament.getExhibitionTypes();
+				List<ResponseMessage> listExhibitionResult = new ArrayList<ResponseMessage>();
+				for (ExhibitionType exhibitionType : getExhibitionTypes) {
+					listExhibitionResult.add(exhibitionResultService.getExhibitionResultByType(exhibitionType.getId()));
+				}
+				tournamentResultDto.setListCompetitiveResult(listCompetitiveResult);
+				tournamentResultDto.setListExhibitionResult(listExhibitionResult);
+				responseMessage.setData(Arrays.asList(tournamentResultDto));
+				responseMessage.setMessage("Kết quả giải đấu");
+			}
+			else {
+				responseMessage.setMessage("Không tìm thấy giải đấu");
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
