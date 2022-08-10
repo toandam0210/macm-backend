@@ -245,4 +245,9 @@ public class TournamentController {
 	ResponseEntity<ResponseMessage> deleteTournamentOrganizingCommittee(@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId){
 		return new ResponseEntity<ResponseMessage>(tournamentService.deleteTournamentOrganizingCommittee(tournamentOrganizingCommitteeId), HttpStatus.OK);
 	}
+	
+	@GetMapping("gettournamentresult/{tournamentId}")
+	ResponseEntity<ResponseMessage> getTournamentResult(@PathVariable(name = "tournamentId") int tournamentId){
+		return new ResponseEntity<ResponseMessage>(tournamentService.getResultOfTournament(tournamentId), HttpStatus.OK);
+	}
 }

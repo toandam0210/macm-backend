@@ -70,4 +70,6 @@ public interface TournamentService {
 	ResponseMessage getAllUserNotJoinTournament(int tournamentId);
 	
 	ResponseMessage deleteTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId);
+	
+	ResponseMessage getResultOfTournament(int tournamentId);
 }
