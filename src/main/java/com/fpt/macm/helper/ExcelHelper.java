@@ -153,4 +153,44 @@ public class ExcelHelper {
 		}
 	}
 
+	public static ByteArrayInputStream usersToExcelWithErrorMessage(List<UserDto> users) {
+		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
+			Sheet sheet = workbook.createSheet(SHEET);
+			Row headerRow = sheet.createRow(0);
+			for (int col = 0; col < HEADERs.length; col++) {
+				Cell cell = headerRow.createCell(col);
+				cell.setCellValue(HEADERs[col]);
+			}
+			int rowIdx = 1;
+			for (UserDto user : users) {
+				Row row = sheet.createRow(rowIdx++);
+
+				row.createCell(0).setCellValue(user.getStudentId());
+				row.createCell(1).setCellValue(user.getName());
+				row.createCell(2).setCellValue(user.getDateOfBirth().toString());
+				row.createCell(3).setCellValue(user.getPhone());
+				row.createCell(4).setCellValue(user.getEmail());
+				
+				if(user.isGender()) {
+					row.createCell(5).setCellValue("Nam");
+				}else {
+					row.createCell(5).setCellValue("Nữ");
+				}
+				if(user.isActive()) {
+					row.createCell(6).setCellValue("Hoạt động");
+				}else {
+					row.createCell(6).setCellValue("Không hoạt động");
+				}
+				row.createCell(7).setCellValue(user.getRoleName());
+				row.createCell(8).setCellValue(user.getCurrentAddress());
+				row.createCell(9).setCellValue(user.getGeneration());
+				row.createCell(10).setCellValue(user.getMessageError());
+			}
+			workbook.write(out);
+			return new ByteArrayInputStream(out.toByteArray());
+		} catch (Exception e) {
+			throw new RuntimeException("fail to import data to Excel file: " + e.getMessage());
+		}
+	}
+	
 }

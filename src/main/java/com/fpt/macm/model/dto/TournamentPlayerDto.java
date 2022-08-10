@@ -1,6 +1,6 @@
 package com.fpt.macm.model.dto;
 
-public class TournamentPlayerDto {
+public class TournamentPlayerDto implements Comparable<TournamentPlayerDto>{
 
 	private int id;
 	private String userName;
@@ -37,6 +37,11 @@ public class TournamentPlayerDto {
 
 	public void setPaymentStatus(boolean paymentStatus) {
 		this.paymentStatus = paymentStatus;
+	}
+
+	@Override
+	public int compareTo(TournamentPlayerDto o) {
+		return o.getId() - this.getId();
 	}
 
 }

@@ -234,6 +234,15 @@ public class UserServiceImpl implements UserService {
 							memberSemester.setUser(user);
 							memberSemesterRepository.save(memberSemester);
 						}
+					}else {
+						if(memberSemesterOp.isPresent()) {
+							memberSemesterRepository.delete(memberSemesterOp.get());
+							AdminSemester adminSemester = new AdminSemester();
+							adminSemester.setUser(user);
+							adminSemester.setRole(roleOptional.get());
+							adminSemester.setSemester(semester.getName());
+							adminSemesterRepository.save(adminSemester);
+						}
 					}
 
 				} else {
@@ -582,9 +591,16 @@ public class UserServiceImpl implements UserService {
 			throw new RuntimeException("fail to store excel data: " + e.getMessage());
 		}
 	}
-
+	
+	@Override
 	public ByteArrayInputStream exportUsersToExcel(List<UserDto> users) {
 		ByteArrayInputStream in = ExcelHelper.usersToExcel(users);
+		return in;
+	}
+	
+	@Override
+	public ByteArrayInputStream exportUsersToExcelWithError(List<UserDto> users) {
+		ByteArrayInputStream in = ExcelHelper.usersToExcelWithErrorMessage(users);
 		return in;
 	}
 
@@ -915,8 +931,8 @@ public class UserServiceImpl implements UserService {
 						MemberEvent memberEvent = memberEventOp.get();
 						if (memberEvent.isRegisterStatus()) {
 							Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
-									.findByEventIdAndMemberEventId(eventSchedule.getEvent().getId(),
-											memberEvent.getId());
+									.findByEventIdAndUserId(eventSchedule.getEvent().getId(),
+											user.getId());
 							if (attendanceEventOp.isPresent()) {
 								AttendanceEvent attendanceEvent = attendanceEventOp.get();
 								UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();

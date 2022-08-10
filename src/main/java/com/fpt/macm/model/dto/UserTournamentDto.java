@@ -8,7 +8,6 @@ public class UserTournamentDto implements Comparable<UserTournamentDto> {
 	private int id;
 	private String name;
 	private String description;
-	private int maxQuantityComitee;
 	private double feeOrganizingCommiteePay;
 	private int status;
 	private LocalDate startDate;
@@ -43,14 +42,6 @@ public class UserTournamentDto implements Comparable<UserTournamentDto> {
 
 	public void setDescription(String description) {
 		this.description = description;
-	}
-
-	public int getMaxQuantityComitee() {
-		return maxQuantityComitee;
-	}
-
-	public void setMaxQuantityComitee(int maxQuantityComitee) {
-		this.maxQuantityComitee = maxQuantityComitee;
 	}
 
 	public double getFeeOrganizingCommiteePay() {

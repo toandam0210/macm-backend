@@ -36,11 +36,9 @@ public class MemberEventController {
 
 	@GetMapping("/headculture/getallmembercanceljoinevent/{eventId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> getAllMemberCancelJoinEvent(@PathVariable(name = "eventId") int eventId,
-			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
-			@RequestParam(defaultValue = "id") String sortBy) {
-		return new ResponseEntity<ResponseMessage>(
-				memberEventService.getAllMemberCancelJoinEvent(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllMemberCancelJoinEvent(@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.getAllMemberCancelJoinEvent(eventId),
+				HttpStatus.OK);
 	}
 
 	@PutMapping("/treasurer/updatemembereventpaymentstatus/{memberEventId}")
@@ -53,11 +51,9 @@ public class MemberEventController {
 
 	@GetMapping("treasurer/getreportpaymentstatus/{eventId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> getReportPaymentStatus(@PathVariable(name = "eventId") int eventId,
-			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize,
-			@RequestParam(defaultValue = "id") String sortBy) {
-		return new ResponseEntity<ResponseMessage>(
-				memberEventService.getReportPaymentStatusByEventId(eventId, pageNo, pageSize, sortBy), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getReportPaymentStatus(@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.getReportPaymentStatusByEventId(eventId),
+				HttpStatus.OK);
 	}
 
 	@GetMapping("/headculture/getmemberjoinevent/{eventId}")
@@ -75,10 +71,22 @@ public class MemberEventController {
 				HttpStatus.OK);
 	}
 
-	@GetMapping("/headculture/getallroleevent")
+	@GetMapping("/getallrolebyeventid/{eventId}")
+	ResponseEntity<ResponseMessage> getAllRoleByEventId(@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.getAllRoleByEventId(eventId), HttpStatus.OK);
+	}
+
+	@GetMapping("/headculture/getallsuggestionrole")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> getAllRoleEvent() {
-		return new ResponseEntity<ResponseMessage>(memberEventService.getAllEventRole(), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAllSuggestionRole() {
+		return new ResponseEntity<ResponseMessage>(memberEventService.getAllSuggestionRole(), HttpStatus.OK);
+	}
+
+	@GetMapping("/getallorganizingcommitteerolebyeventid/{eventId}")
+	ResponseEntity<ResponseMessage> getAllOrganizingCommitteeRoleByEventId(
+			@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.getAllOrganizingCommitteeRoleByEventId(eventId),
+				HttpStatus.OK);
 	}
 
 	@GetMapping("/headculture/getlistmembernotjoin/{eventId}")
@@ -117,10 +125,9 @@ public class MemberEventController {
 		return new ResponseEntity<ResponseMessage>(memberEventService.cancelToJoinEvent(eventId, studentId),
 				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/getalleventbystudentid/{studentId}")
 	ResponseEntity<ResponseMessage> getAllEventByStudentId(@PathVariable(name = "studentId") String studentId) {
-		return new ResponseEntity<ResponseMessage>(
-				memberEventService.getAllEventByStudentId(studentId), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(memberEventService.getAllEventByStudentId(studentId), HttpStatus.OK);
 	}
 }

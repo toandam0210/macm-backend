@@ -604,28 +604,27 @@ public class UserServiceTest {
 	
 	@Test
 	public void addUserFromExcel() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
-		List<User> users = Arrays.asList(createUser());
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
 		List<Semester> semesters = Arrays.asList(semester());
-		Iterable<User> iterable = users;
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
-		when(userRepository.findAll()).thenReturn(iterable);
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 3);
+		assertEquals(response.getData().size(), 0);
 	}
 	
 	@Test
 	public void addUserFromExcelFail() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut-fail.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut-fail.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut-fail.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut-fail.xlsx")));
 		List<User> users = Arrays.asList(createUser());
 		users.get(0).setStudentId("HE140855");
 		users.get(0).setEmail("toandvhe140855@fpt.edu.vn");
-		Iterable<User> iterable = users;
-		when(userRepository.findAll()).thenReturn(iterable);
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 0);
+		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
@@ -871,6 +870,13 @@ public class UserServiceTest {
 	}
 	
 	@Test
+	public void testGetAllActiveMemberAndCollaboratorCaseUserEmpty() {
+		when(userRepository.findActiveMembersAndCollaborators()).thenReturn(new ArrayList<User>());
+		ResponseMessage response = userService.getAllActiveMemberAndCollaborator();
+		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
 	public void testGetAllActiveMemberAndCollaboratorFail() {
 		when(userRepository.findActiveMembersAndCollaborators()).thenReturn(null);
 		ResponseMessage response = userService.getAllActiveMemberAndCollaborator();
@@ -884,7 +890,7 @@ public class UserServiceTest {
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(),anyInt())).thenReturn(attendanceStatus());
 		when(eventScheduleRepository.findAll()).thenReturn(Arrays.asList(eventSchedule()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(),anyInt())).thenReturn(Optional.of(memberEvent()));
-		when(attendanceEventRepository.findByEventIdAndMemberEventId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
+		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
 		when(tournamentScheduleRepository.findAll()).thenReturn(Arrays.asList(tournamentSchedule()));
 		ResponseMessage response = userService.getAllUserAttendanceStatus("HE140855");
 		assertEquals(response.getData().size(), 3);
@@ -898,7 +904,7 @@ public class UserServiceTest {
 		when(trainingScheduleRepository.findAll()).thenReturn(Arrays.asList(trainingSchedule));
 		when(eventScheduleRepository.findAll()).thenReturn(Arrays.asList(eventSchedule()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(),anyInt())).thenReturn(Optional.of(memberEvent()));
-		when(attendanceEventRepository.findByEventIdAndMemberEventId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
+		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
 		when(tournamentScheduleRepository.findAll()).thenReturn(Arrays.asList(tournamentSchedule()));
 		ResponseMessage response = userService.getAllUserAttendanceStatus("HE140855");
 		assertEquals(response.getData().size(), 3);
@@ -911,7 +917,7 @@ public class UserServiceTest {
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(),anyInt())).thenReturn(null);
 		when(eventScheduleRepository.findAll()).thenReturn(Arrays.asList(eventSchedule()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(),anyInt())).thenReturn(Optional.of(memberEvent()));
-		when(attendanceEventRepository.findByEventIdAndMemberEventId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
+		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(),anyInt())).thenReturn(Optional.of(attendanceEvent()));
 		when(tournamentScheduleRepository.findAll()).thenReturn(Arrays.asList(tournamentSchedule()));
 		ResponseMessage response = userService.getAllUserAttendanceStatus("HE140855");
 		assertEquals(response.getData().size(), 3);

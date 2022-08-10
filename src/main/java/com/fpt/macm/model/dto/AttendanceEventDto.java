@@ -2,8 +2,10 @@ package com.fpt.macm.model.dto;
 
 import java.time.LocalDate;
 
-public class AttendanceEventDto {
+public class AttendanceEventDto implements Comparable<AttendanceEventDto>{
 
+	private int id;
+	private int eventId;
 	private String eventName;
 	private String name;
 	private String studentId;
@@ -48,6 +50,28 @@ public class AttendanceEventDto {
 
 	public void setDate(LocalDate date) {
 		this.date = date;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getEventId() {
+		return eventId;
+	}
+
+	public void setEventId(int eventId) {
+		this.eventId = eventId;
+	}
+
+	@Override
+	public int compareTo(AttendanceEventDto o) {
+		// TODO Auto-generated method stub
+		return this.getId() - o.getId();
 	}
 
 }

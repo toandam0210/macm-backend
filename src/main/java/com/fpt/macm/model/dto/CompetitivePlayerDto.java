@@ -1,6 +1,6 @@
 package com.fpt.macm.model.dto;
 
-public class CompetitivePlayerDto {
+public class CompetitivePlayerDto implements Comparable<CompetitivePlayerDto>{
 
 	private int id;
 	private String playerName;
@@ -73,6 +73,11 @@ public class CompetitivePlayerDto {
 
 	public void setCompetitiveTypeId(int competitiveTypeId) {
 		this.competitiveTypeId = competitiveTypeId;
+	}
+
+	@Override
+	public int compareTo(CompetitivePlayerDto o) {
+		return o.getId() - this.getId();
 	}
 
 }

@@ -1,30 +1,29 @@
 package com.fpt.macm.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fpt.macm.model.dto.ActiveUserDto;
+import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
-import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.response.ResponseMessage;
 
 public interface TournamentService {
 
+	ResponseMessage createTournament(TournamentCreateDto tournamentCreateDto, boolean isOverwritten);
+	
 	ResponseMessage getAllTournamentOrganizingCommitteeByTournamentId(int tournamentId);
 
 	ResponseMessage updateTournamentOrganizingCommitteeRole(
 			List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto);
 
-	ResponseMessage createTournament(Tournament tournament);
+	ResponseMessage updateTournament(int tournamentId, TournamentDto tournamentDto);
 
-	ResponseMessage updateTournament(int id, TournamentDto tournamentDto);
+	ResponseMessage deleteTournamentById(int tournamentId);
 
-	ResponseMessage deleteTournamentById(int id);
-
-	ResponseMessage getTournamentById(int id);
+	ResponseMessage getTournamentById(int tournamentId);
 
 	ResponseMessage getAllTournamentBySemester(String semester, int status);
 
@@ -32,13 +31,9 @@ public interface TournamentService {
 
 	ResponseMessage getAllExhibitionTeam(int tournamentId, int exhibitionTypeId);
 	
-	ResponseMessage getAllOrganizingCommitteeRole();
+	ResponseMessage getAllOrganizingCommitteeRoleByTournamentId(int tournamentId);
 	
 	ResponseMessage getAllExhibitionType(int tournamentId);
-	
-	ResponseMessage acceptRequestOrganizingCommittee(int tournamentOrganizingCommitteeId);
-	
-	ResponseMessage declineRequestOrganizingCommittee(int tournamentOrganizingCommitteeId);
 	
 	ResponseMessage getAllTournamentPlayerPaymentStatus(int tournamentId);
 	
@@ -58,8 +53,6 @@ public interface TournamentService {
 	
 	ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight, int competitiveTypeId);
 	
-	List<Tournament> listTournamentsByRegistrationPlayerDeadline(LocalDateTime playerDeadline);
-	
 	ResponseMessage registerToJoinTournamentExhibitionType(int tournamentId, String studentId, int exhibitionTypeId, String teamName, List<ActiveUserDto> activeUsersDto);
 
 	ResponseMessage getAllUserCompetitivePlayer(int tournamentId, String studentId);
@@ -70,9 +63,13 @@ public interface TournamentService {
 	
 	LocalDate getStartDate(int tournamentId);
 	
+	LocalDate getEndDate(int tournamentId);
+	
 	ResponseMessage getAllTournamentByStudentId(String studentId, String semester, int status);
 	
 	ResponseMessage addListTournamentOrganizingCommittee(String studentId, List<UserTournamentOrganizingCommitteeDto> users, int tournamentId);
 	
 	ResponseMessage getAllUserNotJoinTournament(int tournamentId);
+	
+	ResponseMessage deleteTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId);
 }

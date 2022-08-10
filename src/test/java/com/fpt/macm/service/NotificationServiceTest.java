@@ -170,12 +170,12 @@ public class NotificationServiceTest {
 		event.setAmountFromClub(0);
 		event.setAmountPerRegisterActual(0);
 		event.setAmountPerRegisterEstimated(50000);
-		event.setMaxQuantityComitee(12);
 		event.setSemester(semester().getName());
 		event.setTotalAmountActual(0);
 		event.setTotalAmountEstimated(100000);
 		event.setRegistrationMemberDeadline(LocalDateTime.of(2022, 10, 30, 0, 0));
 		event.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 10, 30, 0, 0));
+		event.setStatus(true);
 		return event;
 	}
 	
@@ -187,12 +187,11 @@ public class NotificationServiceTest {
 		tournament.setFeeOrganizingCommiteePay(100000);
 		tournament.setFeePlayerPay(100000);
 		tournament.setId(1);
-		tournament.setMaxQuantityComitee(10);
 		tournament.setName("FNC");
 		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setSemester("Summer2022");
-	//	tournament.setStatus(1);
+		tournament.setStatus(true);
 		tournament.setTournamentPlayers(tournamentPlayers());
 		return tournament;
 	}
@@ -262,7 +261,6 @@ public class NotificationServiceTest {
 		TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
 		tournamentOrganizingCommittee.setId(1);
 		tournamentOrganizingCommittee.setPaymentStatus(false);
-		tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 		RoleEvent roleEvent = new RoleEvent();
 		roleEvent.setId(1);
 		roleEvent.setName("Ban truyen thong");
@@ -631,7 +629,7 @@ public class NotificationServiceTest {
 		when(notificationRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(notification()));
 		when(userRepository.findAll()).thenReturn(Arrays.asList(user()));
 		
-		ResponseMessage responseMessage = notificationService.createTournamentNotification(1, "FNC");
+		ResponseMessage responseMessage = notificationService.createTournamentCreateNotification(1, "FNC");
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -639,7 +637,7 @@ public class NotificationServiceTest {
 	public void createTournamentNotificationCaseException() {
 		when(notificationRepository.findAll(any(Sort.class))).thenReturn(null);
 		
-		ResponseMessage responseMessage = notificationService.createTournamentNotification(1, "FNC");
+		ResponseMessage responseMessage = notificationService.createTournamentCreateNotification(1, "FNC");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
@@ -648,7 +646,7 @@ public class NotificationServiceTest {
 		when(notificationRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(notification()));
 		when(userRepository.findAll()).thenReturn(Arrays.asList(user()));
 		
-		ResponseMessage responseMessage = notificationService.createEventNotification(1, "Test");
+		ResponseMessage responseMessage = notificationService.createEventCreateNotification(1, "Test");
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -656,7 +654,7 @@ public class NotificationServiceTest {
 	public void createEventNotificationCaseException() {
 		when(notificationRepository.findAll(any(Sort.class))).thenReturn(null);
 		
-		ResponseMessage responseMessage = notificationService.createEventNotification(1, "Test");
+		ResponseMessage responseMessage = notificationService.createEventCreateNotification(1, "Test");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
