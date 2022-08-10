@@ -288,7 +288,7 @@ public class CompetititveMatchServiceTest {
 		when(userRepository.getByStudentId(anyString())).thenReturn(createUser());
 		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		ResponseMessage response = competitiveMatchService.listMatchs(1);
-		assertEquals(response.getData().size(), 4);
+		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
@@ -315,7 +315,7 @@ public class CompetititveMatchServiceTest {
 		when(userRepository.getByStudentId(anyString())).thenReturn(createUser());
 		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		ResponseMessage response = competitiveMatchService.listMatchs(1);
-		assertEquals(response.getData().size(), 4);
+		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
@@ -518,6 +518,151 @@ public class CompetititveMatchServiceTest {
 		when(competitiveMatchRepository.findById(anyInt())).thenReturn(null);
 		ResponseMessage response = competitiveMatchService.updateListMatchsPlayer(Arrays.asList(competitiveMatchDto()));
 		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
+	public void testSpawnMatchsAutoCaseNotEnoughPlyer() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		competitiveType.setStatus(1);
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
+		competitiveMatchService.autoSpawnMatchs(1);
+		
+	}
+	
+	@Test
+	public void testSpawnMatchsAutoCaseNotEnoughPlyerAndDelete() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatchs.add(competitiveMatch);
+		CompetitiveMatch competitiveMatch1 = competitiveMatch();
+		competitiveMatch1.setId(2);
+		competitiveMatchs.add(competitiveMatch1);
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(3);
+		competitiveMatchs.add(competitiveMatch2);
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(4);
+		competitiveMatchs.add(competitiveMatch3);
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		competitiveType.setStatus(1);
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		competitiveMatchService.autoSpawnMatchs(1);
+	}
+	
+	@Test
+	public void testSpawnMatchsAutoCaseEnoughPlyer() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		competitiveType.setStatus(1);
+		List<CompetitivePlayer> competitivePlayers = new ArrayList<CompetitivePlayer>();
+		CompetitivePlayer competitivePlayer = competitivePlayer();
+		competitivePlayer.setId(1);
+		competitivePlayers.add(competitivePlayer);
+		CompetitivePlayer competitivePlayer2 = competitivePlayer();
+		competitivePlayer.setId(2);
+		competitivePlayers.add(competitivePlayer2);
+		CompetitivePlayer competitivePlayer3 = competitivePlayer();
+		competitivePlayer.setId(3);
+		competitivePlayers.add(competitivePlayer3);
+		CompetitivePlayer competitivePlayer4 = competitivePlayer();
+		competitivePlayer.setId(4);
+		competitivePlayers.add(competitivePlayer4);
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatchs.add(competitiveMatch);
+		CompetitiveMatch competitiveMatch1 = competitiveMatch();
+		competitiveMatch1.setId(2);
+		competitiveMatchs.add(competitiveMatch1);
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(3);
+		competitiveMatchs.add(competitiveMatch2);
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(4);
+		competitiveMatchs.add(competitiveMatch3);
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(competitivePlayers);
+		when(competitiveMatchRepository.listMatchsByTypeDesc(anyInt())).thenReturn(competitiveMatchs);
+		when(competitiveMatchRepository.listMatchsByTypeAsc(anyInt())).thenReturn(competitiveMatchs);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		competitiveMatchService.autoSpawnMatchs(1);
+	}
+	
+	@Test
+	public void testSpawnMatchsAutoCaseEnoughPlyer2() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		competitiveType.setStatus(1);
+		List<CompetitivePlayer> competitivePlayers = new ArrayList<CompetitivePlayer>();
+		CompetitivePlayer competitivePlayer = competitivePlayer();
+		competitivePlayer.setId(1);
+		competitivePlayers.add(competitivePlayer);
+		CompetitivePlayer competitivePlayer2 = competitivePlayer();
+		competitivePlayer.setId(2);
+		competitivePlayers.add(competitivePlayer2);
+		CompetitivePlayer competitivePlayer3 = competitivePlayer();
+		competitivePlayer.setId(3);
+		competitivePlayers.add(competitivePlayer3);
+		CompetitivePlayer competitivePlayer4 = competitivePlayer();
+		competitivePlayer.setId(4);
+		competitivePlayers.add(competitivePlayer4);
+		CompetitivePlayer competitivePlayer5 = competitivePlayer();
+		competitivePlayer.setId(5);
+		competitivePlayers.add(competitivePlayer5);
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatchs.add(competitiveMatch);
+		CompetitiveMatch competitiveMatch1 = competitiveMatch();
+		competitiveMatch1.setId(2);
+		competitiveMatchs.add(competitiveMatch1);
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(3);
+		competitiveMatchs.add(competitiveMatch2);
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(4);
+		competitiveMatchs.add(competitiveMatch3);
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(competitivePlayers);
+		when(competitiveMatchRepository.listMatchsByTypeDesc(anyInt())).thenReturn(competitiveMatchs);
+		when(competitiveMatchRepository.listMatchsByTypeAsc(anyInt())).thenReturn(competitiveMatchs);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
+		competitiveMatchService.autoSpawnMatchs(1);
+	}
+	
+	@Test
+	public void testSpawnMatchsAutoCaseStatusEq2() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		competitiveType.setStatus(2);
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
+		competitiveMatchService.autoSpawnMatchs(1);
+	}
+	
+	@Test
+	public void testSpawnMatchsAutoCaseTypeEmpty() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		competitiveType.setStatus(2);
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.empty());
+		competitiveMatchService.autoSpawnMatchs(1);
+	}
+	
+	
+	@Test
+	public void testSpawnMatchsAutoCaseException() {
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(null);
+		competitiveMatchService.autoSpawnMatchs(1);
 	}
 	
 }

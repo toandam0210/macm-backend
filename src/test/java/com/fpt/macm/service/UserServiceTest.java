@@ -362,12 +362,97 @@ public class UserServiceTest {
 	public void testUpdateUser() {
 		List<User> users = Arrays.asList(createUser());
 		Iterable<User> iterable = users;
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		UserDto userDto = createUserDto();
+		userDto.setRoleId(13);
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
 		when(userRepository.findAll()).thenReturn(iterable);
 		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role()));
-		ResponseMessage responseMessage = userService.updateUser("HE140855", createUserDto());
-		assertEquals(responseMessage.getData().size(), 1);
+		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		when(adminSemesterRepository.findByUserId(anyInt(), anyString())).thenReturn(Optional.of(adminSemester()));
+		ResponseMessage result = userService.updateUser("HE140855", createUserDto());
+		assertEquals(result.getData().size(), 1);
 	}
+	
+	@Test
+	public void testUpdateUser2() {
+		List<User> users = Arrays.asList(createUser());
+		Iterable<User> iterable = users;
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		UserDto userDto = createUserDto();
+		userDto.setRoleId(13);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(userRepository.findAll()).thenReturn(iterable);
+		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role()));
+		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		when(memberSemesterRepository.findByUserIdAndSemester(anyInt(), anyString())).thenReturn(Optional.of(memberSemester()));
+		ResponseMessage result = userService.updateUser("HE140855", createUserDto());
+		assertEquals(result.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateUser3() {
+		List<User> users = Arrays.asList(createUser());
+		Iterable<User> iterable = users;
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		UserDto userDto = createUserDto();
+		userDto.setRoleId(13);
+		Role role = role();
+		role.setId(13);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(userRepository.findAll()).thenReturn(iterable);
+		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role));
+		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		when(memberSemesterRepository.findByUserIdAndSemester(anyInt(), anyString())).thenReturn(Optional.of(memberSemester()));
+		ResponseMessage result = userService.updateUser("HE140855", userDto);
+		assertEquals(result.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateUser4() {
+		List<User> users = Arrays.asList(createUser());
+		Iterable<User> iterable = users;
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		UserDto userDto = createUserDto();
+		userDto.setRoleId(10);
+		Role role = role();
+		role.setId(10);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(userRepository.findAll()).thenReturn(iterable);
+		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role));
+		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		when(memberSemesterRepository.findByUserIdAndSemester(anyInt(), anyString())).thenReturn(Optional.empty());
+		ResponseMessage result = userService.updateUser("HE140855", userDto);
+		assertEquals(result.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateUserRoleHeadClub() {
+		List<User> users = Arrays.asList(createUser());
+		Iterable<User> iterable = users;
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		UserDto userDto = createUserDto();
+		userDto.setRoleId(10);
+		Role role = role();
+		role.setId(10);
+		role.setName("ABC");
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(userRepository.findAll()).thenReturn(iterable);
+		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role));
+		ResponseMessage result = userService.updateUser("HE140855", userDto);
+		assertEquals(result.getData().size(), 0);
+	}
+	
 	
 	@Test
 	public void testUpdateUserFail() {
@@ -400,11 +485,19 @@ public class UserServiceTest {
 	}
 	
 	@Test
+	public void testGetAllMemberAndCollaboratorCaseException() {
+		ResponseMessage responseMessage = userService.getAllMemberAndCollaborator(0,-10,"studentId");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
 	public void testAddAnMemberOrCollaborator() {
 		List<User> users = Arrays.asList(createUser());
 		Iterable<User> iterable = users;
 		when(userRepository.findAll()).thenReturn(iterable);
 		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(trainingScheduleRepository.findAllFutureTrainingSchedule(any())).thenReturn(Arrays.asList(trainingSchedule()));
 		ResponseMessage responseMessage = userService.addAnMemberOrCollaborator(createUserDto());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
@@ -421,6 +514,13 @@ public class UserServiceTest {
 	}
 	
 	@Test
+	public void testAddAnMemberOrCollaboratorCaseException() {
+		when(userRepository.findAll()).thenReturn(null);
+		ResponseMessage responseMessage = userService.addAnMemberOrCollaborator(createUserDto());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
 	public void testAddAnMemberOrCollaboratorSuccess2() {
 		List<User> users = Arrays.asList(createUser());
 		List<Semester> semesters = Arrays.asList(semester());
@@ -432,6 +532,8 @@ public class UserServiceTest {
 		when(userRepository.findAll()).thenReturn(iterable);
 		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role()));
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(trainingScheduleRepository.findAllFutureTrainingSchedule(any())).thenReturn(Arrays.asList(trainingSchedule()));
 		ResponseMessage response = userService.addAnMemberOrCollaborator(userDto);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -573,6 +675,20 @@ public class UserServiceTest {
 	public void testUpdateStatusForUser() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
 		when(memberSemesterRepository.findByUserIdAndSemester(anyInt(),anyString())).thenReturn(Optional.of(memberSemester()));
+		when(trainingScheduleRepository.findAllFutureTrainingSchedule(any())).thenReturn(Arrays.asList(trainingSchedule()));
+		ResponseMessage response = userService.updateStatusForUser("HE140855", "Summer2022");
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateStatusForUserDeactive() {
+		User user = createUser();
+		user.setActive(false);
+		MemberSemester memberSemester = memberSemester();
+		memberSemester.setStatus(false);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
+		when(memberSemesterRepository.findByUserIdAndSemester(anyInt(),anyString())).thenReturn(Optional.of(memberSemester));
+		when(trainingScheduleRepository.findAllFutureTrainingSchedule(any())).thenReturn(Arrays.asList(trainingSchedule()));
 		ResponseMessage response = userService.updateStatusForUser("HE140855", "Summer2022");
 		assertEquals(response.getData().size(), 1);
 	}
@@ -583,6 +699,24 @@ public class UserServiceTest {
 		when(memberSemesterRepository.findByUserIdAndSemester(anyInt(),anyString())).thenReturn(null);
 		ResponseMessage response = userService.updateStatusForUser("HE140855", "Summer2022");
 		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateStatusForUserEmpty() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.empty());
+		ResponseMessage response = userService.updateStatusForUser("HE140855", "Summer2022");
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateStatusForUserCaseMemberSemesterEmpty() {
+		User user = createUser();
+		user.setActive(false);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
+		when(memberSemesterRepository.findByUserIdAndSemester(anyInt(),anyString())).thenReturn(Optional.empty());
+		when(trainingScheduleRepository.findAllFutureTrainingSchedule(any())).thenReturn(Arrays.asList(trainingSchedule()));
+		ResponseMessage response = userService.updateStatusForUser("HE140855", "Summer2022");
+		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
@@ -597,25 +731,47 @@ public class UserServiceTest {
 	
 	@Test
 	public void testSearchUserByStudentIdOrNameFail() {
-		when(userRepository.searchByStudentIdOrName(anyString(), any())).thenReturn(null);
-		ResponseMessage response = userService.searchUserByStudentIdOrName("HE140855", 0,5,"studentId");
+		ResponseMessage response = userService.searchUserByStudentIdOrName("HE140855", -1,5,"studentId");
 		assertEquals(response.getData().size(), 0);
 	}
 	
 	@Test
 	public void addUserFromExcel() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
 		List<Semester> semesters = Arrays.asList(semester());
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
 		assertEquals(response.getData().size(), 0);
 	}
 	
 	@Test
+	public void addUserFromExcelDuplicateStudentId() throws IOException {
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
+		assertEquals(response.getData().size(), 3);
+	}
+	
+	@Test
+	public void addUserFromExcelDuplicateEmail() throws IOException {
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
+		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
+		assertEquals(response.getData().size(), 3);
+	}
+	
+	@Test
 	public void addUserFromExcelFail() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut-fail.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut-fail.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut-fail.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut-fail.xlsx")));
 		List<User> users = Arrays.asList(createUser());
 		users.get(0).setStudentId("HE140855");
 		users.get(0).setEmail("toandvhe140855@fpt.edu.vn");
@@ -624,8 +780,9 @@ public class UserServiceTest {
 		responseMessage.setData(semesters);
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 1);
+		assertEquals(response.getData().size(), 0);
 	}
+	
 	
 	@Test
 	public void testFindAllMember() {
@@ -635,6 +792,15 @@ public class UserServiceTest {
 		when(userRepository.findMember(any())).thenReturn(pages);
 		ResponseMessage response = userService.findAllMember(0,5,"studentId");
 		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testFindAllMemberException() {
+		User user = createUser();
+		List<User> users = Arrays.asList(user);
+		Page<User> pages = new PageImpl<User>(users);
+		ResponseMessage response = userService.findAllMember(0,-5,"studentId");
+		assertEquals(response.getData().size(), 0);
 	}
 	
 	@Test
@@ -667,12 +833,29 @@ public class UserServiceTest {
 		List<Semester> semesters = Arrays.asList(semester());
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
+		User user = createUser();
+		user.setActive(false);
 		when(memberSemesterRepository.findBySemesterOrderByIdDesc(anyString())).thenReturn(Arrays.asList(memberSemester()));
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
-		when(userRepository.findCollaborator()).thenReturn(Arrays.asList(createUser()));
-		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(userRepository.findCollaborator()).thenReturn(Arrays.asList(user));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
 		ResponseMessage response = userService.getMembersBySemester("Summer2022");
 		assertEquals(response.getData().size(), 2);
+	}
+	
+	@Test
+	public void testGetMembersBySemesterDiffSemester() {
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		User user = createUser();
+		user.setActive(false);
+		when(memberSemesterRepository.findBySemesterOrderByIdDesc(anyString())).thenReturn(Arrays.asList(memberSemester()));
+		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		when(userRepository.findCollaborator()).thenReturn(Arrays.asList(user));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
+		ResponseMessage response = userService.getMembersBySemester("Spring2022");
+		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
@@ -692,8 +875,9 @@ public class UserServiceTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
 		User user = createUser();
-		user.setActive(false);
-		when(memberSemesterRepository.findBySemesterOrderByIdDesc(anyString())).thenReturn(Arrays.asList(memberSemester()));
+		MemberSemester memberSemester = memberSemester();
+		memberSemester.setStatus(false);
+		when(memberSemesterRepository.findBySemesterOrderByIdDesc(anyString())).thenReturn(Arrays.asList(memberSemester));
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		when(userRepository.findCollaborator()).thenReturn(Arrays.asList(user));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
@@ -815,6 +999,13 @@ public class UserServiceTest {
 		assertEquals(response.getData().size(), 0);
 	}
 	
+	@Test 
+	public void testSearchByMultipleFieldCaseDateToException() {
+		List<UserDto> userDtoResponse = usersDto();
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"","","09/02/2022");
+		assertEquals(response.getData().size(), 0);
+	}
+	
 	@Test
 	public void testGenerateQrCode() {
 		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
@@ -838,6 +1029,14 @@ public class UserServiceTest {
 		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(null);
 		ResponseMessage response = userService.generateQrCode(inforInQrCode());
 		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGenerateQrCodeCaseException() {
+		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
+		when(userRepository.findByStudentId(anyString())).thenReturn(null);
+		ResponseMessage response = userService.generateQrCode(inforInQrCode());
+		assertEquals(response.getData().size(), 0);
 	}
 	
 	@Test
@@ -924,6 +1123,19 @@ public class UserServiceTest {
 	}
 	
 	@Test
+	public void testGetAllUserAttendanceStatusCaseAttendanceEventEmpty() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(trainingScheduleRepository.findAll()).thenReturn(Arrays.asList(trainingSchedule()));
+		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(),anyInt())).thenReturn(null);
+		when(eventScheduleRepository.findAll()).thenReturn(Arrays.asList(eventSchedule()));
+		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(),anyInt())).thenReturn(Optional.of(memberEvent()));
+		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(),anyInt())).thenReturn(Optional.empty());
+		when(tournamentScheduleRepository.findAll()).thenReturn(Arrays.asList(tournamentSchedule()));
+		ResponseMessage response = userService.getAllUserAttendanceStatus("HE140855");
+		assertEquals(response.getData().size(), 3);
+	}
+	
+	@Test
 	public void testGetAllUserAttendanceStatusCaseBeforeEventSchedule() {
 		EventSchedule eventSchedule = eventSchedule();
 		eventSchedule.setDate(LocalDate.now().plusDays(1));
@@ -960,6 +1172,13 @@ public class UserServiceTest {
 		when(tournamentScheduleRepository.findAll()).thenReturn(Arrays.asList(tournamentSchedule()));
 		ResponseMessage response = userService.getAllUserAttendanceStatus("HE140855");
 		assertEquals(response.getData().size(), 3);
+	}
+	
+	@Test
+	public void testGetAllUserAttendanceStatusCaseException() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(null);
+		ResponseMessage response = userService.getAllUserAttendanceStatus("HE140855");
+		assertEquals(response.getData().size(), 0);
 	}
 	
 	

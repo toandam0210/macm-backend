@@ -64,6 +64,14 @@ public class SemesterServiceTest {
 	}
 	
 	@Test
+	public void testGetTop3SemestersCaseException() {
+		when(semesterRepository.findTop3Semester()).thenReturn(null);
+		ResponseMessage responseMessage = semesterService.getTop3Semesters();
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	
+	@Test
 	public void testGetListMonthsBySemesterCaseSummer() {
 		ResponseMessage responseMessage = semesterService.getListMonthsBySemester("Summer");
 		assertEquals(responseMessage.getData().size(), 4);
@@ -86,6 +94,13 @@ public class SemesterServiceTest {
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
 		ResponseMessage responseMessage = semesterService.getListMonthsBySemester("");
 		assertEquals(responseMessage.getData().size(), 4);
+	}
+	
+	@Test
+	public void testGetListMonthsBySemesterCaseException() {
+		when(semesterRepository.findTop3Semester()).thenReturn(null);
+		ResponseMessage responseMessage = semesterService.getListMonthsBySemester("");
+		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 }

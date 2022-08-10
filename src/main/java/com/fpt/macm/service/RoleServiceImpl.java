@@ -18,13 +18,8 @@ public class RoleServiceImpl implements RoleService {
 	@Override
 	public ResponseMessage addListRole(List<Role> roles) {
 		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			roleRepository.saveAll(roles);
-			responseMessage.setData(roles);
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
+		roleRepository.saveAll(roles);
+		responseMessage.setData(roles);
 		return responseMessage;
 	}
 
@@ -48,7 +43,9 @@ public class RoleServiceImpl implements RoleService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<Role> roles = roleRepository.findRoleForViceHead();
-			responseMessage.setData(roles);
+			if (roles.size() > 0) {
+				responseMessage.setData(roles);
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
