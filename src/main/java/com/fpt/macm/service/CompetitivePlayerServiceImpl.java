@@ -10,7 +10,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.fpt.macm.model.dto.CompetitiveMatchByTypeDto;
 import com.fpt.macm.model.dto.CompetitivePlayerByTypeDto;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitiveType;

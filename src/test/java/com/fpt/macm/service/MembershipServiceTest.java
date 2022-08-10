@@ -160,6 +160,13 @@ public class MembershipServiceTest {
 	}
 	
 	@Test
+	public void testUpdateMembershipBySemesterCaseEmpty() {
+		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(Optional.empty());
+		ResponseMessage responseMessage = membershipService.updateMembershipBySemester(150000, "Summer2022");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
 	public void testUpdateMembershipBySemesterCaseException() {
 		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(null);
 		ResponseMessage responseMessage = membershipService.updateMembershipBySemester(150000, "Summer2022");
@@ -171,6 +178,13 @@ public class MembershipServiceTest {
 		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(Optional.of(membershipInfo()));
 		ResponseMessage responseMessage = membershipService.getMembershipInfoBySemester("Summer2022");
 		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGetMembershipInfoBySemesterCaseEmpty() {
+		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(Optional.empty());
+		ResponseMessage responseMessage = membershipService.getMembershipInfoBySemester("Summer2022");
+		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 	@Test
@@ -200,8 +214,13 @@ public class MembershipServiceTest {
 	
 	@Test
 	public void testGetReportMembershipPaymentStatusCaseNull() {
-		when(membershipPaymentStatusReportRepository.findByMembershipInfoId(anyInt(), any())).thenReturn(null);
-		ResponseMessage responseMessage = membershipService.getReportMembershipPaymentStatus(1,0,10,"id");
+		ResponseMessage responseMessage = membershipService.getReportMembershipPaymentStatus(0,0,10,"id");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testGetReportMembershipPaymentStatusCaseException() {
+		ResponseMessage responseMessage = membershipService.getReportMembershipPaymentStatus(0,0,-10,"id");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 }

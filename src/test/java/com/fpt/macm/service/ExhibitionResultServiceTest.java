@@ -389,4 +389,44 @@ public class ExhibitionResultServiceTest {
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
+	@Test
+	public void testGetExhibitionResultByType() {
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
+		ResponseMessage responseMessage = exhibitionResultService.getExhibitionResultByType(1);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGetExhibitionResultByTypeCaseEmpty() {
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.empty());
+		ResponseMessage responseMessage = exhibitionResultService.getExhibitionResultByType(1);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGetExhibitionResultByTypeCaseTypeEmpty() {
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.empty());
+		ResponseMessage responseMessage = exhibitionResultService.getExhibitionResultByType(1);
+		assertEquals(responseMessage.getData().size(),0);
+	}
+	
+	@Test
+	public void testGetExhibitionResultByTypeCaseResultNull() {
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setScore(null);
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult));
+		ResponseMessage responseMessage = exhibitionResultService.getExhibitionResultByType(1);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGetExhibitionResultByTypeCaseException() {
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(null);
+		ResponseMessage responseMessage = exhibitionResultService.getExhibitionResultByType(1);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
 }
