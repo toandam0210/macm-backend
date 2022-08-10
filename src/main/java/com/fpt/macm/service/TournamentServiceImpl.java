@@ -635,6 +635,7 @@ public class TournamentServiceImpl implements TournamentService {
 		return null;
 	}
 
+	@Override
 	public LocalDate getEndDate(int tournamentId) {
 		List<TournamentSchedule> listSchedule = tournamentScheduleRepository.findByTournamentId(tournamentId);
 		if (listSchedule.size() > 0) {
@@ -1304,8 +1305,12 @@ public class TournamentServiceImpl implements TournamentService {
 
 				int countMale = 0;
 				int countFemale = 0;
+				
+				List<User> members = new ArrayList<User>();
+				
 				for (ActiveUserDto activeUserDto : activeUsersDto) {
 					User member = userRepository.findByStudentId(activeUserDto.getStudentId()).get();
+					members.add(member);
 					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
 							.getPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
 					if (tournamentPlayerOp.isPresent()) {
@@ -1331,10 +1336,9 @@ public class TournamentServiceImpl implements TournamentService {
 				}
 
 				Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
-				for (ActiveUserDto activeUserDto : activeUsersDto) {
-					User member = userRepository.findByStudentId(activeUserDto.getStudentId()).get();
+				for (User member : members) {
 					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
-							.getPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
+							.findPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
 					if (!tournamentPlayerOp.isPresent()) {
 						createTournamentPlayer(tournament, member);
 						tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(member.getId(),
@@ -1343,7 +1347,7 @@ public class TournamentServiceImpl implements TournamentService {
 					TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
 					ExhibitionPlayer exhibitionPlayer = new ExhibitionPlayer();
 					exhibitionPlayer.setTournamentPlayer(tournamentPlayer);
-					if (member.getStudentId().equals(user.getStudentId())) {
+					if (member.getStudentId().equals(studentId)) {
 						exhibitionPlayer.setRoleInTeam(true);
 					} else {
 						exhibitionPlayer.setRoleInTeam(false);

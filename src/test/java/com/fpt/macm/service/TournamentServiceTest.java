@@ -24,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 
-import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ActiveUserDto;
 import com.fpt.macm.model.dto.CompetitiveTypeDto;
 import com.fpt.macm.model.dto.ExhibitionTypeDto;
@@ -158,6 +157,9 @@ public class TournamentServiceTest {
 
 	@Mock
 	CommonScheduleRepository commonScheduleRepository;
+
+	@Mock
+	CompetitiveMatchService competitiveMatchService;
 
 	private Set<CompetitiveType> competitiveTypes() {
 		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();
@@ -384,14 +386,12 @@ public class TournamentServiceTest {
 		return exhibitionPlayer;
 	}
 
-	private List<ActiveUserDto> activeUserDtos() {
-		List<ActiveUserDto> activeUserDtos = new ArrayList<ActiveUserDto>();
+	private ActiveUserDto activeUserDto() {
 		ActiveUserDto activeUserDto = new ActiveUserDto();
 		activeUserDto.setGender(true);
-		activeUserDto.setStudentId("HE140140");
-		activeUserDto.setStudentName("toan");
-		activeUserDtos.add(activeUserDto);
-		return activeUserDtos;
+		activeUserDto.setStudentId(user().getStudentId());
+		activeUserDto.setStudentName(user().getName());
+		return activeUserDto;
 
 	}
 
@@ -1625,11 +1625,12 @@ public class TournamentServiceTest {
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
 		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
 				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
-		
-		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(), semester().getName(), 0);
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 0);
 		assertEquals(response.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getAllTournamentByStudentIdCaseJoinPlayer() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
@@ -1637,10 +1638,11 @@ public class TournamentServiceTest {
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
 		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
 				.thenReturn(Optional.empty());
-		when(tournamentPlayerRepository
-								.findPlayerByUserIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.of(tournamentPlayer()));
-		
-		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(), semester().getName(), 0);
+		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentPlayer()));
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 0);
 		assertEquals(response.getData().size(), 1);
 	}
 
@@ -1651,29 +1653,200 @@ public class TournamentServiceTest {
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
 		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
 				.thenReturn(Optional.empty());
-		when(tournamentPlayerRepository
-								.findPlayerByUserIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.empty());
-		
-		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(), semester().getName(), 0);
+		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.empty());
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 0);
 		assertEquals(response.getData().size(), 1);
 	}
-	
-//	@Test
-//	public void getAllTournamentByStudentIdCaseTournamentEnd() {
-//		TournamentSchedule tournamentSchedule = tournamentSchedule();
-//		tournamentSchedule
-//		
-//		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-//		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
-//		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
-//		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
-//				.thenReturn(Optional.empty());
-//		when(tournamentPlayerRepository
-//								.findPlayerByUserIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.empty());
-//		
-//		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(), semester().getName(), 0);
-//		assertEquals(response.getData().size(), 1);
-//	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseTournamentEnd() {
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.now().minusDays(1));
+
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
+				.thenReturn(Optional.empty());
+		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.empty());
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 0);
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseTournamentNotHappened() {
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.now().plusDays(1));
+
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
+				.thenReturn(Optional.empty());
+		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.empty());
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 0);
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseStartDateNull() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
+				.thenReturn(Optional.empty());
+		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.empty());
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 0);
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseTournamentDeleted() {
+		Tournament tournament = tournament();
+		tournament.setStatus(false);
+
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament));
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 0);
+		assertEquals(response.getData().size(), 0);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseSemesterNull() {
+		Tournament tournament = tournament();
+		tournament.setStatus(false);
+		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament));
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(), "", 0);
+		assertEquals(response.getData().size(), 0);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseStatus1() {
+		List<TournamentSchedule> tournamentSchedules = new ArrayList<TournamentSchedule>();
+
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.now().minusDays(2));
+
+		tournamentSchedules.add(tournamentSchedule);
+
+		tournamentSchedule.setDate(LocalDate.now().minusDays(3));
+
+		tournamentSchedules.add(tournamentSchedule);
+
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(tournamentSchedules);
+		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 1);
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseStatus1Empty() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 1);
+		assertEquals(response.getData().size(), 0);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseStatus2() {
+		List<TournamentSchedule> tournamentSchedules = new ArrayList<TournamentSchedule>();
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.now());
+		tournamentSchedules.add(tournamentSchedule);
+		tournamentSchedule.setDate(LocalDate.now());
+		tournamentSchedules.add(tournamentSchedule);
+
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(tournamentSchedules);
+		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 2);
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseStatus2Empty() {
+		List<TournamentSchedule> tournamentSchedules = new ArrayList<TournamentSchedule>();
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.now().minusDays(2));
+		tournamentSchedules.add(tournamentSchedule);
+		tournamentSchedule.setDate(LocalDate.now().plusDays(2));
+		tournamentSchedules.add(tournamentSchedule);
+
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(tournamentSchedules);
+		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 2);
+		assertEquals(response.getData().size(), 0);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseStatus3() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(null);
+		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 3);
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseStatus3Empty() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 3);
+		assertEquals(response.getData().size(), 0);
+	}
+
+	@Test
+	public void getAllTournamentByStudentIdCaseException() {
+		when(userRepository.findByStudentId(anyString())).thenReturn(null);
+
+		ResponseMessage response = tournamentService.getAllTournamentByStudentId(user().getStudentId(),
+				semester().getName(), 3);
+		assertEquals(response.getData().size(), 0);
+	}
 
 	@Test
 	public void testAddListTournamentOrganizingCommittee() {
@@ -1723,10 +1896,190 @@ public class TournamentServiceTest {
 	}
 
 	@Test
+	public void testGetAllUserNotJoinTournamentCaseJoin() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentPlayer()));
+
+		ResponseMessage response = tournamentService.getAllUserNotJoinTournament(1);
+		assertEquals(response.getData().size(), 0);
+	}
+
+	@Test
 	public void testGetAllUserNotJoinTournamentCaseException() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
 		ResponseMessage response = tournamentService.getAllUserNotJoinTournament(1);
 		assertEquals(response.getData().size(), 0);
 	}
 
+	@Test
+	public void deleteTournamentOrganizingCommitteeCaseSuccess() {
+		TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommittee();
+		tournamentOrganizingCommittee.setPaymentStatus(false);
+
+		when(tournamentOrganizingCommitteeRepository.findById(anyInt()))
+				.thenReturn(Optional.of(tournamentOrganizingCommittee));
+
+		ResponseMessage response = tournamentService
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void deleteTournamentOrganizingCommitteeCaseHavePaid() {
+		when(tournamentOrganizingCommitteeRepository.findById(anyInt()))
+				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
+
+		ResponseMessage response = tournamentService
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+		assertEquals(response.getData().size(), 0);
+	}
+
+	@Test
+	public void deleteTournamentOrganizingCommitteeCaseEmpty() {
+		when(tournamentOrganizingCommitteeRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+		ResponseMessage response = tournamentService
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+		assertEquals(response.getData().size(), 0);
+	}
+
+	@Test
+	public void deleteTournamentOrganizingCommitteeCaseException() {
+		when(tournamentOrganizingCommitteeRepository.findById(anyInt())).thenReturn(null);
+
+		ResponseMessage response = tournamentService
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+		assertEquals(response.getData().size(), 0);
+	}
+
+	@Test
+	public void registerToJoinTournamentExhibitionTypeCaseSuccess() {
+		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
+		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.empty());
+		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentPlayer()));
+
+		ResponseMessage response = tournamentService.registerToJoinTournamentExhibitionType(tournament().getId(),
+				user().getStudentId(), 1, "Team 1", Arrays.asList(activeUserDto()));
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void registerToJoinTournamentExhibitionTypeCaseTournamentPlayerNotNull() {
+		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
+		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentPlayer()));
+		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.empty());
+
+		ResponseMessage response = tournamentService.registerToJoinTournamentExhibitionType(tournament().getId(),
+				user().getStudentId(), 1, "Team 1", Arrays.asList(activeUserDto()));
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void registerToJoinTournamentExhibitionTypeCaseExhibitionPlayerNotNull() {
+		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
+		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentPlayer()));
+		when(exhibitionPlayerRepository.findByTournamentPlayerAndType(anyInt(), anyInt()))
+				.thenReturn(Optional.of(exhibitionPlayer()));
+
+		ResponseMessage response = tournamentService.registerToJoinTournamentExhibitionType(tournament().getId(),
+				user().getStudentId(), 1, "Team 1", Arrays.asList(activeUserDto()));
+		assertEquals(response.getData().size(), 0);
+	}
+
+	@Test
+	public void registerToJoinTournamentExhibitionTypeCaseFemale() {
+		User user = user();
+		user.setGender(false);
+		
+		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
+		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentPlayer()));
+
+		ResponseMessage response = tournamentService.registerToJoinTournamentExhibitionType(tournament().getId(),
+				user().getStudentId(), 1, "Team 1", Arrays.asList(activeUserDto()));
+		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
+	public void registerToJoinTournamentExhibitionTypeCaseOutOfSlot() {
+		List<ActiveUserDto> activeUserDtos = new ArrayList<ActiveUserDto>();
+		activeUserDtos.add(activeUserDto());
+		activeUserDtos.add(activeUserDto());
+		
+		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
+		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentPlayer()));
+
+		ResponseMessage response = tournamentService.registerToJoinTournamentExhibitionType(tournament().getId(),
+				user().getStudentId(), 1, "Team 1", activeUserDtos);
+		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
+	public void registerToJoinTournamentExhibitionTypeCaseRoleFalse() {
+		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
+		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(tournamentPlayer()));
+		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+				.thenReturn(Optional.empty());
+
+		ResponseMessage response = tournamentService.registerToJoinTournamentExhibitionType(tournament().getId(),
+				"HE141122", 1, "Team 1", Arrays.asList(activeUserDto()));
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void registerToJoinTournamentExhibitionTypeCaseOutOfDeadline() {
+		Tournament tournament = tournament();
+		tournament.setRegistrationPlayerDeadline(LocalDateTime.now().minusHours(1));
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+
+		ResponseMessage response = tournamentService.registerToJoinTournamentExhibitionType(tournament().getId(),
+				user().getStudentId(), 1, "Team 1", Arrays.asList(activeUserDto()));
+		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
+	public void registerToJoinTournamentExhibitionTypeCaseException() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(null);
+
+		ResponseMessage response = tournamentService.registerToJoinTournamentExhibitionType(tournament().getId(),
+				user().getStudentId(), 1, "Team 1", Arrays.asList(activeUserDto()));
+		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
+	public void getEndDateNull() {
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(new ArrayList<TournamentSchedule>());
+		
+		LocalDate date = tournamentService.getEndDate(tournament().getId());
+		assertEquals(date, null);
+	}
+	
 }
