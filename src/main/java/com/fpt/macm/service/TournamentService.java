@@ -63,6 +63,8 @@ public interface TournamentService {
 	
 	LocalDate getStartDate(int tournamentId);
 	
+	LocalDate getEndDate(int tournamentId);
+	
 	ResponseMessage getAllTournamentByStudentId(String studentId, String semester, int status);
 	
 	ResponseMessage addListTournamentOrganizingCommittee(String studentId, List<UserTournamentOrganizingCommitteeDto> users, int tournamentId);
