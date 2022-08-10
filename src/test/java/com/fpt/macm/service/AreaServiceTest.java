@@ -40,6 +40,16 @@ public class AreaServiceTest {
 	}
 	
 	@Test
+	public void getAllAreaCaseException() {
+		when(areaRepository.findAll()).thenReturn(null);
+		
+		ResponseMessage responseMessage = areaService.getAllArea();
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	
+	
+	@Test
 	public void addNewAreaCaseSuccess() {
 		ResponseMessage responseMessage = areaService.addNewArea(area());
 		assertEquals(responseMessage.getData().size(), 1);

@@ -36,7 +36,7 @@ public class RoleServiceTest {
 		ResponseMessage responseMessage = roleService.addListRole(Arrays.asList(role()));
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getAllRoleCaseSuccess() {
 		when(roleRepository.findAll()).thenReturn(Arrays.asList(role()));
@@ -59,6 +59,22 @@ public class RoleServiceTest {
 		
 		ResponseMessage responseMessage = roleService.getRoleForViceHeadClub();
 		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getRoleForViceHeadClubCaseFail() {
+		when(roleRepository.findRoleForViceHead()).thenReturn(Arrays.asList());
+		
+		ResponseMessage responseMessage = roleService.getRoleForViceHeadClub();
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getRoleForViceHeadClubCaseException() {
+		when(roleRepository.findRoleForViceHead()).thenReturn(null);
+		
+		ResponseMessage responseMessage = roleService.getRoleForViceHeadClub();
+		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 }

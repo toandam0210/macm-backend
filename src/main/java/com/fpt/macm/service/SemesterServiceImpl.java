@@ -44,9 +44,11 @@ public class SemesterServiceImpl implements SemesterService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<Semester> semesters = semesterRepository.findTop3Semester();
+			if(semesters.size() > 0) {
 			responseMessage.setData(semesters);
 			responseMessage.setMessage("Lấy kì thành công");
 			responseMessage.setTotalResult(semesters.size());
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}

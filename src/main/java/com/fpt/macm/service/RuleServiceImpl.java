@@ -51,16 +51,11 @@ public class RuleServiceImpl implements RuleService{
 	public ResponseMessage addRule(Rule rule) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
-		try {
 			rule.setCreatedBy("toandv");
 			rule.setCreatedOn(LocalDateTime.now());
 			ruleRepository.save(rule);
 			responseMessage.setData(Arrays.asList(rule));
 			responseMessage.setMessage(Constant.MSG_020);
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
 		return responseMessage;
 	}
 
