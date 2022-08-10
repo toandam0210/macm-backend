@@ -11,5 +11,4 @@ public interface CompetitivePlayerService {
 	ResponseMessage deleteCompetitivePlayer (int competitivePlayerId);
 	ResponseMessage listUserNotJoinCompetitive(int tournamentId);
 	ResponseMessage getListPlayer(int competitiveTypeId);
-	
 }
