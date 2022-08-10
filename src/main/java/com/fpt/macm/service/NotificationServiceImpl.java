@@ -154,20 +154,16 @@ public class NotificationServiceImpl implements NotificationService {
 	@Override
 	public ResponseMessage sendNotificationToAnUser(User user, Notification notification) {
 		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			NotificationToUser notificationToUser = new NotificationToUser();
+		NotificationToUser notificationToUser = new NotificationToUser();
 
-			notificationToUser.setNotification(notification);
-			notificationToUser.setUser(user);
-			notificationToUser.setRead(false);
-			notificationToUser.setCreatedOn(LocalDateTime.now());
-			notificationToUserRepository.save(notificationToUser);
+		notificationToUser.setNotification(notification);
+		notificationToUser.setUser(user);
+		notificationToUser.setRead(false);
+		notificationToUser.setCreatedOn(LocalDateTime.now());
+		notificationToUserRepository.save(notificationToUser);
 
-			responseMessage.setData(Arrays.asList(notificationToUser));
-			responseMessage.setMessage("Gửi thông báo đến người dùng thành công");
-		} catch (Exception e) {
-			responseMessage.setMessage(e.getMessage());
-		}
+		responseMessage.setData(Arrays.asList(notificationToUser));
+		responseMessage.setMessage("Gửi thông báo đến người dùng thành công");
 		return responseMessage;
 	}
 
@@ -195,7 +191,7 @@ public class NotificationServiceImpl implements NotificationService {
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
 	public ResponseMessage createTournamentDeleteNotification(int tournamentId, String tournamentName) {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -245,7 +241,7 @@ public class NotificationServiceImpl implements NotificationService {
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
 	public ResponseMessage createEventDeleteNotification(int eventId, String eventName) {
 		ResponseMessage responseMessage = new ResponseMessage();
