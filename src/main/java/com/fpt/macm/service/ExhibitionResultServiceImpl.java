@@ -6,12 +6,16 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.dto.ExhibitionResultByTypeDto;
+import com.fpt.macm.model.dto.ExhibitionTeamDto;
 import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitiveType;
@@ -201,6 +205,56 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 			responseMessage.setData(Arrays.asList(getResult));
 			responseMessage.setMessage(
 					"Cập nhật điểm cho đội " + exhibitionTeamRepository.findById(exhibitionTeamId).get().getTeamName());
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getExhibitionResultByType(int exhibitionTypeId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<ExhibitionType> getTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
+			if(getTypeOp.isPresent()) {
+				ExhibitionResultByTypeDto exhibitionResultByTypeDto = new ExhibitionResultByTypeDto();
+				ExhibitionType getType = getTypeOp.get();
+				exhibitionResultByTypeDto.setExhibitionType(getType);
+				responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
+				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
+				List<ExhibitionTeamDto> listResult = new ArrayList<ExhibitionTeamDto>();
+				for (ExhibitionTeam exhibitionTeam : getTeams) {
+					Optional<ExhibitionResult> exhibitionResultOp = exhibitionResultRepository.findByTeam(exhibitionTeam.getId());
+					if(exhibitionResultOp.isPresent()) {
+						ExhibitionResult exhibitionResult = exhibitionResultOp.get();
+						if(exhibitionResult.getScore() == null) {
+							responseMessage.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa có điểm");
+							return responseMessage;
+						} else {
+							ExhibitionTeamDto exhibitionTeamDto = new ExhibitionTeamDto();
+							exhibitionTeamDto.setTeamName(exhibitionTeam.getTeamName());
+							exhibitionTeamDto.setScore(exhibitionResult.getScore());
+							listResult.add(exhibitionTeamDto);
+						}
+					}
+					else {
+						responseMessage.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa được xếp lịch thi đấu");
+						return responseMessage;
+					}
+				}
+				Collections.sort(listResult, new Comparator<ExhibitionTeamDto>() {
+					@Override
+					public int compare(ExhibitionTeamDto o1, ExhibitionTeamDto o2) {
+						// TODO Auto-generated method stub
+						return o1.getScore() - o2.getScore() < 0? 1 : (o1.getScore() - o2.getScore() > 0? -1 : 0);
+					}
+				});
+				exhibitionResultByTypeDto.setListResult(listResult);
+				responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
+				responseMessage.setMessage("Kết quả thi đấu của nội dung " + getType.getName());
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

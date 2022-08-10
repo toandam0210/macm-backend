@@ -291,4 +291,66 @@ public class AttendanceStatusServiceTest {
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
+	@Test
+	public void getAttendanceTrainingStatisticCaseSuccess() {
+		when(semesterRepository.findByName(anyString())).thenReturn(Optional.of(semester()));
+		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
+		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(attendanceStatus());
+		
+		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName());
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getAttendanceTrainingStatisticCaseStatusEq1() {
+		AttendanceStatus attendanceStatus = attendanceStatus();
+		attendanceStatus.setStatus(1);
+		
+		when(semesterRepository.findByName(anyString())).thenReturn(Optional.of(semester()));
+		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
+		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(attendanceStatus);
+		
+		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName());
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getAttendanceTrainingStatisticCaseAttendanceStatusNull() {
+		AttendanceStatus attendanceStatus = attendanceStatus();
+		attendanceStatus.setStatus(1);
+		
+		when(semesterRepository.findByName(anyString())).thenReturn(Optional.of(semester()));
+		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
+		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(null);
+		
+		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName());
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getAttendanceTrainingStatisticCaseSemesterEmpty() {
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(Arrays.asList(semester()));
+		
+		when(semesterRepository.findByName(anyString())).thenReturn(Optional.empty());
+		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
+		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(null);
+		
+		ResponseMessage response = attendanceStatusService.getAttendanceTrainingStatistic("");
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void getAttendanceTrainingStatisticCaseException() {
+		when(semesterRepository.findByName(anyString())).thenReturn(null);
+		
+		ResponseMessage response = attendanceStatusService.getAttendanceTrainingStatistic("");
+		assertEquals(response.getData().size(), 0);
+	}
+	
 }

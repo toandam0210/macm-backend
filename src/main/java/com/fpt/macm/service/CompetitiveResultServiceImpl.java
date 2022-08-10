@@ -13,6 +13,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.dto.CompetitiveResultByTypeDto;
 import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitiveResult;
@@ -301,41 +302,53 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			CompetitiveType getType = competitiveTypeRepository.findById(competitiveTypeId).get();
-			User getUser = new User();
-			User[] listResult = new User[3];
-			if (getType.getStatus() == 3) {
-				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
-				CompetitiveResult getResult = competitiveResultRepository.findByMatchId(listMatchs.get(1).getId()).get();
-				if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
-					responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
-					return responseMessage;
-				} else {
-					getUser = userRepository.findByStudentId(getResult.getFirstPoint() > getResult.getSecondPoint()
-							? listMatchs.get(0).getFirstStudentId()
-							: listMatchs.get(0).getSecondStudentId()).get();
-					listResult[2] = getUser;
-				}
-				getResult = competitiveResultRepository.findByMatchId(listMatchs.get(0).getId()).get();
-				if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
-					responseMessage.setMessage("Trận chung kết chưa diễn ra");
-					return responseMessage;
-				} else {
-					if(getResult.getFirstPoint() > getResult.getSecondPoint()) {
-						getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
-						listResult[0] = getUser;
-						getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
-						listResult[1] = getUser;
-					}
+			CompetitiveResultByTypeDto competitiveResultByTypeDto = new CompetitiveResultByTypeDto();
+			Optional<CompetitiveType> getTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
+			if(getTypeOp.isPresent()) {
+				CompetitiveType getType = getTypeOp.get();
+				competitiveResultByTypeDto.setCompetitiveType(getType);
+				User getUser = new User();
+				User[] listResult = new User[3];
+				if (getType.getStatus() == 3) {
+					List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
+					CompetitiveResult getResult = competitiveResultRepository.findByMatchId(listMatchs.get(1).getId()).get();
+					if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
+						responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
+					} 
 					else {
-						getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
-						listResult[1] = getUser;
-						getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
-						listResult[0] = getUser;
+						getUser = userRepository.findByStudentId(getResult.getFirstPoint() > getResult.getSecondPoint()
+								? listMatchs.get(0).getFirstStudentId()
+								: listMatchs.get(0).getSecondStudentId()).get();
+						listResult[2] = getUser;
+						getResult = competitiveResultRepository.findByMatchId(listMatchs.get(0).getId()).get();
+						if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
+							responseMessage.setMessage("Trận chung kết chưa diễn ra");
+						} 
+						else {
+							if(getResult.getFirstPoint() > getResult.getSecondPoint()) {
+								getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
+								listResult[0] = getUser;
+								getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
+								listResult[1] = getUser;
+							}
+							else {
+								getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
+								listResult[1] = getUser;
+								getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
+								listResult[0] = getUser;
+							}
+							competitiveResultByTypeDto.setListResult(listResult);
+							responseMessage.setMessage("Kết quả thi đấu ở thể thức " + (getType.isGender()? "Nam: " : "Nữ: ") + getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
+						}
 					}
 				}
-				responseMessage.setData(Arrays.asList(listResult));
-				responseMessage.setMessage("Kết quả thi đấu ở thể thức " + (getType.isGender()? "Nam: " : "Nữ: ") + getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
+				else {
+					responseMessage.setMessage("Chưa tổ chức thi đấu");
+				}
+				responseMessage.setData(Arrays.asList(competitiveResultByTypeDto));
+			}
+			else {
+				responseMessage.setMessage("Không tìm thấy thể thức");
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
