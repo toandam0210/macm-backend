@@ -42,6 +42,8 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 	@Autowired
 	CompetitiveTypeRepository competitiveTypeRepository;
 	
+	@Autowired
+	CompetitiveMatchService competitiveMatchService;
 	
 	@Override
 	public ResponseMessage addNewCompetitivePlayer(List<User> users, int competitiveTypeId) {
@@ -51,46 +53,50 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 			Optional<CompetitiveType> getCompetitiveTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
 			if (getCompetitiveTypeOp.isPresent()) {
 				CompetitiveType getType = getCompetitiveTypeOp.get();
-				int tournamentId = competitiveTypeRepository.findTournamentOfType(competitiveTypeId);
-				Tournament getTounament = tournamentRepository.findById(tournamentId).get();
-				List<String> listUsers = new ArrayList<String>();
-				for (User user : users) {
-					if(user.isGender() == getType.isGender()) {
-						TournamentPlayer getTournamentPlayer = new TournamentPlayer();
-						Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(user.getId(), tournamentId);
-						if(!tournamentPlayerOp.isPresent()) {
-							Set<TournamentPlayer> players = getTounament.getTournamentPlayers();
-							TournamentPlayer newTournamentPlayer = new TournamentPlayer();
-							newTournamentPlayer.setUser(userRepository.findById(user.getId()).get());
-							newTournamentPlayer.setPaymentStatus(false);
-							newTournamentPlayer.setCreatedBy("LinhLHN");
-							newTournamentPlayer.setCreatedOn(LocalDateTime.now());
-							newTournamentPlayer.setUpdatedBy("LinhLHN");
-							newTournamentPlayer.setUpdatedOn(LocalDateTime.now());
-							players.add(newTournamentPlayer);
-							getTounament.setTournamentPlayers(players);
-							tournamentRepository.save(getTounament);
-							getTournamentPlayer = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(user.getId(), tournamentId).get();
-						} else {
-							getTournamentPlayer = tournamentPlayerOp.get();
+				if(getType.getStatus() == 0) {
+					int tournamentId = competitiveTypeRepository.findTournamentOfType(competitiveTypeId);
+					Tournament getTounament = tournamentRepository.findById(tournamentId).get();
+					List<String> listUsers = new ArrayList<String>();
+					for (User user : users) {
+						if(user.isGender() == getType.isGender()) {
+							TournamentPlayer getTournamentPlayer = new TournamentPlayer();
+							Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(user.getId(), tournamentId);
+							if(!tournamentPlayerOp.isPresent()) {
+								Set<TournamentPlayer> players = getTounament.getTournamentPlayers();
+								TournamentPlayer newTournamentPlayer = new TournamentPlayer();
+								newTournamentPlayer.setUser(userRepository.findById(user.getId()).get());
+								newTournamentPlayer.setPaymentStatus(false);
+								newTournamentPlayer.setCreatedBy("LinhLHN");
+								newTournamentPlayer.setCreatedOn(LocalDateTime.now());
+								newTournamentPlayer.setUpdatedBy("LinhLHN");
+								newTournamentPlayer.setUpdatedOn(LocalDateTime.now());
+								players.add(newTournamentPlayer);
+								getTounament.setTournamentPlayers(players);
+								tournamentRepository.save(getTounament);
+								getTournamentPlayer = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(user.getId(), tournamentId).get();
+							} else {
+								getTournamentPlayer = tournamentPlayerOp.get();
+							}
+							CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
+							newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
+							newCompetitivePlayer.setWeight(0);
+							newCompetitivePlayer.setIsEligible(true);
+							newCompetitivePlayer.setCompetitiveType(getType);
+							newCompetitivePlayer.setCreatedBy("LinhLHN");
+							newCompetitivePlayer.setCreatedOn(LocalDateTime.now());
+							newCompetitivePlayer.setUpdatedBy("LinhLHN");
+							newCompetitivePlayer.setUpdatedOn(LocalDateTime.now());
+							competitivePlayerRepository.save(newCompetitivePlayer);
+							listUsers.add(user.getName() + " - " + user.getStudentId());
+							competitiveMatchService.autoSpawnMatchs(competitiveTypeId);
 						}
-						CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
-						newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
-						newCompetitivePlayer.setWeight(0);
-						newCompetitivePlayer.setIsEligible(true);
-						newCompetitivePlayer.setCompetitiveType(getType);
-						newCompetitivePlayer.setCreatedBy("LinhLHN");
-						newCompetitivePlayer.setCreatedOn(LocalDateTime.now());
-						newCompetitivePlayer.setUpdatedBy("LinhLHN");
-						newCompetitivePlayer.setUpdatedOn(LocalDateTime.now());
-						competitivePlayerRepository.save(newCompetitivePlayer);
-						listUsers.add(user.getName() + " - " + user.getStudentId());
-						getType.setChanged(true);
-					}
+					}				
+					responseMessage.setData(listUsers);
+					responseMessage.setMessage("Danh sách đăng ký tham gia thi đấu thể thức " + (getType.isGender()? "Nam: " : "Nữ: ") + getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
 				}
-				competitiveTypeRepository.save(getType);
-				responseMessage.setData(listUsers);
-				responseMessage.setMessage("Danh sách đăng ký tham gia thi đấu thể thức " + (getType.isGender()? "Nam: " : "Nữ: ") + getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
+				else {
+					responseMessage.setMessage("Đã quá thời gian để đăng ký thi đấu");
+				}
 			}
 			else {
 				responseMessage.setMessage("Không tìm thấy thể thức thi đấu");
@@ -120,8 +126,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 					}
 					else {
 						getCompetitivePlayer.setIsEligible(false);
-						getType.setChanged(true);
-						competitiveTypeRepository.save(getType);
+						competitiveMatchService.autoSpawnMatchs(getType.getId());
 					}
 					competitivePlayerRepository.save(getCompetitivePlayer);
 					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
@@ -153,8 +158,7 @@ public class CompetitivePlayerServiceImpl implements CompetitivePlayerService{
 					competitivePlayerRepository.delete(getCompetitivePlayer);
 					responseMessage.setMessage("Xóa tuyển thủ thành công");
 					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
-					getType.setChanged(true);
-					competitiveTypeRepository.save(getType);
+					competitiveMatchService.autoSpawnMatchs(getType.getId());
 				}
 				else {
 					if(getCompetitivePlayer.getIsEligible()) {
