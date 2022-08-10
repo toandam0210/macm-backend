@@ -152,6 +152,9 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	CommonScheduleRepository commonScheduleRepository;
+	
+	@Autowired
+	CompetitiveMatchService competitiveMatchService;
 
 	@Override
 	public ResponseMessage createTournament(TournamentCreateDto tournamentCreateDto, boolean isOverwritten) {
@@ -1283,8 +1286,7 @@ public class TournamentServiceImpl implements TournamentService {
 					competitivePlayerRepository.save(competitivePlayer);
 					responseMessage.setData(Arrays.asList(competitivePlayer));
 					responseMessage.setMessage("Đăng ký thành công");
-					competitiveType.setChanged(true);
-					competitiveTypeRepository.save(competitiveType);
+					competitiveMatchService.autoSpawnMatchs(competitiveTypeId);
 				} else {
 					responseMessage.setMessage("Bạn đã đăng ký vào giải này rồi");
 				}
