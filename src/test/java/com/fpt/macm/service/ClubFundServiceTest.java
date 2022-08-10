@@ -1,6 +1,7 @@
 package com.fpt.macm.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Sort;
 
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.ClubFundReport;
@@ -120,7 +122,7 @@ public class ClubFundServiceTest {
 	
 	@Test
 	public void getClubFundReportCaseSuccess() {
-		when(clubFundReportRepository.findAll()).thenReturn(Arrays.asList(clubFundReport()));
+		when(clubFundReportRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(clubFundReport()));
 		
 		ResponseMessage responseMessage = clubFundService.getClubFundReport();
 		assertEquals(responseMessage.getData().size(), 1);
@@ -128,7 +130,7 @@ public class ClubFundServiceTest {
 	
 	@Test
 	public void getClubFundReportCaseListEmpty() {
-		when(clubFundReportRepository.findAll()).thenReturn(new ArrayList<ClubFundReport>());
+		when(clubFundReportRepository.findAll(any(Sort.class))).thenReturn(new ArrayList<ClubFundReport>());
 		
 		ResponseMessage responseMessage = clubFundService.getClubFundReport();
 		assertEquals(responseMessage.getData().size(), 0);
@@ -136,7 +138,7 @@ public class ClubFundServiceTest {
 	
 	@Test
 	public void getClubFundReportCaseException() {
-		when(clubFundReportRepository.findAll()).thenReturn(null);
+		when(clubFundReportRepository.findAll(any(Sort.class))).thenReturn(null);
 		
 		ResponseMessage responseMessage = clubFundService.getClubFundReport();
 		assertEquals(responseMessage.getData().size(), 0);
