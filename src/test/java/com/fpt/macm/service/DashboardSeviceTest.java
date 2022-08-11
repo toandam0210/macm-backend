@@ -111,6 +111,9 @@ public class DashboardSeviceTest {
 	@Mock
 	ClubFundRepository clubFundRepository;
 	
+	@Mock
+	TournamentService tournamentService;
+	
 	private CollaboratorReport collaboratorReport() {
 		CollaboratorReport collaboratorReport = new CollaboratorReport();
 		collaboratorReport.setId(1);
@@ -575,6 +578,36 @@ public class DashboardSeviceTest {
 		when(semesterRepository.findByName(anyString())).thenReturn(null);
 		
 		ResponseMessage responseMessage = dashboardService.feeReport(semester().getName());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getAllUpcomingActivitiesCaseSuccess() {
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventService.getStartDate(anyInt())).thenReturn(LocalDate.now().plusMonths(1));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentService.getStartDate(anyInt())).thenReturn(LocalDate.now().plusMonths(1));
+		
+		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities(semester().getName());
+		assertEquals(responseMessage.getData().size(), 2);
+	}
+	
+	@Test
+	public void getAllUpcomingActivitiesCaseEmpty() {
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventService.getStartDate(anyInt())).thenReturn(LocalDate.now().minusMonths(1));
+		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentService.getStartDate(anyInt())).thenReturn(LocalDate.now().minusMonths(1));
+		
+		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities(semester().getName());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getAllUpcomingActivitiesCaseException() {
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(null);
+		
+		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities(semester().getName());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 }
