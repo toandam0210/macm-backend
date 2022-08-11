@@ -40,4 +40,5 @@ public class CommonScheduleController {
 //		return new ResponseEntity<ResponseMessage>(commonScheduleService.getAllUpcomingActivities(semesterName), HttpStatus.OK);
 //	}
 
+
 }
