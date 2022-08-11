@@ -153,10 +153,14 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 			List<CompetitiveMatch> listMatchUpdated = new ArrayList<CompetitiveMatch>();
 			for (CompetitiveMatchDto matchDto : listUpdated) {
 				CompetitiveMatch getMatch = competitiveMatchRepository.findById(matchDto.getId()).get();
-				if (matchDto.getFirstPlayer() != null && matchDto.getSecondPlayer() != null) {
+
+				if(getMatch.getFirstStudentId() != null && matchDto.getFirstPlayer() != null) {
 					getMatch.setFirstStudentId(matchDto.getFirstPlayer().getStudentId());
+				}
+				if(getMatch.getSecondStudentId() != null && matchDto.getSecondPlayer() != null) {
 					getMatch.setSecondStudentId(matchDto.getSecondPlayer().getStudentId());
 				}
+				
 				getMatch.setUpdatedBy("LinhLHN");
 				getMatch.setUpdatedOn(LocalDateTime.now());
 				competitiveMatchRepository.save(getMatch);
