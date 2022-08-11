@@ -3,6 +3,7 @@ package com.fpt.macm.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.jupiter.api.Test;
@@ -55,11 +56,43 @@ public class ContactServiceTest {
 	}
 	
 	@Test
+	public void getAllContactCaseEmpty() {
+		when(contactRepository.findAll()).thenReturn(new ArrayList<Contact>());
+		
+		ResponseMessage responseMessage = contactService.getAllContact();
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getAllContactCaseException() {
+		when(contactRepository.findAll()).thenReturn(null);
+		
+		ResponseMessage responseMessage = contactService.getAllContact();
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
 	public void getAllSocialNetworkCaseSuccess() {
 		when(socialNetworkRepository.findAll()).thenReturn(Arrays.asList(socialNetwork()));
 		
 		ResponseMessage responseMessage = contactService.getAllSocialNetwork();
 		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getAllSocialNetworkCaseEmpty() {
+		when(socialNetworkRepository.findAll()).thenReturn(new ArrayList<SocialNetwork>());
+		
+		ResponseMessage responseMessage = contactService.getAllSocialNetwork();
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getAllSocialNetworkCaseException() {
+		when(socialNetworkRepository.findAll()).thenReturn(null);
+		
+		ResponseMessage responseMessage = contactService.getAllSocialNetwork();
+		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 	@Test

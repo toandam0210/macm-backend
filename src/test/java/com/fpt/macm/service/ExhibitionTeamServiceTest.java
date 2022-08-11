@@ -275,6 +275,27 @@ public class ExhibitionTeamServiceTest {
 	}
 	
 	@Test
+	public void registerTeamCaseInvalidNumberOfFemale() {
+		List<String> listStudentId = new ArrayList<>();
+		listStudentId.add("HE140855");
+		listStudentId.add("HE140856");
+		
+		User user = user();
+		user.setGender(false);
+		
+		ExhibitionType exhibitionType = exhibitionType();
+		exhibitionType.setNumberMale(0);
+		exhibitionType.setNumberFemale(1);
+		
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
+		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.of(tournamentPlayer()));
+		
+		ResponseMessage responseMessage = exhibitionTeamService.registerTeam(1, "Team 1", listStudentId);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
 	public void registerTeamCaseSuccessTeam2Member() {
 		List<String> listStudentId = new ArrayList<>();
 		listStudentId.add("HE140855");
@@ -288,6 +309,25 @@ public class ExhibitionTeamServiceTest {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(tournamentRepository.getById(anyInt())).thenReturn(tournament());
 		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.of(tournamentPlayer()));
+		
+		ResponseMessage responseMessage = exhibitionTeamService.registerTeam(1, "Team 1", listStudentId);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void registerTeamCaseSuccessTeam2MemberHaveRegisterElse() {
+		List<String> listStudentId = new ArrayList<>();
+		listStudentId.add("HE140855");
+		listStudentId.add("HE140856");
+		
+		ExhibitionType exhibitionType = exhibitionType();
+		exhibitionType.setNumberFemale(0);
+		exhibitionType.setNumberMale(2);
+		
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentPlayerRepository
+							.getPlayerByUserIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.of(tournamentPlayer()));
 		
 		ResponseMessage responseMessage = exhibitionTeamService.registerTeam(1, "Team 1", listStudentId);
 		assertEquals(responseMessage.getData().size(), 1);

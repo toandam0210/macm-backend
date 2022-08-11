@@ -6,7 +6,6 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -244,13 +243,14 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 						return responseMessage;
 					}
 				}
-				Collections.sort(listResult, new Comparator<ExhibitionTeamDto>() {
-					@Override
-					public int compare(ExhibitionTeamDto o1, ExhibitionTeamDto o2) {
-						// TODO Auto-generated method stub
-						return o1.getScore() - o2.getScore() < 0? 1 : (o1.getScore() - o2.getScore() > 0? -1 : 0);
-					}
-				});
+				Collections.sort(listResult);
+//				Collections.sort(listResult, new Comparator<ExhibitionTeamDto>() {
+//					@Override
+//					public int compare(ExhibitionTeamDto o1, ExhibitionTeamDto o2) {
+//						// TODO Auto-generated method stub
+//						return o1.getScore() - o2.getScore() < 0? 1 : (o1.getScore() - o2.getScore() > 0? -1 : 0);
+//					}
+//				});
 				exhibitionResultByTypeDto.setListResult(listResult);
 				responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
 				responseMessage.setMessage("Kết quả thi đấu của nội dung " + getType.getName());

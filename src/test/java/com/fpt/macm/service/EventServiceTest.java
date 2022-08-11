@@ -54,55 +54,55 @@ public class EventServiceTest {
 
 	@InjectMocks
 	EventService eventService = new EventServiceImpl();
-	
+
 	@Mock
 	SemesterService semesterService;
-	
+
 	@Mock
 	EventScheduleService eventScheduleService;
-	
+
 	@Mock
 	CommonScheduleService commonScheduleService;
-	
+
 	@Mock
 	EventRepository eventRepository;
-	
+
 	@Mock
 	ClubFundRepository clubFundRepository;
-	
+
 	@Mock
 	EventScheduleRepository eventScheduleRepository;
-	
+
 	@Mock
 	CommonScheduleRepository commonScheduleRepository;
-	
+
 	@Mock
 	MemberEventRepository memberEventRepository;
-	
+
 	@Mock
 	SemesterRepository semesterRepository;
-	
+
 	@Mock
 	UserRepository userRepository;
-	
+
 	@Mock
 	NotificationService notificationService;
-	
+
 	@Mock
 	RoleEventRepository roleEventRepository;
-	
+
 	@Mock
 	TrainingScheduleService trainingScheduleService;
-	
+
 	@Mock
 	AttendanceStatusRepository attendanceStatusRepository;
-	
+
 	@Mock
 	EventRoleRepository eventRoleRepository;
-	
+
 	@Mock
 	TrainingScheduleRepository trainingScheduleRepository;
-	
+
 	public Event event() {
 		Event event = new Event();
 		event.setId(1);
@@ -119,7 +119,7 @@ public class EventServiceTest {
 		event.setStatus(true);
 		return event;
 	}
-	
+
 	public List<EventSchedule> eventSchedules() {
 		List<EventSchedule> eventSchedules = new ArrayList<EventSchedule>();
 		EventSchedule eventSchedule = new EventSchedule();
@@ -134,7 +134,7 @@ public class EventServiceTest {
 		eventSchedules.add(eventSchedule);
 		return eventSchedules;
 	}
-	
+
 	public Semester semester() {
 		Semester semester = new Semester();
 		semester.setId(1);
@@ -143,14 +143,14 @@ public class EventServiceTest {
 		semester.setEndDate(LocalDate.of(2022, 8, 31));
 		return semester;
 	}
-	
+
 	public ClubFund clubFund() {
 		ClubFund clubFund = new ClubFund();
 		clubFund.setId(1);
 		clubFund.setFundAmount(10000000);
 		return clubFund;
 	}
-	
+
 	public List<CommonSchedule> commonSchedules() {
 		List<CommonSchedule> commonSchedules = new ArrayList<CommonSchedule>();
 		CommonSchedule commonSchedule = new CommonSchedule();
@@ -166,7 +166,7 @@ public class EventServiceTest {
 		commonSchedules.add(commonSchedule);
 		return commonSchedules;
 	}
-	
+
 	private User user() {
 		User user = new User();
 		user.setStudentId("HE140860");
@@ -180,7 +180,7 @@ public class EventServiceTest {
 		user.setCreatedBy("toandv");
 		return user;
 	}
-	
+
 	private MemberEvent memberEvent() {
 		MemberEvent memberEvent = new MemberEvent();
 		memberEvent.setId(1);
@@ -192,14 +192,14 @@ public class EventServiceTest {
 		memberEvent.setPaymentValue(0);
 		return memberEvent;
 	}
-	
+
 	private RoleEvent roleEvent() {
 		RoleEvent roleEvent = new RoleEvent();
 		roleEvent.setId(1);
 		roleEvent.setName("ROLE_Member");
 		return roleEvent;
 	}
-	
+
 	private ScheduleDto scheduleDto() {
 		ScheduleDto scheduleDto = new ScheduleDto();
 		scheduleDto.setTitle("Đi Đà Lạt");
@@ -209,7 +209,7 @@ public class EventServiceTest {
 		scheduleDto.setExisted(false);
 		return scheduleDto;
 	}
-	
+
 	private EventRole eventRole() {
 		EventRole eventRole = new EventRole();
 		eventRole.setId(1);
@@ -218,7 +218,7 @@ public class EventServiceTest {
 		eventRole.setQuantity(10);
 		return eventRole;
 	}
-	
+
 	private RoleEventDto roleEventDto() {
 		RoleEventDto roleEventDto = new RoleEventDto();
 		roleEventDto.setId(roleEvent().getId());
@@ -227,7 +227,7 @@ public class EventServiceTest {
 		roleEventDto.setAvailableQuantity(10);
 		return roleEventDto;
 	}
-	
+
 	private EventCreateDto eventCreateDto() {
 		EventCreateDto eventCreateDto = new EventCreateDto();
 		eventCreateDto.setEvent(event());
@@ -235,7 +235,7 @@ public class EventServiceTest {
 		eventCreateDto.setRolesEventDto(Arrays.asList(roleEventDto()));
 		return eventCreateDto;
 	}
-	
+
 	private TrainingSchedule trainingSchedule() {
 		TrainingSchedule trainingSchedule = new TrainingSchedule();
 		trainingSchedule.setId(1);
@@ -244,7 +244,7 @@ public class EventServiceTest {
 		trainingSchedule.setFinishTime(LocalTime.now().plusHours(1));
 		return trainingSchedule;
 	}
-	
+
 	private AttendanceStatus attendanceStatus() {
 		AttendanceStatus attendanceStatus = new AttendanceStatus();
 		attendanceStatus.setId(1);
@@ -253,41 +253,57 @@ public class EventServiceTest {
 		attendanceStatus.setStatus(2);
 		return attendanceStatus;
 	}
-	 
+
 	@Test
 	public void createEventCaseSuccess() {
 		ResponseMessage semesterResponse = new ResponseMessage();
 		semesterResponse.setData(Arrays.asList(semester()));
-		
+
 		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(eventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(event()));
 		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.of(roleEvent()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
-		
+
 		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto(), false);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
+	@Test
+	public void createEventCaseRoleEventEmpty() {
+		ResponseMessage semesterResponse = new ResponseMessage();
+		semesterResponse.setData(Arrays.asList(semester()));
+
+		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
+		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(eventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(event()));
+		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.empty());
+		when(roleEventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(roleEvent()));
+		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
+
+		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto(), false);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+
 	@Test
 	public void createEventCaseDuplicateWithTrainingScheduleAndNotOverwrite() {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.getListPreview().get(0).setExisted(true);
 		eventCreateDto.getListPreview().get(0).setTitle("Trùng với Lịch tập");
-		
+
 		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createEventCaseDuplicateWithTrainingScheduleAndOverwrite() {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.getListPreview().get(0).setExisted(true);
 		eventCreateDto.getListPreview().get(0).setTitle("Trùng với Lịch tập");
-		
+
 		ResponseMessage semesterResponse = new ResponseMessage();
 		semesterResponse.setData(Arrays.asList(semester()));
-		
+
 		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(eventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(event()));
@@ -295,74 +311,73 @@ public class EventServiceTest {
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedules().get(0));
 		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
-		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(attendanceStatus()));
-		
-		
+		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt()))
+				.thenReturn(Arrays.asList(attendanceStatus()));
+
 		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, true);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void createEventCaseNotDuplicateWithTrainingSchedule() {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.getListPreview().get(0).setExisted(true);
 		eventCreateDto.getListPreview().get(0).setTitle("Trùng với Giải đấu");
-		
+
 		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createEventCaseEventNull() {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setEvent(null);
-		
+
 		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createEventCaseListPreviewNull() {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setListPreview(null);
-		
+
 		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createEventCaseRolesEventDtoNull() {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setRolesEventDto(null);
-		
+
 		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createEventCaseListPreviewEmpty() {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setListPreview(new ArrayList<ScheduleDto>());
-		
+
 		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createEventCaseRolesEventDtoEmpty() {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setRolesEventDto(new ArrayList<RoleEventDto>());
-		
+
 		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createEventCaseException() {
 		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto(), false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
 
 	@Test
 	public void updateBeforeEventCaseSuccess() {
@@ -371,23 +386,22 @@ public class EventServiceTest {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedules().get(0));
 
-		
 		ResponseMessage responseMessage = eventService.updateBeforeEvent(1, event());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void updateBeforeEventCaseEventInPast() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
-		
+
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		ResponseMessage responseMessage = eventService.updateBeforeEvent(1, event());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void updateBeforeEventCaseEventScheduleEmpty() {
 		List<EventSchedule> eventSchedules = new ArrayList<EventSchedule>();
@@ -395,311 +409,346 @@ public class EventServiceTest {
 		ResponseMessage responseMessage = eventService.updateBeforeEvent(1, event());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void deleteEventCaseSuccess() {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		when(commonScheduleRepository.findByDate(any())).thenReturn(Optional.of(commonSchedules().get(0)));
-		
+
 		ResponseMessage responseMessage = eventService.deleteEvent(1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void deleteEventCaseEventEmpty() {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.empty());
-		
+
 		ResponseMessage responseMessage = eventService.deleteEvent(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void deleteEventCaseEventStarted() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
-		
+
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
+
 		ResponseMessage responseMessage = eventService.deleteEvent(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void deleteEventCaseEventScheduleEmpty() {
 		List<EventSchedule> eventSchedules = new ArrayList<EventSchedule>();
-		
+
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
+
 		ResponseMessage responseMessage = eventService.deleteEvent(1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void deleteEventCaseException() {
 		when(eventRepository.findById(anyInt())).thenReturn(null);
-		
+
 		ResponseMessage responseMessage = eventService.deleteEvent(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getEventByIdCaseSuccess() {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-		
+
 		ResponseMessage responseMessage = eventService.getEventById(1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventByIdCaseStatusFalse() {
 		Event event = event();
 		event.setStatus(false);
-		
+
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event));
-		
+
 		ResponseMessage responseMessage = eventService.getEventById(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getEventByIdCaseEventEmpty() {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.empty());
-		
+
 		ResponseMessage responseMessage = eventService.getEventById(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getEventByIdCaseException() {
 		when(eventRepository.findById(anyInt())).thenReturn(null);
-		
+
 		ResponseMessage responseMessage = eventService.getEventById(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getEventsByDateCaseFinishDateInFuture() {
-		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 12, 1), LocalDate.of(2022, 1, 1), 0, 1000);
+		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 12, 1),
+				LocalDate.of(2022, 1, 1), 0, 1000);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getEventsByDateCaseEventScheduleNull() {
 		when(eventScheduleService.getEventScheduleByDate(any())).thenReturn(null);
-		
-		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 1), 0, 1000);
+
+		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1),
+				LocalDate.of(2022, 12, 1), 0, 1000);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getEventsByDateCaseNotYet() {
 		when(eventScheduleService.getEventScheduleByDate(any())).thenReturn(eventSchedules().get(0));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
-		
-		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 1), 0, 1000);
+
+		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1),
+				LocalDate.of(2022, 12, 1), 0, 1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventsByDateCaseEnded() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
-		
+
 		when(eventScheduleService.getEventScheduleByDate(any())).thenReturn(eventSchedules.get(0));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
-		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 1), 0, 1000);
+
+		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1),
+				LocalDate.of(2022, 12, 1), 0, 1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventsByDateCaseOnGoing() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.now());
 		}
-		
+
 		when(eventScheduleService.getEventScheduleByDate(any())).thenReturn(eventSchedules.get(0));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
-		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 1), 0, 1000);
+
+		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1),
+				LocalDate.of(2022, 12, 1), 0, 1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventsByDateCaseFail() {
 		when(eventScheduleService.getEventScheduleByDate(any())).thenReturn(new EventSchedule());
-		
-		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1), LocalDate.of(2022, 12, 1), 0, 1000);
+
+		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1),
+				LocalDate.of(2022, 12, 1), 0, 1000);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getEventsBySemesterCaseNotYet() {
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
 		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
-		
+
 		ResponseMessage responseMessage = eventService.getEventsBySemester("", 0, 0, 1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
+	@Test
+	public void getEventsBySemesterCaseMonthNotEq0() {
+		List<EventSchedule> eventSchedules = eventSchedules();
+		for (EventSchedule eventSchedule : eventSchedules) {
+			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
+		}
+
+		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
+
+		ResponseMessage responseMessage = eventService.getEventsBySemester("", 1, 0, 1000);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+
+	@Test
+	public void getEventsBySemesterCaseDeleted() {
+		Event event = event();
+		event.setStatus(false);
+
+		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
+		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event));
+
+		ResponseMessage responseMessage = eventService.getEventsBySemester("", 0, 0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
 	@Test
 	public void getEventsBySemesterCaseNotOnGoing() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.now());
 		}
-		
+
 		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
+
 		ResponseMessage responseMessage = eventService.getEventsBySemester("Summer2022", 0, 0, 1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventsBySemesterCaseEnded() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
-		
+
 		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
+
 		ResponseMessage responseMessage = eventService.getEventsBySemester("Summer2022", 0, 0, 1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventsBySemesterCaseStartDateNull() {
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
 		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
-		
+
 		ResponseMessage responseMessage = eventService.getEventsBySemester("", 0, 0, 1000);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getEventsBySemesterCaseFail() {
 		when(semesterRepository.findTop3Semester()).thenReturn(null);
-		
+
 		ResponseMessage responseMessage = eventService.getEventsBySemester("", 0, 0, 1000);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void updateAfterEventCaseUseClubFund() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
-		
+
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(memberEventRepository.findMemberEventByEventId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
-		
+
 		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 100000, true, true);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void updateAfterEventCaseNotUseClubFund() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
-		
+
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(memberEventRepository.findMemberEventByEventId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
-		
+
 		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 100000, true, false);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void updateAfterEventCaseNoIncurredWithoutMoney() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
-		
+
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
-		
+
 		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 0, false, false);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void updateAfterEventCaseNoIncurredWithMoney() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
-		
+
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
-		
+
 		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 100000, false, false);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void updateAfterEventCaseListScheduleNull() {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(null);
-		
+
 		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 100000, false, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void updateAfterEventCaseFail() {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
-		
+
 		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 100000, false, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getEventsBySemesterAndStudentIdCaseJoinEvent() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
 		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent()));
+		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+				.thenReturn(Optional.of(memberEvent()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
-		
+
 		ResponseMessage responseMessage = eventService.getEventsBySemesterAndStudentId("", "HE140855", 0, 0, 1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventsBySemesterAndStudentIdCaseCancelJoinEvent() {
 		MemberEvent memberEvent = memberEvent();
 		memberEvent.setRegisterStatus(false);
-		
+
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
 		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent));
+		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+				.thenReturn(Optional.of(memberEvent));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
-		
+
 		ResponseMessage responseMessage = eventService.getEventsBySemesterAndStudentId("", "HE140855", 0, 0, 1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventsBySemesterAndStudentIdCaseNotJoinEvent() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
@@ -707,75 +756,93 @@ public class EventServiceTest {
 		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
-		
+
 		ResponseMessage responseMessage = eventService.getEventsBySemesterAndStudentId("", "HE140855", 0, 0, 1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventsBySemesterAndStudentIdCaseEventEnded() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
-		
+
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
-		ResponseMessage responseMessage = eventService.getEventsBySemesterAndStudentId("Summer2022", "HE140855", 1, 0, 1000);
+
+		ResponseMessage responseMessage = eventService.getEventsBySemesterAndStudentId("Summer2022", "HE140855", 1, 0,
+				1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventsBySemesterAndStudentIdCaseEventOnGoing() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		for (EventSchedule eventSchedule : eventSchedules) {
 			eventSchedule.setDate(LocalDate.now());
 		}
-		
+
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		
-		ResponseMessage responseMessage = eventService.getEventsBySemesterAndStudentId("Summer2022", "HE140855", 0, 0, 1000);
+
+		ResponseMessage responseMessage = eventService.getEventsBySemesterAndStudentId("Summer2022", "HE140855", 0, 0,
+				1000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getEventsBySemesterAndStudentIdCaseFail() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.empty());
-		
-		ResponseMessage responseMessage = eventService.getEventsBySemesterAndStudentId("Summer2022", "HE140855", 0, 0, 1000);
+
+		ResponseMessage responseMessage = eventService.getEventsBySemesterAndStudentId("Summer2022", "HE140855", 0, 0,
+				1000);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllEventHasJoinedByStudentId() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
-		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId( "HE140855", 0,  1000);
-		assertEquals(responseMessage.getData().size(),1);
+		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId("HE140855", 0, 1000);
+		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
+	@Test
+	public void testGetAllEventHasJoinedByStudentIdCaseAmountPerRegisterActualNotEq0() {
+		Event event = event();
+		event.setAmountPerRegisterActual(100);
+
+		MemberEvent memberEvent = memberEvent();
+		memberEvent.setEvent(event);
+
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent));
+		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
+		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId("HE140855", 0, 1000);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+
 	@Test
 	public void testGetAllEventHasJoinedByStudentIdCaseMemberEventEmpty() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList());
-		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId( "HE140855", 0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId("HE140855", 0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllEventHasJoinedByStudentIdCaseException() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(null);
-		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId( "HE140855", 0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId("HE140855", 0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllEventHasJoinedByStudentIdCaseEventEnd() {
 		List<EventSchedule> eventSchedules = eventSchedules();
@@ -783,10 +850,10 @@ public class EventServiceTest {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId( "HE140855", 0,  1000);
-		assertEquals(responseMessage.getData().size(),1);
+		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId("HE140855", 0, 1000);
+		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testGetAllEventHasJoinedByStudentIdCaseHappenning() {
 		List<EventSchedule> eventSchedules = eventSchedules();
@@ -794,154 +861,209 @@ public class EventServiceTest {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId( "HE140855", 0,  1000);
-		assertEquals(responseMessage.getData().size(),1);
+		ResponseMessage responseMessage = eventService.getAllEventHasJoinedByStudentId("HE140855", 0, 1000);
+		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testGetAllUpcomingEvent() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		eventSchedules.get(0).setDate(LocalDate.now().plusDays(1));
 		when(eventRepository.findAll()).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getAllUpcomingEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),1);
+		ResponseMessage responseMessage = eventService.getAllUpcomingEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testGetAllUpcomingEventCaseNotFound() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		eventSchedules.get(0).setDate(LocalDate.now().minusDays(1));
 		when(eventRepository.findAll()).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getAllUpcomingEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllUpcomingEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllUpcomingEventCaseEventEmpty() {
 		when(eventRepository.findAll()).thenReturn(Arrays.asList());
-		ResponseMessage responseMessage = eventService.getAllUpcomingEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllUpcomingEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllUpcomingEventCaseException() {
 		when(eventRepository.findAll()).thenReturn(null);
-		ResponseMessage responseMessage = eventService.getAllUpcomingEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllUpcomingEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllOngoingEvent() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		eventSchedules.get(0).setDate(LocalDate.now());
 		when(eventRepository.findAll()).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getAllOngoingEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),2);
+		ResponseMessage responseMessage = eventService.getAllOngoingEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 2);
 	}
-	
+
 	@Test
 	public void testGetAllOngoingEventCaseNotFound() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		eventSchedules.get(0).setDate(LocalDate.now().minusDays(1));
 		when(eventRepository.findAll()).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getAllOngoingEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllOngoingEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllOngoingEventCaseEventEmpty() {
 		when(eventRepository.findAll()).thenReturn(Arrays.asList());
-		ResponseMessage responseMessage = eventService.getAllOngoingEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllOngoingEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllOngoingEventCaseException() {
 		when(eventRepository.findAll()).thenReturn(null);
-		ResponseMessage responseMessage = eventService.getAllOngoingEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllOngoingEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllClosedEvent() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		eventSchedules.get(0).setDate(LocalDate.now());
 		when(eventRepository.findAll()).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getAllClosedEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllClosedEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllClosedEventCaseNotFound() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		eventSchedules.get(0).setDate(LocalDate.now().minusDays(1));
 		when(eventRepository.findAll()).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getAllClosedEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),1);
+		ResponseMessage responseMessage = eventService.getAllClosedEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testGetAllClosedEventCaseEventEmpty() {
 		when(eventRepository.findAll()).thenReturn(Arrays.asList());
-		ResponseMessage responseMessage = eventService.getAllClosedEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllClosedEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetAllClosedEventCaseException() {
 		when(eventRepository.findAll()).thenReturn(null);
-		ResponseMessage responseMessage = eventService.getAllClosedEvent(0,  1000);
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getAllClosedEvent(0, 1000);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetEventsByName() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		eventSchedules.get(0).setDate(LocalDate.now());
 		when(eventRepository.findByName(anyString())).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt",0,  1000,"id");
-		assertEquals(responseMessage.getData().size(),1);
+		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
+	@Test
+	public void testGetEventsByNameCaseSortId() {
+		List<Event> events = new ArrayList<Event>();
+		events.add(event());
+		events.add(event());
+
+		List<EventSchedule> eventSchedules = eventSchedules();
+		eventSchedules.get(0).setDate(LocalDate.now());
+		when(eventRepository.findByName(anyString())).thenReturn(events);
+		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
+		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+		assertEquals(responseMessage.getData().size(), 2);
+	}
+
+	@Test
+	public void testGetEventsByNameCaseSortName() {
+		List<Event> events = new ArrayList<Event>();
+		events.add(event());
+		events.add(event());
+
+		List<EventSchedule> eventSchedules = eventSchedules();
+		eventSchedules.get(0).setDate(LocalDate.now());
+		when(eventRepository.findByName(anyString())).thenReturn(events);
+		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
+		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "name");
+		assertEquals(responseMessage.getData().size(), 2);
+	}
+
+	@Test
+	public void testGetEventsByNameCaseSortDefault() {
+		List<Event> events = new ArrayList<Event>();
+		events.add(event());
+		events.add(event());
+
+		List<EventSchedule> eventSchedules = eventSchedules();
+		eventSchedules.get(0).setDate(LocalDate.now());
+		when(eventRepository.findByName(anyString())).thenReturn(events);
+		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
+		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "");
+		assertEquals(responseMessage.getData().size(), 2);
+	}
+
 	@Test
 	public void testGetEventsByNameCaseNotHappenning() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		eventSchedules.get(0).setDate(LocalDate.now().plusDays(1));
 		when(eventRepository.findByName(anyString())).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt",0,  1000,"name");
-		assertEquals(responseMessage.getData().size(),1);
+		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "name");
+		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testGetEventsByNameCaseEnd() {
 		List<EventSchedule> eventSchedules = eventSchedules();
 		eventSchedules.get(0).setDate(LocalDate.now().minusDays(1));
 		when(eventRepository.findByName(anyString())).thenReturn(Arrays.asList(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt",0,  1000,"id");
-		assertEquals(responseMessage.getData().size(),1);
+		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+		assertEquals(responseMessage.getData().size(), 1);
 	}
+
 	@Test
 	public void testGetEventsByNameCaseStartDateNull() {
 		when(eventRepository.findByName(anyString())).thenReturn(Arrays.asList(event()));
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt",0,  1000,"id");
-		assertEquals(responseMessage.getData().size(),1);
+		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testGetEventsByNameCaseException() {
 		when(eventRepository.findByName(anyString())).thenReturn(null);
-		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt",0,  1000,"id");
-		assertEquals(responseMessage.getData().size(),0);
+		ResponseMessage responseMessage = eventService.getEventsByName("Đi Đà Lạt", 0, 1000, "id");
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
-	
+
+	@Test
+	public void testGetEndDateCaseNull() {
+		LocalDate date = eventService.getEndDate(1);
+		assertEquals(date, null);
+	}
+
+	@Test
+	public void testGetStartDateCaseNull() {
+		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(null);
+
+		LocalDate date = eventService.getStartDate(1);
+		assertEquals(date, null);
+	}
 }

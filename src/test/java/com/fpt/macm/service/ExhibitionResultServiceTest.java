@@ -398,6 +398,24 @@ public class ExhibitionResultServiceTest {
 	}
 	
 	@Test
+	public void testGetExhibitionResultByTypeCaseSort() {
+		Set<ExhibitionTeam> exhibitionTeams = exhibitionTeams();
+		exhibitionTeams.add(exhibitionTeam());
+		
+		ExhibitionType exhibitionType = exhibitionType();
+		exhibitionType.setExhibitionTeams(exhibitionTeams);
+		
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTeam(exhibitionTeam());
+		exhibitionResult.setScore(10.1);
+		
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult));
+		ResponseMessage responseMessage = exhibitionResultService.getExhibitionResultByType(1);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
 	public void testGetExhibitionResultByTypeCaseEmpty() {
 		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType()));
 		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.empty());

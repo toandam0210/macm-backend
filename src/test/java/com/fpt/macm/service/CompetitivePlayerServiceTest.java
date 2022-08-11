@@ -1,7 +1,6 @@
 package com.fpt.macm.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 
@@ -182,8 +181,22 @@ public class CompetitivePlayerServiceTest {
 		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.of(tournamentPlayer()));
 		ResponseMessage response = competitivePlayerService.addNewCompetitivePlayer(Arrays.asList(createUser()), 1);
 		assertEquals(response.getData().size(), 1);
-		
 	}
+
+	@Test
+	public void testAddNewCompetitivePlayerCaseStatusEq0AndTypeFemale() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		listCompetitive.get(0).setStatus(0);
+		listCompetitive.get(0).setGender(false);
+		
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(listCompetitive.get(0)));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		
+		ResponseMessage response = competitivePlayerService.addNewCompetitivePlayer(Arrays.asList(createUser()), 1);
+		assertEquals(response.getData().size(), 0);
+	}
+	
 	@Test
 	public void testAddNewCompetitivePlayerCaseStatusEq1() {
 		Set<CompetitiveType> competitiveTypes = competitiveTypes();
@@ -351,6 +364,18 @@ public class CompetitivePlayerServiceTest {
 		Set<CompetitiveType> competitiveTypes = competitiveTypes();
 		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
 		listCompetitive.get(0).setStatus(0);
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(listCompetitive.get(0)));
+		when(competitivePlayerRepository.findByCompetitiveTypeId(anyInt())).thenReturn(Arrays.asList(competitivePlayer()));
+		ResponseMessage response = competitivePlayerService.getListPlayer(1);
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGetListPlayerCaseTypeFemale() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		listCompetitive.get(0).setStatus(0);
+		listCompetitive.get(0).setGender(false);
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(listCompetitive.get(0)));
 		when(competitivePlayerRepository.findByCompetitiveTypeId(anyInt())).thenReturn(Arrays.asList(competitivePlayer()));
 		ResponseMessage response = competitivePlayerService.getListPlayer(1);
