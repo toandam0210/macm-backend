@@ -43,7 +43,7 @@ public class UpcomingActivityDto implements Comparable<UpcomingActivityDto>{
 
 	@Override
 	public int compareTo(UpcomingActivityDto o) {
-		return o.getDate().compareTo(this.getDate());
+		return this.getDate().compareTo(o.getDate());
 	}
 
 }
