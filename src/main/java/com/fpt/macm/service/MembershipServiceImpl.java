@@ -41,6 +41,9 @@ public class MembershipServiceImpl implements MembershipService {
 	@Autowired
 	MembershipPaymentStatusReportRepository membershipPaymentStatusReportRepository;
 
+	@Autowired
+	ClubFundService clubFundService;
+
 	@Override
 	public ResponseMessage getListMemberPayMembershipBySemester(int membershipInfoId) {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -84,10 +87,23 @@ public class MembershipServiceImpl implements MembershipService {
 			double fundAmount = clubFund.getFundAmount();
 
 			double membershipFee = membershipStatus.getMembershipInfo().getAmount();
-			
-			double fundBalance = membershipStatus.isStatus() ? (fundAmount - membershipFee) : (fundAmount + membershipFee);
-			clubFund.setFundAmount(fundBalance);
-			clubFundRepository.save(clubFund);
+
+			double fundBalance = membershipStatus.isStatus() ? (fundAmount - membershipFee)
+					: (fundAmount + membershipFee);
+
+			if (membershipStatus.isStatus()) {
+				clubFundService.withdrawFromClubFund(membershipFee,
+						"Cập nhật trạng thái đóng phí duy trì CLB kỳ "
+								+ membershipStatus.getMembershipInfo().getSemester() + " của "
+								+ membershipStatus.getUser().getName() + " - "
+								+ membershipStatus.getUser().getStudentId() + " thành chưa đóng");
+			} else {
+				clubFundService.depositToClubFund(membershipFee,
+						"Cập nhật trạng thái đóng phí duy trì CLB kỳ "
+								+ membershipStatus.getMembershipInfo().getSemester() + " của "
+								+ membershipStatus.getUser().getName() + " - "
+								+ membershipStatus.getUser().getStudentId() + " thành đã đóng");
+			}
 
 			MembershipPaymentStatusReport membershipPaymentStatusReport = new MembershipPaymentStatusReport();
 			membershipPaymentStatusReport.setMembershipInfo(membershipStatus.getMembershipInfo());

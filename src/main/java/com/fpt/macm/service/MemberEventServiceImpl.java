@@ -63,6 +63,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 	@Autowired
 	EventRoleRepository eventRoleRepository;
 
+	@Autowired
+	ClubFundService clubFundService;
+
 	@Override
 	public ResponseMessage updateListMemberEventRole(List<MemberEventDto> membersEventDto) {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -184,8 +187,17 @@ public class MemberEventServiceImpl implements MemberEventService {
 				}
 			}
 
-			clubFund.setFundAmount(fundBalance);
-			clubFundRepository.save(clubFund);
+			if (fundChange > 0) {
+				clubFundService.depositToClubFund(fundChange,
+						"Cập nhật trạng thái đóng phí tham gia sự kiện " + event.getName() + " của "
+								+ memberEvent.getUser().getName() + " - " + memberEvent.getUser().getStudentId()
+								+ " thành đã đóng");
+			} else if (fundChange < 0) {
+				clubFundService.withdrawFromClubFund(-fundChange,
+						"Cập nhật trạng thái đóng phí tham gia sự kiện " + event.getName() + " của "
+								+ memberEvent.getUser().getName() + " - " + memberEvent.getUser().getStudentId()
+								+ " thành chưa đóng");
+			}
 
 			EventPaymentStatusReport eventPaymentStatusReport = new EventPaymentStatusReport();
 			eventPaymentStatusReport.setEvent(memberEvent.getEvent());
