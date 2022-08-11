@@ -292,6 +292,13 @@ public class CompetitiveTypeServiceTest {
 	}
 	
 	@Test
+	public void testGetListNotJoinCompetitiveCaseEmpty() {
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.empty());
+		ResponseMessage response = competitiveTypeService.getListNotJoinCompetitive(1);
+		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
 	public void testGetListNotJoinCompetitiveCaseException() {
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(null);
 		ResponseMessage response = competitiveTypeService.getListNotJoinCompetitive(1);
