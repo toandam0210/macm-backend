@@ -35,10 +35,4 @@ public class CommonScheduleController {
 				HttpStatus.OK);
 	}
 
-//	@GetMapping("/getallupcomingactivities/{semesterName}")
-//	ResponseEntity<ResponseMessage> getAllUpcomingActivities(@PathVariable(name = "semesterName") String semesterName) {
-//		return new ResponseEntity<ResponseMessage>(commonScheduleService.getAllUpcomingActivities(semesterName), HttpStatus.OK);
-//	}
-
-
 }
