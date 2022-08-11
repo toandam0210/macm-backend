@@ -281,6 +281,7 @@ public class TournamentServiceImpl implements TournamentService {
 					commonSession.setFinishTime(scheduleDto.getFinishTime());
 					commonSession.setCreatedOn(LocalDateTime.now());
 					commonSession.setUpdatedOn(LocalDateTime.now());
+					commonSession.setType(2);
 					listCommon.add(commonSession);
 
 					CommonSchedule oldCommonSchedule = commonScheduleService
