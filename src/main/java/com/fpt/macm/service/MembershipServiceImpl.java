@@ -3,6 +3,7 @@ package com.fpt.macm.service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,8 +62,8 @@ public class MembershipServiceImpl implements MembershipService {
 					membershipStatusDto.setRole(Utils.convertRoleFromDbToExcel(membershipStatus.getUser().getRole()));
 					membershipStatusDto.setSemester(membershipStatus.getMembershipInfo().getSemester());
 					membershipStatusDtos.add(membershipStatusDto);
-
 				}
+				Collections.sort(membershipStatusDtos);
 				responseMessage.setData(membershipStatusDtos);
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(membershipStatusDtos.size());

@@ -1,6 +1,6 @@
 package com.fpt.macm.model.dto;
 
-public class MembershipStatusDto {
+public class MembershipStatusDto implements Comparable<MembershipStatusDto> {
 	private int id;
 	private String studentName;
 	private String studentId;
@@ -55,7 +55,10 @@ public class MembershipStatusDto {
 	public void setId(int id) {
 		this.id = id;
 	}
-	
-	
+
+	@Override
+	public int compareTo(MembershipStatusDto o) {
+		return this.getId() - o.getId();
+	}
 
 }
