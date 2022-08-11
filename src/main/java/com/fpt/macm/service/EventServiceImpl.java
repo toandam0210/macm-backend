@@ -305,6 +305,10 @@ public class EventServiceImpl implements EventService {
 					eventRepository.save(event);
 
 					notificationService.createEventDeleteNotification(event.getId(), event.getName());
+					
+					if (event.getAmountFromClub() > 0) {
+						clubFundService.depositToClubFund(event.getAmountFromClub(), ("Hoàn tiền tổ chức sự kiện " + event.getName()));
+					}
 
 					responseMessage.setData(Arrays.asList(event));
 					responseMessage.setMessage("Xóa sự kiện thành công");
