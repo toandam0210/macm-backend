@@ -182,6 +182,7 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ExhibitionResultRepository exhibitionResultRepository;
+	
 
 	@Override
 	public ResponseMessage createTournament(TournamentCreateDto tournamentCreateDto, boolean isOverwritten) {
@@ -281,6 +282,7 @@ public class TournamentServiceImpl implements TournamentService {
 					commonSession.setFinishTime(scheduleDto.getFinishTime());
 					commonSession.setCreatedOn(LocalDateTime.now());
 					commonSession.setUpdatedOn(LocalDateTime.now());
+					commonSession.setType(2);
 					listCommon.add(commonSession);
 
 					CommonSchedule oldCommonSchedule = commonScheduleService
@@ -1920,6 +1922,42 @@ public class TournamentServiceImpl implements TournamentService {
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateAfterTournament(int tournamentId, double totalAmountActual) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<TournamentSchedule> listSchedule = tournamentScheduleRepository.findByTournamentId(tournamentId);
+			if (listSchedule.size() > 0
+					&& listSchedule.get(listSchedule.size() - 1).getDate().compareTo(LocalDate.now()) > 0) {
+				responseMessage.setMessage("Không thành công. Không thể tổng kết giải đấu chưa kết thúc");
+			} else {
+				Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+				Tournament getTournament = tournamentOp.get();
+				int countPlayer = getTournament.getTournamentPlayers().size();
+				List<TournamentOrganizingCommittee> listCommittee = tournamentOrganizingCommitteeRepository.findByTournamentId(tournamentId);
+				double totalProceedsActual = countPlayer * getTournament.getFeePlayerPay() + listCommittee.size() * getTournament.getFeeOrganizingCommiteePay();
+				
+				getTournament.setTotalAmount(totalAmountActual);
+				getTournament.setTotalAmountFromClubActual(totalAmountActual - totalProceedsActual);
+					
+				List<ClubFund> clubFunds = clubFundRepository.findAll();
+				ClubFund clubFund = clubFunds.get(0);
+				clubFund.setFundAmount(clubFund.getFundAmount() - (getTournament.getTotalAmountFromClubActual()) + getTournament.getTotalAmountEstimate());
+				clubFundRepository.save(clubFund);
+			
+				getTournament.setUpdatedBy("LinhLHN");
+				getTournament.setUpdatedOn(LocalDateTime.now());
+				tournamentRepository.save(getTournament);
+				responseMessage.setData(Arrays.asList(getTournament));
+				responseMessage.setMessage(Constant.MSG_129);
+			}
+		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
