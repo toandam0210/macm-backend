@@ -1761,6 +1761,7 @@ public class TournamentServiceImpl implements TournamentService {
 				Set<CompetitiveType> listCompetitiveTypes = getTournament.getCompetitiveTypes();
 				List<Area> listArea = areaRepository.findAll();
 				for (CompetitiveType competitiveType : listCompetitiveTypes) {
+					competitiveType.setStatus(2);
 					List<CompetitiveMatch> listMatchByType = competitiveMatchRepository
 							.listMatchsByType(competitiveType.getId());
 					for (CompetitiveMatch competitiveMatch : listMatchByType) {
@@ -1776,10 +1777,13 @@ public class TournamentServiceImpl implements TournamentService {
 				List<ExhibitionTeam> listExhibitionTeams = new ArrayList<ExhibitionTeam>();
 				Set<ExhibitionType> listExhibitionTypes = getTournament.getExhibitionTypes();
 				for (ExhibitionType exhibitionType : listExhibitionTypes) {
+					exhibitionType.setStatus(null);
 					List<ExhibitionTeam> getTeams = new ArrayList<ExhibitionTeam>(exhibitionType.getExhibitionTeams());
 					listExhibitionTeams.addAll(getTeams);
 				}
-
+				
+				tournamentRepository.save(getTournament);
+				
 				List<TournamentSchedule> listTournamentSchedules = tournamentScheduleRepository
 						.findByTournamentId(tournamentId);
 
