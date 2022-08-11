@@ -444,6 +444,7 @@ public class TournamentServiceImpl implements TournamentService {
 					for (ExhibitionType exhibitionType : exhibitionTypes) {
 						if (exhibitionTypeDto.getId() == exhibitionType.getId()) {
 							exhibitionType = convertExhibitionTypeDto(exhibitionTypeDto);
+							exhibitionType.setStatus(0);
 							exhibitionType.setUpdatedBy("toandv");
 							exhibitionType.setUpdatedOn(LocalDateTime.now());
 							exhibitionTypeRepository.save(exhibitionType);
@@ -455,6 +456,7 @@ public class TournamentServiceImpl implements TournamentService {
 				for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
 					ExhibitionType exhibitionType = convertExhibitionTypeDto(exhibitionTypeDto);
 					exhibitionType.setUpdatedBy("toandv");
+					exhibitionType.setStatus(0);
 					exhibitionType.setUpdatedOn(LocalDateTime.now());
 					exhibitionTypes.add(exhibitionType);
 				}
