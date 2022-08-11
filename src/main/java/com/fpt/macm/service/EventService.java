@@ -16,6 +16,7 @@ public interface EventService {
 	ResponseMessage getEventsBySemester(String semester, int month, int pageNo, int pageSize);
 	ResponseMessage updateAfterEvent(int eventId, double money, boolean isIncurred, boolean isUseClubFund);
 	LocalDate getStartDate(int eventId);
+	LocalDate getEndDate(int eventId);
 	ResponseMessage getEventsBySemesterAndStudentId(String semester, String studentId, int month, int pageNo, int pageSize);
 	ResponseMessage getAllEventHasJoinedByStudentId(String studentId, int pageNo, int pageSize);
 	ResponseMessage getAllUpcomingEvent(int pageNo, int pageSize);

@@ -27,11 +27,7 @@ import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
-import com.fpt.macm.model.entity.ExhibitionPlayer;
-import com.fpt.macm.model.entity.ExhibitionTeam;
-import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.Role;
-import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
@@ -43,7 +39,7 @@ import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
-public class CompetititveMatchServiceTest {
+public class CompetititiveMatchServiceTest {
 	
 	@InjectMocks
 	CompetitiveMatchService competitiveMatchService = new CompetitiveMatchServiceImpl();
@@ -69,22 +65,22 @@ public class CompetititveMatchServiceTest {
 	@Mock
 	CompetitivePlayerRepository competitivePlayerRepository;
 	
-	private Tournament tournament() {
-		Tournament tournament = new Tournament();
-		tournament.setCompetitiveTypes(competitiveTypes());
-		tournament.setDescription("abc");
-		tournament.setExhibitionTypes(exhibitionTypes());
-		tournament.setFeeOrganizingCommiteePay(100000);
-		tournament.setFeePlayerPay(100000);
-		tournament.setId(1);
-		tournament.setName("FNC");
-		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
-		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
-		tournament.setSemester("Summer2022");
-		tournament.setStatus(true);
-		tournament.setTournamentPlayers(tournamentPlayers());
-		return tournament;
-	}
+//	private Tournament tournament() {
+//		Tournament tournament = new Tournament();
+//		tournament.setCompetitiveTypes(competitiveTypes());
+//		tournament.setDescription("abc");
+//		tournament.setExhibitionTypes(exhibitionTypes());
+//		tournament.setFeeOrganizingCommiteePay(100000);
+//		tournament.setFeePlayerPay(100000);
+//		tournament.setId(1);
+//		tournament.setName("FNC");
+//		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
+//		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
+//		tournament.setSemester("Summer2022");
+//		tournament.setStatus(true);
+//		tournament.setTournamentPlayers(tournamentPlayers());
+//		return tournament;
+//	}
 	
 	private Set<CompetitiveType> competitiveTypes() {
 		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();
@@ -97,17 +93,17 @@ public class CompetititveMatchServiceTest {
 		return competitiveTypes;
 	}
 
-	private Set<ExhibitionType> exhibitionTypes() {
-		Set<ExhibitionType> exhibitionTypes = new HashSet<ExhibitionType>();
-		ExhibitionType exhibitionType = new ExhibitionType();
-		exhibitionType.setExhibitionTeams(exhibitionTeams());
-		exhibitionType.setId(1);
-		exhibitionType.setName("Long ho quyen");
-		exhibitionType.setNumberFemale(0);
-		exhibitionType.setNumberMale(1);
-		exhibitionTypes.add(exhibitionType);
-		return exhibitionTypes;
-	}
+//	private Set<ExhibitionType> exhibitionTypes() {
+//		Set<ExhibitionType> exhibitionTypes = new HashSet<ExhibitionType>();
+//		ExhibitionType exhibitionType = new ExhibitionType();
+//		exhibitionType.setExhibitionTeams(exhibitionTeams());
+//		exhibitionType.setId(1);
+//		exhibitionType.setName("Long ho quyen");
+//		exhibitionType.setNumberFemale(0);
+//		exhibitionType.setNumberMale(1);
+//		exhibitionTypes.add(exhibitionType);
+//		return exhibitionTypes;
+//	}
 	
 	private TournamentPlayer tournamentPlayer() {
 		TournamentPlayer tournamentPlayer = new TournamentPlayer();
@@ -117,25 +113,25 @@ public class CompetititveMatchServiceTest {
 		return tournamentPlayer;
 	}
 	
-	private Set<ExhibitionTeam> exhibitionTeams() {
-		Set<ExhibitionTeam> exhibitionTeams = new HashSet<ExhibitionTeam>();
-		ExhibitionTeam exhibitionTeam = new ExhibitionTeam();
-		exhibitionTeam.setExhibitionPlayers(exhibitionPlayers());
-		exhibitionTeam.setId(1);
-		exhibitionTeam.setTeamName("Team 1");
-		exhibitionTeams.add(exhibitionTeam);
-		return exhibitionTeams;
-	}
+//	private Set<ExhibitionTeam> exhibitionTeams() {
+//		Set<ExhibitionTeam> exhibitionTeams = new HashSet<ExhibitionTeam>();
+//		ExhibitionTeam exhibitionTeam = new ExhibitionTeam();
+//		exhibitionTeam.setExhibitionPlayers(exhibitionPlayers());
+//		exhibitionTeam.setId(1);
+//		exhibitionTeam.setTeamName("Team 1");
+//		exhibitionTeams.add(exhibitionTeam);
+//		return exhibitionTeams;
+//	}
 	
-	private Set<TournamentPlayer> tournamentPlayers() {
-		Set<TournamentPlayer> tournamentPlayers = new HashSet<TournamentPlayer>();
-		TournamentPlayer tournamentPlayer = new TournamentPlayer();
-		tournamentPlayer.setId(1);
-		tournamentPlayer.setPaymentStatus(true);
-		tournamentPlayer.setUser(createUser());
-		tournamentPlayers.add(tournamentPlayer);
-		return tournamentPlayers;
-	}
+//	private Set<TournamentPlayer> tournamentPlayers() {
+//		Set<TournamentPlayer> tournamentPlayers = new HashSet<TournamentPlayer>();
+//		TournamentPlayer tournamentPlayer = new TournamentPlayer();
+//		tournamentPlayer.setId(1);
+//		tournamentPlayer.setPaymentStatus(true);
+//		tournamentPlayer.setUser(createUser());
+//		tournamentPlayers.add(tournamentPlayer);
+//		return tournamentPlayers;
+//	}
 	
 	private User createUser() {
 		User user = new User();
@@ -159,15 +155,15 @@ public class CompetititveMatchServiceTest {
 		return user;
 	}
 	
-	private Set<ExhibitionPlayer> exhibitionPlayers() {
-		Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
-		ExhibitionPlayer exhibitionPlayer = new ExhibitionPlayer();
-		exhibitionPlayer.setId(1);
-		exhibitionPlayer.setRoleInTeam(true);
-		exhibitionPlayer.setTournamentPlayer(tournamentPlayer());
-		exhibitionPlayers.add(exhibitionPlayer);
-		return exhibitionPlayers;
-	}
+//	private Set<ExhibitionPlayer> exhibitionPlayers() {
+//		Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
+//		ExhibitionPlayer exhibitionPlayer = new ExhibitionPlayer();
+//		exhibitionPlayer.setId(1);
+//		exhibitionPlayer.setRoleInTeam(true);
+//		exhibitionPlayer.setTournamentPlayer(tournamentPlayer());
+//		exhibitionPlayers.add(exhibitionPlayer);
+//		return exhibitionPlayers;
+//	}
 	
 	private CompetitivePlayer competitivePlayer() {
 		CompetitivePlayer competitivePlayer = new CompetitivePlayer();
@@ -286,7 +282,7 @@ public class CompetititveMatchServiceTest {
 		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(Arrays.asList(competitivePlayer()));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
 		when(userRepository.getByStudentId(anyString())).thenReturn(createUser());
-		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		ResponseMessage response = competitiveMatchService.listMatchs(1);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -313,7 +309,7 @@ public class CompetititveMatchServiceTest {
 		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(Arrays.asList(competitivePlayer()));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
 		when(userRepository.getByStudentId(anyString())).thenReturn(createUser());
-		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		ResponseMessage response = competitiveMatchService.listMatchs(1);
 		assertEquals(response.getData().size(), 1);
 	}

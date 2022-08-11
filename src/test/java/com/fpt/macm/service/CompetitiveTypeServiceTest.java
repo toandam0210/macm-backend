@@ -173,6 +173,75 @@ public class CompetitiveTypeServiceTest {
 	}
 	
 	@Test
+	public void testGetAllTypeCaseSort() {
+		List<CompetitiveType> competitiveTypes = new ArrayList<>(competitiveTypes());
+		CompetitiveType competitiveType = new CompetitiveType();
+		competitiveType.setId(1);
+		competitiveType.setGender(false);
+		competitiveType.setWeightMin(45);
+		competitiveType.setWeightMax(50);
+		competitiveTypes.add(competitiveType);
+		
+		Tournament tournament = tournament();
+		tournament.setCompetitiveTypes(new HashSet<>(competitiveTypes));
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		ResponseMessage response = competitiveTypeService.getAllType(1);
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGetAllTypeCaseSort2() {
+		List<CompetitiveType> competitiveTypes = new ArrayList<>(competitiveTypes());
+		CompetitiveType competitiveType = new CompetitiveType();
+		competitiveType.setId(1);
+		competitiveType.setGender(true);
+		competitiveType.setWeightMin(45);
+		competitiveType.setWeightMax(50);
+		competitiveTypes.add(competitiveType);
+		
+		Tournament tournament = tournament();
+		tournament.setCompetitiveTypes(new HashSet<>(competitiveTypes));
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		ResponseMessage response = competitiveTypeService.getAllType(1);
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void testGetAllTypeCaseSort3() {
+		List<CompetitiveType> competitiveTypes = new ArrayList<>();
+		CompetitiveType competitiveType = new CompetitiveType();
+		competitiveType.setId(1);
+		competitiveType.setGender(false);
+		competitiveType.setWeightMin(40);
+		competitiveType.setWeightMax(45);
+		competitiveTypes.add(competitiveType);
+		competitiveType.setId(3);
+		competitiveType.setGender(true);
+		competitiveType.setWeightMin(45);
+		competitiveType.setWeightMax(50);
+		competitiveTypes.add(competitiveType);
+		competitiveType.setId(2);
+		competitiveType.setGender(false);
+		competitiveType.setWeightMin(10);
+		competitiveType.setWeightMax(18);
+		competitiveTypes.add(competitiveType);
+		competitiveType.setId(4);
+		competitiveType.setGender(false);
+		competitiveType.setWeightMin(51);
+		competitiveType.setWeightMax(53);
+		competitiveTypes.add(competitiveType);
+		
+		Tournament tournament = tournament();
+		tournament.setCompetitiveTypes(new HashSet<>(competitiveTypes));
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		ResponseMessage response = competitiveTypeService.getAllType(1);
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
 	public void testGetAllTypeCaseException() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
 		ResponseMessage response = competitiveTypeService.getAllType(10);

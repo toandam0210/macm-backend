@@ -155,7 +155,8 @@ public class EventServiceImpl implements EventService {
 						roleEvent.setName(roleEventDto.getName());
 						roleEventRepository.save(roleEvent);
 
-						RoleEvent newRoleEvent = roleEventRepository.findByName(roleEvent.getName()).get();
+						List<RoleEvent> roleEvents = roleEventRepository.findAll(Sort.by("id").descending());
+						RoleEvent newRoleEvent = roleEvents.get(0);
 
 						EventRole eventRole = new EventRole();
 						eventRole.setEvent(newEvent);
@@ -483,6 +484,7 @@ public class EventServiceImpl implements EventService {
 		return responseMessage;
 	}
 
+	@Override
 	public LocalDate getEndDate(int eventId) {
 		List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
 		if (listSchedule.size() > 0) {

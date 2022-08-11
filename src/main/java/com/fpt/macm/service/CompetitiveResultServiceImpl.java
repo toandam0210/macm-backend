@@ -219,7 +219,7 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 				}
 			}
 			if (checkExisted == -1) {
-				CompetitiveResult getResult = competitiveResultRepository.findByMatchId(matchId).get();
+				CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(matchId).get();
 				getResult.setArea(newResult.getArea());
 				getResult.setTime(newResult.getTime());
 				getResult.setUpdatedBy("LinhLHN");
@@ -245,7 +245,7 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 		try {
 			CompetitiveMatch getMatch = competitiveMatchRepository.findById(matchId).get();
 			if (!getMatch.getStatus()) {
-				Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(matchId);
+				Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findResultByMatchId(matchId);
 				if (getResultOp.isPresent()) {
 					CompetitiveResult getResult = getResultOp.get();
 					getResult.setFirstPoint(firstPoint);
@@ -311,7 +311,7 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 				User[] listResult = new User[3];
 				if (getType.getStatus() == 3) {
 					List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
-					CompetitiveResult getResult = competitiveResultRepository.findByMatchId(listMatchs.get(1).getId()).get();
+					CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(listMatchs.get(1).getId()).get();
 					if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
 						responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
 					} 

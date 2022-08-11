@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionType;
@@ -111,15 +110,15 @@ public class TournamentScheduleServiceTest {
 		return commonSchedule;
 	}
 	
-	private ScheduleDto scheduleDto() {
-		ScheduleDto scheduleDto = new ScheduleDto();
-		scheduleDto.setDate(LocalDate.now().plusMonths(1));
-		scheduleDto.setStartTime(LocalTime.of(18, 0));
-		scheduleDto.setFinishTime(LocalTime.of(20, 0));
-		scheduleDto.setExisted(false);
-		scheduleDto.setTitle("Giải đấu FNC Summer2022 update");
-		return scheduleDto;
-	}
+//	private ScheduleDto scheduleDto() {
+//		ScheduleDto scheduleDto = new ScheduleDto();
+//		scheduleDto.setDate(LocalDate.now().plusMonths(1));
+//		scheduleDto.setStartTime(LocalTime.of(18, 0));
+//		scheduleDto.setFinishTime(LocalTime.of(20, 0));
+//		scheduleDto.setExisted(false);
+//		scheduleDto.setTitle("Giải đấu FNC Summer2022 update");
+//		return scheduleDto;
+//	}
 	
 	@Test
 	public void createPreviewTournamentScheduleCaseStartDateAfterEndDate() {

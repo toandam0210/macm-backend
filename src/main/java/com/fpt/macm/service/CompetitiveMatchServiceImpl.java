@@ -90,7 +90,7 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 								newCompetitiveMatchDto.setSecondPlayer(null);
 							}
 							Optional<CompetitiveResult> getResultOp = competitiveResultRepository
-									.findByMatchId(competitiveMatch.getId());
+									.findResultByMatchId(competitiveMatch.getId());
 							if (getResultOp.isPresent()) {
 								CompetitiveResult getResult = getResultOp.get();
 								newCompetitiveMatchDto.setArea(getResult.getArea().getName());

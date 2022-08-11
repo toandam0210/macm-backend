@@ -560,7 +560,7 @@ public class UserServiceImpl implements UserService {
 					
 					// Thêm data điểm danh khi user active
 					List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
-					Optional<User> newUserOp = userRepository.findByStudentId(userFromExcel.getStudentId());
+					Optional<User> newUserOp = userRepository.findByStudentIdAndEmail(userFromExcel.getStudentId(), userFromExcel.getEmail());
 					if (newUserOp.isPresent()) {
 						User newUser = newUserOp.get();
 						if (newUser.isActive()) {
@@ -587,9 +587,12 @@ public class UserServiceImpl implements UserService {
 			responseMessage.setTotalActive(countAddSuccess);
 			responseMessage.setTotalDeactive(countAddFail);
 			return responseMessage;
-		} catch (IOException e) {
-			throw new RuntimeException("fail to store excel data: " + e.getMessage());
+//		} catch (IOException e) {
+//			throw new RuntimeException("fail to store excel data: " + e.getMessage());
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
 		}
+		return responseMessage;
 	}
 	
 	@Override
