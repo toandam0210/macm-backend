@@ -2,6 +2,7 @@ package com.fpt.macm.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,12 +35,16 @@ import com.fpt.macm.model.dto.TournamentPlayerPaymentStatusReportDto;
 import com.fpt.macm.model.dto.TournamentResultDto;
 import com.fpt.macm.model.dto.UserTournamentDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
+import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
+import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
+import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.RoleEvent;
@@ -54,13 +59,16 @@ import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
+import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
+import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.NotificationRepository;
@@ -162,6 +170,18 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ExhibitionResultService exhibitionResultService;
+
+	@Autowired
+	CompetitiveResultRepository competitiveResultRepository;
+
+	@Autowired
+	CompetitiveTypeService competitiveTypeService;
+
+	@Autowired
+	AreaRepository areaRepository;
+
+	@Autowired
+	ExhibitionResultRepository exhibitionResultRepository;
 
 	@Override
 	public ResponseMessage createTournament(TournamentCreateDto tournamentCreateDto, boolean isOverwritten) {
@@ -1316,9 +1336,9 @@ public class TournamentServiceImpl implements TournamentService {
 
 				int countMale = 0;
 				int countFemale = 0;
-				
+
 				List<User> members = new ArrayList<User>();
-				
+
 				for (ActiveUserDto activeUserDto : activeUsersDto) {
 					User member = userRepository.findByStudentId(activeUserDto.getStudentId()).get();
 					members.add(member);
@@ -1719,9 +1739,180 @@ public class TournamentServiceImpl implements TournamentService {
 				tournamentResultDto.setListExhibitionResult(listExhibitionResult);
 				responseMessage.setData(Arrays.asList(tournamentResultDto));
 				responseMessage.setMessage("Kết quả giải đấu");
-			}
-			else {
+			} else {
 				responseMessage.setMessage("Không tìm thấy giải đấu");
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage spawnTimeAndArea(int tournamentId) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> getTournamentOp = tournamentRepository.findById(tournamentId);
+			if (getTournamentOp.isPresent()) {
+				Tournament getTournament = getTournamentOp.get();
+				List<CompetitiveMatch> listCompetitiveMatchs = new ArrayList<CompetitiveMatch>();
+				Set<CompetitiveType> listCompetitiveTypes = getTournament.getCompetitiveTypes();
+				List<Area> listArea = areaRepository.findAll();
+				for (CompetitiveType competitiveType : listCompetitiveTypes) {
+					List<CompetitiveMatch> listMatchByType = competitiveMatchRepository
+							.listMatchsByType(competitiveType.getId());
+					for (CompetitiveMatch competitiveMatch : listMatchByType) {
+						if (competitiveMatch.getRound() == 1 && (competitiveMatch.getFirstStudentId() == null
+								|| competitiveMatch.getSecondStudentId() == null)) {
+							continue;
+						}
+						listCompetitiveMatchs.add(competitiveMatch);
+					}
+				}
+				Collections.sort(listCompetitiveMatchs);
+
+				List<ExhibitionTeam> listExhibitionTeams = new ArrayList<ExhibitionTeam>();
+				Set<ExhibitionType> listExhibitionTypes = getTournament.getExhibitionTypes();
+				for (ExhibitionType exhibitionType : listExhibitionTypes) {
+					List<ExhibitionTeam> getTeams = new ArrayList<ExhibitionTeam>(exhibitionType.getExhibitionTeams());
+					listExhibitionTeams.addAll(getTeams);
+				}
+
+				List<TournamentSchedule> listTournamentSchedules = tournamentScheduleRepository
+						.findByTournamentId(tournamentId);
+
+				int timeMatchNeedHeld = listCompetitiveMatchs.size() * 10 + listExhibitionTeams.size() * 5;
+				int timeMatchCanHeld = 0;
+				for (TournamentSchedule tournamentSchedule : listTournamentSchedules) {
+					LocalTime startTime = tournamentSchedule.getStartTime();
+					LocalTime finishTime = tournamentSchedule.getFinishTime();
+					timeMatchCanHeld += ((finishTime.getHour() - startTime.getHour()) * 60 + finishTime.getMinute()
+							- startTime.getMinute());
+				}
+				LocalDate doneSpawnCompetitiveDate = listTournamentSchedules.get(0).getDate();
+				LocalTime doneSpawnCompetitiveTime = listTournamentSchedules.get(0).getStartTime();
+				if (timeMatchCanHeld >= timeMatchNeedHeld) {
+					boolean continueSpawnCompetitive = true;
+					int index = 0;
+					CompetitiveResult oldResult = new CompetitiveResult();
+
+					boolean continueSpawnExhibition = true;
+					List<ExhibitionType> listTypeNeedHeld = new ArrayList<ExhibitionType>();
+					for (ExhibitionType exhibitionType : listExhibitionTypes) {
+
+						if (exhibitionType.getExhibitionTeams().size() > 0) {
+							listTypeNeedHeld.add(exhibitionType);
+						}
+					}
+					Area getArea = listArea.get(0);
+					for (TournamentSchedule tournamentSchedule : listTournamentSchedules) {
+						if (continueSpawnCompetitive) {
+							LocalDate date = tournamentSchedule.getDate();
+							LocalTime startTime = tournamentSchedule.getStartTime();
+							LocalTime finishTime = tournamentSchedule.getFinishTime();
+							while (startTime.isBefore(finishTime)) {
+								if (continueSpawnCompetitive) {
+									for (Area area : listArea) {
+										LocalDateTime timeMatch = LocalDateTime.of(date, startTime);
+										if (continueSpawnCompetitive) {
+											CompetitiveResult newResult = new CompetitiveResult();
+											newResult.setMatch(listCompetitiveMatchs.get(index));
+											if (index > 0
+													&& oldResult.getMatch().getRound() < newResult.getMatch().getRound()
+													&& oldResult.getTime().equals(timeMatch)) {
+												startTime = startTime.plusMinutes(10);
+												timeMatch = LocalDateTime.of(date, startTime);
+											}
+											newResult.setTime(timeMatch);
+											newResult.setArea(area);
+											newResult.setCreatedBy("LinhLHN");
+											newResult.setCreatedOn(LocalDateTime.now());
+											newResult.setUpdatedBy("LinhLHN");
+											newResult.setUpdatedOn(LocalDateTime.now());
+											competitiveResultRepository.save(newResult);
+											oldResult = newResult;
+											index++;
+											if (index == listCompetitiveMatchs.size()) {
+												continueSpawnCompetitive = false;
+												doneSpawnCompetitiveDate = date;
+												if (startTime.plusMinutes(10).compareTo(finishTime) <= 0) {
+													doneSpawnCompetitiveTime = startTime.plusMinutes(10);
+												} else {
+													doneSpawnCompetitiveDate = date.plusDays(1);
+												}
+											}
+										} else {
+											break;
+										}
+									}
+									startTime = startTime.plusMinutes(10);
+								} else {
+									break;
+								}
+							}
+						}
+						if (!continueSpawnCompetitive) {
+							index = 0;
+							LocalDate getDate = tournamentSchedule.getDate();
+							LocalTime startTime = tournamentSchedule.getStartTime();
+							LocalTime finishTime = tournamentSchedule.getFinishTime();
+							if (getDate.isEqual(doneSpawnCompetitiveDate)) {
+								while (startTime.isBefore(doneSpawnCompetitiveTime)) {
+									startTime = startTime.plusMinutes(10);
+								}
+							}
+							if (startTime.compareTo(finishTime) >= 0) {
+								continue;
+							}
+							while (true) {
+								int countMatchCanHeld = ((tournamentSchedule.getFinishTime().getHour()
+										- startTime.getHour()) * 60 + tournamentSchedule.getFinishTime().getMinute()
+										- startTime.getMinute()) / 5;
+								if (listTypeNeedHeld.get(index).getExhibitionTeams().size() > countMatchCanHeld) {
+									break;
+								}
+								ExhibitionType getType = listTypeNeedHeld.get(index);
+								Set<ExhibitionTeam> getTeamsByType = getType.getExhibitionTeams();
+								List<ExhibitionTeam> getTeams = new ArrayList<ExhibitionTeam>();
+								for (ExhibitionTeam exhibitionTeam : getTeamsByType) {
+									getTeams.add(exhibitionTeam);
+								}
+								for (ExhibitionTeam exhibitionTeam : getTeams) {
+									ExhibitionResult newResult = new ExhibitionResult();
+									newResult.setTeam(exhibitionTeam);
+									newResult.setArea(getArea);
+									LocalDateTime getTime = LocalDateTime.of(getDate, startTime);
+									newResult.setTime(getTime);
+									newResult.setCreatedBy("LinhLHN");
+									newResult.setCreatedOn(LocalDateTime.now());
+									newResult.setUpdatedBy("LinhLHN");
+									newResult.setUpdatedOn(LocalDateTime.now());
+									exhibitionResultRepository.save(newResult);
+									startTime = startTime.plusMinutes(5);
+								}
+								index++;
+
+								if (index == listTypeNeedHeld.size()) {
+									continueSpawnExhibition = false;
+								} else {
+									continue;
+								}
+								if (!continueSpawnExhibition) {
+									break;
+								}
+							}
+							if (!continueSpawnExhibition) {
+								break;
+							}
+						}
+					}
+					responseMessage.setMessage("Phân chia thời gian cho tất cả thể loại");
+				} else {
+					responseMessage.setMessage("Không thành công. Chỉ đủ thời gian để tổ chức " + timeMatchCanHeld + "/"
+							+ timeMatchNeedHeld + " trận đấu");
+				}
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

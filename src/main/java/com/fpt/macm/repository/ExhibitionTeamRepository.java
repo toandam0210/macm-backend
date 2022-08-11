@@ -7,5 +7,5 @@ import com.fpt.macm.model.entity.ExhibitionTeam;
 
 @Repository
 public interface ExhibitionTeamRepository extends JpaRepository<ExhibitionTeam, Integer> {
-
+	
 }

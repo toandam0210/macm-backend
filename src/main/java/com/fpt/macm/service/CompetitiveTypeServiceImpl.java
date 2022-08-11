@@ -89,27 +89,33 @@ public class CompetitiveTypeServiceImpl implements CompetitiveTypeService{
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			CompetitiveType getType = competitiveTypeRepository.findById(competitiveTypeId).get();
-			Tournament getTournament = tournamentRepository.findById(competitiveTypeRepository.findTournamentOfType(competitiveTypeId)).get();
-			List<User> userJoined= new ArrayList<User>();
-			List<User> listActive = userRepository.findAllActiveUser();
-			List<TournamentPlayer> listPlayers = tournamentPlayerRepository.getPlayerByTournamentId(getTournament.getId());
-			for (TournamentPlayer tournamentPlayer : listPlayers) {
-				Optional<CompetitivePlayer> getCompetitivePlayerOp = competitivePlayerRepository.findByTournamentPlayerId(tournamentPlayer.getId());
-				if(getCompetitivePlayerOp.isPresent()) {
-					User getUser = tournamentPlayer.getUser();
-					userJoined.add(getUser);
+			Optional<CompetitiveType> getTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
+			if(getTypeOp.isPresent()) {
+				CompetitiveType getType = getTypeOp.get();
+				Tournament getTournament = tournamentRepository.findById(competitiveTypeRepository.findTournamentOfType(competitiveTypeId)).get();
+				List<User> userJoined= new ArrayList<User>();
+				List<User> listActive = userRepository.findAllActiveUser();
+				List<TournamentPlayer> listPlayers = tournamentPlayerRepository.getPlayerByTournamentId(getTournament.getId());
+				for (TournamentPlayer tournamentPlayer : listPlayers) {
+					Optional<CompetitivePlayer> getCompetitivePlayerOp = competitivePlayerRepository.findByTournamentPlayerId(tournamentPlayer.getId());
+					if(getCompetitivePlayerOp.isPresent()) {
+						User getUser = tournamentPlayer.getUser();
+						userJoined.add(getUser);
+					}
 				}
-			}
-			List<User> userNotJoined= new ArrayList<User>();
-			for (User user : listActive) {
-				if(!userJoined.contains(user) && getType.isGender() == user.isGender()) {
-					userNotJoined.add(user);
+				List<User> userNotJoined= new ArrayList<User>();
+				for (User user : listActive) {
+					if(!userJoined.contains(user) && getType.isGender() == user.isGender()) {
+						userNotJoined.add(user);
+					}
 				}
+				responseMessage.setData(userNotJoined);
+				responseMessage.setTotalResult(userNotJoined.size());
+				responseMessage.setMessage("Danh sách thành viên chưa đăng ký tham gia thi đấu đối kháng");
 			}
-			responseMessage.setData(userNotJoined);
-			responseMessage.setTotalResult(userNotJoined.size());
-			responseMessage.setMessage("Danh sách thành viên chưa đăng ký tham gia thi đấu đối kháng");
+			else {
+				responseMessage.setMessage("Không tìm thấy thể thức");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
