@@ -10,4 +10,5 @@ public interface CommonScheduleService {
 	ResponseMessage getCommonSchedule();
 	ResponseMessage getCommonScheduleByDate(String date);
 	ResponseMessage getCommonScheduleBySemester(int semesterId);
+	ResponseMessage getAllUpcomingActivities(String semesterName);
 }

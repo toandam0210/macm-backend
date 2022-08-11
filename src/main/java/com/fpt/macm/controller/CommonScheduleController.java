@@ -15,22 +15,29 @@ import com.fpt.macm.service.CommonScheduleService;
 @RestController
 @RequestMapping("/api/commonschedule")
 public class CommonScheduleController {
-	
+
 	@Autowired
 	CommonScheduleService commonScheduleService;
-	
+
 	@GetMapping("/getcommonschedule")
-	ResponseEntity<ResponseMessage> getCommonSchedule(){
-			return new ResponseEntity<ResponseMessage>(commonScheduleService.getCommonSchedule(), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getCommonSchedule() {
+		return new ResponseEntity<ResponseMessage>(commonScheduleService.getCommonSchedule(), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/getcommonsessionbydate")
 	ResponseEntity<ResponseMessage> getCommonSessionByDate(@RequestParam String date) {
-			return new ResponseEntity<ResponseMessage>(commonScheduleService.getCommonScheduleByDate(date), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(commonScheduleService.getCommonScheduleByDate(date), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/getcommonschedulebysemester/{semesterId}")
-	ResponseEntity<ResponseMessage> getCommonScheduleBySemester(@PathVariable(name = "semesterId") int semesterId){
-			return new ResponseEntity<ResponseMessage>(commonScheduleService.getCommonScheduleBySemester(semesterId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getCommonScheduleBySemester(@PathVariable(name = "semesterId") int semesterId) {
+		return new ResponseEntity<ResponseMessage>(commonScheduleService.getCommonScheduleBySemester(semesterId),
+				HttpStatus.OK);
 	}
+
+	@GetMapping("/getallupcomingactivities/{semesterName}")
+	ResponseEntity<ResponseMessage> getAllUpcomingActivities(@PathVariable(name = "semesterName") String semesterName) {
+		return new ResponseEntity<ResponseMessage>(commonScheduleService.getAllUpcomingActivities(semesterName), HttpStatus.OK);
+	}
+
 }
