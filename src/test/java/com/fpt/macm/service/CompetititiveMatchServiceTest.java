@@ -288,6 +288,104 @@ public class CompetititiveMatchServiceTest {
 	}
 	
 	@Test
+	public void testListMatchsCaseTypeFemale() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatchs.add(competitiveMatch);
+		CompetitiveMatch competitiveMatch1 = competitiveMatch();
+		competitiveMatch1.setId(2);
+		competitiveMatchs.add(competitiveMatch1);
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(3);
+		competitiveMatchs.add(competitiveMatch2);
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(4);
+		competitiveMatchs.add(competitiveMatch3);
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		competitiveType.setStatus(1);
+		competitiveType.setGender(false);
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
+		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(Arrays.asList(competitivePlayer()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(userRepository.getByStudentId(anyString())).thenReturn(createUser());
+		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		ResponseMessage response = competitiveMatchService.listMatchs(1);
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testListMatchsCaseListPlayer() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatchs.add(competitiveMatch);
+		CompetitiveMatch competitiveMatch1 = competitiveMatch();
+		competitiveMatch1.setId(2);
+		competitiveMatchs.add(competitiveMatch1);
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(3);
+		competitiveMatchs.add(competitiveMatch2);
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(4);
+		competitiveMatchs.add(competitiveMatch3);
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		competitiveType.setStatus(1);
+		
+		List<CompetitivePlayer> competitivePlayers = new ArrayList<CompetitivePlayer>();
+		competitivePlayers.add(competitivePlayer());
+		competitivePlayers.add(competitivePlayer());
+		competitivePlayers.add(competitivePlayer());
+		competitivePlayers.add(competitivePlayer());
+		
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
+		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(competitivePlayers);
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(userRepository.getByStudentId(anyString())).thenReturn(createUser());
+		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		ResponseMessage response = competitiveMatchService.listMatchs(1);
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testListMatchsCaseListStudentIdNull() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatch.setFirstStudentId(null);
+		competitiveMatch.setSecondStudentId(null);
+		competitiveMatchs.add(competitiveMatch);
+		CompetitiveMatch competitiveMatch1 = competitiveMatch();
+		competitiveMatch1.setId(2);
+		competitiveMatchs.add(competitiveMatch1);
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(3);
+		competitiveMatchs.add(competitiveMatch2);
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(4);
+		competitiveMatchs.add(competitiveMatch3);
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		competitiveType.setStatus(1);
+		
+		List<CompetitivePlayer> competitivePlayers = new ArrayList<CompetitivePlayer>();
+		competitivePlayers.add(competitivePlayer());
+		competitivePlayers.add(competitivePlayer());
+		competitivePlayers.add(competitivePlayer());
+		competitivePlayers.add(competitivePlayer());
+		
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
+		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(competitivePlayers);
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		ResponseMessage response = competitiveMatchService.listMatchs(1);
+		assertEquals(response.getData().size(), 0);
+	}
+	
+	
+	@Test
 	public void testListMatchsCaseListCaseStausGreaterThan1() {
 		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
 		CompetitiveMatch competitiveMatch = competitiveMatch();
@@ -327,6 +425,18 @@ public class CompetititiveMatchServiceTest {
 		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
 		CompetitiveType competitiveType = listCompetitive.get(0);
 		competitiveType.setStatus(1);
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
+		ResponseMessage response = competitiveMatchService.confirmListMatchsPlayer(1);
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testConfirmListMatchsPlayerCaseFemale() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		competitiveType.setStatus(1);
+		competitiveType.setGender(false);
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		ResponseMessage response = competitiveMatchService.confirmListMatchsPlayer(1);
 		assertEquals(response.getData().size(), 1);
@@ -416,6 +526,9 @@ public class CompetititiveMatchServiceTest {
 		CompetitiveMatch competitiveMatch3 = competitiveMatch();
 		competitiveMatch3.setId(4);
 		competitiveMatchs.add(competitiveMatch3);
+		CompetitiveMatch competitiveMatch4 = competitiveMatch();
+		competitiveMatch4.setId(5);
+		competitiveMatchs.add(competitiveMatch4);
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
 		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(competitivePlayers);
@@ -423,7 +536,7 @@ public class CompetititiveMatchServiceTest {
 		when(competitiveMatchRepository.listMatchsByTypeAsc(anyInt())).thenReturn(competitiveMatchs);
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
 		ResponseMessage response = competitiveMatchService.spawnMatchs(1);
-		assertEquals(response.getData().size(), 4);
+		assertEquals(response.getData().size(), 5);
 	}
 	
 	@Test
@@ -581,6 +694,9 @@ public class CompetititiveMatchServiceTest {
 		CompetitiveMatch competitiveMatch3 = competitiveMatch();
 		competitiveMatch3.setId(4);
 		competitiveMatchs.add(competitiveMatch3);
+		CompetitiveMatch competitiveMatch4 = competitiveMatch();
+		competitiveMatch4.setId(5);
+		competitiveMatchs.add(competitiveMatch4);
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
 		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(competitivePlayers);
