@@ -230,11 +230,6 @@ public class TournamentServiceImpl implements TournamentService {
 				tournamentRepository.save(tournament);
 
 				// Trừ tiền từ clb
-				List<ClubFund> clubFunds = clubFundRepository.findAll();
-				ClubFund clubFund = clubFunds.get(0);
-				clubFund.setFundAmount(clubFund.getFundAmount() - tournament.getTotalAmountFromClubEstimate());
-				clubFundRepository.save(clubFund);
-
 				if (tournament.getTotalAmountFromClubEstimate() > 0) {
 					clubFundService.withdrawFromClubFund(tournament.getTotalAmountFromClubEstimate(),
 							("Rút tiền để tổ chức giải đấu " + tournament.getName()));
@@ -543,6 +538,11 @@ public class TournamentServiceImpl implements TournamentService {
 					tournamentRepository.save(tournament);
 
 					notificationService.createTournamentDeleteNotification(tournament.getId(), tournament.getName());
+					
+					if (tournament.getTotalAmountFromClubEstimate() > 0) {
+						clubFundService.depositToClubFund(tournament.getTotalAmountFromClubEstimate(),
+								("Hoàn tiền tổ chức giải đấu " + tournament.getName()));
+					}
 
 					responseMessage.setData(Arrays.asList(tournament));
 					responseMessage.setMessage(Constant.MSG_102);
