@@ -73,4 +73,11 @@ public class ExhibitionController {
 	ResponseEntity<ResponseMessage> updateExhibitionResult(@PathVariable(name = "exhibitionTeamId") int exhibitionTeamId, @RequestParam Double score) {
 		return new ResponseEntity<ResponseMessage>(exhibitionResultService.updateExhibitionResult(exhibitionTeamId, score), HttpStatus.OK);
 	}
+	
+	@GetMapping("/headclub/listusernotjoinexhibition/{exhibitionTypeId}")
+	ResponseEntity<ResponseMessage> listUserNotJoinExhibition(
+			@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId) {
+		return new ResponseEntity<ResponseMessage>(
+				exhibitionTypeService.getListNotJoinExhibition(exhibitionTypeId), HttpStatus.OK);
+	}
 }

@@ -74,4 +74,6 @@ public interface TournamentService {
 	ResponseMessage deleteTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId);
 	
 	ResponseMessage getResultOfTournament(int tournamentId);
+	
+	ResponseMessage spawnTimeAndArea(int tournamentId);
 }
