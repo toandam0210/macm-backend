@@ -421,6 +421,7 @@ public class TournamentServiceImpl implements TournamentService {
 					for (CompetitiveType competitiveType : competitiveTypes) {
 						if (competitiveTypeDto.getId() == competitiveType.getId()) {
 							competitiveType = convertCompetitiveTypeDto(competitiveTypeDto);
+							competitiveType.setStatus(0);
 							competitiveType.setUpdatedBy("toandv");
 							competitiveType.setUpdatedOn(LocalDateTime.now());
 							competitiveTypeRepository.save(competitiveType);
@@ -431,6 +432,7 @@ public class TournamentServiceImpl implements TournamentService {
 				competitiveTypeDtos.removeAll(competitiveTypeDtosRemove);
 				for (CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
 					CompetitiveType competitiveType = convertCompetitiveTypeDto(competitiveTypeDto);
+					competitiveType.setStatus(0);
 					competitiveType.setUpdatedBy("toandv");
 					competitiveType.setUpdatedOn(LocalDateTime.now());
 					competitiveTypes.add(competitiveType);
