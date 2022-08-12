@@ -119,7 +119,7 @@ public class TournamentController {
 	}
 
 	@GetMapping("/treasurer/getalltournamentplayerpaymentstatus/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getAllTournamentPlayerPaymentStatus(
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllTournamentPlayerPaymentStatus(tournamentId),
@@ -127,7 +127,7 @@ public class TournamentController {
 	}
 
 	@GetMapping("/treasurer/getalltournamentorganizingcommitteepaymentstatus/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getAllTournamentOrganizingCommitteePaymentStatus(
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -135,7 +135,7 @@ public class TournamentController {
 	}
 
 	@PutMapping("/treasurer/updatetournamentorganizingcommitteepaymentstatus/{tournamentOrganizingCommitteeId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateTournamentOrganizingCommitteePaymentStatus(
 			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -144,7 +144,7 @@ public class TournamentController {
 	}
 
 	@GetMapping("/treasurer/getalltournamentorganizingcommitteepaymentstatusreport/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getAllTournamentOrganizingCommitteePaymentStatusReport(
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -152,7 +152,7 @@ public class TournamentController {
 	}
 
 	@PutMapping("/treasurer/updatetournamentplayerpaymentstatus/{tournamentPlayerId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateTournamentPlayerPaymentStatus(
 			@PathVariable(name = "tournamentPlayerId") int tournamentPlayerId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -160,7 +160,7 @@ public class TournamentController {
 	}
 
 	@GetMapping("/treasurer/getalltournamentplayerpaymentstatusreport/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getAllTournamentPlayerPaymentStatusReport(
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -263,7 +263,7 @@ public class TournamentController {
 	}
 	
 	@PutMapping("/headclub/updateaftertournament/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateAfterTournament(@PathVariable(name = "tournamentId") int id, @RequestParam double totalAmountActual) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.updateAfterTournament(id, totalAmountActual),
 				HttpStatus.OK);

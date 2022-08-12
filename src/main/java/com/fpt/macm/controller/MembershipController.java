@@ -22,7 +22,7 @@ public class MembershipController {
 	MembershipService membershipService;
 
 	@GetMapping("/treasure/membership/{membershipInfoId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getListMembershipStatus(
 			@PathVariable(name = "membershipInfoId") int membershipInfoId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -30,14 +30,14 @@ public class MembershipController {
 	}
 
 	@PutMapping("/treasure/membership/update/{id}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateMembershipStatus(@PathVariable(name = "id") int id) {
 		return new ResponseEntity<ResponseMessage>(membershipService.updateStatusPaymenMembershipById(id),
 				HttpStatus.OK);
 	}
 
 	@PutMapping("/treasure/membership/membershipinfo/{semester}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateMembershipInfo(@RequestParam double amount,
 			@PathVariable(name = "semester") String semester) {
 		return new ResponseEntity<ResponseMessage>(membershipService.updateMembershipBySemester(amount, semester),
@@ -45,14 +45,14 @@ public class MembershipController {
 	}
 
 	@GetMapping("/treasure/membership/membershipinfo/{semester}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateMembershipInfo(@PathVariable(name = "semester") String semester) {
 		return new ResponseEntity<ResponseMessage>(membershipService.getMembershipInfoBySemester(semester),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/treasure/membership/getreportmembershippaymentstatus/{membershipInfoId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getReportMembershipPaymentStatus(
 			@PathVariable(name = "membershipInfoId") int membershipInfoId, @RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {

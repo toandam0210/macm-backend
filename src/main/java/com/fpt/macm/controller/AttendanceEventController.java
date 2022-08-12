@@ -22,7 +22,7 @@ public class AttendanceEventController {
 	AttendanceEventService attendanceEventService;
 
 	@PutMapping("/takeattendanceevent/{eventId}/{studentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> takeAttendanceEvent(@PathVariable(name = "eventId") int eventId,
 			@PathVariable(name = "studentId") String studentId, @RequestParam int status) {
 		return new ResponseEntity<ResponseMessage>(
@@ -30,14 +30,14 @@ public class AttendanceEventController {
 	}
 
 	@GetMapping("/checkattendance/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> checkAttendanceByEventId(@PathVariable(name = "eventId") int eventId) {
 		return new ResponseEntity<ResponseMessage>(attendanceEventService.checkAttendanceStatusByEventId(eventId),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/getlistoldeventtotakeattendancebysemester/{semesterName}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getListOldEventToTakeAttendanceBySemester(
 			@PathVariable(name = "semesterName") String semesterName) {
 		return new ResponseEntity<ResponseMessage>(
