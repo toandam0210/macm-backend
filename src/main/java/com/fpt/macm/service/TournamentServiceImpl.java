@@ -1808,7 +1808,7 @@ public class TournamentServiceImpl implements TournamentService {
 				List<ExhibitionTeam> listExhibitionTeams = new ArrayList<ExhibitionTeam>();
 				Set<ExhibitionType> listExhibitionTypes = getTournament.getExhibitionTypes();
 				for (ExhibitionType exhibitionType : listExhibitionTypes) {
-					exhibitionType.setStatus(null);
+					exhibitionType.setStatus(2);
 					List<ExhibitionTeam> getTeams = new ArrayList<ExhibitionTeam>(exhibitionType.getExhibitionTeams());
 					listExhibitionTeams.addAll(getTeams);
 				}
