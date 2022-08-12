@@ -50,8 +50,8 @@ public class DashboardController {
 		return new ResponseEntity<ResponseMessage>(dashboardService.feeReport(semester), HttpStatus.OK);
 	}
 	
-	@GetMapping("/getallupcomingactivities/{semesterName}")
-	ResponseEntity<ResponseMessage> getAllUpcomingActivities(@PathVariable(name = "semesterName") String semesterName) {
-		return new ResponseEntity<ResponseMessage>(dashboardService.getAllUpcomingActivities(semesterName), HttpStatus.OK);
+	@GetMapping("/getallupcomingactivities")
+	ResponseEntity<ResponseMessage> getAllUpcomingActivities() {
+		return new ResponseEntity<ResponseMessage>(dashboardService.getAllUpcomingActivities(), HttpStatus.OK);
 	}
 }
