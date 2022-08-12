@@ -2,6 +2,7 @@ package com.fpt.macm.model.dto;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class EventDto implements Comparable<EventDto> {
 	private int id;
@@ -11,10 +12,15 @@ public class EventDto implements Comparable<EventDto> {
 	private double amountPerMemberRegister;
 	private double totalAmount;
 	private double amountFromClub;
-	private LocalDate startDate;
 	private String description;
 	private LocalDateTime registrationMemberDeadline;
 	private LocalDateTime registrationOrganizingCommitteeDeadline;
+	private LocalDate startDate;
+	private LocalDate endDate;
+	private LocalTime startTime;
+	private LocalTime endTime;
+	private int totalAttend;
+	private int totalJoin;
 
 	public String getStatus() {
 		return status;
@@ -108,6 +114,46 @@ public class EventDto implements Comparable<EventDto> {
 
 	public void setRegistrationOrganizingCommitteeDeadline(LocalDateTime registrationOrganizingCommitteeDeadline) {
 		this.registrationOrganizingCommitteeDeadline = registrationOrganizingCommitteeDeadline;
+	}
+
+	public LocalDate getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(LocalDate endDate) {
+		this.endDate = endDate;
+	}
+
+	public LocalTime getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(LocalTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public LocalTime getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(LocalTime endTime) {
+		this.endTime = endTime;
+	}
+
+	public int getTotalAttend() {
+		return totalAttend;
+	}
+
+	public void setTotalAttend(int totalAttend) {
+		this.totalAttend = totalAttend;
+	}
+
+	public int getTotalJoin() {
+		return totalJoin;
+	}
+
+	public void setTotalJoin(int totalJoin) {
+		this.totalJoin = totalJoin;
 	}
 
 }
