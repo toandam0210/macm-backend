@@ -1808,7 +1808,7 @@ public class TournamentServiceImpl implements TournamentService {
 				List<ExhibitionTeam> listExhibitionTeams = new ArrayList<ExhibitionTeam>();
 				Set<ExhibitionType> listExhibitionTypes = getTournament.getExhibitionTypes();
 				for (ExhibitionType exhibitionType : listExhibitionTypes) {
-					exhibitionType.setStatus(null);
+					exhibitionType.setStatus(2);
 					List<ExhibitionTeam> getTeams = new ArrayList<ExhibitionTeam>(exhibitionType.getExhibitionTeams());
 					listExhibitionTeams.addAll(getTeams);
 				}
@@ -1944,6 +1944,13 @@ public class TournamentServiceImpl implements TournamentService {
 						}
 					}
 					responseMessage.setMessage("Phân chia thời gian cho tất cả thể loại");
+					for (CompetitiveType competitiveType : listCompetitiveTypes) {
+						competitiveType.setStatus(3);
+					}
+					for (ExhibitionType exhibitionType : listExhibitionTypes) {
+						exhibitionType.setStatus(3);
+					}
+					tournamentRepository.save(getTournament);
 				} else {
 					responseMessage.setMessage("Không thành công. Chỉ đủ thời gian để tổ chức " + timeMatchCanHeld + "/"
 							+ timeMatchNeedHeld + " trận đấu");
