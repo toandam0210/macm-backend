@@ -583,31 +583,31 @@ public class DashboardSeviceTest {
 	
 	@Test
 	public void getAllUpcomingActivitiesCaseSuccess() {
-		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findAll()).thenReturn(Arrays.asList(event()));
 		when(eventService.getStartDate(anyInt())).thenReturn(LocalDate.now().plusMonths(1));
-		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament()));
 		when(tournamentService.getStartDate(anyInt())).thenReturn(LocalDate.now().plusMonths(1));
 		
-		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities(semester().getName());
+		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities();
 		assertEquals(responseMessage.getData().size(), 2);
 	}
 	
 	@Test
 	public void getAllUpcomingActivitiesCaseEmpty() {
-		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(Arrays.asList(event()));
+		when(eventRepository.findAll()).thenReturn(Arrays.asList(event()));
 		when(eventService.getStartDate(anyInt())).thenReturn(LocalDate.now().minusMonths(1));
-		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
+		when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament()));
 		when(tournamentService.getStartDate(anyInt())).thenReturn(LocalDate.now().minusMonths(1));
 		
-		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities(semester().getName());
+		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities();
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 	@Test
 	public void getAllUpcomingActivitiesCaseException() {
-		when(eventRepository.findBySemesterOrderByIdAsc(anyString())).thenReturn(null);
+		when(eventRepository.findAll()).thenReturn(null);
 		
-		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities(semester().getName());
+		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities();
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 }
