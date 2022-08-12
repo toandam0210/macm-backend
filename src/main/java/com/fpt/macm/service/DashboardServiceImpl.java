@@ -122,6 +122,9 @@ public class DashboardServiceImpl implements DashboardService {
 				Semester semester = semesterOp.get();
 				List<TrainingSchedule> trainingSchedulesBySemester = trainingScheduleRepository
 						.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
+				List<TrainingSchedule> trainingSchedulesHasDone = trainingScheduleRepository
+						.listTrainingScheduleByTime(semester.getStartDate(), LocalDate.now());
+				int totalAttendInSemester = 0;
 				for (TrainingSchedule trainingSchedule : trainingSchedulesBySemester) {
 					int totalUserJoinTrainingSession = 0;
 					int totalUserAttentInTrainingSession = 0;
@@ -133,6 +136,7 @@ public class DashboardServiceImpl implements DashboardService {
 							totalUserJoinTrainingSession++;
 							if (attendanceStatus.getStatus() == 1) {
 								totalUserAttentInTrainingSession++;
+								totalAttendInSemester++;
 							}
 							if (attendanceStatus.getStatus() == 0) {
 								totalUserAbsentInTrainingSession++;
@@ -154,6 +158,9 @@ public class DashboardServiceImpl implements DashboardService {
 				responseMessage.setData(attendanceReportDtos);
 				responseMessage.setMessage("Lấy dữ liệu điểm danh thành công");
 				responseMessage.setTotalResult(attendanceReportDtos.size());
+				responseMessage.setPageSize(trainingSchedulesBySemester.size());
+				// tổng số người tham gia các buổi đã diễn ra chia cho tổng số buổi đã diễn ra
+				responseMessage.setTotalActive(totalAttendInSemester / trainingSchedulesHasDone.size());
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
@@ -399,4 +406,5 @@ public class DashboardServiceImpl implements DashboardService {
 		}
 		return responseMessage;
 	}
+	
 }
