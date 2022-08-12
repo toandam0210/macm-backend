@@ -15,4 +15,6 @@ public interface AttendanceEventRepository extends JpaRepository<AttendanceEvent
 	
 	Optional<AttendanceEvent> findByEventIdAndUserId(int eventId, int userId);
 	
+	List<AttendanceEvent> findByEventIdAndStatus(int eventId, int status);
+	
 }
