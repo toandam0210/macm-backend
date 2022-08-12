@@ -352,11 +352,11 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 	
 	@Override
-	public ResponseMessage getAllUpcomingActivities(String semesterName) {
+	public ResponseMessage getAllUpcomingActivities() {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<UpcomingActivityDto> upcomingActivitiesDto = new ArrayList<UpcomingActivityDto>();
-			List<Event> events = eventRepository.findBySemesterOrderByIdAsc(semesterName);
+			List<Event> events = eventRepository.findAll();
 			if (!events.isEmpty()) {
 				for (Event event : events) {
 					LocalDate startDate = eventService.getStartDate(event.getId());
@@ -371,7 +371,7 @@ public class DashboardServiceImpl implements DashboardService {
 				}
 			}
 
-			List<Tournament> tournaments = tournamentRepository.findBySemester(semesterName);
+			List<Tournament> tournaments = tournamentRepository.findAll();
 			if (!tournaments.isEmpty()) {
 				for (Tournament tournament : tournaments) {
 					LocalDate startDate = tournamentService.getStartDate(tournament.getId());
