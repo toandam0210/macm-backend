@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import com.fpt.macm.model.dto.ActivityReportDto;
 import com.fpt.macm.model.dto.AttendanceReportDto;
 import com.fpt.macm.model.dto.EventDashboardDto;
-import com.fpt.macm.model.dto.FeeBalanceDashboardDto;
 import com.fpt.macm.model.dto.FeeDashboardDto;
 import com.fpt.macm.model.dto.UpcomingActivityDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
@@ -236,7 +235,8 @@ public class DashboardServiceImpl implements DashboardService {
 				for (int i = startMonth; i < endMonth; i++) {
 					int totalIncome = 0;
 					int totalSpend = 0;
-
+					double latestBalance = 0;
+					
 					LocalDateTime startDate = LocalDateTime.of(year, i, 1, 0, 0, 0);
 					LocalDate startDateTemp = startDate.toLocalDate();
 					LocalDateTime endDate = LocalDateTime.of(year, i,
@@ -246,105 +246,19 @@ public class DashboardServiceImpl implements DashboardService {
 
 					List<ClubFundReport> clubFundReports = clubFundReportRepository.findAllFundChange(startDate,
 							endDate);
-					for (ClubFundReport clubFundReport : clubFundReports) {
-						double fundChange = clubFundReport.getFundChange();
-						if (fundChange < 0) {
-							totalSpend += -fundChange;
-						} else {
-							totalIncome += fundChange;
+
+					if (!clubFundReports.isEmpty()) {
+						for (ClubFundReport clubFundReport : clubFundReports) {
+							double fundChange = clubFundReport.getFundChange();
+							if (fundChange < 0) {
+								totalSpend += -fundChange;
+							} else {
+								totalIncome += fundChange;
+							}
 						}
+						latestBalance = clubFundReports.get(clubFundReports.size() - 1)
+								.getFundBalance();
 					}
-
-//					List<MembershipPaymentStatusReport> membershipPaymentStatusReports = membershipPaymentStatusReportRepository
-//							.findAllFundChange(startDate, endDate);
-//					for (MembershipPaymentStatusReport membershipPaymentStatusReport : membershipPaymentStatusReports) {
-//						double fundChange = membershipPaymentStatusReport.getFundChange();
-//						totalIncome += fundChange;
-//					}
-//
-//					List<EventPaymentStatusReport> eventPaymentStatusReports = eventPaymentStatusReportRepository
-//							.findAllFundChange(startDate, endDate);
-//					for (EventPaymentStatusReport eventPaymentStatusReport : eventPaymentStatusReports) {
-//						double fundChange = eventPaymentStatusReport.getFundChange();
-//						totalIncome += fundChange;
-//					}
-//
-//					List<TournamentOrganizingCommitteePaymentStatusReport> tournamentOrganizingCommitteePaymentStatusReports = tournamentOrganizingCommitteePaymentStatusReportRepository
-//							.findAllFundChange(startDate, endDate);
-//					for (TournamentOrganizingCommitteePaymentStatusReport tournamentOrganizingCommitteePaymentStatusReport : tournamentOrganizingCommitteePaymentStatusReports) {
-//						double fundChange = tournamentOrganizingCommitteePaymentStatusReport.getFundChange();
-//						totalIncome += fundChange;
-//					}
-//
-//					List<TournamentPlayerPaymentStatusReport> tournamentPlayerPaymentStatusReports = tournamentPlayerPaymentStatusReportRepository
-//							.findAllFundChange(startDate, endDate);
-//					for (TournamentPlayerPaymentStatusReport tournamentPlayerPaymentStatusReport : tournamentPlayerPaymentStatusReports) {
-//						double fundChange = tournamentPlayerPaymentStatusReport.getFundChange();
-//						totalIncome += fundChange;
-//					}
-//
-//					List<FeeBalanceDashboardDto> feeBalancesDashboardDto = new ArrayList<FeeBalanceDashboardDto>();
-//
-//					if (!clubFundReports.isEmpty()) {
-//						Comparator<ClubFundReport> clubFundReportComparator = Comparator
-//								.comparing(ClubFundReport::getCreatedOn);
-//						ClubFundReport latestClubFundReport = clubFundReports.stream().max(clubFundReportComparator)
-//								.get();
-//						feeBalancesDashboardDto.add(createFeeBalanceDashboardDto(latestClubFundReport.getFundBalance(),
-//								latestClubFundReport.getCreatedOn()));
-//					}
-//
-//					if (!membershipPaymentStatusReports.isEmpty()) {
-//						Comparator<MembershipPaymentStatusReport> membershipPaymentStatusReportComparator = Comparator
-//								.comparing(MembershipPaymentStatusReport::getCreatedOn);
-//						MembershipPaymentStatusReport latestMembershipPaymentStatusReport = membershipPaymentStatusReports
-//								.stream().max(membershipPaymentStatusReportComparator).get();
-//						feeBalancesDashboardDto
-//								.add(createFeeBalanceDashboardDto(latestMembershipPaymentStatusReport.getFundBalance(),
-//										latestMembershipPaymentStatusReport.getCreatedOn()));
-//					}
-//
-//					if (!eventPaymentStatusReports.isEmpty()) {
-//						Comparator<EventPaymentStatusReport> eventPaymentStatusReportComparator = Comparator
-//								.comparing(EventPaymentStatusReport::getCreatedOn);
-//						EventPaymentStatusReport latestEventPaymentStatusReport = eventPaymentStatusReports.stream()
-//								.max(eventPaymentStatusReportComparator).get();
-//						feeBalancesDashboardDto
-//								.add(createFeeBalanceDashboardDto(latestEventPaymentStatusReport.getFundBalance(),
-//										latestEventPaymentStatusReport.getCreatedOn()));
-//					}
-//
-//					if (!tournamentOrganizingCommitteePaymentStatusReports.isEmpty()) {
-//						Comparator<TournamentOrganizingCommitteePaymentStatusReport> tournamentOrganizingCommitteePaymentStatusReportComparator = Comparator
-//								.comparing(TournamentOrganizingCommitteePaymentStatusReport::getCreatedOn);
-//						TournamentOrganizingCommitteePaymentStatusReport latestTournamentOrganizingCommitteePaymentStatusReport = tournamentOrganizingCommitteePaymentStatusReports
-//								.stream().max(tournamentOrganizingCommitteePaymentStatusReportComparator).get();
-//						feeBalancesDashboardDto.add(createFeeBalanceDashboardDto(
-//								latestTournamentOrganizingCommitteePaymentStatusReport.getFundBalance(),
-//								latestTournamentOrganizingCommitteePaymentStatusReport.getCreatedOn()));
-//					}
-//
-//					if (!tournamentPlayerPaymentStatusReports.isEmpty()) {
-//						Comparator<TournamentPlayerPaymentStatusReport> tournamentPlayerPaymentStatusReportComparator = Comparator
-//								.comparing(TournamentPlayerPaymentStatusReport::getCreatedOn);
-//						TournamentPlayerPaymentStatusReport latestTournamentPlayerPaymentStatusReport = tournamentPlayerPaymentStatusReports
-//								.stream().max(tournamentPlayerPaymentStatusReportComparator).get();
-//						feeBalancesDashboardDto.add(
-//								createFeeBalanceDashboardDto(latestTournamentPlayerPaymentStatusReport.getFundBalance(),
-//										latestTournamentPlayerPaymentStatusReport.getCreatedOn()));
-//					}
-
-//					double latestBalance = 0;
-					
-					double latestBalance = clubFundReports.get(clubFundReports.size() - 1).getFundBalance();
-
-//					if (!feeBalancesDashboardDto.isEmpty()) {
-//						Comparator<FeeBalanceDashboardDto> feeBalanceDashboardDtoComparator = Comparator
-//								.comparing(FeeBalanceDashboardDto::getCreatedOn);
-//						FeeBalanceDashboardDto latestFeeBalanceDashboardDto = feeBalancesDashboardDto.stream()
-//								.max(feeBalanceDashboardDtoComparator).get();
-//						latestBalance = latestFeeBalanceDashboardDto.getBalance();
-//					}
 
 					FeeDashboardDto feeDashboardDto = new FeeDashboardDto();
 					feeDashboardDto.setSemester(semesterName);
@@ -368,13 +282,6 @@ public class DashboardServiceImpl implements DashboardService {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
-	}
-
-	private FeeBalanceDashboardDto createFeeBalanceDashboardDto(double balance, LocalDateTime createdOn) {
-		FeeBalanceDashboardDto feeBalanceDashboardDto = new FeeBalanceDashboardDto();
-		feeBalanceDashboardDto.setBalance(balance);
-		feeBalanceDashboardDto.setCreatedOn(createdOn);
-		return feeBalanceDashboardDto;
 	}
 
 	private double getClubFund() {
@@ -468,10 +375,10 @@ public class DashboardServiceImpl implements DashboardService {
 
 			ActivityReportDto activityReportDto = new ActivityReportDto();
 			activityReportDto.setTotalTournamentAndEvent(totalEvent + totalTournament);
-			activityReportDto.setAverageMembersPerTournamentAndEvent((int) Math.round(
-					(totalMemberJoinEvent + totalMemberJoinTournament) / (totalEvent + totalTournament)));
-			activityReportDto.setAverageCommitteePerTournamentAndEvent((int) Math.round(
-					(totalOrganizingEvent + totalOrganizingTournament) / (totalEvent + totalTournament)));
+			activityReportDto.setAverageMembersPerTournamentAndEvent((int) Math
+					.round((totalMemberJoinEvent + totalMemberJoinTournament) / (totalEvent + totalTournament)));
+			activityReportDto.setAverageCommitteePerTournamentAndEvent((int) Math
+					.round((totalOrganizingEvent + totalOrganizingTournament) / (totalEvent + totalTournament)));
 
 			responseMessage.setData(Arrays.asList(activityReportDto));
 			responseMessage.setMessage("Lấy báo cáo tổng quan cho ban chuyên môn thành công");
