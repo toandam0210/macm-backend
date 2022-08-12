@@ -20,7 +20,6 @@ import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.dto.UserEventSemesterDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
-import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventRole;
@@ -32,7 +31,6 @@ import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AttendanceStatusRepository;
-import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventRoleRepository;
@@ -60,9 +58,6 @@ public class EventServiceImpl implements EventService {
 
 	@Autowired
 	SemesterRepository semesterRepository;
-
-	@Autowired
-	ClubFundRepository clubFundRepository;
 
 	@Autowired
 	EventScheduleService eventScheduleService;
@@ -96,7 +91,10 @@ public class EventServiceImpl implements EventService {
 
 	@Autowired
 	EventRoleRepository eventRoleRepository;
-
+	
+	@Autowired
+	ClubFundService clubFundService;
+	
 	@Override
 	public ResponseMessage createEvent(EventCreateDto eventCreateDto, boolean isOverwritten) {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -128,11 +126,9 @@ public class EventServiceImpl implements EventService {
 				event.setStatus(true);
 				eventRepository.save(event);
 
-				// Trừ tiền từ clb
-				List<ClubFund> clubFunds = clubFundRepository.findAll();
-				ClubFund clubFund = clubFunds.get(0);
-				clubFund.setFundAmount(clubFund.getFundAmount() - event.getAmountFromClub());
-				clubFundRepository.save(clubFund);
+				if (event.getAmountFromClub() > 0) {
+					clubFundService.withdrawFromClubFund(event.getAmountFromClub(), ("Rút tiền để tổ chức sự kiện " + event.getName()));
+				}
 
 				Event newEvent = eventRepository.findAll(Sort.by("id").descending()).get(0);
 
@@ -309,6 +305,10 @@ public class EventServiceImpl implements EventService {
 					eventRepository.save(event);
 
 					notificationService.createEventDeleteNotification(event.getId(), event.getName());
+					
+					if (event.getAmountFromClub() > 0) {
+						clubFundService.depositToClubFund(event.getAmountFromClub(), ("Hoàn tiền tổ chức sự kiện " + event.getName()));
+					}
 
 					responseMessage.setData(Arrays.asList(event));
 					responseMessage.setMessage("Xóa sự kiện thành công");
@@ -579,20 +579,14 @@ public class EventServiceImpl implements EventService {
 						getEvent.setAmountFromClub(getEvent.getAmountFromClub() + money);
 						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());
 						// trừ tiền từ clb
-						List<ClubFund> clubFunds = clubFundRepository.findAll();
-						ClubFund clubFund = clubFunds.get(0);
-						clubFund.setFundAmount(clubFund.getFundAmount() - money);
-						clubFundRepository.save(clubFund);
+						clubFundService.withdrawFromClubFund(money, ("Phát sinh từ sự kiện " + getEvent.getName()));
 					} else {
 						double amountPerMore = money / countMemberEvent;
 						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated() + amountPerMore);
 					}
 				} else {
 					// cộng tiền vào clb
-					List<ClubFund> clubFunds = clubFundRepository.findAll();
-					ClubFund clubFund = clubFunds.get(0);
-					clubFund.setFundAmount(clubFund.getFundAmount() + money);
-					clubFundRepository.save(clubFund);
+					clubFundService.depositToClubFund(money, ("Tiền dư từ sự kiện " + getEvent.getName()));
 					getEvent.setAmountFromClub(
 							getEvent.getAmountFromClub() - money >= 0 ? getEvent.getAmountFromClub() - money : 0);
 					getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());

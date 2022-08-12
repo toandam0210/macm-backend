@@ -883,6 +883,7 @@ public class UserServiceImpl implements UserService {
 					userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
 					userAttendanceStatusDto.setTitle("Lịch tập");
 					userAttendanceStatusDto.setType(0);
+					userAttendanceStatusDto.setId(trainingSchedule.getId());
 					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 				} else {
 					AttendanceStatus attendanceStatus = attendanceStatusRepository
@@ -897,6 +898,7 @@ public class UserServiceImpl implements UserService {
 						userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
 						userAttendanceStatusDto.setTitle("Lịch tập");
 						userAttendanceStatusDto.setType(0);
+						userAttendanceStatusDto.setId(trainingSchedule.getId());
 						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 					} else {
 						UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
@@ -908,6 +910,7 @@ public class UserServiceImpl implements UserService {
 						userAttendanceStatusDto.setFinishTime(attendanceStatus.getTrainingSchedule().getFinishTime());
 						userAttendanceStatusDto.setTitle("Lịch tập");
 						userAttendanceStatusDto.setType(0);
+						userAttendanceStatusDto.setId(trainingSchedule.getId());
 						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 					}
 				}
@@ -925,6 +928,7 @@ public class UserServiceImpl implements UserService {
 					userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
 					userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 					userAttendanceStatusDto.setType(1);
+					userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
 					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 				} else {
 					Optional<MemberEvent> memberEventOp = memberEventRepository
@@ -946,6 +950,7 @@ public class UserServiceImpl implements UserService {
 								userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
 								userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 								userAttendanceStatusDto.setType(1);
+								userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
 								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 							} else {
 								UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
@@ -957,6 +962,7 @@ public class UserServiceImpl implements UserService {
 								userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
 								userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 								userAttendanceStatusDto.setType(1);
+								userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
 								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 							}
 						} else {
@@ -969,6 +975,7 @@ public class UserServiceImpl implements UserService {
 							userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
 							userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 							userAttendanceStatusDto.setType(1);
+							userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
 							listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 						}
 					} else {
@@ -981,6 +988,7 @@ public class UserServiceImpl implements UserService {
 						userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
 						userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 						userAttendanceStatusDto.setType(1);
+						userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
 						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 					}
 				}
@@ -997,6 +1005,7 @@ public class UserServiceImpl implements UserService {
 				userAttendanceStatusDto.setFinishTime(tournamentSchedule.getFinishTime());
 				userAttendanceStatusDto.setTitle(tournamentSchedule.getTournament().getName());
 				userAttendanceStatusDto.setType(2);
+				userAttendanceStatusDto.setId(tournamentSchedule.getTournament().getId());
 				listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 			}
 

@@ -182,7 +182,9 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ExhibitionResultRepository exhibitionResultRepository;
-	
+
+	@Autowired
+	ClubFundService clubFundService;
 
 	@Override
 	public ResponseMessage createTournament(TournamentCreateDto tournamentCreateDto, boolean isOverwritten) {
@@ -228,10 +230,10 @@ public class TournamentServiceImpl implements TournamentService {
 				tournamentRepository.save(tournament);
 
 				// Trừ tiền từ clb
-				List<ClubFund> clubFunds = clubFundRepository.findAll();
-				ClubFund clubFund = clubFunds.get(0);
-				clubFund.setFundAmount(clubFund.getFundAmount() - tournament.getTotalAmountFromClubEstimate());
-				clubFundRepository.save(clubFund);
+				if (tournament.getTotalAmountFromClubEstimate() > 0) {
+					clubFundService.withdrawFromClubFund(tournament.getTotalAmountFromClubEstimate(),
+							("Rút tiền để tổ chức giải đấu " + tournament.getName()));
+				}
 
 				Tournament newTournament = tournamentRepository.findAll(Sort.by("id").descending()).get(0);
 
@@ -536,6 +538,11 @@ public class TournamentServiceImpl implements TournamentService {
 					tournamentRepository.save(tournament);
 
 					notificationService.createTournamentDeleteNotification(tournament.getId(), tournament.getName());
+					
+					if (tournament.getTotalAmountFromClubEstimate() > 0) {
+						clubFundService.depositToClubFund(tournament.getTotalAmountFromClubEstimate(),
+								("Hoàn tiền tổ chức giải đấu " + tournament.getName()));
+					}
 
 					responseMessage.setData(Arrays.asList(tournament));
 					responseMessage.setMessage(Constant.MSG_102);
@@ -994,8 +1001,19 @@ public class TournamentServiceImpl implements TournamentService {
 			double fundBalance = tournamentOrganizingCommittee.isPaymentStatus() ? (fundAmount - tournamentFee)
 					: (fundAmount + tournamentFee);
 
-			clubFund.setFundAmount(fundBalance);
-			clubFundRepository.save(clubFund);
+			if (tournamentOrganizingCommittee.isPaymentStatus()) {
+				clubFundService.withdrawFromClubFund(tournamentFee,
+						"Cập nhật trạng thái đóng phí tham gia giải đấu "
+								+ tournament.getName() + " của "
+								+ tournamentOrganizingCommittee.getUser().getName() + " - "
+								+ tournamentOrganizingCommittee.getUser().getStudentId() + " thành chưa đóng");
+			} else {
+				clubFundService.depositToClubFund(tournamentFee,
+						"Cập nhật trạng thái đóng phí tham gia giải đấu "
+								+ tournament.getName() + " của "
+								+ tournamentOrganizingCommittee.getUser().getName() + " - "
+								+ tournamentOrganizingCommittee.getUser().getStudentId() + " thành đã đóng");
+			}
 
 			TournamentOrganizingCommitteePaymentStatusReport tournamentOrganizingCommitteePaymentStatusReport = new TournamentOrganizingCommitteePaymentStatusReport();
 			tournamentOrganizingCommitteePaymentStatusReport
@@ -1084,8 +1102,19 @@ public class TournamentServiceImpl implements TournamentService {
 			double fundBalance = tournamentPlayer.isPaymentStatus() ? (fundAmount - tournamentFee)
 					: (fundAmount + tournamentFee);
 
-			clubFund.setFundAmount(fundBalance);
-			clubFundRepository.save(clubFund);
+			if (tournamentPlayer.isPaymentStatus()) {
+				clubFundService.withdrawFromClubFund(tournamentFee,
+						"Cập nhật trạng thái đóng phí tham gia giải đấu "
+								+ tournament.getName() + " của "
+								+ tournamentPlayer.getUser().getName() + " - "
+								+ tournamentPlayer.getUser().getStudentId() + " thành chưa đóng");
+			} else {
+				clubFundService.depositToClubFund(tournamentFee,
+						"Cập nhật trạng thái đóng phí tham gia giải đấu "
+								+ tournament.getName() + " của "
+								+ tournamentPlayer.getUser().getName() + " - "
+								+ tournamentPlayer.getUser().getStudentId() + " thành đã đóng");
+			}
 
 			TournamentPlayerPaymentStatusReport tournamentPlayerPaymentStatusReport = new TournamentPlayerPaymentStatusReport();
 			tournamentPlayerPaymentStatusReport.setTournament(tournament);
@@ -1989,19 +2018,22 @@ public class TournamentServiceImpl implements TournamentService {
 				getTournament.setTotalAmount(totalAmountActual);
 				getTournament.setTotalAmountFromClubActual(totalAmountActual - totalProceedsActual);
 
-				List<ClubFund> clubFunds = clubFundRepository.findAll();
-				ClubFund clubFund = clubFunds.get(0);
-				clubFund.setFundAmount(clubFund.getFundAmount() - (getTournament.getTotalAmountFromClubActual())
-						+ getTournament.getTotalAmountEstimate());
-				clubFundRepository.save(clubFund);
+				if (getTournament.getTotalAmountFromClubActual() > getTournament.getTotalAmountEstimate()) {
+					clubFundService.withdrawFromClubFund(
+							(getTournament.getTotalAmountFromClubActual() - getTournament.getTotalAmountEstimate()),
+							"Phát sinh thêm từ giải đấu " + getTournament.getName());
+				} else if (getTournament.getTotalAmountFromClubActual() < getTournament.getTotalAmountEstimate()) {
+					clubFundService.depositToClubFund(
+							(getTournament.getTotalAmountEstimate() - getTournament.getTotalAmountFromClubActual()),
+							"Tiền dư từ giải đấu " + getTournament.getName());
+				}
 
 				getTournament.setUpdatedBy("LinhLHN");
 				getTournament.setUpdatedOn(LocalDateTime.now());
 				tournamentRepository.save(getTournament);
 				responseMessage.setData(Arrays.asList(getTournament));
 				responseMessage.setMessage(Constant.MSG_129);
-			}
-			else {
+			} else {
 				responseMessage.setMessage("Không tìm thấy giải đấu");
 			}
 		} catch (Exception e) {

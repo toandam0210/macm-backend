@@ -2,6 +2,7 @@ package com.fpt.macm.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,13 +42,13 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	SemesterRepository semesterRepository;
 
 	@Autowired
 	SemesterService semesterService;
-	
+
 	@Autowired
 	EventRepository eventRepository;
 
@@ -123,18 +124,18 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 				attendanceEventDto.setName(attendanceEvent.getUser().getName());
 				attendanceEventDto.setStudentId(attendanceEvent.getUser().getStudentId());
 				attendanceEventDto.setStatus(attendanceEvent.getStatus());
-				
+
 				if (attendanceEvent.getStatus() == 1) {
 					attend++;
 				}
 				if (attendanceEvent.getStatus() == 0) {
 					absent++;
 				}
-				
+
 				attendanceEventDto.setDate(startDate);
 				attendanceEventDtos.add(attendanceEventDto);
 			}
-			
+
 			Collections.sort(attendanceEventDtos);
 			responseMessage.setData(attendanceEventDtos);
 			responseMessage.setMessage(Constant.MSG_057);
@@ -158,27 +159,38 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 			} else {
 				semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			}
-			
+
 			List<EventDto> eventsDto = new ArrayList<EventDto>();
 			List<Event> events = eventRepository.findBySemesterOrderByIdAsc(semester.getName());
 			for (Event event : events) {
 				List<EventSchedule> eventSchedules = eventScheduleRepository.findByEventId(event.getId());
 				if (!eventSchedules.isEmpty()) {
 					LocalDate eventStartDate = eventSchedules.get(0).getDate();
+					LocalDate eventEndDate = eventSchedules.get(eventSchedules.size() - 1).getDate();
+					LocalTime eventStartTime = eventSchedules.get(0).getStartTime();
+					LocalTime eventEndTime = eventSchedules.get(eventSchedules.size() - 1).getFinishTime();
 					if (eventStartDate.isBefore(LocalDate.now())) {
+						List<AttendanceEvent> attendedEvent = attendanceEventRepository
+								.findByEventIdAndStatus(event.getId(), 1);
+						List<AttendanceEvent> attendancesEvent = attendanceEventRepository.findByEventId(event.getId());
 						EventDto eventDto = new EventDto();
 						eventDto.setId(event.getId());
-						eventDto.setName(event.getName());
+						eventDto.setName("Sự kiện " + event.getName());
 						eventDto.setStartDate(eventStartDate);
+						eventDto.setEndDate(eventEndDate);
+						eventDto.setStartTime(eventStartTime);
+						eventDto.setEndTime(eventEndTime);
+						eventDto.setTotalAttend(attendedEvent.size());
+						eventDto.setTotalJoin(attendancesEvent.size());
 						eventsDto.add(eventDto);
 					}
 				}
 			}
 			if (!eventsDto.isEmpty()) {
 				responseMessage.setData(eventsDto);
-				responseMessage.setMessage("Lấy danh sách các sự kiện đã qua của kỳ " + semester.getName() + " để điểm danh lại thành công");
-			}
-			else {
+				responseMessage.setMessage("Lấy danh sách các sự kiện đã qua của kỳ " + semester.getName()
+						+ " để điểm danh lại thành công");
+			} else {
 				responseMessage.setMessage("Không có sự kiện nào đã qua để điểm danh lại");
 			}
 		} catch (Exception e) {

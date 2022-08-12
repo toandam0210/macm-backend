@@ -13,9 +13,7 @@ import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CommonScheduleRepository;
-import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.SemesterRepository;
-import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service

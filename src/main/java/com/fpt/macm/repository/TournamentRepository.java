@@ -15,7 +15,7 @@ public interface TournamentRepository extends JpaRepository<Tournament, Integer>
 	@Query(value = "select * from tournament where name like ?1", nativeQuery = true)
 	Optional<Tournament> findByExactName(String name);
 	
-	@Query(value = "select * from tournament where semester like ?1", nativeQuery = true)
+	@Query(value = "select * from tournament where semester like ?1 and status = true", nativeQuery = true)
 	List<Tournament> findBySemester(String semester);
 	
 	Optional<Tournament> findByTournamentPlayers(TournamentPlayer tournamentPlayer);
