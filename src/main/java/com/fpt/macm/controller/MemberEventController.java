@@ -28,21 +28,21 @@ public class MemberEventController {
 	MemberEventService memberEventService;
 
 	@PutMapping("/headculture/updatelistmembereventrole")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateListMemberEventRole(@RequestBody List<MemberEventDto> membersEventDto) {
 		return new ResponseEntity<ResponseMessage>(memberEventService.updateListMemberEventRole(membersEventDto),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/headculture/getallmembercanceljoinevent/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getAllMemberCancelJoinEvent(@PathVariable(name = "eventId") int eventId) {
 		return new ResponseEntity<ResponseMessage>(memberEventService.getAllMemberCancelJoinEvent(eventId),
 				HttpStatus.OK);
 	}
 
 	@PutMapping("/treasurer/updatemembereventpaymentstatus/{memberEventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateMemberEventPaymentStatus(
 			@PathVariable(name = "memberEventId") int memberEventId) {
 		return new ResponseEntity<ResponseMessage>(memberEventService.updateMemberEventPaymentStatus(memberEventId),
@@ -50,14 +50,14 @@ public class MemberEventController {
 	}
 
 	@GetMapping("treasurer/getreportpaymentstatus/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getReportPaymentStatus(@PathVariable(name = "eventId") int eventId) {
 		return new ResponseEntity<ResponseMessage>(memberEventService.getReportPaymentStatusByEventId(eventId),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/headculture/getmemberjoinevent/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getAllMemberJoinEvent(@PathVariable(name = "eventId") int eventId,
 			@RequestParam(defaultValue = "0") int filterIndex) {
 		return new ResponseEntity<ResponseMessage>(
@@ -65,7 +65,7 @@ public class MemberEventController {
 	}
 
 	@GetMapping("/headculture/getlistmembereventtoupdaterole/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getListMemberEventToUpdateRole(@PathVariable(name = "eventId") int eventId) {
 		return new ResponseEntity<ResponseMessage>(memberEventService.getListMemberEventToUpdateRole(eventId),
 				HttpStatus.OK);
@@ -77,7 +77,7 @@ public class MemberEventController {
 	}
 
 	@GetMapping("/headculture/getallsuggestionrole")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getAllSuggestionRole() {
 		return new ResponseEntity<ResponseMessage>(memberEventService.getAllSuggestionRole(), HttpStatus.OK);
 	}
@@ -90,7 +90,7 @@ public class MemberEventController {
 	}
 
 	@GetMapping("/headculture/getlistmembernotjoin/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getListMemberNotJoinEvent(@PathVariable(name = "eventId") int eventId,
 			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
 		return new ResponseEntity<ResponseMessage>(
@@ -98,7 +98,7 @@ public class MemberEventController {
 	}
 
 	@PostMapping("/headculture/addlistmemberjoin/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> addListMemberJoinEvent(@PathVariable(name = "eventId") int eventId,
 			@RequestBody List<MemberNotJoinEventDto> listToJoin) {
 		return new ResponseEntity<ResponseMessage>(memberEventService.addListMemberJoinEvent(eventId, listToJoin),

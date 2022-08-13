@@ -33,7 +33,7 @@ public class EventScheduleController {
 	
 	
 	@PostMapping("/headculture/createpreview")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> createPreviewEventSchedule(@RequestParam String eventName, @RequestParam String startDate, 
 			@RequestParam String finishDate, @RequestParam String startTime, @RequestParam String finishTime) {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.createPreviewEventSchedule(eventName, startDate, finishDate, startTime, finishTime), HttpStatus.OK);
@@ -45,14 +45,14 @@ public class EventScheduleController {
 	}
 	
 	@PostMapping("/headculture/updatepreview/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updatePreviewEventSchedule(@PathVariable(name = "eventId") int eventId, @RequestParam String startDate, 
 			@RequestParam String finishDate, @RequestParam String startTime, @RequestParam String finishTime) {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.updatePreviewEventSchedule(eventId, startDate, finishDate, startTime, finishTime), HttpStatus.OK);
 	}
 	
 	@PostMapping("/headculture/updateschedule/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateEventSchedule(@PathVariable(name = "eventId") int eventId, 
 			@RequestBody List<ScheduleDto> listPreview, @RequestParam Boolean isOverwritten) {
 		return new ResponseEntity<ResponseMessage>(eventScheduleService.updateEventSchedule(eventId, listPreview, isOverwritten), HttpStatus.OK);

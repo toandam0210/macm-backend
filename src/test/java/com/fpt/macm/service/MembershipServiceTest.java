@@ -49,6 +49,9 @@ public class MembershipServiceTest {
 	@Mock
 	MembershipPaymentStatusReportRepository membershipPaymentStatusReportRepository;
 	
+	@Mock
+	ClubFundService clubFundService;
+	
 	private MembershipStatus membershipStatus() {
 		MembershipStatus membershipStatus = new MembershipStatus();
 		membershipStatus.setId(1);

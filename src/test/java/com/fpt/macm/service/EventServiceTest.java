@@ -102,6 +102,9 @@ public class EventServiceTest {
 
 	@Mock
 	TrainingScheduleRepository trainingScheduleRepository;
+	
+	@Mock
+	ClubFundService clubFundService;
 
 	public Event event() {
 		Event event = new Event();

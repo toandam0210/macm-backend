@@ -56,15 +56,15 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 			if (getTypeOp.isPresent()) {
 				CompetitiveType getType = getTypeOp.get();
 				responseMessage.setCode(getType.getStatus());
-				List<CompetitivePlayer> listPlayers = competitivePlayerRepository.findEligibleByCompetitiveTypeId(competitiveTypeId);
+				List<CompetitivePlayer> listPlayers = competitivePlayerRepository
+						.findEligibleByCompetitiveTypeId(competitiveTypeId);
 				if (listPlayers.size() == 0) {
 					responseMessage.setMessage("Chưa có danh sách tuyển thủ thi đấu");
 				} else {
 					List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByType(competitiveTypeId);
-					if(listMatchs.size() == 0) {
+					if (listMatchs.size() == 0) {
 						responseMessage.setMessage("Chưa tạo trận đấu cho thể thức này");
-					}
-					else {
+					} else {
 						List<CompetitiveMatchDto> listMatchDto = new ArrayList<CompetitiveMatchDto>();
 						for (CompetitiveMatch competitiveMatch : listMatchs) {
 							CompetitiveMatchDto newCompetitiveMatchDto = new CompetitiveMatchDto();
@@ -105,8 +105,22 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 							listMatchDto.add(newCompetitiveMatchDto);
 						}
 						Collections.sort(listMatchDto);
+
+						int index = 0;
+						for (CompetitiveMatchDto competitiveMatchDto : listMatchDto) {
+							if ((competitiveMatchDto.getFirstPlayer() == null
+									|| competitiveMatchDto.getSecondPlayer() == null)
+									&& competitiveMatchDto.getRound() == 1) {
+								
+							} else {
+								index++;
+							}
+							competitiveMatchDto.setMatchNo(index);
+						}
+
 						CompetitiveMatchByTypeDto competitiveMatchByTypeDto = new CompetitiveMatchByTypeDto();
-						competitiveMatchByTypeDto.setName((getType.isGender()? "Nam " : "Nữ ") + getType.getWeightMin() + " - " + getType.getWeightMax());
+						competitiveMatchByTypeDto.setName((getType.isGender() ? "Nam " : "Nữ ") + getType.getWeightMin()
+								+ " - " + getType.getWeightMax());
 						competitiveMatchByTypeDto.setChanged(getType.isChanged());
 						competitiveMatchByTypeDto.setStatus(getType.getStatus());
 						competitiveMatchByTypeDto.setListMatchDto(listMatchDto);
@@ -154,13 +168,13 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 			for (CompetitiveMatchDto matchDto : listUpdated) {
 				CompetitiveMatch getMatch = competitiveMatchRepository.findById(matchDto.getId()).get();
 
-				if(getMatch.getFirstStudentId() != null && matchDto.getFirstPlayer() != null) {
+				if (getMatch.getFirstStudentId() != null && matchDto.getFirstPlayer() != null) {
 					getMatch.setFirstStudentId(matchDto.getFirstPlayer().getStudentId());
 				}
-				if(getMatch.getSecondStudentId() != null && matchDto.getSecondPlayer() != null) {
+				if (getMatch.getSecondStudentId() != null && matchDto.getSecondPlayer() != null) {
 					getMatch.setSecondStudentId(matchDto.getSecondPlayer().getStudentId());
 				}
-				
+
 				getMatch.setUpdatedBy("LinhLHN");
 				getMatch.setUpdatedOn(LocalDateTime.now());
 				competitiveMatchRepository.save(getMatch);
@@ -276,10 +290,11 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 							getMatch.setUpdatedBy("LinhLHN");
 							getMatch.setUpdatedOn(LocalDateTime.now());
 							competitiveMatchRepository.save(getMatch);
-							Optional<CompetitiveMatch> nextMatchOp = competitiveMatchRepository.findById(getMatch.getNextMatchId());
-							if(nextMatchOp.isPresent()) {
-								CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId())
-										.get();
+							Optional<CompetitiveMatch> nextMatchOp = competitiveMatchRepository
+									.findById(getMatch.getNextMatchId());
+							if (nextMatchOp.isPresent()) {
+								CompetitiveMatch nextMatch = competitiveMatchRepository
+										.findById(getMatch.getNextMatchId()).get();
 								if (getMatch.isNextIsFirst()) {
 									nextMatch.setFirstStudentId(studentId);
 									nextMatch.setUpdatedBy("LinhLHN");
@@ -291,13 +306,15 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 									nextMatch.setUpdatedOn(LocalDateTime.now());
 									competitiveMatchRepository.save(nextMatch);
 								}
-							}			
+							}
 							currentMatch++;
 						}
 						for (int i = freePlayer; i < numberPlayer; i += 2) {
 							CompetitiveMatch getMatch = listMatch.get(currentMatch);
-							getMatch.setFirstStudentId(listPlayers.get(i).getTournamentPlayer().getUser().getStudentId());
-							getMatch.setSecondStudentId(listPlayers.get(i + 1).getTournamentPlayer().getUser().getStudentId());
+							getMatch.setFirstStudentId(
+									listPlayers.get(i).getTournamentPlayer().getUser().getStudentId());
+							getMatch.setSecondStudentId(
+									listPlayers.get(i + 1).getTournamentPlayer().getUser().getStudentId());
 							getMatch.setUpdatedBy("LinhLHN");
 							getMatch.setUpdatedOn(LocalDateTime.now());
 							competitiveMatchRepository.save(getMatch);
@@ -416,10 +433,11 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 							getMatch.setUpdatedBy("LinhLHN");
 							getMatch.setUpdatedOn(LocalDateTime.now());
 							competitiveMatchRepository.save(getMatch);
-							Optional<CompetitiveMatch> nextMatchOp = competitiveMatchRepository.findById(getMatch.getNextMatchId());
-							if(nextMatchOp.isPresent()) {
-								CompetitiveMatch nextMatch = competitiveMatchRepository.findById(getMatch.getNextMatchId())
-										.get();
+							Optional<CompetitiveMatch> nextMatchOp = competitiveMatchRepository
+									.findById(getMatch.getNextMatchId());
+							if (nextMatchOp.isPresent()) {
+								CompetitiveMatch nextMatch = competitiveMatchRepository
+										.findById(getMatch.getNextMatchId()).get();
 								if (getMatch.isNextIsFirst()) {
 									nextMatch.setFirstStudentId(studentId);
 									nextMatch.setUpdatedBy("LinhLHN");
@@ -431,13 +449,15 @@ public class CompetitiveMatchServiceImpl implements CompetitiveMatchService {
 									nextMatch.setUpdatedOn(LocalDateTime.now());
 									competitiveMatchRepository.save(nextMatch);
 								}
-							}			
+							}
 							currentMatch++;
 						}
 						for (int i = freePlayer; i < numberPlayer; i += 2) {
 							CompetitiveMatch getMatch = listMatch.get(currentMatch);
-							getMatch.setFirstStudentId(listPlayers.get(i).getTournamentPlayer().getUser().getStudentId());
-							getMatch.setSecondStudentId(listPlayers.get(i + 1).getTournamentPlayer().getUser().getStudentId());
+							getMatch.setFirstStudentId(
+									listPlayers.get(i).getTournamentPlayer().getUser().getStudentId());
+							getMatch.setSecondStudentId(
+									listPlayers.get(i + 1).getTournamentPlayer().getUser().getStudentId());
 							getMatch.setUpdatedBy("LinhLHN");
 							getMatch.setUpdatedOn(LocalDateTime.now());
 							competitiveMatchRepository.save(getMatch);

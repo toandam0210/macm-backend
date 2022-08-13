@@ -165,6 +165,9 @@ public class TournamentServiceTest {
 
 	@Mock
 	ExhibitionResultService exhibitionResultService;
+	
+	@Mock
+	ClubFundService clubFundService;
 
 	private Set<CompetitiveType> competitiveTypes() {
 		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();

@@ -13,4 +13,6 @@ public interface TournamentScheduleService {
 	ResponseMessage updateTournamentSession(int tournamentId, TournamentSchedule tournamentSchedule);
 	ResponseMessage deleteTournamentSession(int tournamentId);
 	TournamentSchedule getTournamentSessionByDate(LocalDate date);
+	ResponseMessage getAllTournamentSchedule();
+	
 }
