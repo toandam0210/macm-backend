@@ -71,6 +71,9 @@ public class MemberEventServiceTest {
 
 	@Mock
 	EventRoleRepository eventRoleRepository;
+	
+	@Mock
+	ClubFundService clubFundService;
 
 	private User user() {
 		User user = new User();
