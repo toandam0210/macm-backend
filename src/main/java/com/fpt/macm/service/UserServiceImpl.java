@@ -1110,4 +1110,94 @@ public class UserServiceImpl implements UserService {
 	        return true;
 	    }
 
+	@Override
+	public ResponseMessage addListUsersAndCollaborators(List<UserDto> listUserDtos) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<User> users = (List<User>) userRepository.findAll();
+			List<UserDto> listUserDtosValid = new ArrayList<UserDto>();
+			String message = "";
+			for (UserDto userDto : listUserDtos) {
+				boolean checkDuplicateEmail = false;
+				boolean checkDuplicateStudentId = false;
+				for (User user : users) {
+					if (user.getStudentId().equals(userDto.getStudentId())) {
+						checkDuplicateStudentId = true;
+					}
+					if (user.getEmail().equals(userDto.getEmail())) {
+						checkDuplicateEmail = true;
+					}
+				}
+				if (!checkDuplicateEmail && !checkDuplicateStudentId) {
+					User user = new User();
+					user.setStudentId(userDto.getStudentId());
+					user.setName(userDto.getName());
+					user.setGender(userDto.isGender());
+					user.setDateOfBirth(userDto.getDateOfBirth());
+					user.setEmail(userDto.getEmail());
+					user.setImage(userDto.getImage());
+					user.setPhone(userDto.getPhone());
+					user.setCurrentAddress(userDto.getCurrentAddress());
+					user.setGeneration(userDto.getGeneration());
+					Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
+					if (roleOptional.isPresent()) {
+						user.setRole(roleOptional.get());
+					}
+					user.setActive(true);
+					user.setCreatedBy("toandv");
+					user.setCreatedOn(LocalDate.now());
+					userRepository.save(user);
+					if (userDto.getRoleId() > 9 && userDto.getRoleId() < 13) {
+						MemberSemester memberSemester = new MemberSemester();
+						memberSemester.setUser(user);
+						memberSemester.setStatus(true);
+						Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+						memberSemester.setSemester(semester.getName());
+						memberSemesterRepository.save(memberSemester);
+					}
+
+					Optional<User> newUserOp = userRepository.findByStudentId(user.getStudentId());
+					List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
+					if (newUserOp.isPresent()) {
+						User newUser = newUserOp.get();
+						UserDto newUserDto = convertUserToUserDto(newUser);
+						listUserDtosValid.add(newUserDto);
+
+						List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
+								.findAllFutureTrainingSchedule(LocalDate.now());
+						for (TrainingSchedule trainingSchedule : trainingSchedules) {
+							AttendanceStatus attendanceStatus = new AttendanceStatus();
+							attendanceStatus.setUser(newUser);
+							attendanceStatus.setTrainingSchedule(trainingSchedule);
+							attendanceStatus.setCreatedOn(LocalDateTime.now());
+							attendanceStatus.setCreatedBy("toandv");
+							attendanceStatus.setStatus(2);
+							listAttendanceStatus.add(attendanceStatus);
+						}
+					}
+					
+					if (!listAttendanceStatus.isEmpty()) {
+						attendanceStatusRepository.saveAll(listAttendanceStatus);
+					}
+					
+					message += Constant.addSuccess(userDto);
+				} else {
+					if (checkDuplicateStudentId) {
+						message += Constant.MSG_048 + userDto.getStudentId() + Constant.MSG_050;
+					}
+					if (checkDuplicateEmail) {
+						message += Constant.MSG_049 + userDto.getEmail() + Constant.MSG_050;
+					}
+				}
+			}
+			responseMessage.setData(listUserDtosValid);
+			responseMessage.setMessage(message);
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+
+		return responseMessage;
+	}
+
 }
