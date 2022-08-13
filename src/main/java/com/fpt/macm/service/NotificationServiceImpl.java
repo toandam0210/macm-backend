@@ -376,29 +376,31 @@ public class NotificationServiceImpl implements NotificationService {
 			List<MemberEvent> membersEvent = memberEventRepository.findByUserId(user.getId());
 			if (!membersEvent.isEmpty()) {
 				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.isRegisterStatus()) {
-						Event event = memberEvent.getEvent();
-						double amountPerRegisterEstimate = event.getAmountPerRegisterEstimated();
-						double amountPerRegisterActual = event.getAmountPerRegisterActual();
+					if (memberEvent.getEvent().isStatus()) {
+						if (memberEvent.isRegisterStatus()) {
+							Event event = memberEvent.getEvent();
+							double amountPerRegisterEstimate = event.getAmountPerRegisterEstimated();
+							double amountPerRegisterActual = event.getAmountPerRegisterActual();
 
-						if (amountPerRegisterEstimate != 0) {
-							if (amountPerRegisterActual == 0) {
-								if (memberEvent.getPaymentValue() == 0) {
-									String message = "Sự kiện " + event.getName() + ": "
-											+ nf.format(amountPerRegisterEstimate) + " VND";
-									messages.add(message);
-								}
-							} else {
-								if (memberEvent.getPaymentValue() == 0) {
-									String message = "Sự kiện " + event.getName() + ": "
-											+ nf.format(amountPerRegisterActual) + " VND";
-									messages.add(message);
-								} else if (amountPerRegisterActual > amountPerRegisterEstimate) {
-									if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
+							if (amountPerRegisterEstimate != 0) {
+								if (amountPerRegisterActual == 0) {
+									if (memberEvent.getPaymentValue() == 0) {
 										String message = "Sự kiện " + event.getName() + ": "
-												+ nf.format((amountPerRegisterActual - amountPerRegisterEstimate))
-												+ " VND";
+												+ nf.format(amountPerRegisterEstimate) + " VND";
 										messages.add(message);
+									}
+								} else {
+									if (memberEvent.getPaymentValue() == 0) {
+										String message = "Sự kiện " + event.getName() + ": "
+												+ nf.format(amountPerRegisterActual) + " VND";
+										messages.add(message);
+									} else if (amountPerRegisterActual > amountPerRegisterEstimate) {
+										if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
+											String message = "Sự kiện " + event.getName() + ": "
+													+ nf.format((amountPerRegisterActual - amountPerRegisterEstimate))
+													+ " VND";
+											messages.add(message);
+										}
 									}
 								}
 							}
@@ -411,25 +413,31 @@ public class NotificationServiceImpl implements NotificationService {
 					.findByUserId(user.getId());
 			if (!tournamentOrganizingCommittees.isEmpty()) {
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					if (!tournamentOrganizingCommittee.isPaymentStatus()) {
-						String message = "Giải đấu " + tournamentOrganizingCommittee.getTournament().getName() + ": "
-								+ nf.format(tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay())
-								+ " VND";
-						messages.add(message);
+					if (tournamentOrganizingCommittee.getTournament().isStatus()) {
+						if (!tournamentOrganizingCommittee.isPaymentStatus()) {
+							String message = "Giải đấu " + tournamentOrganizingCommittee.getTournament().getName()
+									+ ": "
+									+ nf.format(
+											tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay())
+									+ " VND";
+							messages.add(message);
+						}
 					}
 				}
 			}
 
 			List<Tournament> tournaments = tournamentRepository.findAll();
 			for (Tournament tournament : tournaments) {
-				Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
-				for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
-					if (studentId.equals(tournamentPlayer.getUser().getStudentId())
-							&& !tournamentPlayer.isPaymentStatus()) {
-						String message = "Giải đấu " + tournament.getName() + ": "
-								+ nf.format(tournament.getFeePlayerPay()) + " VND";
-						messages.add(message);
-						break;
+				if (tournament.isStatus()) {
+					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+						if (studentId.equals(tournamentPlayer.getUser().getStudentId())
+								&& !tournamentPlayer.isPaymentStatus()) {
+							String message = "Giải đấu " + tournament.getName() + ": "
+									+ nf.format(tournament.getFeePlayerPay()) + " VND";
+							messages.add(message);
+							break;
+						}
 					}
 				}
 			}
