@@ -1,6 +1,8 @@
 package com.fpt.macm.model.dto;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class UserDto implements Comparable<UserDto> {
 	private int id;
@@ -16,7 +18,7 @@ public class UserDto implements Comparable<UserDto> {
 	private String name;
 	private int generation;
 	private String roleName;
-	private String messageError;
+	private List<String> messageError = new ArrayList<String>();
 
 	public String getStudentId() {
 		return studentId;
@@ -122,11 +124,13 @@ public class UserDto implements Comparable<UserDto> {
 		this.roleName = roleName;
 	}
 
-	public String getMessageError() {
+
+
+	public List<String> getMessageError() {
 		return messageError;
 	}
 
-	public void setMessageError(String messageError) {
+	public void setMessageError(List<String> messageError) {
 		this.messageError = messageError;
 	}
 
