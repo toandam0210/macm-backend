@@ -413,14 +413,16 @@ public class NotificationServiceImpl implements NotificationService {
 					.findByUserId(user.getId());
 			if (!tournamentOrganizingCommittees.isEmpty()) {
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					if (tournamentOrganizingCommittee.getTournament().isStatus()) {
-						if (!tournamentOrganizingCommittee.isPaymentStatus()) {
-							String message = "Giải đấu " + tournamentOrganizingCommittee.getTournament().getName()
-									+ ": "
-									+ nf.format(
-											tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay())
-									+ " VND";
-							messages.add(message);
+					if (tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay() > 0) {
+						if (tournamentOrganizingCommittee.getTournament().isStatus()) {
+							if (!tournamentOrganizingCommittee.isPaymentStatus()) {
+								String message = "Giải đấu " + tournamentOrganizingCommittee.getTournament().getName()
+										+ ": "
+										+ nf.format(
+												tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay())
+										+ " VND";
+								messages.add(message);
+							}
 						}
 					}
 				}

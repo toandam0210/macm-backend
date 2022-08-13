@@ -172,16 +172,15 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 									"Không thành công. Đã có " + commonSchedule.getTitle() + " trong ngày này.");
 							break;
 						case 1:
-							responseMessage.setMessage(
-									"Không thành công. Đã có sự kiện " + commonSchedule.getTitle() + " trong ngày này.");
+							responseMessage.setMessage("Không thành công. Đã có sự kiện " + commonSchedule.getTitle()
+									+ " trong ngày này.");
 							break;
 						case 2:
-							responseMessage.setMessage(
-									"Không thành công. Đã có giải đấu " + commonSchedule.getTitle() + " trong ngày này.");
+							responseMessage.setMessage("Không thành công. Đã có giải đấu " + commonSchedule.getTitle()
+									+ " trong ngày này.");
 							break;
 						default:
-							responseMessage.setMessage(
-									"Không thành công. Vui lòng thử lại.");
+							responseMessage.setMessage("Không thành công. Vui lòng thử lại.");
 							break;
 						}
 
@@ -277,6 +276,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 
 						notificationService.createTrainingSessionDeleteNotification(getDate);
 					}
+				} else {
+					responseMessage.setMessage("Không có buổi tập này");
 				}
 			} else {
 				responseMessage.setMessage(Constant.MSG_045);
