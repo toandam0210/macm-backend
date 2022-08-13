@@ -1,5 +1,6 @@
 package com.fpt.macm.constant;
 
+import com.fpt.macm.model.dto.UserDto;
 import com.fpt.macm.model.entity.Event;
 
 public class Constant {
@@ -186,4 +187,8 @@ public class Constant {
 		return "Sự kiện " + event.getName() + " sẽ bắt đầu sau 1 ngày nữa, chuẩn bị lên đồ thôi !!";
 	}
 	public static final String MSG_131 = "Đã hết hạn đăng ký";
+	
+	public static String addSuccess(UserDto userDto) {
+		return "Thêm thành công người dùng với tên là " + userDto.getName() + " và mã sinh viên là " + userDto.getStudentId() + ". ";
+	}
 }
