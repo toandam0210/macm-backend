@@ -120,7 +120,9 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 				responseMessage.setMessage(Constant.MSG_038);
 			} else {
 				if (trainingSchedule.getDate().compareTo(LocalDate.now()) > 0) {
-					if (commonScheduleService.getCommonSessionByDate(trainingSchedule.getDate()) == null) {
+					CommonSchedule commonSchedule = commonScheduleService
+							.getCommonSessionByDate(trainingSchedule.getDate());
+					if (commonSchedule == null) {
 						trainingSchedule.setCreatedBy("LinhLHN");
 						trainingSchedule.setCreatedOn(LocalDateTime.now());
 						trainingSchedule.setUpdatedBy("LinhLHN");
@@ -164,7 +166,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 						// Gửi thông báo đến cho user khi tạo 1 buổi tập mới
 						notificationService.createTrainingSessionCreateNotification(trainingSchedule.getDate());
 					} else {
-						responseMessage.setMessage(Constant.MSG_041);
+						responseMessage
+								.setMessage("Không thành công. Đã có " + commonSchedule.getTitle() + " trong ngày này");
 					}
 				} else {
 					responseMessage.setMessage(Constant.MSG_039);
