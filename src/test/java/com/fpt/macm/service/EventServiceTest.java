@@ -508,7 +508,7 @@ public class EventServiceTest {
 
 	@Test
 	public void getEventsByDateCaseEventScheduleNull() {
-		when(eventScheduleService.getEventScheduleByDate(any())).thenReturn(null);
+		when(eventScheduleRepository.findByDate(any())).thenReturn(null);
 
 		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1),
 				LocalDate.of(2022, 12, 1), 0, 1000);
@@ -517,7 +517,7 @@ public class EventServiceTest {
 
 	@Test
 	public void getEventsByDateCaseNotYet() {
-		when(eventScheduleService.getEventScheduleByDate(any())).thenReturn(eventSchedules().get(0));
+		when(eventScheduleRepository.findByDate(any())).thenReturn(Optional.of(eventSchedules().get(0)));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 
 		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1),
@@ -532,7 +532,7 @@ public class EventServiceTest {
 			eventSchedule.setDate(LocalDate.of(2022, 1, 1));
 		}
 
-		when(eventScheduleService.getEventScheduleByDate(any())).thenReturn(eventSchedules.get(0));
+		when(eventScheduleRepository.findByDate(any())).thenReturn(Optional.of(eventSchedules().get(0)));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 
 		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1),
@@ -547,7 +547,7 @@ public class EventServiceTest {
 			eventSchedule.setDate(LocalDate.now());
 		}
 
-		when(eventScheduleService.getEventScheduleByDate(any())).thenReturn(eventSchedules.get(0));
+		when(eventScheduleRepository.findByDate(any())).thenReturn(Optional.of(eventSchedules().get(0)));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 
 		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1),
@@ -557,7 +557,7 @@ public class EventServiceTest {
 
 	@Test
 	public void getEventsByDateCaseFail() {
-		when(eventScheduleService.getEventScheduleByDate(any())).thenReturn(new EventSchedule());
+		when(eventScheduleRepository.findByDate(any())).thenReturn(Optional.of(new EventSchedule()));
 
 		ResponseMessage responseMessage = eventService.getEventsByDate(LocalDate.of(2022, 1, 1),
 				LocalDate.of(2022, 12, 1), 0, 1000);

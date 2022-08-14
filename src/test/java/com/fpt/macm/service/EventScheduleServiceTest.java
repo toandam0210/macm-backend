@@ -276,30 +276,6 @@ public class EventScheduleServiceTest {
 	}
 	
 	@Test
-	public void getEventScheduleByDateCaseSuccess() {
-		when(eventScheduleRepository.findByDate(any())).thenReturn(Optional.of(eventSchedule()));
-		
-		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
-		assertEquals(eventSchedule.getId(), eventSchedule().getId());
-	}
-	
-	@Test
-	public void getEventScheduleByDateCaseScheduleEmpty() {
-		when(eventScheduleRepository.findByDate(any())).thenReturn(Optional.empty());
-		
-		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
-		assertEquals(eventSchedule, null);
-	}
-	
-	@Test
-	public void getEventScheduleByDateCaseException() {
-		when(eventScheduleRepository.findByDate(any())).thenReturn(null);
-		
-		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
-		assertEquals(eventSchedule, null);
-	}
-	
-	@Test
 	public void updatePreviewEventScheduleCaseStartDateAfterEndDate() {
 		ResponseMessage responseMessage = eventScheduleService.updatePreviewEventSchedule(1, "30/08/2022", "29/08/2022", "08:00", "16:00");
 		assertEquals(responseMessage.getData().size(), 0);
