@@ -111,7 +111,7 @@ public class EventServiceTest {
 		event.setId(1);
 		event.setName("Đi Đà Lạt");
 		event.setDescription("Gẹt gô");
-		event.setAmountFromClub(0);
+		event.setAmountFromClub(10000);
 		event.setAmountPerRegisterActual(0);
 		event.setAmountPerRegisterEstimated(50000);
 		event.setSemester(semester().getName());

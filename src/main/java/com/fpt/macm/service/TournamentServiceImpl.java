@@ -545,6 +545,31 @@ public class TournamentServiceImpl implements TournamentService {
 						}
 						tournamentScheduleRepository.deleteAll(tournamentSchedules);
 					}
+					
+					Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+					for (CompetitiveType competitiveType : competitiveTypes) {
+						List<CompetitiveMatch> competitiveMatchs = competitiveMatchRepository.listMatchsByType(competitiveType.getId());
+						for (CompetitiveMatch competitiveMatch : competitiveMatchs) {
+							Optional<CompetitiveResult> competitiveResultOp = competitiveResultRepository.findResultByMatchId(competitiveMatch.getId());
+							if (competitiveResultOp.isPresent()) {
+								CompetitiveResult competitiveResult = competitiveResultOp.get();
+								competitiveResultRepository.delete(competitiveResult);
+							}
+						}
+					}
+					
+					Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+					for (ExhibitionType exhibitionType : exhibitionTypes) {
+						Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
+						for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
+							Optional<ExhibitionResult> exhibitionResultOp = exhibitionResultRepository.findByTeam(exhibitionTeam.getId());
+							if (exhibitionResultOp.isPresent()) {
+								ExhibitionResult exhibitionResult = exhibitionResultOp.get();
+								exhibitionResultRepository.delete(exhibitionResult);
+							}
+						}
+					}
+					
 					tournament.setStatus(false);
 					tournamentRepository.save(tournament);
 
