@@ -309,13 +309,13 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				double percentAbsent = Math
 						.ceil(((double) totalAbsent / (double) trainingSchedules.size()) * 100);
 				
-				attendanceStatistics.put("percentAbsent", String.valueOf(percentAbsent));
 				attendanceStatistics.put("totalAbsent", String.valueOf(totalAbsent));
 				attendanceStatistics.put("totalSession", String.valueOf(trainingSchedules.size()));
+				attendanceStatistics.put("percentAbsent", String.valueOf(percentAbsent));
 				
-				Map<String, String> attendanceStatisticSorted = new TreeMap<String, String>(attendanceStatistics);
+//				Map<String, String> attendanceStatisticSorted = new TreeMap<String, String>(attendanceStatistics);
 				
-				listAttendanceStatistics.add(attendanceStatisticSorted);
+				listAttendanceStatistics.add(attendanceStatistics);
 			}
 			
 			responseMessage.setData(listAttendanceStatistics);
