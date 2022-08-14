@@ -78,4 +78,6 @@ public interface TournamentService {
 	ResponseMessage spawnTimeAndArea(int tournamentId);
 	
 	ResponseMessage updateAfterTournament(int tournamentId, double totalAmountActual);
+	
+	ResponseMessage getAllSuggestType();
 }
