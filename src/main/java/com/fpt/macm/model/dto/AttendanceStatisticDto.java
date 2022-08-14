@@ -1,9 +1,7 @@
 package com.fpt.macm.model.dto;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class AttendanceStatisticDto {
@@ -12,7 +10,6 @@ public class AttendanceStatisticDto {
 	private String userName;
 	private String userStudentId;
 	private String roleInClub;
-	List<AttendanceTrainingDto> attendanceTrainingsDto = new ArrayList<AttendanceTrainingDto>();
 	Map<LocalDate, Integer> attendanceTrainings = new HashMap<LocalDate, Integer>();
 	private double percentAbsent;
 	private int totalAbsent;
@@ -48,14 +45,6 @@ public class AttendanceStatisticDto {
 
 	public void setRoleInClub(String roleInClub) {
 		this.roleInClub = roleInClub;
-	}
-
-	public List<AttendanceTrainingDto> getAttendanceTrainingsDto() {
-		return attendanceTrainingsDto;
-	}
-
-	public void setAttendanceTrainingsDto(List<AttendanceTrainingDto> attendanceTrainingsDto) {
-		this.attendanceTrainingsDto = attendanceTrainingsDto;
 	}
 
 	public double getPercentAbsent() {

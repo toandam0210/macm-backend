@@ -285,60 +285,64 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			}
 			
-			List<AttendanceStatisticDto> attendancesStatisticDto = new ArrayList<AttendanceStatisticDto>();
+//			List<AttendanceStatisticDto> attendancesStatisticDto = new ArrayList<AttendanceStatisticDto>();
+			
+			List<Map<String, String>> listAttendanceStatistics = new ArrayList<Map<String, String>>();
 			
 			List<User> users = userRepository.findAllActiveUser();
 			for (User user : users) {
-				AttendanceStatisticDto attendanceStatisticDto = new AttendanceStatisticDto();
-				attendanceStatisticDto.setUserId(user.getId());
-				attendanceStatisticDto.setUserName(user.getName());
-				attendanceStatisticDto.setUserStudentId(user.getStudentId());
-				Role role = user.getRole();
-				Utils.convertNameOfRole(role);
-				attendanceStatisticDto.setRoleInClub(role.getName());
+//				AttendanceStatisticDto attendanceStatisticDto = new AttendanceStatisticDto();
+//				attendanceStatisticDto.setUserId(user.getId());
+//				attendanceStatisticDto.setUserName(user.getName());
+//				attendanceStatisticDto.setUserStudentId(user.getStudentId());
+//				Role role = user.getRole();
+//				Utils.convertNameOfRole(role);
+//				attendanceStatisticDto.setRoleInClub(role.getName());
+				
+				Map<String, String> attendanceStatistics = new HashMap<String, String>();
+				attendanceStatistics.put("id", String.valueOf(user.getId()));
+				attendanceStatistics.put("name", user.getName());
+				attendanceStatistics.put("studentId", user.getStudentId());
 				
 				int totalAbsent = 0;
 				
-				Map<LocalDate, Integer> attendanceTrainings = new HashMap<LocalDate, Integer>();
-//				List<AttendanceTrainingDto> listAttendanceTrainingDto = new ArrayList<AttendanceTrainingDto>();
+//				Map<LocalDate, Integer> attendanceTrainings = new HashMap<LocalDate, Integer>();
 				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 				for (TrainingSchedule trainingSchedule : trainingSchedules) {
-//					AttendanceTrainingDto attendanceTrainingDto = new AttendanceTrainingDto();
-//					attendanceTrainingDto.setTrainingScheduleId(trainingSchedule.getId());
-//					attendanceTrainingDto.setDate(trainingSchedule.getDate());
-//					attendanceTrainingDto.setStartTime(trainingSchedule.getStartTime());
-//					attendanceTrainingDto.setFinishTime(trainingSchedule.getFinishTime());
-					
 					AttendanceStatus attendanceStatus = attendanceStatusRepository.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
 					if (attendanceStatus != null) {
-//						attendanceTrainingDto.setStatus(attendanceStatus.getStatus());
-						attendanceTrainings.put(trainingSchedule.getDate(), attendanceStatus.getStatus());
+//						attendanceTrainings.put(trainingSchedule.getDate(), attendanceStatus.getStatus());
+						attendanceStatistics.put(trainingSchedule.getDate().toString(), String.valueOf(attendanceStatus.getStatus()));
 						if (attendanceStatus.getStatus() == 0) {
 							totalAbsent++;
 						}
 					} else {
-//						attendanceTrainingDto.setStatus(2);
-						attendanceTrainings.put(trainingSchedule.getDate(), 2);
+//						attendanceTrainings.put(trainingSchedule.getDate(), 2);
+						attendanceStatistics.put(trainingSchedule.getDate().toString(), String.valueOf(2));
 					}
-					
-//					listAttendanceTrainingDto.add(attendanceTrainingDto);
 				}
 				
 				double percentAbsent = Math
 						.ceil(((double) totalAbsent / (double) trainingSchedules.size()) * 100);
 				
-				Map<LocalDate, Integer> attendanceTrainingsSorted = new TreeMap<LocalDate, Integer>(attendanceTrainings);
-				attendanceStatisticDto.setAttendanceTrainings(attendanceTrainingsSorted);
-//				Collections.sort(listAttendanceTrainingDto);
-//				attendanceStatisticDto.setAttendanceTrainingsDto(listAttendanceTrainingDto);
-				attendanceStatisticDto.setPercentAbsent(percentAbsent);
-				attendanceStatisticDto.setTotalAbsent(totalAbsent);
-				attendanceStatisticDto.setTotalSession(trainingSchedules.size());
+//				Map<LocalDate, Integer> attendanceTrainingsSorted = new TreeMap<LocalDate, Integer>(attendanceTrainings);
+//				attendanceStatisticDto.setAttendanceTrainings(attendanceTrainingsSorted);
+//				attendanceStatisticDto.setPercentAbsent(percentAbsent);
+//				attendanceStatisticDto.setTotalAbsent(totalAbsent);
+//				attendanceStatisticDto.setTotalSession(trainingSchedules.size());
 				
-				attendancesStatisticDto.add(attendanceStatisticDto);
+				attendanceStatistics.put("percentAbsent", String.valueOf(percentAbsent));
+				attendanceStatistics.put("totalAbsent", String.valueOf(totalAbsent));
+				attendanceStatistics.put("totalSession", String.valueOf(trainingSchedules.size()));
+				
+				Map<String, String> attendanceStatisticSorted = new TreeMap<String, String>(attendanceStatistics);
+//				
+//				attendancesStatisticDto.add(attendanceStatisticDto);
+				
+				listAttendanceStatistics.add(attendanceStatisticSorted);
 			}
 			
-			responseMessage.setData(attendancesStatisticDto);
+			responseMessage.setData(listAttendanceStatistics);
 			responseMessage.setMessage("Lấy thống kê điểm danh thành công");
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
