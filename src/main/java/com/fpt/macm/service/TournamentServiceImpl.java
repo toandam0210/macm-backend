@@ -545,6 +545,19 @@ public class TournamentServiceImpl implements TournamentService {
 						}
 						tournamentScheduleRepository.deleteAll(tournamentSchedules);
 					}
+					
+					Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+					for (CompetitiveType competitiveType : competitiveTypes) {
+						List<CompetitiveMatch> competitiveMatchs = competitiveMatchRepository.listMatchsByType(competitiveType.getId());
+						for (CompetitiveMatch competitiveMatch : competitiveMatchs) {
+							Optional<CompetitiveResult> competitiveResultOp = competitiveResultRepository.findResultByMatchId(competitiveMatch.getId());
+							if (competitiveResultOp.isPresent()) {
+								CompetitiveResult competitiveResult = competitiveResultOp.get();
+								competitiveResultRepository.delete(competitiveResult);
+							}
+						}
+					}
+					
 					tournament.setStatus(false);
 					tournamentRepository.save(tournament);
 
