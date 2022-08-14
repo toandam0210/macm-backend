@@ -5,23 +5,23 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
-import com.fpt.macm.model.dto.AttendanceStatisticDto;
 import com.fpt.macm.model.dto.AttendanceStatusDto;
-import com.fpt.macm.model.dto.AttendanceTrainingDto;
 import com.fpt.macm.model.dto.TrainingScheduleDto;
 import com.fpt.macm.model.dto.UserAttendanceStatusDto;
 import com.fpt.macm.model.dto.UserAttendanceTrainingReportDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
-import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
@@ -282,55 +282,43 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			}
 			
-			List<AttendanceStatisticDto> attendancesStatisticDto = new ArrayList<AttendanceStatisticDto>();
+			List<Map<String, String>> listAttendanceStatistics = new ArrayList<Map<String, String>>();
 			
 			List<User> users = userRepository.findAllActiveUser();
 			for (User user : users) {
-				AttendanceStatisticDto attendanceStatisticDto = new AttendanceStatisticDto();
-				attendanceStatisticDto.setUserId(user.getId());
-				attendanceStatisticDto.setUserName(user.getName());
-				attendanceStatisticDto.setUserStudentId(user.getStudentId());
-				Role role = user.getRole();
-				Utils.convertNameOfRole(role);
-				attendanceStatisticDto.setRoleInClub(role.getName());
+				Map<String, String> attendanceStatistics = new HashMap<String, String>();
+				attendanceStatistics.put("id", String.valueOf(user.getId()));
+				attendanceStatistics.put("name", user.getName());
+				attendanceStatistics.put("studentId", user.getStudentId());
 				
 				int totalAbsent = 0;
 				
-				List<AttendanceTrainingDto> listAttendanceTrainingDto = new ArrayList<AttendanceTrainingDto>();
 				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 				for (TrainingSchedule trainingSchedule : trainingSchedules) {
-					AttendanceTrainingDto attendanceTrainingDto = new AttendanceTrainingDto();
-					attendanceTrainingDto.setTrainingScheduleId(trainingSchedule.getId());
-					attendanceTrainingDto.setDate(trainingSchedule.getDate());
-					attendanceTrainingDto.setStartTime(trainingSchedule.getStartTime());
-					attendanceTrainingDto.setFinishTime(trainingSchedule.getFinishTime());
-					
 					AttendanceStatus attendanceStatus = attendanceStatusRepository.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
 					if (attendanceStatus != null) {
-						attendanceTrainingDto.setStatus(attendanceStatus.getStatus());
+						attendanceStatistics.put(trainingSchedule.getDate().toString(), String.valueOf(attendanceStatus.getStatus()));
 						if (attendanceStatus.getStatus() == 0) {
 							totalAbsent++;
 						}
 					} else {
-						attendanceTrainingDto.setStatus(2);
+						attendanceStatistics.put(trainingSchedule.getDate().toString(), String.valueOf(2));
 					}
-					
-					listAttendanceTrainingDto.add(attendanceTrainingDto);
 				}
 				
 				double percentAbsent = Math
 						.ceil(((double) totalAbsent / (double) trainingSchedules.size()) * 100);
 				
-				Collections.sort(listAttendanceTrainingDto);
-				attendanceStatisticDto.setAttendanceTrainingsDto(listAttendanceTrainingDto);
-				attendanceStatisticDto.setPercentAbsent(percentAbsent);
-				attendanceStatisticDto.setTotalAbsent(totalAbsent);
-				attendanceStatisticDto.setTotalSession(trainingSchedules.size());
+				attendanceStatistics.put("percentAbsent", String.valueOf(percentAbsent));
+				attendanceStatistics.put("totalAbsent", String.valueOf(totalAbsent));
+				attendanceStatistics.put("totalSession", String.valueOf(trainingSchedules.size()));
 				
-				attendancesStatisticDto.add(attendanceStatisticDto);
+				Map<String, String> attendanceStatisticSorted = new TreeMap<String, String>(attendanceStatistics);
+				
+				listAttendanceStatistics.add(attendanceStatisticSorted);
 			}
 			
-			responseMessage.setData(attendancesStatisticDto);
+			responseMessage.setData(listAttendanceStatistics);
 			responseMessage.setMessage("Lấy thống kê điểm danh thành công");
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());

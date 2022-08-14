@@ -45,6 +45,7 @@ import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CollaboratorReportRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.EventRepository;
+import com.fpt.macm.repository.EventScheduleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.MembershipShipInforRepository;
@@ -57,7 +58,6 @@ import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.repository.UserStatusReportRepository;
-import com.fpt.macm.service.EventScheduleService;
 import com.fpt.macm.service.EventService;
 import com.fpt.macm.service.NotificationService;
 import com.fpt.macm.service.SemesterService;
@@ -123,7 +123,7 @@ public class TaskSchedule {
 	CompetitiveMatchRepository competitiveMatchRepository;
 
 	@Autowired
-	EventScheduleService eventScheduleService;
+	EventScheduleRepository eventScheduleRepository;
 
 	@Autowired
 	TournamentScheduleService tournamentScheduleService;
@@ -520,8 +520,9 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 59 23 * * *")
 	public void changeStatusAttendanceEvent() {
-		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
-		if (eventSchedule != null) {
+		Optional<EventSchedule> eventScheduleOp = eventScheduleRepository.findByDate(LocalDate.now());
+		if (eventScheduleOp.isPresent()) {
+			EventSchedule eventSchedule = eventScheduleOp.get();
 			List<AttendanceEvent> listAttendanceEvent = attendanceEventRepository
 					.findByEventId(eventSchedule.getEvent().getId());
 			for (AttendanceEvent attendanceEvent : listAttendanceEvent) {

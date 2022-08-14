@@ -263,10 +263,11 @@ public class TournamentController {
 	ResponseEntity<ResponseMessage> spawnTimeAndArea(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/updateaftertournament/{tournamentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> updateAfterTournament(@PathVariable(name = "tournamentId") int id, @RequestParam double totalAmountActual) {
+	ResponseEntity<ResponseMessage> updateAfterTournament(@PathVariable(name = "tournamentId") int id,
+			@RequestParam double totalAmountActual) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.updateAfterTournament(id, totalAmountActual),
 				HttpStatus.OK);
 	}
@@ -285,5 +286,11 @@ public class TournamentController {
 			@RequestBody ExhibitionResult newResult) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.updateTimeAndAreaExhibition(teamId, newResult),
 				HttpStatus.OK);
+	}
+
+	@GetMapping("headclub/getallsuggesttype")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> getAllSuggestType() {
+		return new ResponseEntity<ResponseMessage>(tournamentService.getAllSuggestType(), HttpStatus.OK);
 	}
 }

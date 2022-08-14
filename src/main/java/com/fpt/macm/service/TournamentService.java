@@ -84,4 +84,7 @@ public interface TournamentService {
 	ResponseMessage updateTimeAndAreaCompetitive(int matchId, CompetitiveResult newResult);
 	
 	ResponseMessage updateTimeAndAreaExhibition(int teamId, ExhibitionResult newResult);
+
+	ResponseMessage getAllSuggestType();
+
 }
