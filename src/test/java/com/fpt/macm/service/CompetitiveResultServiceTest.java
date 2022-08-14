@@ -355,92 +355,92 @@ public class CompetitiveResultServiceTest {
 		assertEquals(response.getData().size(), 0);
 	}
 	
-	@Test
-	public void testUpdateTimeAndAreaCaseExisted() {
-		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(Arrays.asList(competitiveResult()));
-		ResponseMessage response = competitiveResultService.updateTimeAndArea(1,competitiveResult());
-		assertEquals(response.getData().size(), 0);
-	}
+//	@Test
+//	public void testUpdateTimeAndAreaCaseExisted() {
+//		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+//		ResponseMessage response = competitiveResultService.updateTimeAndArea(1,competitiveResult());
+//		assertEquals(response.getData().size(), 0);
+//	}
+//	
+//	@Test
+//	public void testUpdateTimeAndArea() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setArea(area());
+//		competitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 0));
+//		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+//		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+//		ResponseMessage response = competitiveResultService.updateTimeAndArea(1,competitiveResult);
+//		assertEquals(response.getData().size(), 1 );
+//	}
+//	
+//	@Test
+//	public void testUpdateTimeAndAreaDuplicateTimeAndArea() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setArea(area());
+//		competitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 0));
+//		CompetitiveResult competitiveResult2 = competitiveResult();
+//		competitiveResult2.setArea(area());
+//		competitiveResult2.setTime(LocalDateTime.of(2022, 9, 1, 18, 10));
+//		
+//		CompetitiveResult newCompetitiveResult = competitiveResult();
+//		newCompetitiveResult.setArea(area());
+//		newCompetitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 05));
+//		
+//		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+//		competitiveResults.add(competitiveResult);
+//		competitiveResults.add(competitiveResult2);
+//		
+//		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
+//		
+//		ResponseMessage response = competitiveResultService.updateTimeAndArea(1, newCompetitiveResult);
+//		assertEquals(response.getData().size(), 0);
+//	}
 	
-	@Test
-	public void testUpdateTimeAndArea() {
-		CompetitiveResult competitiveResult = competitiveResult();
-		competitiveResult.setArea(area());
-		competitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 0));
-		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(Arrays.asList(competitiveResult()));
-		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
-		ResponseMessage response = competitiveResultService.updateTimeAndArea(1,competitiveResult);
-		assertEquals(response.getData().size(), 1 );
-	}
-	
-	@Test
-	public void testUpdateTimeAndAreaDuplicateTimeAndArea() {
-		CompetitiveResult competitiveResult = competitiveResult();
-		competitiveResult.setArea(area());
-		competitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 0));
-		CompetitiveResult competitiveResult2 = competitiveResult();
-		competitiveResult2.setArea(area());
-		competitiveResult2.setTime(LocalDateTime.of(2022, 9, 1, 18, 10));
-		
-		CompetitiveResult newCompetitiveResult = competitiveResult();
-		newCompetitiveResult.setArea(area());
-		newCompetitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 05));
-		
-		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
-		competitiveResults.add(competitiveResult);
-		competitiveResults.add(competitiveResult2);
-		
-		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
-		
-		ResponseMessage response = competitiveResultService.updateTimeAndArea(1, newCompetitiveResult);
-		assertEquals(response.getData().size(), 0);
-	}
-	
-	@Test
-	public void testUpdateTimeAndAreaDuplicateTimeAndArea2() {
-		CompetitiveMatch competitiveMatch = competitiveMatch();
-		
-		CompetitiveResult competitiveResult = competitiveResult();
-		competitiveResult.setArea(area());
-		competitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 0));
-		competitiveResult.setMatch(competitiveMatch);
-		CompetitiveResult competitiveResult2 = competitiveResult();
-		competitiveResult2.setArea(area());
-		competitiveResult2.setTime(LocalDateTime.of(2022, 9, 1, 18, 10));
-		
-		CompetitiveResult newCompetitiveResult = competitiveResult();
-		newCompetitiveResult.setArea(area());
-		newCompetitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 05));
-		newCompetitiveResult.setMatch(competitiveMatch);
-		
-		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
-		competitiveResults.add(competitiveResult);
-		competitiveResults.add(competitiveResult2);
-		
-		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
-		
-		ResponseMessage response = competitiveResultService.updateTimeAndArea(1, newCompetitiveResult);
-		assertEquals(response.getData().size(), 0);
-	}
-	
-	@Test
-	public void testUpdateTimeAndAreaDuplicateTimeAndArea3() {
-		CompetitiveResult competitiveResult = competitiveResult();
-		competitiveResult.setArea(area());
-		competitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 0));
-		
-		CompetitiveResult newCompetitiveResult = competitiveResult();
-		newCompetitiveResult.setArea(area());
-		newCompetitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 15, 05));
-		
-		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
-		competitiveResults.add(competitiveResult);
-		
-		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
-		
-		ResponseMessage response = competitiveResultService.updateTimeAndArea(1, newCompetitiveResult);
-		assertEquals(response.getData().size(), 0);
-	}
+//	@Test
+//	public void testUpdateTimeAndAreaDuplicateTimeAndArea2() {
+//		CompetitiveMatch competitiveMatch = competitiveMatch();
+//		
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setArea(area());
+//		competitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 0));
+//		competitiveResult.setMatch(competitiveMatch);
+//		CompetitiveResult competitiveResult2 = competitiveResult();
+//		competitiveResult2.setArea(area());
+//		competitiveResult2.setTime(LocalDateTime.of(2022, 9, 1, 18, 10));
+//		
+//		CompetitiveResult newCompetitiveResult = competitiveResult();
+//		newCompetitiveResult.setArea(area());
+//		newCompetitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 05));
+//		newCompetitiveResult.setMatch(competitiveMatch);
+//		
+//		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+//		competitiveResults.add(competitiveResult);
+//		competitiveResults.add(competitiveResult2);
+//		
+//		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
+//		
+//		ResponseMessage response = competitiveResultService.updateTimeAndArea(1, newCompetitiveResult);
+//		assertEquals(response.getData().size(), 0);
+//	}
+//	
+//	@Test
+//	public void testUpdateTimeAndAreaDuplicateTimeAndArea3() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setArea(area());
+//		competitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 0));
+//		
+//		CompetitiveResult newCompetitiveResult = competitiveResult();
+//		newCompetitiveResult.setArea(area());
+//		newCompetitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 15, 05));
+//		
+//		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+//		competitiveResults.add(competitiveResult);
+//		
+//		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
+//		
+//		ResponseMessage response = competitiveResultService.updateTimeAndArea(1, newCompetitiveResult);
+//		assertEquals(response.getData().size(), 0);
+//	}
 	
 	@Test
 	public void testUpdateTimeAndAreaCaseException() {
