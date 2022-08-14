@@ -7,10 +7,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -286,7 +288,8 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			
 			List<User> users = userRepository.findAllActiveUser();
 			for (User user : users) {
-				Map<String, String> attendanceStatistics = new HashMap<String, String>();
+				Map<String, String> attendanceStatistics = new LinkedHashMap<String, String>();
+				
 				attendanceStatistics.put("id", String.valueOf(user.getId()));
 				attendanceStatistics.put("name", user.getName());
 				attendanceStatistics.put("studentId", user.getStudentId());
@@ -316,8 +319,6 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				attendanceStatistics.put("totalAbsent", String.valueOf(totalAbsent));
 				attendanceStatistics.put("totalSession", String.valueOf(trainingSchedules.size()));
 				attendanceStatistics.put("percentAbsent", String.valueOf(percentAbsent));
-				
-//				Map<String, String> attendanceStatisticSorted = new TreeMap<String, String>(attendanceStatistics);
 				
 				listAttendanceStatistics.add(attendanceStatistics);
 			}
