@@ -558,6 +558,18 @@ public class TournamentServiceImpl implements TournamentService {
 						}
 					}
 					
+					Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+					for (ExhibitionType exhibitionType : exhibitionTypes) {
+						Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
+						for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
+							Optional<ExhibitionResult> exhibitionResultOp = exhibitionResultRepository.findByTeam(exhibitionTeam.getId());
+							if (exhibitionResultOp.isPresent()) {
+								ExhibitionResult exhibitionResult = exhibitionResultOp.get();
+								exhibitionResultRepository.delete(exhibitionResult);
+							}
+						}
+					}
+					
 					tournament.setStatus(false);
 					tournamentRepository.save(tournament);
 
