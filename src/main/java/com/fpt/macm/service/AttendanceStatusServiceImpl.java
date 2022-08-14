@@ -5,10 +5,13 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -296,33 +299,38 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				
 				int totalAbsent = 0;
 				
-				List<AttendanceTrainingDto> listAttendanceTrainingDto = new ArrayList<AttendanceTrainingDto>();
+				Map<LocalDate, Integer> attendanceTrainings = new HashMap<LocalDate, Integer>();
+//				List<AttendanceTrainingDto> listAttendanceTrainingDto = new ArrayList<AttendanceTrainingDto>();
 				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 				for (TrainingSchedule trainingSchedule : trainingSchedules) {
-					AttendanceTrainingDto attendanceTrainingDto = new AttendanceTrainingDto();
-					attendanceTrainingDto.setTrainingScheduleId(trainingSchedule.getId());
-					attendanceTrainingDto.setDate(trainingSchedule.getDate());
-					attendanceTrainingDto.setStartTime(trainingSchedule.getStartTime());
-					attendanceTrainingDto.setFinishTime(trainingSchedule.getFinishTime());
+//					AttendanceTrainingDto attendanceTrainingDto = new AttendanceTrainingDto();
+//					attendanceTrainingDto.setTrainingScheduleId(trainingSchedule.getId());
+//					attendanceTrainingDto.setDate(trainingSchedule.getDate());
+//					attendanceTrainingDto.setStartTime(trainingSchedule.getStartTime());
+//					attendanceTrainingDto.setFinishTime(trainingSchedule.getFinishTime());
 					
 					AttendanceStatus attendanceStatus = attendanceStatusRepository.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
 					if (attendanceStatus != null) {
-						attendanceTrainingDto.setStatus(attendanceStatus.getStatus());
+//						attendanceTrainingDto.setStatus(attendanceStatus.getStatus());
+						attendanceTrainings.put(trainingSchedule.getDate(), attendanceStatus.getStatus());
 						if (attendanceStatus.getStatus() == 0) {
 							totalAbsent++;
 						}
 					} else {
-						attendanceTrainingDto.setStatus(2);
+//						attendanceTrainingDto.setStatus(2);
+						attendanceTrainings.put(trainingSchedule.getDate(), 2);
 					}
 					
-					listAttendanceTrainingDto.add(attendanceTrainingDto);
+//					listAttendanceTrainingDto.add(attendanceTrainingDto);
 				}
 				
 				double percentAbsent = Math
 						.ceil(((double) totalAbsent / (double) trainingSchedules.size()) * 100);
 				
-				Collections.sort(listAttendanceTrainingDto);
-				attendanceStatisticDto.setAttendanceTrainingsDto(listAttendanceTrainingDto);
+				Map<LocalDate, Integer> attendanceTrainingsSorted = new TreeMap<LocalDate, Integer>(attendanceTrainings);
+				attendanceStatisticDto.setAttendanceTrainings(attendanceTrainingsSorted);
+//				Collections.sort(listAttendanceTrainingDto);
+//				attendanceStatisticDto.setAttendanceTrainingsDto(listAttendanceTrainingDto);
 				attendanceStatisticDto.setPercentAbsent(percentAbsent);
 				attendanceStatisticDto.setTotalAbsent(totalAbsent);
 				attendanceStatisticDto.setTotalSession(trainingSchedules.size());
