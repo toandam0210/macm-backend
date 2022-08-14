@@ -10,6 +10,7 @@ public class ExhibitionTeamDto implements Comparable<ExhibitionTeamDto> {
 	private int exhibitionTypeId;
 	private String exhibitionTypeName;
 	private Double score;
+	private Integer rank;
 
 	public int getId() {
 		return id;
@@ -57,6 +58,14 @@ public class ExhibitionTeamDto implements Comparable<ExhibitionTeamDto> {
 
 	public void setExhibitionTypeId(int exhibitionTypeId) {
 		this.exhibitionTypeId = exhibitionTypeId;
+	}
+
+	public Integer getRank() {
+		return rank;
+	}
+
+	public void setRank(Integer rank) {
+		this.rank = rank;
 	}
 
 	@Override

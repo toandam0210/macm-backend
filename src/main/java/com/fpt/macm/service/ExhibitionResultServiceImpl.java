@@ -221,7 +221,7 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 				ExhibitionResultByTypeDto exhibitionResultByTypeDto = new ExhibitionResultByTypeDto();
 				ExhibitionType getType = getTypeOp.get();
 				exhibitionResultByTypeDto.setExhibitionType(getType);
-				responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
+				//responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
 				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
 				List<ExhibitionTeamDto> listResult = new ArrayList<ExhibitionTeamDto>();
 				for (ExhibitionTeam exhibitionTeam : getTeams) {
@@ -244,13 +244,19 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 					}
 				}
 				Collections.sort(listResult);
-//				Collections.sort(listResult, new Comparator<ExhibitionTeamDto>() {
-//					@Override
-//					public int compare(ExhibitionTeamDto o1, ExhibitionTeamDto o2) {
-//						// TODO Auto-generated method stub
-//						return o1.getScore() - o2.getScore() < 0? 1 : (o1.getScore() - o2.getScore() > 0? -1 : 0);
-//					}
-//				});
+				List<Double> listScore = new ArrayList<Double>();
+				for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
+					if(!listScore.contains(exhibitionTeamDto.getScore())) {
+						listScore.add(exhibitionTeamDto.getScore());
+					}
+				}
+				for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
+					for (int i = 0; i < listScore.size(); i++) {
+						if(exhibitionTeamDto.getScore().equals(listScore.get(i))) {
+							exhibitionTeamDto.setRank(i + 1);
+						}
+					}
+				}
 				exhibitionResultByTypeDto.setListResult(listResult);
 				responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
 				responseMessage.setMessage("Kết quả thi đấu của nội dung " + getType.getName());
