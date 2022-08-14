@@ -17,14 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
-import com.fpt.macm.model.dto.AttendanceStatisticDto;
 import com.fpt.macm.model.dto.AttendanceStatusDto;
-import com.fpt.macm.model.dto.AttendanceTrainingDto;
 import com.fpt.macm.model.dto.TrainingScheduleDto;
 import com.fpt.macm.model.dto.UserAttendanceStatusDto;
 import com.fpt.macm.model.dto.UserAttendanceTrainingReportDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
-import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
@@ -285,20 +282,10 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			}
 			
-//			List<AttendanceStatisticDto> attendancesStatisticDto = new ArrayList<AttendanceStatisticDto>();
-			
 			List<Map<String, String>> listAttendanceStatistics = new ArrayList<Map<String, String>>();
 			
 			List<User> users = userRepository.findAllActiveUser();
 			for (User user : users) {
-//				AttendanceStatisticDto attendanceStatisticDto = new AttendanceStatisticDto();
-//				attendanceStatisticDto.setUserId(user.getId());
-//				attendanceStatisticDto.setUserName(user.getName());
-//				attendanceStatisticDto.setUserStudentId(user.getStudentId());
-//				Role role = user.getRole();
-//				Utils.convertNameOfRole(role);
-//				attendanceStatisticDto.setRoleInClub(role.getName());
-				
 				Map<String, String> attendanceStatistics = new HashMap<String, String>();
 				attendanceStatistics.put("id", String.valueOf(user.getId()));
 				attendanceStatistics.put("name", user.getName());
@@ -306,18 +293,15 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				
 				int totalAbsent = 0;
 				
-//				Map<LocalDate, Integer> attendanceTrainings = new HashMap<LocalDate, Integer>();
 				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 				for (TrainingSchedule trainingSchedule : trainingSchedules) {
 					AttendanceStatus attendanceStatus = attendanceStatusRepository.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
 					if (attendanceStatus != null) {
-//						attendanceTrainings.put(trainingSchedule.getDate(), attendanceStatus.getStatus());
 						attendanceStatistics.put(trainingSchedule.getDate().toString(), String.valueOf(attendanceStatus.getStatus()));
 						if (attendanceStatus.getStatus() == 0) {
 							totalAbsent++;
 						}
 					} else {
-//						attendanceTrainings.put(trainingSchedule.getDate(), 2);
 						attendanceStatistics.put(trainingSchedule.getDate().toString(), String.valueOf(2));
 					}
 				}
@@ -325,19 +309,11 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				double percentAbsent = Math
 						.ceil(((double) totalAbsent / (double) trainingSchedules.size()) * 100);
 				
-//				Map<LocalDate, Integer> attendanceTrainingsSorted = new TreeMap<LocalDate, Integer>(attendanceTrainings);
-//				attendanceStatisticDto.setAttendanceTrainings(attendanceTrainingsSorted);
-//				attendanceStatisticDto.setPercentAbsent(percentAbsent);
-//				attendanceStatisticDto.setTotalAbsent(totalAbsent);
-//				attendanceStatisticDto.setTotalSession(trainingSchedules.size());
-				
 				attendanceStatistics.put("percentAbsent", String.valueOf(percentAbsent));
 				attendanceStatistics.put("totalAbsent", String.valueOf(totalAbsent));
 				attendanceStatistics.put("totalSession", String.valueOf(trainingSchedules.size()));
 				
 				Map<String, String> attendanceStatisticSorted = new TreeMap<String, String>(attendanceStatistics);
-//				
-//				attendancesStatisticDto.add(attendanceStatisticDto);
 				
 				listAttendanceStatistics.add(attendanceStatisticSorted);
 			}
