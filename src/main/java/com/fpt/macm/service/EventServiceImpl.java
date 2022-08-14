@@ -60,9 +60,6 @@ public class EventServiceImpl implements EventService {
 	SemesterRepository semesterRepository;
 
 	@Autowired
-	EventScheduleService eventScheduleService;
-
-	@Autowired
 	CommonScheduleService commonScheduleService;
 
 	@Autowired
@@ -432,11 +429,12 @@ public class EventServiceImpl implements EventService {
 				List<EventDto> eventDtos = new ArrayList<EventDto>();
 				List<Event> eventList = new ArrayList<Event>();
 				while (startDate.compareTo(finishDate) <= 0) {
-					EventSchedule getEventSession = eventScheduleService.getEventScheduleByDate(startDate);
-					if (getEventSession != null) {
-						Event getEvent = getEventSession.getEvent();
-						if (!eventList.contains(getEvent)) {
-							eventList.add(getEvent);
+					Optional<EventSchedule> eventScheduleOp = eventScheduleRepository.findByDate(startDate);
+					if (eventScheduleOp.isPresent()) {
+						EventSchedule eventSchedule = eventScheduleOp.get();
+						Event event = eventSchedule.getEvent();
+						if (!eventList.contains(event)) {
+							eventList.add(event);
 						}
 					}
 					startDate = startDate.plusDays(1);

@@ -168,22 +168,6 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 	}
 
 	@Override
-	public EventSchedule getEventScheduleByDate(LocalDate date) {
-		try {
-			Optional<EventSchedule> getEventSessionOp = eventScheduleRepository.findByDate(date);
-			if (getEventSessionOp.isPresent()) {
-				EventSchedule getEventSession = getEventSessionOp.get();
-				return getEventSession;
-			} else {
-				return null;
-			}
-		} catch (Exception e) {
-			System.out.print(e.getMessage());
-		}
-		return null;
-	}
-
-	@Override
 	public ResponseMessage updatePreviewEventSchedule(int eventId, String startDate, String finishDate,
 			String startTime, String finishTime) {
 		// TODO Auto-generated method stub
