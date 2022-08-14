@@ -18,6 +18,7 @@ import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
@@ -26,6 +27,7 @@ import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
+import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
@@ -63,6 +65,9 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 
 	@Autowired
 	TournamentRepository tournamentRepository;
+
+	@Autowired
+	ExhibitionResultRepository exhibitionResultRepository;
 
 	@Override
 	public ResponseMessage spawnTimeAndArea(int tournamentId) {
@@ -187,37 +192,56 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 		try {
 			LocalDate getDate = LocalDate.of(newResult.getTime().getYear(), newResult.getTime().getMonthValue(),
 					newResult.getTime().getDayOfMonth());
-			List<CompetitiveResult> listResult = competitiveResultRepository
-					.listResultByAreaOrderTime(newResult.getArea().getId());
-			List<CompetitiveResult> listResultAtDate = new ArrayList<CompetitiveResult>();
-			for (CompetitiveResult competitiveResult : listResult) {
-				LocalDate currentDate = competitiveResult.getTime().toLocalDate();
-				if (getDate.equals(currentDate)) {
-					listResultAtDate.add(competitiveResult);
-				}
-			}
+
+			List<CompetitiveResult> listCompetitiveResults = competitiveResultRepository
+					.listCompetitiveResultByAreaOrderTime(newResult.getArea().getId(), getDate.getDayOfYear(), getDate.getYear());
+
+//			List<ExhibitionResult> listExhibitionResults = exhibitionResultRepository
+//					.listExhibitionResultByAreaOrderTime(newResult.getArea().getId(), getDate.getDayOfYear(), getDate.getYear());
+			
 			int checkExisted = -1;
-			for (int i = 0; i < listResultAtDate.size(); i++) {
-				if (i == listResultAtDate.size() - 1) {
-					if (listResultAtDate.get(i).getTime().compareTo(newResult.getTime()) <= 0
-							&& listResultAtDate.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
-							&& !listResultAtDate.get(i).getMatch().equals(newResult.getMatch())) {
-						checkExisted = i;
-						break;
-					}
+			for (int i = 0; i < listCompetitiveResults.size(); i++) {
+				if(listCompetitiveResults.get(i).getTime().compareTo(newResult.getTime()) > 0) {
+					checkExisted = i;
+					break;
 				}
-				if (listResultAtDate.get(i).getTime().compareTo(newResult.getTime()) <= 0
-						&& listResultAtDate.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) > 0
-						&& listResultAtDate.get(i + 1).getTime().compareTo(newResult.getTime().plusMinutes(10)) < 0) {
-					if (listResultAtDate.get(i).getMatch().equals(newResult.getMatch())) {
-						checkExisted = i + 1;
-						break;
-					} else {
-						checkExisted = i;
-						break;
-					}
+				
+//				if (i == listCompetitiveResults.size() - 1) {
+//					if (listCompetitiveResults.get(i).getTime().compareTo(newResult.getTime()) <= 0
+//							&& listCompetitiveResults.get(i).getTime().plusMinutes(10)
+//									.compareTo(newResult.getTime()) > 0
+//							&& !listCompetitiveResults.get(i).getMatch().equals(newResult.getMatch())) {
+//						checkExisted = i;
+//						break;
+//					}
+//				}
+//				if (listCompetitiveResults.get(i).getTime().compareTo(newResult.getTime()) <= 0
+//						&& listCompetitiveResults.get(i).getTime().plusMinutes(10)
+//								.compareTo(newResult.getTime()) > 0
+//						&& listCompetitiveResults.get(i + 1).getTime()
+//								.compareTo(newResult.getTime().plusMinutes(10)) < 0) {
+//					if (listCompetitiveResults.get(i).getMatch().equals(newResult.getMatch())) {
+//						checkExisted = i + 1;
+//						break;
+//					} else {
+//						checkExisted = i;
+//						break;
+//					}
+//				}
+			}
+			if(checkExisted == -1) {
+				if(listCompetitiveResults.get(0).getTime().compareTo(newResult.getTime().minusMinutes(10)) < 0) {
+					responseMessage.setMessage("Bị trùng với trận khác diễn ra trên cùng sân vào lúc "
+							+ listCompetitiveResults.get(0).getTime());
 				}
 			}
+			if(checkExisted == 0) {
+				if(listCompetitiveResults.get(0).getTime().compareTo(newResult.getTime().minusMinutes(10)) < 0) {
+					responseMessage.setMessage("Bị trùng với trận khác diễn ra trên cùng sân vào lúc "
+							+ listCompetitiveResults.get(0).getTime());
+				}
+			}
+			
 			if (checkExisted == -1) {
 				CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(matchId).get();
 				getResult.setArea(newResult.getArea());
@@ -229,8 +253,10 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 				responseMessage.setMessage("Cập nhật thời gian và địa điểm thành công");
 			} else {
 				responseMessage.setMessage("Bị trùng với trận khác diễn ra trên cùng sân vào lúc "
-						+ listResultAtDate.get(checkExisted).getTime());
+						+ listCompetitiveResults.get(checkExisted).getTime());
 			}
+			
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -304,18 +330,19 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 		try {
 			CompetitiveResultByTypeDto competitiveResultByTypeDto = new CompetitiveResultByTypeDto();
 			Optional<CompetitiveType> getTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
-			if(getTypeOp.isPresent()) {
+			if (getTypeOp.isPresent()) {
 				CompetitiveType getType = getTypeOp.get();
 				competitiveResultByTypeDto.setCompetitiveType(getType);
 				User getUser = new User();
 				User[] listResult = new User[3];
 				if (getType.getStatus() == 3) {
-					List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
-					CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(listMatchs.get(1).getId()).get();
+					List<CompetitiveMatch> listMatchs = competitiveMatchRepository
+							.listMatchsByTypeDesc(competitiveTypeId);
+					CompetitiveResult getResult = competitiveResultRepository
+							.findResultByMatchId(listMatchs.get(1).getId()).get();
 					if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
 						responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
-					} 
-					else {
+					} else {
 						getUser = userRepository.findByStudentId(getResult.getFirstPoint() > getResult.getSecondPoint()
 								? listMatchs.get(0).getFirstStudentId()
 								: listMatchs.get(0).getSecondStudentId()).get();
@@ -323,31 +350,29 @@ public class CompetitiveResultServiceImpl implements CompetitiveResultService {
 						getResult = competitiveResultRepository.findByMatchId(listMatchs.get(0).getId()).get();
 						if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
 							responseMessage.setMessage("Trận chung kết chưa diễn ra");
-						} 
-						else {
-							if(getResult.getFirstPoint() > getResult.getSecondPoint()) {
+						} else {
+							if (getResult.getFirstPoint() > getResult.getSecondPoint()) {
 								getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
 								listResult[0] = getUser;
 								getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
 								listResult[1] = getUser;
-							}
-							else {
+							} else {
 								getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
 								listResult[1] = getUser;
 								getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
 								listResult[0] = getUser;
 							}
 							competitiveResultByTypeDto.setListResult(listResult);
-							responseMessage.setMessage("Kết quả thi đấu ở thể thức " + (getType.isGender()? "Nam: " : "Nữ: ") + getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
+							responseMessage
+									.setMessage("Kết quả thi đấu ở thể thức " + (getType.isGender() ? "Nam: " : "Nữ: ")
+											+ getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
 						}
 					}
-				}
-				else {
+				} else {
 					responseMessage.setMessage("Chưa tổ chức thi đấu");
 				}
 				responseMessage.setData(Arrays.asList(competitiveResultByTypeDto));
-			}
-			else {
+			} else {
 				responseMessage.setMessage("Không tìm thấy thể thức");
 			}
 		} catch (Exception e) {

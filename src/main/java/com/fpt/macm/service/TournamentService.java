@@ -8,6 +8,8 @@ import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
+import com.fpt.macm.model.entity.CompetitiveResult;
+import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.response.ResponseMessage;
 
 public interface TournamentService {
@@ -78,4 +80,8 @@ public interface TournamentService {
 	ResponseMessage spawnTimeAndArea(int tournamentId);
 	
 	ResponseMessage updateAfterTournament(int tournamentId, double totalAmountActual);
+	
+	ResponseMessage updateTimeAndAreaCompetitive(int matchId, CompetitiveResult newResult);
+	
+	ResponseMessage updateTimeAndAreaExhibition(int teamId, ExhibitionResult newResult);
 }
