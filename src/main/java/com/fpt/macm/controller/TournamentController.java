@@ -21,6 +21,8 @@ import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
+import com.fpt.macm.model.entity.CompetitiveResult;
+import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.CompetitiveTypeService;
 import com.fpt.macm.service.TournamentService;
@@ -267,6 +269,22 @@ public class TournamentController {
 	ResponseEntity<ResponseMessage> updateAfterTournament(@PathVariable(name = "tournamentId") int id,
 			@RequestParam double totalAmountActual) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.updateAfterTournament(id, totalAmountActual),
+				HttpStatus.OK);
+	}
+	
+	@PutMapping("/headclub/updatetimeandplacematch/{matchId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> updateTimeAndPlaceMatch(@PathVariable(name = "matchId") int matchId,
+			@RequestBody CompetitiveResult newResult) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.updateTimeAndAreaCompetitive(matchId, newResult),
+				HttpStatus.OK);
+	}
+	
+	@PutMapping("/headclub/updatetimeandplaceteam/{teamId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> updateTimeAndPlaceTeam(@PathVariable(name = "teamId") int teamId,
+			@RequestBody ExhibitionResult newResult) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.updateTimeAndAreaExhibition(teamId, newResult),
 				HttpStatus.OK);
 	}
 

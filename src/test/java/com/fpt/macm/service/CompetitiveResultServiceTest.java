@@ -357,7 +357,7 @@ public class CompetitiveResultServiceTest {
 	
 	@Test
 	public void testUpdateTimeAndAreaCaseExisted() {
-		when(competitiveResultRepository.listResultByAreaOrderTime(anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(Arrays.asList(competitiveResult()));
 		ResponseMessage response = competitiveResultService.updateTimeAndArea(1,competitiveResult());
 		assertEquals(response.getData().size(), 0);
 	}
@@ -367,7 +367,7 @@ public class CompetitiveResultServiceTest {
 		CompetitiveResult competitiveResult = competitiveResult();
 		competitiveResult.setArea(area());
 		competitiveResult.setTime(LocalDateTime.of(2022, 9, 1, 18, 0));
-		when(competitiveResultRepository.listResultByAreaOrderTime(anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(Arrays.asList(competitiveResult()));
 		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		ResponseMessage response = competitiveResultService.updateTimeAndArea(1,competitiveResult);
 		assertEquals(response.getData().size(), 1 );
@@ -390,7 +390,7 @@ public class CompetitiveResultServiceTest {
 		competitiveResults.add(competitiveResult);
 		competitiveResults.add(competitiveResult2);
 		
-		when(competitiveResultRepository.listResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
 		
 		ResponseMessage response = competitiveResultService.updateTimeAndArea(1, newCompetitiveResult);
 		assertEquals(response.getData().size(), 0);
@@ -417,7 +417,7 @@ public class CompetitiveResultServiceTest {
 		competitiveResults.add(competitiveResult);
 		competitiveResults.add(competitiveResult2);
 		
-		when(competitiveResultRepository.listResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
 		
 		ResponseMessage response = competitiveResultService.updateTimeAndArea(1, newCompetitiveResult);
 		assertEquals(response.getData().size(), 0);
@@ -436,7 +436,7 @@ public class CompetitiveResultServiceTest {
 		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
 		competitiveResults.add(competitiveResult);
 		
-		when(competitiveResultRepository.listResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt())).thenReturn(competitiveResults);
 		
 		ResponseMessage response = competitiveResultService.updateTimeAndArea(1, newCompetitiveResult);
 		assertEquals(response.getData().size(), 0);

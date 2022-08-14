@@ -71,7 +71,7 @@ public class Utils {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 		return LocalDate.parse(input, formatter);
 	}
-	
+
 	public static LocalDateTime ConvertStringToLocalDateTime(String input) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
 		return LocalDateTime.parse(input, formatter);
@@ -245,26 +245,26 @@ public class Utils {
 //			break;
 //		}
 //	}
-	
+
 	public static String generateQrCode(String data, int wid, int hei) {
 		StringBuilder result = new StringBuilder();
-		
-		if(!data.isEmpty()) {
+
+		if (!data.isEmpty()) {
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
 			try {
 				QRCodeWriter writer = new QRCodeWriter();
 				BitMatrix bitMatrix = writer.encode(data, BarcodeFormat.QR_CODE, wid, hei);
-				BufferedImage bufferedImage =  MatrixToImageWriter.toBufferedImage(bitMatrix);
+				BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
 				ImageIO.write(bufferedImage, "png", os);
 				result.append("data:image/png;base64,");
 				result.append(new String(Base64.getEncoder().encode(os.toByteArray())));
 			} catch (Exception e) {
-				 e.printStackTrace();
+				e.printStackTrace();
 			}
 		}
 		return result.toString();
 	}
-	
+
 	public static String prettyObject(Object object) {
 		try {
 			ObjectMapper mapper = new ObjectMapper();
@@ -273,5 +273,10 @@ public class Utils {
 			e.printStackTrace();
 		}
 		return "";
+	}
+
+	public static String ConvertLocalDateTimeToString(LocalDateTime time) {
+		return time.getHour() + ":" + time.getMinute() + ":" + time.getSecond() 
+				+ " ngày " + time.getDayOfMonth() + "/" + time.getMonthValue() + "/" + time.getYear();
 	}
 }
