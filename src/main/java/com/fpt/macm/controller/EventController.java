@@ -27,11 +27,12 @@ public class EventController {
 	@Autowired
 	EventService eventService;
 
-	@PostMapping("/headculture/createevent")
+	@PostMapping("/headculture/createevent/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> createEvent(@RequestBody EventCreateDto eventCreateDto, @RequestParam boolean isOverwritten) {
-		return new ResponseEntity<ResponseMessage>(
-				eventService.createEvent(eventCreateDto, isOverwritten), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> createEvent(@PathVariable(name = "studentId") String studentId,
+			@RequestBody EventCreateDto eventCreateDto, @RequestParam boolean isOverwritten) {
+		return new ResponseEntity<ResponseMessage>(eventService.createEvent(studentId, eventCreateDto, isOverwritten),
+				HttpStatus.OK);
 	}
 
 	@GetMapping("/geteventsbyname")
@@ -49,10 +50,11 @@ public class EventController {
 		return new ResponseEntity<ResponseMessage>(eventService.updateBeforeEvent(id, event), HttpStatus.OK);
 	}
 
-	@PutMapping("/headculture/deleteevent/{eventId}")
+	@PutMapping("/headculture/deleteevent/{eventId}/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> deleteEvent(@PathVariable(name = "eventId") int id) {
-		return new ResponseEntity<ResponseMessage>(eventService.deleteEvent(id), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> deleteEvent(@PathVariable(name = "eventId") int id,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(eventService.deleteEvent(studentId, id), HttpStatus.OK);
 	}
 
 	@GetMapping("/geteventsbydate")
@@ -71,13 +73,14 @@ public class EventController {
 				HttpStatus.OK);
 	}
 
-	@PutMapping("/headculture/updateafterevent/{eventId}")
+	@PutMapping("/headculture/updateafterevent/{eventId}/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> updateAfterEvent(@PathVariable(name = "eventId") int id, @RequestParam double money,
+	ResponseEntity<ResponseMessage> updateAfterEvent(@PathVariable(name = "eventId") int id,
+			@PathVariable(name = "studentId") String studentId, @RequestParam double money,
 			@RequestParam(defaultValue = "true") boolean isIncurred,
 			@RequestParam(defaultValue = "true") boolean isUseClubFund) {
-		return new ResponseEntity<ResponseMessage>(eventService.updateAfterEvent(id, money, isIncurred, isUseClubFund),
-				HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(
+				eventService.updateAfterEvent(studentId, id, money, isIncurred, isUseClubFund), HttpStatus.OK);
 	}
 
 	@GetMapping("/geteventbyid/{eventId}")

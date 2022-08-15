@@ -41,12 +41,13 @@ public class MemberEventController {
 				HttpStatus.OK);
 	}
 
-	@PutMapping("/treasurer/updatemembereventpaymentstatus/{memberEventId}")
+	@PutMapping("/treasurer/updatemembereventpaymentstatus/{memberEventId}/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateMemberEventPaymentStatus(
-			@PathVariable(name = "memberEventId") int memberEventId) {
-		return new ResponseEntity<ResponseMessage>(memberEventService.updateMemberEventPaymentStatus(memberEventId),
-				HttpStatus.OK);
+			@PathVariable(name = "memberEventId") int memberEventId,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(
+				memberEventService.updateMemberEventPaymentStatus(studentId, memberEventId), HttpStatus.OK);
 	}
 
 	@GetMapping("treasurer/getreportpaymentstatus/{eventId}")

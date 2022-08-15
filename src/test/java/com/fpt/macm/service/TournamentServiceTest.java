@@ -159,13 +159,13 @@ public class TournamentServiceTest {
 
 	@Mock
 	CompetitiveMatchService competitiveMatchService;
-	
+
 	@Mock
 	CompetitiveResultService competitiveResultService;
 
 	@Mock
 	ExhibitionResultService exhibitionResultService;
-	
+
 	@Mock
 	ClubFundService clubFundService;
 
@@ -507,8 +507,10 @@ public class TournamentServiceTest {
 		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
 		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt()))
 				.thenReturn(Arrays.asList(attendanceStatus()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage response = tournamentService.createTournament(tournamentCreateDto(), false);
+		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto(),
+				false);
 		assertEquals(response.getData().size(), 1);
 	}
 
@@ -521,8 +523,10 @@ public class TournamentServiceTest {
 		when(tournamentRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(tournament()));
 		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.empty());
 		when(roleEventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(roleEvent()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage response = tournamentService.createTournament(tournamentCreateDto(), false);
+		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto(),
+				false);
 		assertEquals(response.getData().size(), 1);
 	}
 
@@ -531,7 +535,8 @@ public class TournamentServiceTest {
 		TournamentCreateDto tournamentCreateDto = tournamentCreateDto();
 		tournamentCreateDto.setTournament(null);
 
-		ResponseMessage response = tournamentService.createTournament(tournamentCreateDto, false);
+		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto,
+				false);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -540,7 +545,8 @@ public class TournamentServiceTest {
 		TournamentCreateDto tournamentCreateDto = tournamentCreateDto();
 		tournamentCreateDto.setListPreview(null);
 
-		ResponseMessage response = tournamentService.createTournament(tournamentCreateDto, false);
+		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto,
+				false);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -549,7 +555,8 @@ public class TournamentServiceTest {
 		TournamentCreateDto tournamentCreateDto = tournamentCreateDto();
 		tournamentCreateDto.setListPreview(new ArrayList<ScheduleDto>());
 
-		ResponseMessage response = tournamentService.createTournament(tournamentCreateDto, false);
+		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto,
+				false);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -558,7 +565,8 @@ public class TournamentServiceTest {
 		TournamentCreateDto tournamentCreateDto = tournamentCreateDto();
 		tournamentCreateDto.setRolesEventDto(null);
 
-		ResponseMessage response = tournamentService.createTournament(tournamentCreateDto, false);
+		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto,
+				false);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -567,7 +575,8 @@ public class TournamentServiceTest {
 		TournamentCreateDto tournamentCreateDto = tournamentCreateDto();
 		tournamentCreateDto.setRolesEventDto(new ArrayList<RoleEventDto>());
 
-		ResponseMessage response = tournamentService.createTournament(tournamentCreateDto, false);
+		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto,
+				false);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -577,7 +586,8 @@ public class TournamentServiceTest {
 		tournamentCreateDto.getListPreview().get(0).setExisted(true);
 		tournamentCreateDto.getListPreview().get(0).setTitle("Trùng với Lịch tập");
 
-		ResponseMessage response = tournamentService.createTournament(tournamentCreateDto, false);
+		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto,
+				false);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -587,7 +597,7 @@ public class TournamentServiceTest {
 		tournamentCreateDto.getListPreview().get(0).setExisted(true);
 		tournamentCreateDto.getListPreview().get(0).setTitle("Trùng với Lịch tập");
 
-		ResponseMessage response = tournamentService.createTournament(tournamentCreateDto, true);
+		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto, true);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -597,7 +607,8 @@ public class TournamentServiceTest {
 		tournamentCreateDto.getListPreview().get(0).setExisted(true);
 		tournamentCreateDto.getListPreview().get(0).setTitle("Trùng với Sự kiện");
 
-		ResponseMessage response = tournamentService.createTournament(tournamentCreateDto, false);
+		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto,
+				false);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -716,8 +727,9 @@ public class TournamentServiceTest {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
 		when(commonScheduleRepository.findByDate(any())).thenReturn(Optional.of(commonSchedule()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage response = tournamentService.deleteTournamentById(1);
+		ResponseMessage response = tournamentService.deleteTournamentById(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
 
@@ -726,7 +738,7 @@ public class TournamentServiceTest {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
 
-		ResponseMessage response = tournamentService.deleteTournamentById(1);
+		ResponseMessage response = tournamentService.deleteTournamentById(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -734,7 +746,7 @@ public class TournamentServiceTest {
 	public void testDeleteTournamentByIdCaseStartDateNull() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 
-		ResponseMessage response = tournamentService.deleteTournamentById(1);
+		ResponseMessage response = tournamentService.deleteTournamentById(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
 
@@ -742,7 +754,7 @@ public class TournamentServiceTest {
 	public void testDeleteTournamentByIdCaseException() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
 
-		ResponseMessage response = tournamentService.deleteTournamentById(1);
+		ResponseMessage response = tournamentService.deleteTournamentById(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -750,7 +762,7 @@ public class TournamentServiceTest {
 	public void testDeleteTournamentByIdCaseEmpty() {
 		Optional<Tournament> tOptional = Optional.empty();
 		when(tournamentRepository.findById(anyInt())).thenReturn(tOptional);
-		ResponseMessage response = tournamentService.deleteTournamentById(1);
+		ResponseMessage response = tournamentService.deleteTournamentById(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -1157,7 +1169,10 @@ public class TournamentServiceTest {
 				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
-		ResponseMessage response = tournamentService.updateTournamentOrganizingCommitteePaymentStatus(1);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+
+		ResponseMessage response = tournamentService
+				.updateTournamentOrganizingCommitteePaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
 
@@ -1170,14 +1185,20 @@ public class TournamentServiceTest {
 				.thenReturn(Optional.of(tournamentOrganizingCommittee));
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
-		ResponseMessage response = tournamentService.updateTournamentOrganizingCommitteePaymentStatus(1);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+
+		ResponseMessage response = tournamentService
+				.updateTournamentOrganizingCommitteePaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
 
 	@Test
 	public void testUpdateTournamentOrganizingCommitteePaymentStatusCaseException() {
 		when(tournamentOrganizingCommitteeRepository.findById(anyInt())).thenReturn(null);
-		ResponseMessage response = tournamentService.updateTournamentOrganizingCommitteePaymentStatus(1);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+
+		ResponseMessage response = tournamentService
+				.updateTournamentOrganizingCommitteePaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -1201,7 +1222,7 @@ public class TournamentServiceTest {
 		when(tournamentPlayerRepository.findById(anyInt())).thenReturn(Optional.of(tournamentPlayer()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(tournamentRepository.findByTournamentPlayers(any())).thenReturn(Optional.of(tournament()));
-		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(1);
+		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
 
@@ -1213,14 +1234,14 @@ public class TournamentServiceTest {
 		when(tournamentPlayerRepository.findById(anyInt())).thenReturn(Optional.of(tournamentPlayer));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(tournamentRepository.findByTournamentPlayers(any())).thenReturn(Optional.of(tournament()));
-		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(1);
+		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
 
 	@Test
 	public void testUpdateTournamentPlayerPaymentStatusCaseException() {
 		when(tournamentPlayerRepository.findById(anyInt())).thenReturn(null);
-		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(1);
+		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -1568,16 +1589,16 @@ public class TournamentServiceTest {
 		ResponseMessage response = tournamentService.getAllUserExhibitionPlayer(1, "HE140855");
 		assertEquals(response.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testGetAllUserExhibitionPlayerCaseSortFail() {
-		
+
 		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<ExhibitionPlayer>();
 		exhibitionPlayers.add(exhibitionPlayer());
 		ExhibitionPlayer exhibitionPlayer = exhibitionPlayer();
 		exhibitionPlayer.setId(2);
 		exhibitionPlayers.add(exhibitionPlayer);
-		
+
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
@@ -1586,14 +1607,14 @@ public class TournamentServiceTest {
 		ResponseMessage response = tournamentService.getAllUserExhibitionPlayer(1, "HE140855");
 		assertEquals(response.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testGetAllUserExhibitionPlayerCaseSortSuccess() {
-		
+
 		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<ExhibitionPlayer>();
 		exhibitionPlayers.add(exhibitionPlayer());
 		exhibitionPlayers.add(exhibitionPlayer());
-		
+
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
@@ -2048,7 +2069,7 @@ public class TournamentServiceTest {
 	public void registerToJoinTournamentExhibitionTypeCaseFemale() {
 		User user = user();
 		user.setGender(false);
-		
+
 		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
@@ -2060,13 +2081,13 @@ public class TournamentServiceTest {
 				user().getStudentId(), 1, "Team 1", Arrays.asList(activeUserDto()));
 		assertEquals(response.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void registerToJoinTournamentExhibitionTypeCaseOutOfSlot() {
 		List<ActiveUserDto> activeUserDtos = new ArrayList<ActiveUserDto>();
 		activeUserDtos.add(activeUserDto());
 		activeUserDtos.add(activeUserDto());
-		
+
 		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
@@ -2078,7 +2099,7 @@ public class TournamentServiceTest {
 				user().getStudentId(), 1, "Team 1", activeUserDtos);
 		assertEquals(response.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void registerToJoinTournamentExhibitionTypeCaseRoleFalse() {
 		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
@@ -2094,19 +2115,19 @@ public class TournamentServiceTest {
 				"HE141122", 1, "Team 1", Arrays.asList(activeUserDto()));
 		assertEquals(response.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void registerToJoinTournamentExhibitionTypeCaseOutOfDeadline() {
 		Tournament tournament = tournament();
 		tournament.setRegistrationPlayerDeadline(LocalDateTime.now().minusHours(1));
-		
+
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 
 		ResponseMessage response = tournamentService.registerToJoinTournamentExhibitionType(tournament().getId(),
 				user().getStudentId(), 1, "Team 1", Arrays.asList(activeUserDto()));
 		assertEquals(response.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void registerToJoinTournamentExhibitionTypeCaseException() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
@@ -2115,45 +2136,45 @@ public class TournamentServiceTest {
 				user().getStudentId(), 1, "Team 1", Arrays.asList(activeUserDto()));
 		assertEquals(response.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getEndDateNull() {
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(new ArrayList<TournamentSchedule>());
-		
+
 		LocalDate date = tournamentService.getEndDate(tournament().getId());
 		assertEquals(date, null);
 	}
-	
+
 	@Test
 	public void getResultOfTournamentCaseSuccess() {
 		ResponseMessage competitiveResultResponse = new ResponseMessage();
 		competitiveResultResponse.setData(Arrays.asList(new CompetitiveResultByTypeDto()));
-		
+
 		ResponseMessage exhibitionResultResponse = new ResponseMessage();
 		exhibitionResultResponse.setData(Arrays.asList(new ExhibitionResultByTypeDto()));
-		
+
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(competitiveResultService.getResultByType(anyInt())).thenReturn(competitiveResultResponse);
 		when(exhibitionResultService.getExhibitionResultByType(anyInt())).thenReturn(exhibitionResultResponse);
-		
+
 		ResponseMessage responseMessage = tournamentService.getResultOfTournament(tournament().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getResultOfTournamentCaseEmpty() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.empty());
-		
+
 		ResponseMessage responseMessage = tournamentService.getResultOfTournament(tournament().getId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getResultOfTournamentCaseException() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
-		
+
 		ResponseMessage responseMessage = tournamentService.getResultOfTournament(tournament().getId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 }

@@ -27,16 +27,16 @@ public class ClubFundController {
 		return new ResponseEntity<ResponseMessage>(clubFundService.getClubFund(), HttpStatus.OK);
 	}
 	
-	@PutMapping("/deposittoclubfund/{amount}")
+	@PutMapping("/deposittoclubfund/{amount}/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')") 
-	ResponseEntity<ResponseMessage> depositToClubFund(@PathVariable(name = "amount") int amount, @RequestParam(defaultValue = "") String note){
-		return new ResponseEntity<ResponseMessage>(clubFundService.depositToClubFund(amount, note), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> depositToClubFund(@PathVariable(name = "amount") int amount, @PathVariable(name = "studentId") String studentId, @RequestParam(defaultValue = "") String note){
+		return new ResponseEntity<ResponseMessage>(clubFundService.depositToClubFund(studentId, amount, note), HttpStatus.OK);
 	}
 	
-	@PutMapping("/withdrawfromclubfund/{amount}")
+	@PutMapping("/withdrawfromclubfund/{amount}/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')") 
-	ResponseEntity<ResponseMessage> withdrawFromClubFund(@PathVariable(name = "amount") int amount, @RequestParam(defaultValue = "") String note){
-		return new ResponseEntity<ResponseMessage>(clubFundService.withdrawFromClubFund(amount, note), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> withdrawFromClubFund(@PathVariable(name = "amount") int amount, @PathVariable(name = "studentId") String studentId, @RequestParam(defaultValue = "") String note){
+		return new ResponseEntity<ResponseMessage>(clubFundService.withdrawFromClubFund(studentId, amount, note), HttpStatus.OK);
 	}
 	
 	@GetMapping("/getclubfundreport")

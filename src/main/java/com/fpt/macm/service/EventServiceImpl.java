@@ -88,14 +88,16 @@ public class EventServiceImpl implements EventService {
 
 	@Autowired
 	EventRoleRepository eventRoleRepository;
-	
+
 	@Autowired
 	ClubFundService clubFundService;
-	
+
 	@Override
-	public ResponseMessage createEvent(EventCreateDto eventCreateDto, boolean isOverwritten) {
+	public ResponseMessage createEvent(String studentId, EventCreateDto eventCreateDto, boolean isOverwritten) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			User user = userRepository.findByStudentId(studentId).get();
+
 			Event event = eventCreateDto.getEvent();
 			List<ScheduleDto> listPreview = eventCreateDto.getListPreview();
 			List<RoleEventDto> rolesEventDto = eventCreateDto.getRolesEventDto();
@@ -117,14 +119,15 @@ public class EventServiceImpl implements EventService {
 				// Tạo sự kiện
 				event.setAmountPerRegisterActual(0);
 				event.setTotalAmountActual(0);
-				event.setCreatedBy("LinhLHN");
+				event.setCreatedBy(user.getName() + " - " + user.getStudentId());
 				event.setCreatedOn(LocalDateTime.now());
 				event.setSemester(semester.getName());
 				event.setStatus(true);
 				eventRepository.save(event);
 
 				if (event.getAmountFromClub() > 0) {
-					clubFundService.withdrawFromClubFund(event.getAmountFromClub(), ("Rút tiền để tổ chức sự kiện " + event.getName()));
+					clubFundService.withdrawFromClubFund(user.getStudentId(), event.getAmountFromClub(),
+							("Rút tiền để tổ chức sự kiện " + event.getName()));
 				}
 
 				Event newEvent = eventRepository.findAll(Sort.by("id").descending()).get(0);
@@ -172,10 +175,8 @@ public class EventServiceImpl implements EventService {
 					eventSchedule.setDate(scheduleDto.getDate());
 					eventSchedule.setStartTime(scheduleDto.getStartTime());
 					eventSchedule.setFinishTime(scheduleDto.getFinishTime());
-					eventSchedule.setCreatedBy("LinhLHN");
+					eventSchedule.setCreatedBy(user.getName() + " - " + user.getStudentId());
 					eventSchedule.setCreatedOn(LocalDateTime.now());
-					eventSchedule.setUpdatedBy("LinhLHN");
-					eventSchedule.setUpdatedOn(LocalDateTime.now());
 					listEventSchedule.add(eventSchedule);
 
 					CommonSchedule commonSession = new CommonSchedule();
@@ -184,7 +185,6 @@ public class EventServiceImpl implements EventService {
 					commonSession.setStartTime(scheduleDto.getStartTime());
 					commonSession.setFinishTime(scheduleDto.getFinishTime());
 					commonSession.setCreatedOn(LocalDateTime.now());
-					commonSession.setUpdatedOn(LocalDateTime.now());
 					commonSession.setType(1);
 					listCommon.add(commonSession);
 
@@ -281,7 +281,7 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public ResponseMessage deleteEvent(int eventId) {
+	public ResponseMessage deleteEvent(String studentId, int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<Event> eventOp = eventRepository.findById(eventId);
@@ -289,6 +289,8 @@ public class EventServiceImpl implements EventService {
 				Event event = eventOp.get();
 				LocalDate startDate = getStartDate(eventId);
 				if (startDate == null || LocalDate.now().isBefore(startDate)) {
+					User user = userRepository.findByStudentId(studentId).get();
+
 					List<EventSchedule> eventSchedules = eventScheduleRepository.findByEventId(eventId);
 					if (!eventSchedules.isEmpty()) {
 						for (EventSchedule eventSchedule : eventSchedules) {
@@ -299,12 +301,14 @@ public class EventServiceImpl implements EventService {
 						eventScheduleRepository.deleteAll(eventSchedules);
 					}
 					event.setStatus(false);
+					event.setUpdatedBy(user.getName() + " - " + user.getStudentId());
 					eventRepository.save(event);
 
 					notificationService.createEventDeleteNotification(event.getId(), event.getName());
-					
+
 					if (event.getAmountFromClub() > 0) {
-						clubFundService.depositToClubFund(event.getAmountFromClub(), ("Hoàn tiền tổ chức sự kiện " + event.getName()));
+						clubFundService.depositToClubFund(user.getStudentId(), event.getAmountFromClub(),
+								("Hoàn tiền tổ chức sự kiện " + event.getName()));
 					}
 
 					responseMessage.setData(Arrays.asList(event));
@@ -558,7 +562,8 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public ResponseMessage updateAfterEvent(int eventId, double money, boolean isIncurred, boolean isUseClubFund) {
+	public ResponseMessage updateAfterEvent(String studentId, int eventId, double money, boolean isIncurred,
+			boolean isUseClubFund) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
@@ -566,6 +571,8 @@ public class EventServiceImpl implements EventService {
 					&& listSchedule.get(listSchedule.size() - 1).getDate().compareTo(LocalDate.now()) > 0) {
 				responseMessage.setMessage(Constant.MSG_128);
 			} else {
+				User user = userRepository.findByStudentId(studentId).get();
+
 				Optional<Event> eventOp = eventRepository.findById(eventId);
 				Event getEvent = eventOp.get();
 				if (isIncurred) {
@@ -577,20 +584,22 @@ public class EventServiceImpl implements EventService {
 						getEvent.setAmountFromClub(getEvent.getAmountFromClub() + money);
 						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());
 						// trừ tiền từ clb
-						clubFundService.withdrawFromClubFund(money, ("Phát sinh từ sự kiện " + getEvent.getName()));
+						clubFundService.withdrawFromClubFund(user.getStudentId(), money,
+								("Phát sinh từ sự kiện " + getEvent.getName()));
 					} else {
 						double amountPerMore = money / countMemberEvent;
 						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated() + amountPerMore);
 					}
 				} else {
 					// cộng tiền vào clb
-					clubFundService.depositToClubFund(money, ("Tiền dư từ sự kiện " + getEvent.getName()));
+					clubFundService.depositToClubFund(user.getStudentId(), money,
+							("Tiền dư từ sự kiện " + getEvent.getName()));
 					getEvent.setAmountFromClub(
 							getEvent.getAmountFromClub() - money >= 0 ? getEvent.getAmountFromClub() - money : 0);
 					getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());
 					getEvent.setTotalAmountActual(getEvent.getTotalAmountEstimated());
 				}
-				getEvent.setUpdatedBy("LinhLHN");
+				getEvent.setUpdatedBy(user.getName() + " - " + user.getStudentId());
 				getEvent.setUpdatedOn(LocalDateTime.now());
 				eventRepository.save(getEvent);
 				responseMessage.setData(Arrays.asList(getEvent));
