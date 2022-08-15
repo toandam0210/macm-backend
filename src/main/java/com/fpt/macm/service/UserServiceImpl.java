@@ -3,8 +3,6 @@ package com.fpt.macm.service;
 import java.io.ByteArrayInputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -526,16 +524,15 @@ public class UserServiceImpl implements UserService {
 			int countAddFail = 0;
 			for (User userFromExcel : usersFromExcel) {
 				boolean checkInalid = true;
-				List<String> messageErrorList = new ArrayList<String>();
 				String messageError = "";
 				if (userFromExcel.getDateOfBirth() == null) {
 					String messageInvalidFormatDate = "Vui lòng nhập đúng định dạng: yyyy-MM-dd";
-					messageErrorList.add(messageInvalidFormatDate);
+					messageError += messageInvalidFormatDate;
 					checkInalid = false;
 				}
-				if (!userFromExcel.getPhone().startsWith("0") && userFromExcel.getPhone().length() != 10) {
+				if (!userFromExcel.getPhone().startsWith("0") || userFromExcel.getPhone().length() != 10) {
 					String messageInvalidPhone = "Vui lòng nhập đúng SĐT";
-					messageErrorList.add(messageInvalidPhone);
+					messageError += System.lineSeparator() + messageInvalidPhone;
 					checkInalid = false;
 				}
 				String regexEmail = "^[\\w]+@(fpt.edu.vn)\\b";
@@ -543,25 +540,25 @@ public class UserServiceImpl implements UserService {
 				Matcher matcher = pattern.matcher(userFromExcel.getEmail());
 				if (!matcher.matches()) {
 					String messageInvalidEmail = "Vui lòng nhập email FPT";
-					messageErrorList.add(messageInvalidEmail);
+					messageError += System.lineSeparator() + messageInvalidEmail;
 					checkInalid = false;
 				}
 				
 				if(userFromExcel.isGender() == null) {
 					String messageInvalidGener = "Vui lòng nhập: Nam/Nữ";
-					messageErrorList.add(messageInvalidGener);
+					messageError += System.lineSeparator() + messageInvalidGener;
 					checkInalid = false;
 				}
 				
 				if(userFromExcel.isActive() == null) {
 					String messageInvalidActive = "Vui lòng nhập: Hoạt động/Không hoạt động";
-					messageErrorList.add(messageInvalidActive);
+					messageError += System.lineSeparator() + messageInvalidActive;
 					checkInalid = false;
 				}
 				
 				if(userFromExcel.getGeneration() < 1) {
 					String messageInvalidGen = "Vui lòng nhập số lớn hơn 0";
-					messageErrorList.add(messageInvalidGen);
+					messageError += System.lineSeparator() + messageInvalidGen;
 					checkInalid = false;
 				}
 				UserDto userDto = convertUserExcelToUserDto(userFromExcel);
@@ -569,20 +566,18 @@ public class UserServiceImpl implements UserService {
 				Optional<User> userEmail = userRepository.findByEmail(userFromExcel.getEmail());
 				if (userStudentId.isPresent() || userEmail.isPresent()) {
 					if (userStudentId.isPresent()) {
-						messageError = Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
-						messageErrorList.add(messageError);
+						String messageStudentId = Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
+						messageError += System.lineSeparator() + messageStudentId;
 					} else {
-						messageError = Constant.MSG_049 + userFromExcel.getStudentId() + Constant.MSG_050;
-						messageErrorList.add(messageError);
+						String messageEmail = Constant.MSG_049 + userFromExcel.getStudentId() + Constant.MSG_050;
+						messageError += System.lineSeparator() + messageEmail;
 					}
 					checkInalid = false;
 					countAddFail++;
 				}
 				if(!checkInalid) {
 				usersDto.add(userDto);
-				userDto.setMessageError(messageErrorList);
-				userDto.setMessageError(messageErrorList);
-				
+				userDto.setMessageError(messageError);
 				}else{
 					userFromExcel.setCreatedOn(LocalDate.now());
 					userFromExcel.setCreatedBy("toandv");
@@ -1100,104 +1095,4 @@ public class UserServiceImpl implements UserService {
 		}
 		return responseMessage;
 	}
-	
-	 public boolean isValid(String dateStr) {
-	        try {
-	            LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-	        } catch (DateTimeParseException e) {
-	            return false;
-	        }
-	        return true;
-	    }
-
-	@Override
-	public ResponseMessage addListUsersAndCollaborators(List<UserDto> listUserDtos) {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<User> users = (List<User>) userRepository.findAll();
-			List<UserDto> listUserDtosValid = new ArrayList<UserDto>();
-			String message = "";
-			for (UserDto userDto : listUserDtos) {
-				boolean checkDuplicateEmail = false;
-				boolean checkDuplicateStudentId = false;
-				for (User user : users) {
-					if (user.getStudentId().equals(userDto.getStudentId())) {
-						checkDuplicateStudentId = true;
-					}
-					if (user.getEmail().equals(userDto.getEmail())) {
-						checkDuplicateEmail = true;
-					}
-				}
-				if (!checkDuplicateEmail && !checkDuplicateStudentId) {
-					User user = new User();
-					user.setStudentId(userDto.getStudentId());
-					user.setName(userDto.getName());
-					user.setGender(userDto.isGender());
-					user.setDateOfBirth(userDto.getDateOfBirth());
-					user.setEmail(userDto.getEmail());
-					user.setImage(userDto.getImage());
-					user.setPhone(userDto.getPhone());
-					user.setCurrentAddress(userDto.getCurrentAddress());
-					user.setGeneration(userDto.getGeneration());
-					Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
-					if (roleOptional.isPresent()) {
-						user.setRole(roleOptional.get());
-					}
-					user.setActive(true);
-					user.setCreatedBy("toandv");
-					user.setCreatedOn(LocalDate.now());
-					userRepository.save(user);
-					if (userDto.getRoleId() > 9 && userDto.getRoleId() < 13) {
-						MemberSemester memberSemester = new MemberSemester();
-						memberSemester.setUser(user);
-						memberSemester.setStatus(true);
-						Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-						memberSemester.setSemester(semester.getName());
-						memberSemesterRepository.save(memberSemester);
-					}
-
-					Optional<User> newUserOp = userRepository.findByStudentId(user.getStudentId());
-					List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
-					if (newUserOp.isPresent()) {
-						User newUser = newUserOp.get();
-						UserDto newUserDto = convertUserToUserDto(newUser);
-						listUserDtosValid.add(newUserDto);
-
-						List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
-								.findAllFutureTrainingSchedule(LocalDate.now());
-						for (TrainingSchedule trainingSchedule : trainingSchedules) {
-							AttendanceStatus attendanceStatus = new AttendanceStatus();
-							attendanceStatus.setUser(newUser);
-							attendanceStatus.setTrainingSchedule(trainingSchedule);
-							attendanceStatus.setCreatedOn(LocalDateTime.now());
-							attendanceStatus.setCreatedBy("toandv");
-							attendanceStatus.setStatus(2);
-							listAttendanceStatus.add(attendanceStatus);
-						}
-					}
-					
-					if (!listAttendanceStatus.isEmpty()) {
-						attendanceStatusRepository.saveAll(listAttendanceStatus);
-					}
-					
-					message += Constant.addSuccess(userDto);
-				} else {
-					if (checkDuplicateStudentId) {
-						message += Constant.MSG_048 + userDto.getStudentId() + Constant.MSG_050;
-					}
-					if (checkDuplicateEmail) {
-						message += Constant.MSG_049 + userDto.getEmail() + Constant.MSG_050;
-					}
-				}
-			}
-			responseMessage.setData(listUserDtosValid);
-			responseMessage.setMessage(message);
-		} catch (Exception e) {
-			responseMessage.setMessage(e.getMessage());
-		}
-
-		return responseMessage;
-	}
-
 }

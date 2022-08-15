@@ -300,7 +300,7 @@ public class ExhibitionServiceImpl implements ExhibitionService{
 						getTournament.setTournamentPlayers(tournamentPlayers);
 						tournamentRepository.save(getTournament);
 						getTournamentPlayer = tournamentPlayerRepository
-								.findPlayerByUserIdAndTournamentId(getUser.getId(), getTournament.getId()).get();
+								.getPlayerByUserIdAndTournamentId(getUser.getId(), getTournament.getId()).get();
 					}
 					ExhibitionPlayer newPlayer = new ExhibitionPlayer();
 					newPlayer.setTournamentPlayer(getTournamentPlayer);

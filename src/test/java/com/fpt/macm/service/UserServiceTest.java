@@ -122,6 +122,7 @@ public class UserServiceTest {
 		user.setRole(role);
 		user.setCreatedOn(LocalDate.now());
 		user.setCreatedBy("toandv");
+		user.setGeneration(1);
 		return user;
 	}
 	
@@ -741,7 +742,7 @@ public class UserServiceTest {
 		User user = createUser();
 		user.setActive(true);
 		
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
 		List<Semester> semesters = Arrays.asList(semester());
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
@@ -750,12 +751,12 @@ public class UserServiceTest {
 		when(trainingScheduleRepository.findAllFutureTrainingSchedule(any())).thenReturn(Arrays.asList(trainingSchedule()));
 		
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 0);
+		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
 	public void addUserFromExcelCaseException() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
 		
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
 		assertEquals(response.getData().size(), 0);
@@ -763,7 +764,7 @@ public class UserServiceTest {
 	
 	@Test
 	public void addUserFromExcelCaseUserNotActive() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
 		List<Semester> semesters = Arrays.asList(semester());
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
@@ -771,34 +772,34 @@ public class UserServiceTest {
 		when(userRepository.findByStudentIdAndEmail(anyString(), anyString())).thenReturn(Optional.of(createUser()));
 		
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 0);
+		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
 	public void addUserFromExcelDuplicateStudentId() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
 		List<Semester> semesters = Arrays.asList(semester());
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 81);
+		assertEquals(response.getData().size(), 3);
 	}
 	
 	@Test
 	public void addUserFromExcelDuplicateEmail() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
 		List<Semester> semesters = Arrays.asList(semester());
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 81);
+		assertEquals(response.getData().size(), 3);
 	}
 	
 	@Test
 	public void addUserFromExcelFail() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut-fail.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut-fail.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut-fail.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut-fail.xlsx")));
 		List<User> users = Arrays.asList(createUser());
 		users.get(0).setStudentId("HE140855");
 		users.get(0).setEmail("toandvhe140855@fpt.edu.vn");
