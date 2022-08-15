@@ -1090,7 +1090,7 @@ public class UserServiceImpl implements UserService {
 
 			responseMessage.setData(listUserAttendanceStatusDto);
 			responseMessage.setMessage(
-					"Lấy dữ liệu điểm danh của " + user.getName() + " - " + user.getStudentId() + System.lineSeparator() +" thành công");
+					"Lấy dữ liệu điểm danh của " + user.getName() + " - " + user.getStudentId() + "<br>" +" thành công");
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
