@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -179,6 +180,13 @@ public class ExhibitionResultServiceImpl implements ExhibitionResultService {
 				}
 			}
 			if (listResult.size() > 0) {
+				Collections.sort(listResult, new Comparator<ExhibitionResult>() {
+					@Override
+					public int compare(ExhibitionResult o1, ExhibitionResult o2) {
+						// TODO Auto-generated method stub
+						return o1.getTime().compareTo(o2.getTime());
+					}
+				});
 				responseMessage.setData(listResult);
 				responseMessage.setMessage("Danh sách các trận đấu");
 			} else {
