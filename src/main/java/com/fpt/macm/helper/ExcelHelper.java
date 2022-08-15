@@ -28,6 +28,8 @@ public class ExcelHelper {
 	public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 	static String[] HEADERs = { "MSSV", "Tên", "Ngày sinh", "SĐT", "Email", "Giới tính", "Trạng thái hoạt động",
 			"Vai trò", "Địa chỉ", "Generation"};
+	static String[] HEADERsForErrors = { "MSSV", "Tên", "Ngày sinh", "SĐT", "Email", "Giới tính", "Trạng thái hoạt động",
+			"Vai trò", "Địa chỉ", "Generation", "Lỗi"};
 	static String SHEET = "Users";
 	
 	public static boolean hasExcelFormat(MultipartFile file) {
@@ -167,9 +169,9 @@ public class ExcelHelper {
 		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
 			Sheet sheet = workbook.createSheet(SHEET);
 			Row headerRow = sheet.createRow(0);
-			for (int col = 0; col < HEADERs.length; col++) {
+			for (int col = 0; col < HEADERsForErrors.length; col++) {
 				Cell cell = headerRow.createCell(col);
-				cell.setCellValue(HEADERs[col]);
+				cell.setCellValue(HEADERsForErrors[col]);
 			}
 			int rowIdx = 1;
 			for (UserDto user : users) {
@@ -194,7 +196,7 @@ public class ExcelHelper {
 				row.createCell(7).setCellValue(user.getRoleName());
 				row.createCell(8).setCellValue(user.getCurrentAddress());
 				row.createCell(9).setCellValue(user.getGeneration());
-				//row.createCell(10).setCellValue(user.getMessageError());
+				row.createCell(10).setCellValue(user.getMessageError());
 			}
 			workbook.write(out);
 			return new ByteArrayInputStream(out.toByteArray());

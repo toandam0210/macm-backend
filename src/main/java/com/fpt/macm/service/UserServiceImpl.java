@@ -526,16 +526,15 @@ public class UserServiceImpl implements UserService {
 			int countAddFail = 0;
 			for (User userFromExcel : usersFromExcel) {
 				boolean checkInalid = true;
-				List<String> messageErrorList = new ArrayList<String>();
 				String messageError = "";
 				if (userFromExcel.getDateOfBirth() == null) {
 					String messageInvalidFormatDate = "Vui lòng nhập đúng định dạng: yyyy-MM-dd";
-					messageErrorList.add(messageInvalidFormatDate);
+					messageError += messageInvalidFormatDate;
 					checkInalid = false;
 				}
 				if (!userFromExcel.getPhone().startsWith("0") && userFromExcel.getPhone().length() != 10) {
 					String messageInvalidPhone = "Vui lòng nhập đúng SĐT";
-					messageErrorList.add(messageInvalidPhone);
+					messageError += System.lineSeparator() + messageInvalidPhone;
 					checkInalid = false;
 				}
 				String regexEmail = "^[\\w]+@(fpt.edu.vn)\\b";
@@ -543,25 +542,25 @@ public class UserServiceImpl implements UserService {
 				Matcher matcher = pattern.matcher(userFromExcel.getEmail());
 				if (!matcher.matches()) {
 					String messageInvalidEmail = "Vui lòng nhập email FPT";
-					messageErrorList.add(messageInvalidEmail);
+					messageError += System.lineSeparator() + messageInvalidEmail;
 					checkInalid = false;
 				}
 				
 				if(userFromExcel.isGender() == null) {
 					String messageInvalidGener = "Vui lòng nhập: Nam/Nữ";
-					messageErrorList.add(messageInvalidGener);
+					messageError += System.lineSeparator() + messageInvalidGener;
 					checkInalid = false;
 				}
 				
 				if(userFromExcel.isActive() == null) {
 					String messageInvalidActive = "Vui lòng nhập: Hoạt động/Không hoạt động";
-					messageErrorList.add(messageInvalidActive);
+					messageError += System.lineSeparator() + messageInvalidActive;
 					checkInalid = false;
 				}
 				
 				if(userFromExcel.getGeneration() < 1) {
 					String messageInvalidGen = "Vui lòng nhập số lớn hơn 0";
-					messageErrorList.add(messageInvalidGen);
+					messageError += System.lineSeparator() + messageInvalidGen;
 					checkInalid = false;
 				}
 				UserDto userDto = convertUserExcelToUserDto(userFromExcel);
@@ -569,20 +568,18 @@ public class UserServiceImpl implements UserService {
 				Optional<User> userEmail = userRepository.findByEmail(userFromExcel.getEmail());
 				if (userStudentId.isPresent() || userEmail.isPresent()) {
 					if (userStudentId.isPresent()) {
-						messageError = Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
-						messageErrorList.add(messageError);
+						String messageStudentId = Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
+						messageError += System.lineSeparator() + messageStudentId;
 					} else {
-						messageError = Constant.MSG_049 + userFromExcel.getStudentId() + Constant.MSG_050;
-						messageErrorList.add(messageError);
+						String messageEmail = Constant.MSG_049 + userFromExcel.getStudentId() + Constant.MSG_050;
+						messageError += System.lineSeparator() + messageEmail;
 					}
 					checkInalid = false;
 					countAddFail++;
 				}
 				if(!checkInalid) {
 				usersDto.add(userDto);
-				userDto.setMessageError(messageErrorList);
-				userDto.setMessageError(messageErrorList);
-				
+				userDto.setMessageError(messageError);
 				}else{
 					userFromExcel.setCreatedOn(LocalDate.now());
 					userFromExcel.setCreatedBy("toandv");
@@ -1093,7 +1090,7 @@ public class UserServiceImpl implements UserService {
 
 			responseMessage.setData(listUserAttendanceStatusDto);
 			responseMessage.setMessage(
-					"Lấy dữ liệu điểm danh của " + user.getName() + " - " + user.getStudentId() + " thành công");
+					"Lấy dữ liệu điểm danh của " + user.getName() + " - " + user.getStudentId() + System.lineSeparator() +" thành công");
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -1198,6 +1195,10 @@ public class UserServiceImpl implements UserService {
 		}
 
 		return responseMessage;
+	}
+	
+	public static void main(String[] args) {
+		System.out.println("a" + System.lineSeparator() + "b");
 	}
 
 }
