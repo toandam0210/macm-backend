@@ -10,7 +10,7 @@ public interface MemberEventService {
 
 	ResponseMessage updateListMemberEventRole(List<MemberEventDto> membersEventDto);
 	ResponseMessage getAllMemberCancelJoinEvent(int eventId);
-	ResponseMessage updateMemberEventPaymentStatus(int memberEventId);
+	ResponseMessage updateMemberEventPaymentStatus(String studentId, int memberEventId);
 	ResponseMessage getReportPaymentStatusByEventId(int eventId);
 	ResponseMessage getAllMemberJoinEventByRoleEventId(int eventId, int filterIndex);
 	ResponseMessage getAllRoleByEventId(int eventId);

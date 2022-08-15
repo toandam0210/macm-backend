@@ -21,11 +21,13 @@ import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.MembershipInfo;
 import com.fpt.macm.model.entity.MembershipPaymentStatusReport;
 import com.fpt.macm.model.entity.MembershipStatus;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.MembershipPaymentStatusReportRepository;
 import com.fpt.macm.repository.MembershipShipInforRepository;
 import com.fpt.macm.repository.MembershipStatusRepository;
+import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -44,6 +46,9 @@ public class MembershipServiceImpl implements MembershipService {
 
 	@Autowired
 	ClubFundService clubFundService;
+
+	@Autowired
+	UserRepository userRepository;
 
 	@Override
 	public ResponseMessage getListMemberPayMembershipBySemester(int membershipInfoId) {
@@ -77,9 +82,11 @@ public class MembershipServiceImpl implements MembershipService {
 	}
 
 	@Override
-	public ResponseMessage updateStatusPaymenMembershipById(int id) {
+	public ResponseMessage updateStatusPaymenMembershipById(String studentId, int id) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			User user = userRepository.findByStudentId(studentId).get();
+
 			Optional<MembershipStatus> membershipOp = membershipStatusRepository.findById(id);
 			MembershipStatus membershipStatus = membershipOp.get();
 
@@ -93,13 +100,13 @@ public class MembershipServiceImpl implements MembershipService {
 					: (fundAmount + membershipFee);
 
 			if (membershipStatus.isStatus()) {
-				clubFundService.withdrawFromClubFund(membershipFee,
+				clubFundService.withdrawFromClubFund(user.getStudentId(), membershipFee,
 						"Cập nhật trạng thái đóng phí duy trì CLB kỳ "
 								+ membershipStatus.getMembershipInfo().getSemester() + " của "
 								+ membershipStatus.getUser().getName() + " - "
 								+ membershipStatus.getUser().getStudentId() + " thành chưa đóng");
 			} else {
-				clubFundService.depositToClubFund(membershipFee,
+				clubFundService.depositToClubFund(user.getStudentId(), membershipFee,
 						"Cập nhật trạng thái đóng phí duy trì CLB kỳ "
 								+ membershipStatus.getMembershipInfo().getSemester() + " của "
 								+ membershipStatus.getUser().getName() + " - "
@@ -112,12 +119,12 @@ public class MembershipServiceImpl implements MembershipService {
 			membershipPaymentStatusReport.setPaymentStatus(!membershipStatus.isStatus());
 			membershipPaymentStatusReport.setFundChange(membershipStatus.isStatus() ? -membershipFee : membershipFee);
 			membershipPaymentStatusReport.setFundBalance(fundBalance);
-			membershipPaymentStatusReport.setCreatedBy("toandv");
+			membershipPaymentStatusReport.setCreatedBy(user.getName() + " - " + user.getStudentId());
 			membershipPaymentStatusReport.setCreatedOn(LocalDateTime.now());
 			membershipPaymentStatusReportRepository.save(membershipPaymentStatusReport);
 
 			membershipStatus.setStatus(!membershipStatus.isStatus());
-			membershipStatus.setUpdatedBy("toandv");
+			membershipStatus.setUpdatedBy(user.getName() + " - " + user.getStudentId());
 			membershipStatus.setUpdatedOn(LocalDateTime.now());
 			membershipStatusRepository.save(membershipStatus);
 			responseMessage.setData(Arrays.asList(membershipStatus));
