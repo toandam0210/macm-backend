@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.CompetitiveMatchDto;
-import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.CompetitiveMatchService;
@@ -114,5 +113,10 @@ public class CompetitiveController {
 			@PathVariable(name = "competitiveTypeId") int competitiveTypeId) {
 		return new ResponseEntity<ResponseMessage>(
 				competitiveResultService.getResultByType(competitiveTypeId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/treasurer/getallcompetitivetype/{tournamentId}")
+	ResponseEntity<ResponseMessage> getAllCompetitiveType(@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(competitiveTypeService.getAllType(tournamentId), HttpStatus.OK);
 	}
 }
