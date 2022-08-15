@@ -158,14 +158,11 @@ public class TournamentServiceTest {
 	CommonScheduleRepository commonScheduleRepository;
 
 	@Mock
-	CompetitiveMatchService competitiveMatchService;
-
+	CompetitiveService competitiveService;
+	
 	@Mock
-	CompetitiveResultService competitiveResultService;
-
-	@Mock
-	ExhibitionResultService exhibitionResultService;
-
+	ExhibitionService exhibitionService;
+	
 	@Mock
 	ClubFundService clubFundService;
 
@@ -2156,8 +2153,8 @@ public class TournamentServiceTest {
 		exhibitionResultResponse.setData(Arrays.asList(new ExhibitionResultByTypeDto()));
 
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		when(competitiveResultService.getResultByType(anyInt())).thenReturn(competitiveResultResponse);
-		when(exhibitionResultService.getExhibitionResultByType(anyInt())).thenReturn(exhibitionResultResponse);
+		when(competitiveService.getResultByType(anyInt())).thenReturn(competitiveResultResponse);
+		when(exhibitionService.getExhibitionResultByType(anyInt())).thenReturn(exhibitionResultResponse);
 
 		ResponseMessage responseMessage = tournamentService.getResultOfTournament(tournament().getId());
 		assertEquals(responseMessage.getData().size(), 1);

@@ -38,7 +38,7 @@ import com.fpt.macm.repository.UserRepository;
 public class ExhibitionTypeServiceTest {
 	
 	@InjectMocks
-	ExhibitionTypeService exhibitionTypeService = new ExhibitionTypeServiceImpl();
+	ExhibitionService exhibitionTypeService = new ExhibitionServiceImpl();
 	
 	@Mock
 	TournamentRepository tournamentRepository;
