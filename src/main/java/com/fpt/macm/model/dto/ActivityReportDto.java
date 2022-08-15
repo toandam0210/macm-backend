@@ -2,32 +2,41 @@ package com.fpt.macm.model.dto;
 
 public class ActivityReportDto {
 
-	private int totalTournamentAndEvent;
-	private int averageMembersPerTournamentAndEvent;
-	private int averageCommitteePerTournamentAndEvent;
+	private int totalTournament;
+	private int totalEvent;
+	private double averageJoinTournament;
+	private double averageJoinEvent;
 
-	public int getTotalTournamentAndEvent() {
-		return totalTournamentAndEvent;
+	public int getTotalTournament() {
+		return totalTournament;
 	}
 
-	public void setTotalTournamentAndEvent(int totalTournamentAndEvent) {
-		this.totalTournamentAndEvent = totalTournamentAndEvent;
+	public void setTotalTournament(int totalTournament) {
+		this.totalTournament = totalTournament;
 	}
 
-	public int getAverageMembersPerTournamentAndEvent() {
-		return averageMembersPerTournamentAndEvent;
+	public int getTotalEvent() {
+		return totalEvent;
 	}
 
-	public void setAverageMembersPerTournamentAndEvent(int averageMembersPerTournamentAndEvent) {
-		this.averageMembersPerTournamentAndEvent = averageMembersPerTournamentAndEvent;
+	public void setTotalEvent(int totalEvent) {
+		this.totalEvent = totalEvent;
 	}
 
-	public int getAverageCommitteePerTournamentAndEvent() {
-		return averageCommitteePerTournamentAndEvent;
+	public double getAverageJoinTournament() {
+		return averageJoinTournament;
 	}
 
-	public void setAverageCommitteePerTournamentAndEvent(int averageCommitteePerTournamentAndEvent) {
-		this.averageCommitteePerTournamentAndEvent = averageCommitteePerTournamentAndEvent;
+	public void setAverageJoinTournament(double averageJoinTournament) {
+		this.averageJoinTournament = averageJoinTournament;
+	}
+
+	public double getAverageJoinEvent() {
+		return averageJoinEvent;
+	}
+
+	public void setAverageJoinEvent(double averageJoinEvent) {
+		this.averageJoinEvent = averageJoinEvent;
 	}
 
 }
