@@ -28,7 +28,7 @@ public class TrainingScheduleController {
 	TrainingScheduleService trainingScheduleService;
 	
 	@GetMapping("/gettrainingschedule")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getTrainingSchedule(){
 			return new ResponseEntity<ResponseMessage>(trainingScheduleService.getListTrainingSchedule(), HttpStatus.OK);
 	}
