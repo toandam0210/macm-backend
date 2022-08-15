@@ -230,13 +230,14 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService {
 				Set<ExhibitionPlayer> newPlayers = new HashSet<ExhibitionPlayer>();
 				boolean role = true;
 				for (User user : teamUsers) {
+					User getUser = userRepository.getByStudentId(user.getStudentId());
 					TournamentPlayer getTournamentPlayer = new TournamentPlayer();
 					Optional<TournamentPlayer> getTournamentPlayerOp = tournamentPlayerRepository
-							.findPlayerByUserIdAndTournamentId(user.getId(), getTournament.getId());
+							.findPlayerByUserIdAndTournamentId(getUser.getId(), getTournament.getId());
 					if (getTournamentPlayerOp.isPresent()) {
 						getTournamentPlayer = getTournamentPlayerOp.get();
 					} else {
-						getTournamentPlayer.setUser(user);
+						getTournamentPlayer.setUser(getUser);
 						getTournamentPlayer.setPaymentStatus(false);
 						getTournamentPlayer.setCreatedBy("LinhLHN");
 						getTournamentPlayer.setCreatedOn(LocalDateTime.now());
@@ -245,7 +246,7 @@ public class ExhibitionTeamServiceImpl implements ExhibitionTeamService {
 						getTournament.setTournamentPlayers(tournamentPlayers);
 						tournamentRepository.save(getTournament);
 						getTournamentPlayer = tournamentPlayerRepository
-								.findPlayerByUserIdAndTournamentId(user.getId(), getTournament.getId()).get();
+								.findPlayerByUserIdAndTournamentId(getUser.getId(), getTournament.getId()).get();
 					}
 					ExhibitionPlayer newPlayer = new ExhibitionPlayer();
 					newPlayer.setTournamentPlayer(getTournamentPlayer);
