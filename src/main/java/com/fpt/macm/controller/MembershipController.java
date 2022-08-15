@@ -29,10 +29,11 @@ public class MembershipController {
 				membershipService.getListMemberPayMembershipBySemester(membershipInfoId), HttpStatus.OK);
 	}
 
-	@PutMapping("/treasure/membership/update/{id}")
+	@PutMapping("/treasure/membership/update/{id}/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> updateMembershipStatus(@PathVariable(name = "id") int id) {
-		return new ResponseEntity<ResponseMessage>(membershipService.updateStatusPaymenMembershipById(id),
+	ResponseEntity<ResponseMessage> updateMembershipStatus(@PathVariable(name = "id") int id,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(membershipService.updateStatusPaymenMembershipById(studentId, id),
 				HttpStatus.OK);
 	}
 
@@ -57,6 +58,7 @@ public class MembershipController {
 			@PathVariable(name = "membershipInfoId") int membershipInfoId, @RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
 		return new ResponseEntity<ResponseMessage>(
-				membershipService.getReportMembershipPaymentStatus(membershipInfoId, pageNo, pageSize, sortBy), HttpStatus.OK);
+				membershipService.getReportMembershipPaymentStatus(membershipInfoId, pageNo, pageSize, sortBy),
+				HttpStatus.OK);
 	}
 }

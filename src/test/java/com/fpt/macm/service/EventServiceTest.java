@@ -102,7 +102,7 @@ public class EventServiceTest {
 
 	@Mock
 	TrainingScheduleRepository trainingScheduleRepository;
-	
+
 	@Mock
 	ClubFundService clubFundService;
 
@@ -267,8 +267,9 @@ public class EventServiceTest {
 		when(eventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(event()));
 		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.of(roleEvent()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto(), false);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto(), false);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -283,8 +284,9 @@ public class EventServiceTest {
 		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.empty());
 		when(roleEventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(roleEvent()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto(), false);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto(), false);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -294,7 +296,7 @@ public class EventServiceTest {
 		eventCreateDto.getListPreview().get(0).setExisted(true);
 		eventCreateDto.getListPreview().get(0).setTitle("Trùng với Lịch tập");
 
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -316,8 +318,9 @@ public class EventServiceTest {
 		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
 		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt()))
 				.thenReturn(Arrays.asList(attendanceStatus()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, true);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, true);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -327,7 +330,7 @@ public class EventServiceTest {
 		eventCreateDto.getListPreview().get(0).setExisted(true);
 		eventCreateDto.getListPreview().get(0).setTitle("Trùng với Giải đấu");
 
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -336,7 +339,7 @@ public class EventServiceTest {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setEvent(null);
 
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -345,7 +348,7 @@ public class EventServiceTest {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setListPreview(null);
 
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -354,7 +357,7 @@ public class EventServiceTest {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setRolesEventDto(null);
 
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -363,7 +366,7 @@ public class EventServiceTest {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setListPreview(new ArrayList<ScheduleDto>());
 
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -372,13 +375,13 @@ public class EventServiceTest {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setRolesEventDto(new ArrayList<RoleEventDto>());
 
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto, false);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
 	@Test
 	public void createEventCaseException() {
-		ResponseMessage responseMessage = eventService.createEvent(eventCreateDto(), false);
+		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto(), false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -418,8 +421,9 @@ public class EventServiceTest {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 		when(commonScheduleRepository.findByDate(any())).thenReturn(Optional.of(commonSchedules().get(0)));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = eventService.deleteEvent(1);
+		ResponseMessage responseMessage = eventService.deleteEvent(user().getStudentId(), 1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -427,7 +431,7 @@ public class EventServiceTest {
 	public void deleteEventCaseEventEmpty() {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.empty());
 
-		ResponseMessage responseMessage = eventService.deleteEvent(1);
+		ResponseMessage responseMessage = eventService.deleteEvent(user().getStudentId(), 1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -440,8 +444,9 @@ public class EventServiceTest {
 
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = eventService.deleteEvent(1);
+		ResponseMessage responseMessage = eventService.deleteEvent(user().getStudentId(), 1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -452,7 +457,7 @@ public class EventServiceTest {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 
-		ResponseMessage responseMessage = eventService.deleteEvent(1);
+		ResponseMessage responseMessage = eventService.deleteEvent(user().getStudentId(), 1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -460,7 +465,7 @@ public class EventServiceTest {
 	public void deleteEventCaseException() {
 		when(eventRepository.findById(anyInt())).thenReturn(null);
 
-		ResponseMessage responseMessage = eventService.deleteEvent(1);
+		ResponseMessage responseMessage = eventService.deleteEvent(user().getStudentId(), 1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -657,8 +662,9 @@ public class EventServiceTest {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(memberEventRepository.findMemberEventByEventId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 100000, true, true);
+		ResponseMessage responseMessage = eventService.updateAfterEvent(user().getStudentId(), 1, 100000, true, true);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -672,8 +678,9 @@ public class EventServiceTest {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(memberEventRepository.findMemberEventByEventId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 100000, true, false);
+		ResponseMessage responseMessage = eventService.updateAfterEvent(user().getStudentId(), 1, 100000, true, false);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -687,8 +694,9 @@ public class EventServiceTest {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 0, false, false);
+		ResponseMessage responseMessage = eventService.updateAfterEvent(user().getStudentId(), 1, 0, false, false);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -702,8 +710,9 @@ public class EventServiceTest {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 100000, false, false);
+		ResponseMessage responseMessage = eventService.updateAfterEvent(user().getStudentId(), 1, 100000, false, false);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -711,7 +720,7 @@ public class EventServiceTest {
 	public void updateAfterEventCaseListScheduleNull() {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(null);
 
-		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 100000, false, false);
+		ResponseMessage responseMessage = eventService.updateAfterEvent(user().getStudentId(), 1, 100000, false, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -719,7 +728,7 @@ public class EventServiceTest {
 	public void updateAfterEventCaseFail() {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules());
 
-		ResponseMessage responseMessage = eventService.updateAfterEvent(1, 100000, false, false);
+		ResponseMessage responseMessage = eventService.updateAfterEvent(user().getStudentId(), 1, 100000, false, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 

@@ -18,7 +18,6 @@ import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
-import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;

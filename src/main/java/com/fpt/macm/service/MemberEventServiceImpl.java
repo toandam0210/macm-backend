@@ -134,9 +134,11 @@ public class MemberEventServiceImpl implements MemberEventService {
 	}
 
 	@Override
-	public ResponseMessage updateMemberEventPaymentStatus(int memberEventId) {
+	public ResponseMessage updateMemberEventPaymentStatus(String studentId, int memberEventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			User user = userRepository.findByStudentId(studentId).get();
+
 			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
 			MemberEvent memberEvent = memberEventOp.get();
 
@@ -188,12 +190,12 @@ public class MemberEventServiceImpl implements MemberEventService {
 			}
 
 			if (fundChange > 0) {
-				clubFundService.depositToClubFund(fundChange,
+				clubFundService.depositToClubFund(user.getStudentId(), fundChange,
 						"Cập nhật trạng thái đóng phí tham gia sự kiện " + event.getName() + " của "
 								+ memberEvent.getUser().getName() + " - " + memberEvent.getUser().getStudentId()
 								+ " thành đã đóng");
 			} else if (fundChange < 0) {
-				clubFundService.withdrawFromClubFund(-fundChange,
+				clubFundService.withdrawFromClubFund(user.getStudentId(), -fundChange,
 						"Cập nhật trạng thái đóng phí tham gia sự kiện " + event.getName() + " của "
 								+ memberEvent.getUser().getName() + " - " + memberEvent.getUser().getStudentId()
 								+ " thành chưa đóng");
@@ -205,11 +207,11 @@ public class MemberEventServiceImpl implements MemberEventService {
 			eventPaymentStatusReport.setPaymentValue(memberEvent.getPaymentValue());
 			eventPaymentStatusReport.setFundChange(fundChange);
 			eventPaymentStatusReport.setFundBalance(fundBalance);
-			eventPaymentStatusReport.setCreatedBy("toandv");
+			eventPaymentStatusReport.setCreatedBy(user.getName() + " - " + user.getStudentId());
 			eventPaymentStatusReport.setCreatedOn(LocalDateTime.now());
 			eventPaymentStatusReportRepository.save(eventPaymentStatusReport);
 
-			memberEvent.setUpdatedBy("toandv");
+			memberEvent.setUpdatedBy(user.getName() + " - " + user.getStudentId());
 			memberEvent.setUpdatedOn(LocalDateTime.now());
 			memberEventRepository.save(memberEvent);
 			responseMessage.setData(Arrays.asList(memberEvent));
