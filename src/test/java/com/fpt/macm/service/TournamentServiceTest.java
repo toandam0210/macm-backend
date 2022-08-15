@@ -34,12 +34,16 @@ import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
+import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
+import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
+import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.Role;
@@ -55,13 +59,16 @@ import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
+import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
+import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.NotificationRepository;
@@ -159,12 +166,21 @@ public class TournamentServiceTest {
 
 	@Mock
 	CompetitiveService competitiveService;
-	
+
 	@Mock
 	ExhibitionService exhibitionService;
-	
+
 	@Mock
 	ClubFundService clubFundService;
+
+	@Mock
+	CompetitiveResultRepository competitiveResultRepository;
+
+	@Mock
+	ExhibitionResultRepository exhibitionResultRepository;
+
+	@Mock
+	AreaRepository areaRepository;
 
 	private Set<CompetitiveType> competitiveTypes() {
 		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();
@@ -173,6 +189,7 @@ public class TournamentServiceTest {
 		competitiveType.setGender(true);
 		competitiveType.setWeightMax(60);
 		competitiveType.setWeightMin(57);
+		competitiveType.setStatus(3);
 		competitiveTypes.add(competitiveType);
 		return competitiveTypes;
 	}
@@ -248,6 +265,7 @@ public class TournamentServiceTest {
 		tournament.setExhibitionTypes(exhibitionTypes());
 		tournament.setFeeOrganizingCommiteePay(100000);
 		tournament.setFeePlayerPay(100000);
+		tournament.setTotalAmountFromClubEstimate(10000);
 		tournament.setId(1);
 		tournament.setName("FNC");
 		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.now().plusDays(10));
@@ -492,6 +510,53 @@ public class TournamentServiceTest {
 		return attendanceStatus;
 	}
 
+	private CompetitiveMatch competitiveMatch() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		CompetitiveMatch competitiveMatch = new CompetitiveMatch();
+		competitiveMatch.setCompetitiveType(competitiveType);
+		competitiveMatch.setFirstStudentId("HE140855");
+		competitiveMatch.setId(1);
+		competitiveMatch.setLoseMatchId(1);
+		competitiveMatch.setNextIsFirst(true);
+		competitiveMatch.setNextMatchId(1);
+		competitiveMatch.setRound(1);
+		competitiveMatch.setSecondStudentId("HE140856");
+		competitiveMatch.setStatus(true);
+		return competitiveMatch;
+	}
+
+	private CompetitiveResult competitiveResult() {
+		CompetitiveResult competitiveResult = new CompetitiveResult();
+		competitiveResult.setArea(area());
+		competitiveResult.setFirstPoint(3);
+		competitiveResult.setId(1);
+		competitiveResult.setMatch(competitiveMatch());
+		competitiveResult.setSecondPoint(5);
+		competitiveResult.setTime(LocalDateTime.now());
+		return competitiveResult;
+	}
+
+	private Area area() {
+		Area area = new Area();
+		area.setId(1);
+		area.setName("Sân 1");
+		return area;
+	}
+
+	private ExhibitionResult exhibitionResult() {
+		ExhibitionResult exhibitionResult = new ExhibitionResult();
+		for (ExhibitionTeam exhibitionTeam : exhibitionTeams()) {
+			exhibitionResult.setId(1);
+			exhibitionResult.setTeam(exhibitionTeam);
+			exhibitionResult.setScore(0.0);
+			exhibitionResult.setTime(LocalDateTime.now());
+			exhibitionResult.setArea(area());
+		}
+		return exhibitionResult;
+	}
+
 	@Test
 	public void testCreateTournamentCaseSuccess() {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -723,6 +788,9 @@ public class TournamentServiceTest {
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
 		when(commonScheduleRepository.findByDate(any())).thenReturn(Optional.of(commonSchedule()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
 
 		ResponseMessage response = tournamentService.deleteTournamentById(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
@@ -1219,7 +1287,7 @@ public class TournamentServiceTest {
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(tournamentRepository.findByTournamentPlayers(any())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		
+
 		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -1233,7 +1301,7 @@ public class TournamentServiceTest {
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(tournamentRepository.findByTournamentPlayers(any())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		
+
 		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -2173,6 +2241,209 @@ public class TournamentServiceTest {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
 
 		ResponseMessage responseMessage = tournamentService.getResultOfTournament(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void spawnTimeAndAreaCaseSuccess() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatch.setRound(1);
+		competitiveMatch.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch);
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(2);
+		competitiveMatch2.setRound(0);
+		competitiveMatchs.add(competitiveMatch2);
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(3);
+		competitiveMatch3.setRound(1);
+		competitiveMatch3.setSecondStudentId(null);
+		competitiveMatchs.add(competitiveMatch3);
+
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(areaRepository.findAll()).thenReturn(Arrays.asList(area()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
+
+		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void spawnTimeAndAreaCaseFail() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatchs.add(competitiveMatch);
+		CompetitiveMatch competitiveMatch1 = competitiveMatch();
+		competitiveMatch1.setId(2);
+		competitiveMatchs.add(competitiveMatch1);
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(3);
+		competitiveMatchs.add(competitiveMatch2);
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(4);
+		competitiveMatchs.add(competitiveMatch3);
+
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setStartTime(LocalTime.now());
+		tournamentSchedule.setFinishTime(LocalTime.now().plusMinutes(1));
+
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(areaRepository.findAll()).thenReturn(Arrays.asList(area()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+
+		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void spawnTimeAndAreaCaseException() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(null);
+
+		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void updateAfterTournamentCaseFail1() {
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setFirstPoint(null);
+
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseFail1Female() {
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setFirstPoint(null);
+		
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		for (CompetitiveType competitiveType : competitiveTypes) {
+			competitiveType.setGender(false);
+		}
+		
+		Tournament tournament = tournament();
+		tournament.setCompetitiveTypes(competitiveTypes);
+
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void updateAfterTournamentCaseFail2() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.empty());
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseFail2Female() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		for (CompetitiveType competitiveType : competitiveTypes) {
+			competitiveType.setGender(false);
+		}
+		
+		Tournament tournament = tournament();
+		tournament.setCompetitiveTypes(competitiveTypes);
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.empty());
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void updateAfterTournamentCaseFail3() {
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setScore(null);
+
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseFail4() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.empty());
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void updateAfterTournamentCaseSuccess1() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentId(anyInt()))
+				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseSuccess2() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentId(anyInt()))
+				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000000);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseTournamentEmpty() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseException() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(null);
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000000);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
