@@ -167,9 +167,4 @@ public class UserController {
 		return new ResponseEntity<ResponseMessage>(userService.getAllUserAttendanceStatus(studentId), HttpStatus.OK);
 	}
 	
-	@PostMapping("/addusers")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub')")
-	ResponseEntity<ResponseMessage> addListMembers(@RequestBody List<UserDto> users) {
-		return new ResponseEntity<ResponseMessage>(userService.addListUsersAndCollaborators(users), HttpStatus.OK);
-	}
 }
