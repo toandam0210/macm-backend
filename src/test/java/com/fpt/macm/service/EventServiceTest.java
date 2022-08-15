@@ -25,7 +25,6 @@ import com.fpt.macm.model.dto.EventCreateDto;
 import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
-import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventRole;
@@ -38,7 +37,6 @@ import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AttendanceStatusRepository;
-import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventRoleRepository;
@@ -66,9 +64,6 @@ public class EventServiceTest {
 
 	@Mock
 	EventRepository eventRepository;
-
-	@Mock
-	ClubFundRepository clubFundRepository;
 
 	@Mock
 	EventScheduleRepository eventScheduleRepository;
@@ -145,13 +140,6 @@ public class EventServiceTest {
 		semester.setStartDate(LocalDate.of(2022, 5, 1));
 		semester.setEndDate(LocalDate.of(2022, 8, 31));
 		return semester;
-	}
-
-	public ClubFund clubFund() {
-		ClubFund clubFund = new ClubFund();
-		clubFund.setId(1);
-		clubFund.setFundAmount(10000000);
-		return clubFund;
 	}
 
 	public List<CommonSchedule> commonSchedules() {
@@ -263,7 +251,6 @@ public class EventServiceTest {
 		semesterResponse.setData(Arrays.asList(semester()));
 
 		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
-		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(eventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(event()));
 		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.of(roleEvent()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
@@ -279,7 +266,6 @@ public class EventServiceTest {
 		semesterResponse.setData(Arrays.asList(semester()));
 
 		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
-		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(eventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(event()));
 		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.empty());
 		when(roleEventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(roleEvent()));
@@ -295,6 +281,8 @@ public class EventServiceTest {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.getListPreview().get(0).setExisted(true);
 		eventCreateDto.getListPreview().get(0).setTitle("Trùng với Lịch tập");
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
 		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
@@ -310,7 +298,6 @@ public class EventServiceTest {
 		semesterResponse.setData(Arrays.asList(semester()));
 
 		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
-		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(eventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(event()));
 		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.of(roleEvent()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
@@ -329,6 +316,8 @@ public class EventServiceTest {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.getListPreview().get(0).setExisted(true);
 		eventCreateDto.getListPreview().get(0).setTitle("Trùng với Giải đấu");
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
 		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
@@ -339,6 +328,8 @@ public class EventServiceTest {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setEvent(null);
 
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		
 		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
@@ -348,15 +339,8 @@ public class EventServiceTest {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setListPreview(null);
 
-		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-
-	@Test
-	public void createEventCaseRolesEventDtoNull() {
-		EventCreateDto eventCreateDto = eventCreateDto();
-		eventCreateDto.setRolesEventDto(null);
-
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		
 		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
@@ -365,15 +349,8 @@ public class EventServiceTest {
 	public void createEventCaseListPreviewEmpty() {
 		EventCreateDto eventCreateDto = eventCreateDto();
 		eventCreateDto.setListPreview(new ArrayList<ScheduleDto>());
-
-		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-
-	@Test
-	public void createEventCaseRolesEventDtoEmpty() {
-		EventCreateDto eventCreateDto = eventCreateDto();
-		eventCreateDto.setRolesEventDto(new ArrayList<RoleEventDto>());
+		
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
 		ResponseMessage responseMessage = eventService.createEvent(user().getStudentId(), eventCreateDto, false);
 		assertEquals(responseMessage.getData().size(), 0);
@@ -444,7 +421,6 @@ public class EventServiceTest {
 
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
-		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
 		ResponseMessage responseMessage = eventService.deleteEvent(user().getStudentId(), 1);
 		assertEquals(responseMessage.getData().size(), 0);
@@ -456,6 +432,7 @@ public class EventServiceTest {
 
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
 		ResponseMessage responseMessage = eventService.deleteEvent(user().getStudentId(), 1);
 		assertEquals(responseMessage.getData().size(), 1);
@@ -661,7 +638,6 @@ public class EventServiceTest {
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(memberEventRepository.findMemberEventByEventId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
-		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
 		ResponseMessage responseMessage = eventService.updateAfterEvent(user().getStudentId(), 1, 100000, true, true);
@@ -693,7 +669,6 @@ public class EventServiceTest {
 
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
 		ResponseMessage responseMessage = eventService.updateAfterEvent(user().getStudentId(), 1, 0, false, false);
@@ -709,7 +684,6 @@ public class EventServiceTest {
 
 		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(eventSchedules);
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
 		ResponseMessage responseMessage = eventService.updateAfterEvent(user().getStudentId(), 1, 100000, false, false);
