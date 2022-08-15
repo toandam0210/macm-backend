@@ -24,7 +24,6 @@ import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.response.ResponseMessage;
-import com.fpt.macm.service.CompetitiveTypeService;
 import com.fpt.macm.service.TournamentService;
 
 @RestController
@@ -32,9 +31,6 @@ import com.fpt.macm.service.TournamentService;
 public class TournamentController {
 	@Autowired
 	TournamentService tournamentService;
-
-	@Autowired
-	CompetitiveTypeService competitiveTypeService;
 
 	@PostMapping("/headclub/createtournament/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
@@ -170,11 +166,6 @@ public class TournamentController {
 			@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(
 				tournamentService.getAllTournamentPlayerPaymentStatusReport(tournamentId), HttpStatus.OK);
-	}
-
-	@GetMapping("/treasurer/getallcompetitivetype/{tournamentId}")
-	ResponseEntity<ResponseMessage> getAllCompetitiveType(@PathVariable(name = "tournamentId") int tournamentId) {
-		return new ResponseEntity<ResponseMessage>(competitiveTypeService.getAllType(tournamentId), HttpStatus.OK);
 	}
 
 	@PostMapping("/registertojoinorganizingcommittee/{tournamentId}/{studentId}/{roleId}")
