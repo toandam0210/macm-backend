@@ -287,11 +287,56 @@ public class TrainingScheduleServiceTest {
 	}
 
 	@Test
-	public void createTrainingSessionCaseCommonScheduleNotNull() {
+	public void createTrainingSessionCaseCommonScheduleCaseType0() {
+		CommonSchedule commonSchedule = commonSchedule();
+		commonSchedule.setType(0);
+		
 		TrainingSchedule trainingSchedule = trainingSchedule();
 		trainingSchedule.setDate(LocalDate.now().plusDays(1));
 
-		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
+		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule);
+
+		ResponseMessage responseMessage = trainingScheduleService.createTrainingSession(trainingSchedule);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createTrainingSessionCaseCommonScheduleCaseType1() {
+		CommonSchedule commonSchedule = commonSchedule();
+		commonSchedule.setType(1);
+		
+		TrainingSchedule trainingSchedule = trainingSchedule();
+		trainingSchedule.setDate(LocalDate.now().plusDays(1));
+
+		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule);
+
+		ResponseMessage responseMessage = trainingScheduleService.createTrainingSession(trainingSchedule);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createTrainingSessionCaseCommonScheduleCaseType2() {
+		CommonSchedule commonSchedule = commonSchedule();
+		commonSchedule.setType(2);
+		
+		TrainingSchedule trainingSchedule = trainingSchedule();
+		trainingSchedule.setDate(LocalDate.now().plusDays(1));
+
+		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule);
+
+		ResponseMessage responseMessage = trainingScheduleService.createTrainingSession(trainingSchedule);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void createTrainingSessionCaseCommonScheduleCaseType3() {
+		CommonSchedule commonSchedule = commonSchedule();
+		commonSchedule.setType(3);
+		
+		TrainingSchedule trainingSchedule = trainingSchedule();
+		trainingSchedule.setDate(LocalDate.now().plusDays(1));
+
+		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule);
 
 		ResponseMessage responseMessage = trainingScheduleService.createTrainingSession(trainingSchedule);
 		assertEquals(responseMessage.getData().size(), 0);

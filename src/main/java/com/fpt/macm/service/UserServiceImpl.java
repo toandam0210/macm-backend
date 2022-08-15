@@ -210,7 +210,7 @@ public class UserServiceImpl implements UserService {
 					user.setUpdatedOn(LocalDateTime.now());
 					user.setGeneration(userDto.getGeneration());
 					userRepository.save(user);
-					responseMessage.setData(Arrays.asList(user));
+					responseMessage.setData(Arrays.asList(convertUserToUserDto(user)));
 					responseMessage.setMessage(Constant.MSG_005);
 
 					Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);

@@ -497,7 +497,6 @@ public class TournamentServiceTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(semester()));
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
-		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(tournamentRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(tournament()));
 		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.of(roleEvent()));
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
@@ -516,7 +515,6 @@ public class TournamentServiceTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(semester()));
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
-		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(tournamentRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(tournament()));
 		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.empty());
 		when(roleEventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(roleEvent()));
@@ -742,6 +740,7 @@ public class TournamentServiceTest {
 	@Test
 	public void testDeleteTournamentByIdCaseStartDateNull() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
 		ResponseMessage response = tournamentService.deleteTournamentById(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
@@ -1219,6 +1218,8 @@ public class TournamentServiceTest {
 		when(tournamentPlayerRepository.findById(anyInt())).thenReturn(Optional.of(tournamentPlayer()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(tournamentRepository.findByTournamentPlayers(any())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		
 		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -1231,13 +1232,14 @@ public class TournamentServiceTest {
 		when(tournamentPlayerRepository.findById(anyInt())).thenReturn(Optional.of(tournamentPlayer));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(tournamentRepository.findByTournamentPlayers(any())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		
 		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
 
 	@Test
 	public void testUpdateTournamentPlayerPaymentStatusCaseException() {
-		when(tournamentPlayerRepository.findById(anyInt())).thenReturn(null);
 		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 0);
 	}
