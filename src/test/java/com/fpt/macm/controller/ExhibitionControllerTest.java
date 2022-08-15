@@ -46,21 +46,13 @@ import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
-import com.fpt.macm.service.ExhibitionResultService;
-import com.fpt.macm.service.ExhibitionTeamService;
-import com.fpt.macm.service.ExhibitionTypeService;
+import com.fpt.macm.service.ExhibitionService;
 
 @SpringBootTest
 public class ExhibitionControllerTest {
 
 	@MockBean
-	ExhibitionTeamService exhibitionTeamService;
-	
-	@MockBean
-	ExhibitionResultService exhibitionResultService;
-	
-	@MockBean
-	ExhibitionTypeService exhibitionTypeService;
+	ExhibitionService exhibitionService;
 	
 	@Autowired
 	private WebApplicationContext context;
@@ -214,7 +206,7 @@ public class ExhibitionControllerTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(exhibitionTeams()));
 		
-		when(exhibitionTeamService.registerTeam(anyInt(), anyString(), anyList())).thenReturn(responseMessage);
+		when(exhibitionService.registerTeam(anyInt(), anyString(), anyList())).thenReturn(responseMessage);
 		
 		this.mockMvc.perform(post("/api/exhibition/headclub/registerexhibitionteam/{exhibitionTypeId}", "1")
 				.param("name", "Team 1")
@@ -229,7 +221,7 @@ public class ExhibitionControllerTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(exhibitionTeams()));
 		
-		when(exhibitionTeamService.getTeamByType(anyInt())).thenReturn(responseMessage);
+		when(exhibitionService.getTeamByType(anyInt())).thenReturn(responseMessage);
 		
 		this.mockMvc.perform(get("/api/exhibition/headclub/getteambytype/{exhibitionTypeId}", "1"))
 		.andExpect(status().isOk())
@@ -242,7 +234,7 @@ public class ExhibitionControllerTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(exhibitionTeamsDto()));
 		
-		when(exhibitionTeamService.getTop3TeamByType(anyInt())).thenReturn(responseMessage);
+		when(exhibitionService.getTop3TeamByType(anyInt())).thenReturn(responseMessage);
 		
 		this.mockMvc.perform(get("/api/exhibition/headclub/gettop3teambytype/{exhibitionTypeId}", "1"))
 		.andExpect(status().isOk())
@@ -250,25 +242,14 @@ public class ExhibitionControllerTest {
 		.andExpect(jsonPath("$.data.size()").value("1"));
 	}
 	
-	@Test
-	public void spawnTimeAndAreaSuccess() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(exhibitionResult()));
-		
-		when(exhibitionResultService.spawnTimeAndArea(anyInt())).thenReturn(responseMessage);
-		
-		this.mockMvc.perform(post("/api/exhibition/headclub/spawntimeandarea/{tournamentId}", "1"))
-		.andExpect(status().isOk())
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
+	
 	
 	@Test
 	public void getListExhibitionTypeSuccess() throws Exception {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(exhibitionTypes()));
 		
-		when(exhibitionTypeService.getAllExhibitionType(anyInt())).thenReturn(responseMessage);
+		when(exhibitionService.getAllExhibitionType(anyInt())).thenReturn(responseMessage);
 		
 		this.mockMvc.perform(get("/api/exhibition/getlistexhibitiontype/{tournamentId}", "1"))
 		.andExpect(status().isOk())
@@ -281,7 +262,7 @@ public class ExhibitionControllerTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(exhibitionResult()));
 		
-		when(exhibitionResultService.getListExhibitionResult(anyInt(), anyString())).thenReturn(responseMessage);
+		when(exhibitionService.getListExhibitionResult(anyInt(), anyString())).thenReturn(responseMessage);
 		
 		this.mockMvc.perform(get("/api/exhibition/getlistexhibitionresult")
 				.param("exhibitionTypeId", "1")
@@ -296,7 +277,7 @@ public class ExhibitionControllerTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(exhibitionResult()));
 		
-		when(exhibitionResultService.updateExhibitionResult(anyInt(), anyDouble())).thenReturn(responseMessage);
+		when(exhibitionService.updateExhibitionResult(anyInt(), anyDouble())).thenReturn(responseMessage);
 		
 		this.mockMvc.perform(put("/api/exhibition/headclub/updateexhibitionresult/{exhibitionTeamId}", "1")
 				.param("score", "100"))

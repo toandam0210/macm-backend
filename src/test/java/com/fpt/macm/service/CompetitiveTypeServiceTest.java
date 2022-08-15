@@ -40,7 +40,7 @@ import com.fpt.macm.repository.UserRepository;
 public class CompetitiveTypeServiceTest {
 	
 	@InjectMocks
-	CompetitiveTypeService competitiveTypeService = new CompetitiveTypeServiceImpl();
+	CompetitiveService competitiveService = new CompetitiveServiceImpl();
 	
 	@Mock
 	TournamentRepository tournamentRepository;
@@ -168,7 +168,7 @@ public class CompetitiveTypeServiceTest {
 	@Test
 	public void testGetAllType() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		ResponseMessage response = competitiveTypeService.getAllType(1);
+		ResponseMessage response = competitiveService.getAllCompetitiveType(1);
 		assertEquals(response.getData().size(), 1);
 	}
 	
@@ -186,7 +186,7 @@ public class CompetitiveTypeServiceTest {
 		tournament.setCompetitiveTypes(new HashSet<>(competitiveTypes));
 		
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
-		ResponseMessage response = competitiveTypeService.getAllType(1);
+		ResponseMessage response = competitiveService.getAllCompetitiveType(1);
 		assertEquals(response.getData().size(), 1);
 	}
 	
@@ -204,7 +204,7 @@ public class CompetitiveTypeServiceTest {
 		tournament.setCompetitiveTypes(new HashSet<>(competitiveTypes));
 		
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
-		ResponseMessage response = competitiveTypeService.getAllType(1);
+		ResponseMessage response = competitiveService.getAllCompetitiveType(1);
 		assertEquals(response.getData().size(), 1);
 	}
 
@@ -252,30 +252,17 @@ public class CompetitiveTypeServiceTest {
 		tournament.setCompetitiveTypes(new HashSet<>(competitiveTypes));
 		
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
-		ResponseMessage response = competitiveTypeService.getAllType(1);
+		ResponseMessage response = competitiveService.getAllCompetitiveType(1);
 		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
 	public void testGetAllTypeCaseException() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
-		ResponseMessage response = competitiveTypeService.getAllType(10);
+		ResponseMessage response = competitiveService.getAllCompetitiveType(10);
 		assertEquals(response.getData().size(), 0);
 	}
 	
-	@Test
-	public void testGetAllTypeByTournament() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		Set<CompetitiveType> competitiveTypes = competitiveTypeService.getAllTypeByTournament(1);
-		assertEquals(competitiveTypes.size(), 1);
-	}
-	
-	@Test
-	public void testGetAllTypeByTournamentCaseException() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(null);
-		Set<CompetitiveType> competitiveTypes = competitiveTypeService.getAllTypeByTournament(1);
-		assertNull(competitiveTypes);
-	}
 	
 	@Test
 	public void testGetListNotJoinCompetitive() {
@@ -287,21 +274,21 @@ public class CompetitiveTypeServiceTest {
 		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(createUser()));
 		when(tournamentPlayerRepository.getPlayerByTournamentId(anyInt())).thenReturn(tournamentPlayers);
 		when(competitivePlayerRepository.findByTournamentPlayerId(anyInt())).thenReturn(Optional.of(competitivePlayer()));
-		ResponseMessage response = competitiveTypeService.getListNotJoinCompetitive(1);
+		ResponseMessage response = competitiveService.getListNotJoinCompetitive(1);
 		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
 	public void testGetListNotJoinCompetitiveCaseEmpty() {
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.empty());
-		ResponseMessage response = competitiveTypeService.getListNotJoinCompetitive(1);
+		ResponseMessage response = competitiveService.getListNotJoinCompetitive(1);
 		assertEquals(response.getData().size(), 0);
 	}
 	
 	@Test
 	public void testGetListNotJoinCompetitiveCaseException() {
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(null);
-		ResponseMessage response = competitiveTypeService.getListNotJoinCompetitive(1);
+		ResponseMessage response = competitiveService.getListNotJoinCompetitive(1);
 		assertEquals(response.getData().size(), 0);
 	}
 	

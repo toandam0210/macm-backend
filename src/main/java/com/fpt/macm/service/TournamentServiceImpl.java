@@ -97,9 +97,6 @@ public class TournamentServiceImpl implements TournamentService {
 	TournamentRepository tournamentRepository;
 
 	@Autowired
-	SemesterService semesterService;
-
-	@Autowired
 	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
 
 	@Autowired
@@ -148,16 +145,7 @@ public class TournamentServiceImpl implements TournamentService {
 	NotificationRepository notificationRepository;
 
 	@Autowired
-	NotificationService notificationService;
-
-	@Autowired
 	TournamentRoleRepository tournamentRoleRepository;
-
-	@Autowired
-	CommonScheduleService commonScheduleService;
-
-	@Autowired
-	TrainingScheduleService trainingScheduleService;
 
 	@Autowired
 	AttendanceStatusRepository attendanceStatusRepository;
@@ -169,34 +157,40 @@ public class TournamentServiceImpl implements TournamentService {
 	CommonScheduleRepository commonScheduleRepository;
 
 	@Autowired
-	CompetitiveMatchService competitiveMatchService;
-
-	@Autowired
-	CompetitiveResultService competitiveResultService;
-
-	@Autowired
-	ExhibitionResultService exhibitionResultService;
-
-	@Autowired
 	CompetitiveResultRepository competitiveResultRepository;
 
 	@Autowired
-	CompetitiveTypeService competitiveTypeService;
-
-	@Autowired
 	AreaRepository areaRepository;
-
-	@Autowired
-	ExhibitionResultRepository exhibitionResultRepository;
-
-	@Autowired
-	ClubFundService clubFundService;
 
 	@Autowired
 	CompetitiveTypeSampleRepository competitiveTypeSampleRepository;
 
 	@Autowired
 	ExhibitionTypeSampleRepository exhibitionTypeSampleRepository;
+
+	@Autowired
+	ExhibitionResultRepository exhibitionResultRepository;
+
+	@Autowired
+	ExhibitionService exhibitionService;
+
+	@Autowired
+	CompetitiveService competitiveService;
+
+	@Autowired
+	ClubFundService clubFundService;
+
+	@Autowired
+	NotificationService notificationService;
+
+	@Autowired
+	SemesterService semesterService;
+
+	@Autowired
+	CommonScheduleService commonScheduleService;
+
+	@Autowired
+	TrainingScheduleService trainingScheduleService;
 
 	@Override
 	public ResponseMessage createTournament(String studentId, TournamentCreateDto tournamentCreateDto,
@@ -1381,7 +1375,7 @@ public class TournamentServiceImpl implements TournamentService {
 					competitivePlayerRepository.save(competitivePlayer);
 					responseMessage.setData(Arrays.asList(competitivePlayer));
 					responseMessage.setMessage("Đăng ký thành công");
-					competitiveMatchService.autoSpawnMatchs(competitiveTypeId);
+					competitiveService.autoSpawnMatchs(competitiveTypeId);
 				} else {
 					responseMessage.setMessage("Bạn đã đăng ký vào giải này rồi");
 				}
@@ -1809,12 +1803,12 @@ public class TournamentServiceImpl implements TournamentService {
 				Set<CompetitiveType> getCompetitiveTypes = getTournament.getCompetitiveTypes();
 				List<ResponseMessage> listCompetitiveResult = new ArrayList<ResponseMessage>();
 				for (CompetitiveType competitiveType : getCompetitiveTypes) {
-					listCompetitiveResult.add(competitiveResultService.getResultByType(competitiveType.getId()));
+					listCompetitiveResult.add(competitiveService.getResultByType(competitiveType.getId()));
 				}
 				Set<ExhibitionType> getExhibitionTypes = getTournament.getExhibitionTypes();
 				List<ResponseMessage> listExhibitionResult = new ArrayList<ResponseMessage>();
 				for (ExhibitionType exhibitionType : getExhibitionTypes) {
-					listExhibitionResult.add(exhibitionResultService.getExhibitionResultByType(exhibitionType.getId()));
+					listExhibitionResult.add(exhibitionService.getExhibitionResultByType(exhibitionType.getId()));
 				}
 				tournamentResultDto.setListCompetitiveResult(listCompetitiveResult);
 				tournamentResultDto.setListExhibitionResult(listExhibitionResult);
