@@ -9,7 +9,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -267,34 +266,7 @@ public class CompetitiveResultServiceTest {
 		return tournamentSchedule;
 	}
 	
-	@Test
-	public void testSpawnTimeAndArea() {
-		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
-		CompetitiveMatch competitiveMatch = competitiveMatch();
-		competitiveMatchs.add(competitiveMatch);
-		CompetitiveMatch competitiveMatch1 = competitiveMatch();
-		competitiveMatch1.setId(2);
-		competitiveMatchs.add(competitiveMatch1);
-		CompetitiveMatch competitiveMatch2 = competitiveMatch();
-		competitiveMatch2.setId(3);
-		competitiveMatchs.add(competitiveMatch2);
-		CompetitiveMatch competitiveMatch3 = competitiveMatch();
-		competitiveMatch3.setId(4);
-		competitiveMatchs.add(competitiveMatch3);
-		when(competitiveTypeService.getAllTypeByTournament(anyInt())).thenReturn(competitiveTypes());
-		when(areaRepository.findAll()).thenReturn(Arrays.asList(area()));
-		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
-		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
-		ResponseMessage response = competitiveResultService.spawnTimeAndArea(1);
-		assertEquals(response.getData().size(), 4);
-	}
 	
-	@Test
-	public void testSpawnTimeAndAreaCaseException() {
-		when(competitiveTypeService.getAllTypeByTournament(anyInt())).thenReturn(null);
-		ResponseMessage response = competitiveResultService.spawnTimeAndArea(1);
-		assertEquals(response.getData().size(), 0);
-	}
 	
 	@Test
 	public void testUpdateResultMatchCaseAlreadyHasResult() {
@@ -442,11 +414,6 @@ public class CompetitiveResultServiceTest {
 //		assertEquals(response.getData().size(), 0);
 //	}
 	
-	@Test
-	public void testUpdateTimeAndAreaCaseException() {
-		ResponseMessage response = competitiveResultService.updateTimeAndArea(1, null);
-		assertEquals(response.getData().size(), 0);
-	}
 	
 	@Test
 	public void getResultByTypeCaseThirdPlaceNotHappened() {
