@@ -27,21 +27,16 @@ import com.fpt.macm.model.entity.ClubFundReport;
 import com.fpt.macm.model.entity.CollaboratorReport;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Event;
-import com.fpt.macm.model.entity.EventPaymentStatusReport;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.MemberEvent;
-import com.fpt.macm.model.entity.MembershipInfo;
-import com.fpt.macm.model.entity.MembershipPaymentStatusReport;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.RoleEvent;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
-import com.fpt.macm.model.entity.TournamentOrganizingCommitteePaymentStatusReport;
 import com.fpt.macm.model.entity.TournamentPlayer;
-import com.fpt.macm.model.entity.TournamentPlayerPaymentStatusReport;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.entity.UserStatusReport;
@@ -238,14 +233,6 @@ public class DashboardSeviceTest {
 		clubFundReport.setFundBalance(1000000);
 		clubFundReport.setCreatedOn(LocalDateTime.now());
 		return clubFundReport;
-	}
-
-	private MembershipInfo membershipInfo() {
-		MembershipInfo membershipInfo = new MembershipInfo();
-		membershipInfo.setId(1);
-		membershipInfo.setSemester(semester().getName());
-		membershipInfo.setAmount(50000);
-		return membershipInfo;
 	}
 
 	private Set<CompetitiveType> competitiveTypes() {
