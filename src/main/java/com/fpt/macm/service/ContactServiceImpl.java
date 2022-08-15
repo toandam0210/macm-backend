@@ -28,8 +28,12 @@ public class ContactServiceImpl implements ContactService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<Contact> contacts = contactRepository.findAll();
-			responseMessage.setData(contacts);
-			responseMessage.setMessage(Constant.MSG_008);
+			if (contacts.size() > 0) {
+				responseMessage.setData(contacts);
+				responseMessage.setMessage(Constant.MSG_008);
+			} else {
+				responseMessage.setMessage("Chưa có thông tin liên hệ");
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
@@ -42,8 +46,12 @@ public class ContactServiceImpl implements ContactService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<SocialNetwork> socialNetworks = socialNetworkRepository.findAll();
-			responseMessage.setData(socialNetworks);
-			responseMessage.setMessage(Constant.MSG_009);
+			if (socialNetworks.size() > 0) {
+				responseMessage.setData(socialNetworks);
+				responseMessage.setMessage(Constant.MSG_009);
+			} else {
+				responseMessage.setMessage("Chưa có thông tin mạng xã hội");
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}

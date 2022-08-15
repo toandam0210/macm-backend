@@ -21,7 +21,7 @@ public class AttendanceStatusController {
 	AttendanceStatusService attendanceStatusService;
 
 	@PutMapping("/takeattendance/{studentId}/{trainingScheduleId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> takeAttendanceByStudentId(@PathVariable(name = "studentId") String studentId,
 			@PathVariable(name = "trainingScheduleId") int trainingScheduleId, @RequestParam int status) {
 		return new ResponseEntity<ResponseMessage>(
@@ -30,7 +30,7 @@ public class AttendanceStatusController {
 	}
 
 	@GetMapping("/checkattendance/{trainingScheduleId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> checkAttendanceByStudentId(
 			@PathVariable(name = "trainingScheduleId") int trainingScheduleId) {
 		return new ResponseEntity<ResponseMessage>(
@@ -38,7 +38,7 @@ public class AttendanceStatusController {
 	}
 
 	@GetMapping("/checkattendance/report")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> userAttendanceReportBySemester(@RequestParam String semester) {
 		return new ResponseEntity<ResponseMessage>(attendanceStatusService.attendanceTrainingReport(semester),
 				HttpStatus.OK);
@@ -53,7 +53,7 @@ public class AttendanceStatusController {
 	}
 
 	@GetMapping("/getlistoldtrainingscheduletotakeattendancebysemester/{semesterName}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getListOldTrainingScheduleToTakeAttendanceBySemester(
 			@PathVariable(name = "semesterName") String semesterName) {
 		return new ResponseEntity<ResponseMessage>(
@@ -62,7 +62,7 @@ public class AttendanceStatusController {
 	}
 	
 	@GetMapping("/getattendancetrainingstatistic/{semesterName}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getAttendanceTrainingStatistic(@PathVariable(name = "semesterName") String semesterName){
 		return new ResponseEntity<ResponseMessage>(attendanceStatusService.getAttendanceTrainingStatistic(semesterName), HttpStatus.OK);
 	}

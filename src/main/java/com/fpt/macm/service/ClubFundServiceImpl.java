@@ -12,9 +12,11 @@ import org.springframework.stereotype.Service;
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.ClubFundReport;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ClubFundReportRepository;
 import com.fpt.macm.repository.ClubFundRepository;
+import com.fpt.macm.repository.UserRepository;
 
 @Service
 public class ClubFundServiceImpl implements ClubFundService {
@@ -24,6 +26,9 @@ public class ClubFundServiceImpl implements ClubFundService {
 
 	@Autowired
 	ClubFundReportRepository clubFundReportRepository;
+	
+	@Autowired
+	UserRepository userRepository;
 
 	@Override
 	public ResponseMessage getClubFund() {
@@ -42,11 +47,13 @@ public class ClubFundServiceImpl implements ClubFundService {
 	}
 
 	@Override
-	public ResponseMessage depositToClubFund(double amount, String note) {
+	public ResponseMessage depositToClubFund(String studentId, double amount, String note) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			if (!note.trim().equals("")) {
+				User user = userRepository.findByStudentId(studentId).get();
+				
 				Optional<ClubFund> clubFundOp = clubFundRepository.findById(1);
 				ClubFund clubFund = clubFundOp.get();
 				clubFund.setFundAmount(clubFund.getFundAmount() + amount);
@@ -55,7 +62,7 @@ public class ClubFundServiceImpl implements ClubFundService {
 				clubFundReport.setFundChange(amount);
 				clubFundReport.setFundBalance(clubFund.getFundAmount());
 				clubFundReport.setNote(note);
-				clubFundReport.setCreatedBy("toandv");
+				clubFundReport.setCreatedBy(user.getName() + " - " + user.getStudentId());
 				clubFundReport.setCreatedOn(LocalDateTime.now());
 				clubFundReportRepository.save(clubFundReport);
 
@@ -74,11 +81,12 @@ public class ClubFundServiceImpl implements ClubFundService {
 	}
 
 	@Override
-	public ResponseMessage withdrawFromClubFund(double amount, String note) {
+	public ResponseMessage withdrawFromClubFund(String studentId, double amount, String note) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			if (!note.trim().equals("")) {
+				User user = userRepository.findByStudentId(studentId).get();
 				Optional<ClubFund> clubFundOp = clubFundRepository.findById(1);
 				ClubFund clubFund = clubFundOp.get();
 				if (clubFund.getFundAmount() >= amount) {
@@ -88,7 +96,7 @@ public class ClubFundServiceImpl implements ClubFundService {
 					clubFundReport.setFundChange(-amount);
 					clubFundReport.setFundBalance(clubFund.getFundAmount());
 					clubFundReport.setNote(note);
-					clubFundReport.setCreatedBy("toandv");
+					clubFundReport.setCreatedBy(user.getName() + " - " + user.getStudentId());
 					clubFundReport.setCreatedOn(LocalDateTime.now());
 					clubFundReportRepository.save(clubFundReport);
 

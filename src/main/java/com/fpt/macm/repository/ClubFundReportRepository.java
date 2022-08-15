@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 import com.fpt.macm.model.entity.ClubFundReport;
 
 @Repository
-public interface ClubFundReportRepository extends JpaRepository<ClubFundReport, Integer>{
+public interface ClubFundReportRepository extends JpaRepository<ClubFundReport, Integer> {
 
-	@Query(value = "SELECT * FROM club_fund_report WHERE created_on BETWEEN ?1 AND ?2", nativeQuery = true)
+	@Query(value = "SELECT * FROM club_fund_report WHERE created_on BETWEEN ?1 AND ?2 order by created_on asc", nativeQuery = true)
 	List<ClubFundReport> findAllFundChange(LocalDateTime startDate, LocalDateTime endDate);
-	
+
 }

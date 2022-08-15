@@ -15,62 +15,70 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
-import com.fpt.macm.service.ExhibitionResultService;
-import com.fpt.macm.service.ExhibitionTeamService;
-import com.fpt.macm.service.ExhibitionTypeService;
+import com.fpt.macm.service.ExhibitionService;
 
 @RestController
 @RequestMapping("/api/exhibition")
 public class ExhibitionController {
-	
+
 	@Autowired
-	ExhibitionTeamService exhibitionTeamService;
-	
-	@Autowired
-	ExhibitionResultService exhibitionResultService;
-	
-	@Autowired
-	ExhibitionTypeService exhibitionTypeService;
-	
+	ExhibitionService exhibitionService;
+
 	@PostMapping("/headclub/registerexhibitionteam/{exhibitionTypeId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
-	ResponseEntity<ResponseMessage> registerTeam (@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId,
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> registerTeam(@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId,
 			@RequestParam String name, @RequestBody List<String> listStudentId) {
-		return new ResponseEntity<ResponseMessage>(exhibitionTeamService.registerTeam(exhibitionTypeId, name, listStudentId), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(
+				exhibitionService.registerTeam(exhibitionTypeId, name, listStudentId), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headclub/getteambytype/{exhibitionTypeId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
-	ResponseEntity<ResponseMessage> getTeamByType (@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId) {
-		return new ResponseEntity<ResponseMessage>(exhibitionTeamService.getTeamByType(exhibitionTypeId), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> getTeamByType(@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId) {
+		return new ResponseEntity<ResponseMessage>(exhibitionService.getTeamByType(exhibitionTypeId),
+				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/headclub/gettop3teambytype/{exhibitionTypeId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
-	ResponseEntity<ResponseMessage> getTop3TeamByType (@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId) {
-		return new ResponseEntity<ResponseMessage>(exhibitionTeamService.getTop3TeamByType(exhibitionTypeId), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> getTop3TeamByType(@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId) {
+		return new ResponseEntity<ResponseMessage>(exhibitionService.getTop3TeamByType(exhibitionTypeId),
+				HttpStatus.OK);
 	}
-	
-	@PostMapping("/headclub/spawntimeandarea/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
-	ResponseEntity<ResponseMessage> spawnTimeAndArea (@PathVariable(name = "tournamentId") int tournamentId) {
-		return new ResponseEntity<ResponseMessage>(exhibitionResultService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
-	}
-	
+
 	@GetMapping("/getlistexhibitiontype/{tournamentId}")
-	ResponseEntity<ResponseMessage> getListExhibitionType (@PathVariable(name = "tournamentId") int tournamentId) {
-		return new ResponseEntity<ResponseMessage>(exhibitionTypeService.getAllExhibitionType(tournamentId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getListExhibitionType(@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(exhibitionService.getAllExhibitionType(tournamentId),
+				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/getlistexhibitionresult")
-	ResponseEntity<ResponseMessage> getExhibitionResult (@RequestParam(defaultValue = "0") int exhibitionTypeId, @RequestParam(defaultValue = "") String date) {
-		return new ResponseEntity<ResponseMessage>(exhibitionResultService.getListExhibitionResult(exhibitionTypeId, date), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getExhibitionResult(@RequestParam(defaultValue = "0") int exhibitionTypeId,
+			@RequestParam(defaultValue = "") String date) {
+		return new ResponseEntity<ResponseMessage>(
+				exhibitionService.getListExhibitionResult(exhibitionTypeId, date), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/headclub/updateexhibitionresult/{exhibitionTeamId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
-	ResponseEntity<ResponseMessage> updateExhibitionResult(@PathVariable(name = "exhibitionTeamId") int exhibitionTeamId, @RequestParam Double score) {
-		return new ResponseEntity<ResponseMessage>(exhibitionResultService.updateExhibitionResult(exhibitionTeamId, score), HttpStatus.OK);
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> updateExhibitionResult(
+			@PathVariable(name = "exhibitionTeamId") int exhibitionTeamId, @RequestParam Double score) {
+		return new ResponseEntity<ResponseMessage>(
+				exhibitionService.updateExhibitionResult(exhibitionTeamId, score), HttpStatus.OK);
+	}
+
+	@GetMapping("/headclub/listusernotjoinexhibition/{exhibitionTypeId}")
+	ResponseEntity<ResponseMessage> listUserNotJoinExhibition(
+			@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId) {
+		return new ResponseEntity<ResponseMessage>(exhibitionService.getListNotJoinExhibition(exhibitionTypeId),
+				HttpStatus.OK);
+	}
+
+	@PutMapping("/headclub/updateteam/{exhibitionTeamId}")
+	ResponseEntity<ResponseMessage> updateExhibitionTeam(@PathVariable(name = "exhibitionTeamId") int exhibitionTeamId,
+			@RequestBody List<User> teamUsers) {
+		return new ResponseEntity<ResponseMessage>(exhibitionService.updateTeam(exhibitionTeamId, teamUsers), HttpStatus.OK);
 	}
 }

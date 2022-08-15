@@ -31,13 +31,6 @@ public class TournamentScheduleController {
 		return new ResponseEntity<ResponseMessage>(tournamentScheduleService.createPreviewTournamentSchedule(tournamentName, startDate, finishDate, startTime, finishTime), HttpStatus.OK);
 	}
 	
-//	@PostMapping("/headclub/addnewschedule/{tournamentId}")
-//	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
-//	ResponseEntity<ResponseMessage> createTournamentSchedule(@PathVariable(name = "tournamentId") int tournamentId, 
-//			@RequestBody List<ScheduleDto> listPreview, @RequestParam boolean isOverwritten) {
-//		return new ResponseEntity<ResponseMessage>(tournamentScheduleService.createTournamentSchedule(tournamentId, listPreview, isOverwritten), HttpStatus.OK);
-//	}
-	
 	@GetMapping("/headclub/tournamentschedule/{tournamentId}")
 	ResponseEntity<ResponseMessage> getTournamentSchedule(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentScheduleService.getListTournamentScheduleByTournament(tournamentId), HttpStatus.OK);
@@ -59,5 +52,10 @@ public class TournamentScheduleController {
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')") 
 	ResponseEntity<ResponseMessage> updateTournamentSession(@PathVariable(name = "tournamentSessionId") int tournamentSessionId) {
 		return new ResponseEntity<ResponseMessage>(tournamentScheduleService.deleteTournamentSession(tournamentSessionId), HttpStatus.OK);
+	}
+	
+	@GetMapping("/getalltournamentschedule")
+	ResponseEntity<ResponseMessage> getAllTournamentSchedule() {
+		return new ResponseEntity<ResponseMessage>(tournamentScheduleService.getAllTournamentSchedule(), HttpStatus.OK);
 	}
 }

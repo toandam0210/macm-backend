@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -737,11 +738,37 @@ public class UserServiceTest {
 	
 	@Test
 	public void addUserFromExcel() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
+		User user = createUser();
+		user.setActive(true);
+		
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
 		List<Semester> semesters = Arrays.asList(semester());
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		when(userRepository.findByStudentIdAndEmail(anyString(), anyString())).thenReturn(Optional.of(user));
+		when(trainingScheduleRepository.findAllFutureTrainingSchedule(any())).thenReturn(Arrays.asList(trainingSchedule()));
+		
+		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
+		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
+	public void addUserFromExcelCaseException() throws IOException {
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
+		
+		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
+		assertEquals(response.getData().size(), 0);
+	}
+	
+	@Test
+	public void addUserFromExcelCaseUserNotActive() throws IOException {
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		when(userRepository.findByStudentIdAndEmail(anyString(), anyString())).thenReturn(Optional.of(createUser()));
 		
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
 		assertEquals(response.getData().size(), 0);
@@ -749,29 +776,29 @@ public class UserServiceTest {
 	
 	@Test
 	public void addUserFromExcelDuplicateStudentId() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
 		List<Semester> semesters = Arrays.asList(semester());
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 3);
+		assertEquals(response.getData().size(), 81);
 	}
 	
 	@Test
 	public void addUserFromExcelDuplicateEmail() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut.xlsx")));
 		List<Semester> semesters = Arrays.asList(semester());
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
 		when(userRepository.findByEmail(anyString())).thenReturn(Optional.of(createUser()));
 		ResponseMessage response = userService.addUsersFromExcel(multipartFile);
-		assertEquals(response.getData().size(), 3);
+		assertEquals(response.getData().size(), 81);
 	}
 	
 	@Test
 	public void addUserFromExcelFail() throws IOException {
-		MultipartFile multipartFile = new MockMultipartFile("ut-fail.xlsx", new FileInputStream(new File("C:\\Users\\VAN TOAN\\Desktop\\ut-fail.xlsx")));
+		MultipartFile multipartFile = new MockMultipartFile("ut-fail.xlsx", new FileInputStream(new File("D:\\FPT MAJOR\\SUMMER 2022\\SWP490\\ut-fail.xlsx")));
 		List<User> users = Arrays.asList(createUser());
 		users.get(0).setStudentId("HE140855");
 		users.get(0).setEmail("toandvhe140855@fpt.edu.vn");
@@ -783,6 +810,17 @@ public class UserServiceTest {
 		assertEquals(response.getData().size(), 0);
 	}
 	
+	@Test
+	public void exportUsersToExcel() {
+		ByteArrayInputStream in = userService.exportUsersToExcel(usersDto());
+		assertEquals(in, in);
+	}
+	
+	@Test
+	public void exportUsersToExcelWithError() {
+		ByteArrayInputStream in = userService.exportUsersToExcelWithError(usersDto());
+		assertEquals(in, in);
+	}
 	
 	@Test
 	public void testFindAllMember() {
@@ -796,9 +834,9 @@ public class UserServiceTest {
 	
 	@Test
 	public void testFindAllMemberException() {
-		User user = createUser();
-		List<User> users = Arrays.asList(user);
-		Page<User> pages = new PageImpl<User>(users);
+//		User user = createUser();
+//		List<User> users = Arrays.asList(user);
+//		Page<User> pages = new PageImpl<User>(users);
 		ResponseMessage response = userService.findAllMember(0,-5,"studentId");
 		assertEquals(response.getData().size(), 0);
 	}

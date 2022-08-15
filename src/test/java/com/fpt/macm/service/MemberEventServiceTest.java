@@ -72,6 +72,9 @@ public class MemberEventServiceTest {
 	@Mock
 	EventRoleRepository eventRoleRepository;
 
+	@Mock
+	ClubFundService clubFundService;
+
 	private User user() {
 		User user = new User();
 		user.setId(1);
@@ -174,7 +177,7 @@ public class MemberEventServiceTest {
 		eventPaymentStatusReport.setFundBalance(1000000);
 		return eventPaymentStatusReport;
 	}
-	
+
 	private AttendanceEvent attendanceEvent() {
 		AttendanceEvent attendanceEvent = new AttendanceEvent();
 		attendanceEvent.setId(1);
@@ -240,8 +243,10 @@ public class MemberEventServiceTest {
 	public void updateMemberEventPaymentStatusCaseAmountPerRegisterActualEq0AndNotPaid() {
 		when(memberEventRepository.findById(anyInt())).thenReturn(Optional.of(memberEvent()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -253,8 +258,10 @@ public class MemberEventServiceTest {
 
 		when(memberEventRepository.findById(anyInt())).thenReturn(Optional.of(memberEvent));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -265,8 +272,10 @@ public class MemberEventServiceTest {
 
 		when(memberEventRepository.findById(anyInt())).thenReturn(Optional.of(memberEvent));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -278,8 +287,10 @@ public class MemberEventServiceTest {
 
 		when(memberEventRepository.findById(anyInt())).thenReturn(Optional.of(memberEvent));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -292,8 +303,10 @@ public class MemberEventServiceTest {
 
 		when(memberEventRepository.findById(anyInt())).thenReturn(Optional.of(memberEvent));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -305,8 +318,10 @@ public class MemberEventServiceTest {
 
 		when(memberEventRepository.findById(anyInt())).thenReturn(Optional.of(memberEvent));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -318,8 +333,10 @@ public class MemberEventServiceTest {
 
 		when(memberEventRepository.findById(anyInt())).thenReturn(Optional.of(memberEvent));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -331,8 +348,10 @@ public class MemberEventServiceTest {
 
 		when(memberEventRepository.findById(anyInt())).thenReturn(Optional.of(memberEvent));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -344,8 +363,10 @@ public class MemberEventServiceTest {
 
 		when(memberEventRepository.findById(anyInt())).thenReturn(Optional.of(memberEvent));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -357,16 +378,20 @@ public class MemberEventServiceTest {
 
 		when(memberEventRepository.findById(anyInt())).thenReturn(Optional.of(memberEvent));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
 	@Test
 	public void updateMemberEventPaymentStatusCaseException() {
 		when(memberEventRepository.findById(anyInt())).thenReturn(null);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
-		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(memberEvent().getId());
+		ResponseMessage responseMessage = memberEventService.updateMemberEventPaymentStatus(user().getStudentId(),
+				memberEvent().getId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -764,154 +789,171 @@ public class MemberEventServiceTest {
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
 
-		ResponseMessage responseMessage = memberEventService.registerToJoinEvent(event().getId(), user().getStudentId());
+		ResponseMessage responseMessage = memberEventService.registerToJoinEvent(event().getId(),
+				user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void registerToJoinEventCaseAlreadyRegister() {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent()));
+		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+				.thenReturn(Optional.of(memberEvent()));
 
-		ResponseMessage responseMessage = memberEventService.registerToJoinEvent(event().getId(), user().getStudentId());
+		ResponseMessage responseMessage = memberEventService.registerToJoinEvent(event().getId(),
+				user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void registerToJoinEventCaseHaveCanceled() {
 		MemberEvent memberEvent = memberEvent();
 		memberEvent.setRegisterStatus(false);
-		
+
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent));
+		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+				.thenReturn(Optional.of(memberEvent));
 
-		ResponseMessage responseMessage = memberEventService.registerToJoinEvent(event().getId(), user().getStudentId());
+		ResponseMessage responseMessage = memberEventService.registerToJoinEvent(event().getId(),
+				user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void registerToJoinEventCaseOverDeadline() {
 		Event event = event();
 		event.setRegistrationMemberDeadline(LocalDateTime.now().minusDays(1));
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event));
 
-		ResponseMessage responseMessage = memberEventService.registerToJoinEvent(event().getId(), user().getStudentId());
+		ResponseMessage responseMessage = memberEventService.registerToJoinEvent(event().getId(),
+				user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void registerToJoinEventCaseException() {
 		when(eventRepository.findById(anyInt())).thenReturn(null);
 
-		ResponseMessage responseMessage = memberEventService.registerToJoinEvent(event().getId(), user().getStudentId());
+		ResponseMessage responseMessage = memberEventService.registerToJoinEvent(event().getId(),
+				user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void registerToJoinOrganizingCommitteeCaseSuccess() {
 		RoleEvent roleEvent = roleEvent();
 		roleEvent.setId(2);
-		
+
 		EventRole eventRole = eventRole();
 		eventRole.setRoleEvent(roleEvent);
-		
+
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent));
 		when(eventRoleRepository.findByRoleEventIdAndEventId(anyInt(), anyInt())).thenReturn(Optional.of(eventRole));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
-		
-		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(), user().getStudentId(), 2);
+
+		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(),
+				user().getStudentId(), 2);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void registerToJoinOrganizingCommitteeCaseAfterDeadline() {
 		Event event = event();
 		event.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.now().minusDays(1));
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event));
-		
-		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(), user().getStudentId(), 2);
+
+		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(),
+				user().getStudentId(), 2);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void registerToJoinOrganizingCommitteeCaseInvalidRole() {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
 		when(eventRoleRepository.findByRoleEventIdAndEventId(anyInt(), anyInt())).thenReturn(Optional.of(eventRole()));
-		
-		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(), user().getStudentId(), 2);
+
+		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(),
+				user().getStudentId(), 2);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void registerToJoinOrganizingCommitteeCaseAlreadyJoin() {
 		RoleEvent roleEvent = roleEvent();
 		roleEvent.setId(2);
-		
+
 		EventRole eventRole = eventRole();
 		eventRole.setRoleEvent(roleEvent);
-		
+
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent));
 		when(eventRoleRepository.findByRoleEventIdAndEventId(anyInt(), anyInt())).thenReturn(Optional.of(eventRole));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent()));
-		
-		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(), user().getStudentId(), 2);
+		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+				.thenReturn(Optional.of(memberEvent()));
+
+		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(),
+				user().getStudentId(), 2);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void registerToJoinOrganizingCommitteeCaseAlreadyCancel() {
 		RoleEvent roleEvent = roleEvent();
 		roleEvent.setId(2);
-		
+
 		EventRole eventRole = eventRole();
 		eventRole.setRoleEvent(roleEvent);
-		
+
 		MemberEvent memberEvent = memberEvent();
 		memberEvent.setRegisterStatus(false);
-		
+
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent));
 		when(eventRoleRepository.findByRoleEventIdAndEventId(anyInt(), anyInt())).thenReturn(Optional.of(eventRole));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent));
-		
-		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(), user().getStudentId(), 2);
+		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+				.thenReturn(Optional.of(memberEvent));
+
+		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(),
+				user().getStudentId(), 2);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void registerToJoinOrganizingCommitteeCaseMaxQuantity() {
 		RoleEvent roleEvent = roleEvent();
 		roleEvent.setId(2);
-		
+
 		EventRole eventRole = eventRole();
 		eventRole.setRoleEvent(roleEvent);
 		eventRole.setQuantity(0);
-		
+
 		MemberEvent memberEvent = memberEvent();
 		memberEvent.setRegisterStatus(false);
-		
+
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent));
 		when(eventRoleRepository.findByRoleEventIdAndEventId(anyInt(), anyInt())).thenReturn(Optional.of(eventRole));
-		when(memberEventRepository.findOrganizingCommitteeByEventId(anyInt(), anyInt())).thenReturn(Arrays.asList(memberEvent));
-		
-		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(), user().getStudentId(), 2);
+		when(memberEventRepository.findOrganizingCommitteeByEventId(anyInt(), anyInt()))
+				.thenReturn(Arrays.asList(memberEvent));
+
+		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(),
+				user().getStudentId(), 2);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void registerToJoinOrganizingCommitteeCaseException() {
 		when(eventRepository.findById(anyInt())).thenReturn(null);
-		
-		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(), user().getStudentId(), 2);
+
+		ResponseMessage responseMessage = memberEventService.registerToJoinOrganizingCommittee(event().getId(),
+				user().getStudentId(), 2);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -919,102 +961,106 @@ public class MemberEventServiceTest {
 	public void cancelToJoinEventCaseSuccess() {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent()));
-		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(), anyInt())).thenReturn(Optional.of(attendanceEvent()));
-		
+		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+				.thenReturn(Optional.of(memberEvent()));
+		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(), anyInt()))
+				.thenReturn(Optional.of(attendanceEvent()));
+
 		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void cancelToJoinEventCaseAttendanceEventEmpty() {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent()));
+		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+				.thenReturn(Optional.of(memberEvent()));
 		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(), anyInt())).thenReturn(Optional.empty());
-		
+
 		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void cancelToJoinEventCaseRoleOrganizingCommittee() {
 		MemberEvent memberEvent = memberEvent();
 		memberEvent.getRoleEvent().setId(2);
-		
+
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.of(memberEvent));
-		
+		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+				.thenReturn(Optional.of(memberEvent));
+
 		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void cancelToJoinEventCaseMemberEventEmpty() {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
-		
+
 		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void cancelToJoinEventCaseAfterDeadline() {
 		Event event = event();
 		event.setRegistrationMemberDeadline(LocalDateTime.now().minusDays(1));
-		
+
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event));
-		
+
 		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void cancelToJoinEventCaseException() {
 		when(eventRepository.findById(anyInt())).thenReturn(null);
-		
+
 		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getAllEventByStudentIdCaseSuccess() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent()));
-		
+
 		ResponseMessage responseMessage = memberEventService.getAllEventByStudentId(user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getAllEventByStudentIdCaseRegisterStatusFalse() {
 		MemberEvent memberEvent = memberEvent();
 		memberEvent.setRegisterStatus(false);
-		
+
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent));
-		
+
 		ResponseMessage responseMessage = memberEventService.getAllEventByStudentId(user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getAllEventByStudentIdCaseMemberEventEmpty() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(memberEventRepository.findByUserId(anyInt())).thenReturn(new ArrayList<MemberEvent>());
-		
+
 		ResponseMessage responseMessage = memberEventService.getAllEventByStudentId(user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getAllEventByStudentIdCaseException() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(null);
-		
+
 		ResponseMessage responseMessage = memberEventService.getAllEventByStudentId(user().getStudentId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 }

@@ -20,7 +20,6 @@ import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.dto.UserEventSemesterDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
-import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventRole;
@@ -32,7 +31,6 @@ import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AttendanceStatusRepository;
-import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventRoleRepository;
@@ -60,12 +58,6 @@ public class EventServiceImpl implements EventService {
 
 	@Autowired
 	SemesterRepository semesterRepository;
-
-	@Autowired
-	ClubFundRepository clubFundRepository;
-
-	@Autowired
-	EventScheduleService eventScheduleService;
 
 	@Autowired
 	CommonScheduleService commonScheduleService;
@@ -97,10 +89,15 @@ public class EventServiceImpl implements EventService {
 	@Autowired
 	EventRoleRepository eventRoleRepository;
 
+	@Autowired
+	ClubFundService clubFundService;
+
 	@Override
-	public ResponseMessage createEvent(EventCreateDto eventCreateDto, boolean isOverwritten) {
+	public ResponseMessage createEvent(String studentId, EventCreateDto eventCreateDto, boolean isOverwritten) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			User user = userRepository.findByStudentId(studentId).get();
+
 			Event event = eventCreateDto.getEvent();
 			List<ScheduleDto> listPreview = eventCreateDto.getListPreview();
 			List<RoleEventDto> rolesEventDto = eventCreateDto.getRolesEventDto();
@@ -122,17 +119,16 @@ public class EventServiceImpl implements EventService {
 				// Tạo sự kiện
 				event.setAmountPerRegisterActual(0);
 				event.setTotalAmountActual(0);
-				event.setCreatedBy("LinhLHN");
+				event.setCreatedBy(user.getName() + " - " + user.getStudentId());
 				event.setCreatedOn(LocalDateTime.now());
 				event.setSemester(semester.getName());
 				event.setStatus(true);
 				eventRepository.save(event);
 
-				// Trừ tiền từ clb
-				List<ClubFund> clubFunds = clubFundRepository.findAll();
-				ClubFund clubFund = clubFunds.get(0);
-				clubFund.setFundAmount(clubFund.getFundAmount() - event.getAmountFromClub());
-				clubFundRepository.save(clubFund);
+				if (event.getAmountFromClub() > 0) {
+					clubFundService.withdrawFromClubFund(user.getStudentId(), event.getAmountFromClub(),
+							("Rút tiền để tổ chức sự kiện " + event.getName()));
+				}
 
 				Event newEvent = eventRepository.findAll(Sort.by("id").descending()).get(0);
 
@@ -155,7 +151,8 @@ public class EventServiceImpl implements EventService {
 						roleEvent.setName(roleEventDto.getName());
 						roleEventRepository.save(roleEvent);
 
-						RoleEvent newRoleEvent = roleEventRepository.findByName(roleEvent.getName()).get();
+						List<RoleEvent> roleEvents = roleEventRepository.findAll(Sort.by("id").descending());
+						RoleEvent newRoleEvent = roleEvents.get(0);
 
 						EventRole eventRole = new EventRole();
 						eventRole.setEvent(newEvent);
@@ -178,10 +175,8 @@ public class EventServiceImpl implements EventService {
 					eventSchedule.setDate(scheduleDto.getDate());
 					eventSchedule.setStartTime(scheduleDto.getStartTime());
 					eventSchedule.setFinishTime(scheduleDto.getFinishTime());
-					eventSchedule.setCreatedBy("LinhLHN");
+					eventSchedule.setCreatedBy(user.getName() + " - " + user.getStudentId());
 					eventSchedule.setCreatedOn(LocalDateTime.now());
-					eventSchedule.setUpdatedBy("LinhLHN");
-					eventSchedule.setUpdatedOn(LocalDateTime.now());
 					listEventSchedule.add(eventSchedule);
 
 					CommonSchedule commonSession = new CommonSchedule();
@@ -190,7 +185,6 @@ public class EventServiceImpl implements EventService {
 					commonSession.setStartTime(scheduleDto.getStartTime());
 					commonSession.setFinishTime(scheduleDto.getFinishTime());
 					commonSession.setCreatedOn(LocalDateTime.now());
-					commonSession.setUpdatedOn(LocalDateTime.now());
 					commonSession.setType(1);
 					listCommon.add(commonSession);
 
@@ -287,7 +281,7 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public ResponseMessage deleteEvent(int eventId) {
+	public ResponseMessage deleteEvent(String studentId, int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<Event> eventOp = eventRepository.findById(eventId);
@@ -295,6 +289,8 @@ public class EventServiceImpl implements EventService {
 				Event event = eventOp.get();
 				LocalDate startDate = getStartDate(eventId);
 				if (startDate == null || LocalDate.now().isBefore(startDate)) {
+					User user = userRepository.findByStudentId(studentId).get();
+
 					List<EventSchedule> eventSchedules = eventScheduleRepository.findByEventId(eventId);
 					if (!eventSchedules.isEmpty()) {
 						for (EventSchedule eventSchedule : eventSchedules) {
@@ -305,9 +301,15 @@ public class EventServiceImpl implements EventService {
 						eventScheduleRepository.deleteAll(eventSchedules);
 					}
 					event.setStatus(false);
+					event.setUpdatedBy(user.getName() + " - " + user.getStudentId());
 					eventRepository.save(event);
 
 					notificationService.createEventDeleteNotification(event.getId(), event.getName());
+
+					if (event.getAmountFromClub() > 0) {
+						clubFundService.depositToClubFund(user.getStudentId(), event.getAmountFromClub(),
+								("Hoàn tiền tổ chức sự kiện " + event.getName()));
+					}
 
 					responseMessage.setData(Arrays.asList(event));
 					responseMessage.setMessage("Xóa sự kiện thành công");
@@ -431,11 +433,12 @@ public class EventServiceImpl implements EventService {
 				List<EventDto> eventDtos = new ArrayList<EventDto>();
 				List<Event> eventList = new ArrayList<Event>();
 				while (startDate.compareTo(finishDate) <= 0) {
-					EventSchedule getEventSession = eventScheduleService.getEventScheduleByDate(startDate);
-					if (getEventSession != null) {
-						Event getEvent = getEventSession.getEvent();
-						if (!eventList.contains(getEvent)) {
-							eventList.add(getEvent);
+					Optional<EventSchedule> eventScheduleOp = eventScheduleRepository.findByDate(startDate);
+					if (eventScheduleOp.isPresent()) {
+						EventSchedule eventSchedule = eventScheduleOp.get();
+						Event event = eventSchedule.getEvent();
+						if (!eventList.contains(event)) {
+							eventList.add(event);
 						}
 					}
 					startDate = startDate.plusDays(1);
@@ -483,6 +486,7 @@ public class EventServiceImpl implements EventService {
 		return responseMessage;
 	}
 
+	@Override
 	public LocalDate getEndDate(int eventId) {
 		List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
 		if (listSchedule.size() > 0) {
@@ -558,7 +562,8 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public ResponseMessage updateAfterEvent(int eventId, double money, boolean isIncurred, boolean isUseClubFund) {
+	public ResponseMessage updateAfterEvent(String studentId, int eventId, double money, boolean isIncurred,
+			boolean isUseClubFund) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<EventSchedule> listSchedule = eventScheduleRepository.findByEventId(eventId);
@@ -566,6 +571,8 @@ public class EventServiceImpl implements EventService {
 					&& listSchedule.get(listSchedule.size() - 1).getDate().compareTo(LocalDate.now()) > 0) {
 				responseMessage.setMessage(Constant.MSG_128);
 			} else {
+				User user = userRepository.findByStudentId(studentId).get();
+
 				Optional<Event> eventOp = eventRepository.findById(eventId);
 				Event getEvent = eventOp.get();
 				if (isIncurred) {
@@ -577,26 +584,22 @@ public class EventServiceImpl implements EventService {
 						getEvent.setAmountFromClub(getEvent.getAmountFromClub() + money);
 						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());
 						// trừ tiền từ clb
-						List<ClubFund> clubFunds = clubFundRepository.findAll();
-						ClubFund clubFund = clubFunds.get(0);
-						clubFund.setFundAmount(clubFund.getFundAmount() - money);
-						clubFundRepository.save(clubFund);
+						clubFundService.withdrawFromClubFund(user.getStudentId(), money,
+								("Phát sinh từ sự kiện " + getEvent.getName()));
 					} else {
 						double amountPerMore = money / countMemberEvent;
 						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated() + amountPerMore);
 					}
 				} else {
 					// cộng tiền vào clb
-					List<ClubFund> clubFunds = clubFundRepository.findAll();
-					ClubFund clubFund = clubFunds.get(0);
-					clubFund.setFundAmount(clubFund.getFundAmount() + money);
-					clubFundRepository.save(clubFund);
+					clubFundService.depositToClubFund(user.getStudentId(), money,
+							("Tiền dư từ sự kiện " + getEvent.getName()));
 					getEvent.setAmountFromClub(
 							getEvent.getAmountFromClub() - money >= 0 ? getEvent.getAmountFromClub() - money : 0);
 					getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated());
 					getEvent.setTotalAmountActual(getEvent.getTotalAmountEstimated());
 				}
-				getEvent.setUpdatedBy("LinhLHN");
+				getEvent.setUpdatedBy(user.getName() + " - " + user.getStudentId());
 				getEvent.setUpdatedOn(LocalDateTime.now());
 				eventRepository.save(getEvent);
 				responseMessage.setData(Arrays.asList(getEvent));

@@ -16,7 +16,7 @@ public interface CompetitivePlayerRepository extends JpaRepository<CompetitivePl
 	@Query(value = "select * from competitive_player where player_id = ?1", nativeQuery = true)
 	Optional<CompetitivePlayer> findCompetitivePlayerByTournamentPlayerId(int tournamentPlayerId);
 	
-	@Query(value = "select * from competitive_player where is_eligible = true and competitive_type_id = ?1", nativeQuery = true)
+	@Query(value = "select * from competitive_player where competitive_type_id = ?1", nativeQuery = true)
 	List<CompetitivePlayer> findByCompetitiveTypeId(int competitiveTypeId);
 	
 	@Query(value = "select * from competitive_player where is_eligible = true and competitive_type_id = ?1", nativeQuery = true)

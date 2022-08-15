@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -44,24 +43,14 @@ import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
-import com.fpt.macm.service.CompetitiveMatchService;
-import com.fpt.macm.service.CompetitivePlayerService;
-import com.fpt.macm.service.CompetitiveResultService;
+import com.fpt.macm.service.CompetitiveService;
 
 @SpringBootTest
 public class CompetitiveControllerTest {
 
+	
 	@MockBean
-	CompetitivePlayerService competitivePlayerService;
-
-	@MockBean
-	CompetitiveMatchService competitiveMatchService;
-
-//	@MockBean
-//	CompetitivePlayerBracketService competitivePlayerBracketService;
-
-	@MockBean
-	CompetitiveResultService competitiveResultService;
+	CompetitiveService competitiveService;
 
 	@Autowired
 	private WebApplicationContext context;
@@ -206,7 +195,7 @@ public class CompetitiveControllerTest {
 	public void testUpdateWeightForCompetitivePlayer() throws Exception{
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(competitivePlayer()));
-		when(competitivePlayerService.updateWeightForCompetitivePlayer(anyInt(), anyDouble()))
+		when(competitiveService.updateWeightForCompetitivePlayer(anyInt(), anyDouble()))
 		.thenReturn(responseMessage);
 		this.mockMvc
 		.perform(put("/api/competitive/headclub/updateweightplayer/{competitivePlayerId}", 1).param("weight", "50"))
@@ -218,7 +207,7 @@ public class CompetitiveControllerTest {
 	public void testdDeleteCompetitivePlayer() throws Exception{
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(competitivePlayer()));
-		when(competitivePlayerService.deleteCompetitivePlayer(anyInt()))
+		when(competitiveService.deleteCompetitivePlayer(anyInt()))
 		.thenReturn(responseMessage);
 		this.mockMvc
 		.perform(put("/api/competitive/headclub/deletecompetitiveplayer/{competitivePlayerId}", 1))
@@ -237,15 +226,6 @@ public class CompetitiveControllerTest {
 //		.andExpect(jsonPath("$.data.size()").value("1"));
 //	}
 	
-	@Test 
-	public void testListUserNotJoinCompetitive() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(createUser()));
-		when(competitivePlayerService.listUserNotJoinCompetitive(anyInt())).thenReturn(responseMessage);
-		this.mockMvc.perform(get("/api/competitive/headclub/listusernotjoincompetitive/{tournamentId}", 1))
-		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
 	
 //	@Test
 //	public void testSpawnMatchs() throws Exception {
@@ -257,22 +237,12 @@ public class CompetitiveControllerTest {
 //		.andExpect(jsonPath("$.data.size()").value("1"));
 //	}
 	
-	@Test
-	public void testUpdateTimeAndPlaceMatch() throws Exception{
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(competitiveResult()));
-		when(competitiveResultService.updateTimeAndArea(anyInt(), any())).thenReturn(responseMessage);
-		this.mockMvc.perform(put("/api/competitive/headclub/updatetimeandplacematch/{matchId}", 1).content(asJsonString(competitiveResult()))
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
 	
 	@Test
 	public void testUpdateResultMatch() throws Exception {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setMessage("Đã cập nhật tỉ số trận đấu");
-		when(competitiveResultService.updateResultMatch(anyInt(), anyInt(),anyInt())).thenReturn(responseMessage);
+		when(competitiveService.updateResultMatch(anyInt(), anyInt(),anyInt())).thenReturn(responseMessage);
 		this.mockMvc.perform(put("/api/competitive/headclub/updateresultmatch/{matchId}", 1))
 		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
 		.andExpect(jsonPath("$.message").value("Đã cập nhật tỉ số trận đấu"));
@@ -282,7 +252,7 @@ public class CompetitiveControllerTest {
 	public void testListMatchs() throws Exception {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(competitiveMatchDto()));
-		when(competitiveMatchService.listMatchs(anyInt())).thenReturn(responseMessage);
+		when(competitiveService.listMatchs(anyInt())).thenReturn(responseMessage);
 		this.mockMvc.perform(get("/api/competitive/headclub/listmatchs/{competitiveTypeId}", 1))
 		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
 		.andExpect(jsonPath("$.data.size()").value("1"));
@@ -292,7 +262,7 @@ public class CompetitiveControllerTest {
 	public void testUpdateListMatchsPlayer() throws Exception {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(competitiveMatch()));
-		when(competitiveMatchService.updateListMatchsPlayer(any())).thenReturn(responseMessage);
+		when(competitiveService.updateListMatchsPlayer(any())).thenReturn(responseMessage);
 		this.mockMvc.perform(put("/api/competitive/headclub/updatelistmatchsplayer").content(asJsonString(Arrays.asList(competitiveMatchDto())))
 				.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
@@ -309,15 +279,6 @@ public class CompetitiveControllerTest {
 //		.andExpect(jsonPath("$.data.size()").value("1"));
 //	}
 	
-	@Test
-	public void testSpawnTimeAndArea() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(competitiveResult()));
-		when(competitiveResultService.spawnTimeAndArea(anyInt())).thenReturn(responseMessage);
-		this.mockMvc.perform(post("/api/competitive/headclub/spawntimeandarea/{tournamentId}", 1))
-		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
 	
 	public static String asJsonString(final Object obj) {
 	    try {

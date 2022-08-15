@@ -40,7 +40,7 @@ import com.fpt.macm.repository.UserRepository;
 public class CompetitiveTypeServiceTest {
 	
 	@InjectMocks
-	CompetitiveTypeService competitiveTypeService = new CompetitiveTypeServiceImpl();
+	CompetitiveService competitiveService = new CompetitiveServiceImpl();
 	
 	@Mock
 	TournamentRepository tournamentRepository;
@@ -168,30 +168,101 @@ public class CompetitiveTypeServiceTest {
 	@Test
 	public void testGetAllType() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		ResponseMessage response = competitiveTypeService.getAllType(1);
+		ResponseMessage response = competitiveService.getAllCompetitiveType(1);
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGetAllTypeCaseSort() {
+		List<CompetitiveType> competitiveTypes = new ArrayList<>(competitiveTypes());
+		CompetitiveType competitiveType = new CompetitiveType();
+		competitiveType.setId(1);
+		competitiveType.setGender(false);
+		competitiveType.setWeightMin(45);
+		competitiveType.setWeightMax(50);
+		competitiveTypes.add(competitiveType);
+		
+		Tournament tournament = tournament();
+		tournament.setCompetitiveTypes(new HashSet<>(competitiveTypes));
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		ResponseMessage response = competitiveService.getAllCompetitiveType(1);
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGetAllTypeCaseSort2() {
+		List<CompetitiveType> competitiveTypes = new ArrayList<>(competitiveTypes());
+		CompetitiveType competitiveType = new CompetitiveType();
+		competitiveType.setId(1);
+		competitiveType.setGender(true);
+		competitiveType.setWeightMin(45);
+		competitiveType.setWeightMax(50);
+		competitiveTypes.add(competitiveType);
+		
+		Tournament tournament = tournament();
+		tournament.setCompetitiveTypes(new HashSet<>(competitiveTypes));
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		ResponseMessage response = competitiveService.getAllCompetitiveType(1);
+		assertEquals(response.getData().size(), 1);
+	}
+
+	@Test
+	public void testGetAllTypeCaseSort3() {
+		List<CompetitiveType> competitiveTypes = new ArrayList<>();
+		CompetitiveType competitiveType = new CompetitiveType();
+		competitiveType.setId(1);
+		competitiveType.setGender(false);
+		competitiveType.setWeightMin(40);
+		competitiveType.setWeightMax(45);
+		competitiveTypes.add(competitiveType);
+		CompetitiveType competitiveType2 = new CompetitiveType();
+		competitiveType2.setId(3);
+		competitiveType2.setGender(true);
+		competitiveType2.setWeightMin(45);
+		competitiveType2.setWeightMax(50);
+		competitiveTypes.add(competitiveType2);
+		CompetitiveType competitiveType3 = new CompetitiveType();
+		competitiveType3.setId(2);
+		competitiveType3.setGender(false);
+		competitiveType3.setWeightMin(50);
+		competitiveType3.setWeightMax(55);
+		competitiveTypes.add(competitiveType3);
+		CompetitiveType competitiveType4 = new CompetitiveType();
+		competitiveType4.setId(4);
+		competitiveType4.setGender(false);
+		competitiveType4.setWeightMin(45);
+		competitiveType4.setWeightMax(50);
+		competitiveTypes.add(competitiveType4);
+		CompetitiveType competitiveType5 = new CompetitiveType();
+		competitiveType5.setId(5);
+		competitiveType5.setGender(true);
+		competitiveType5.setWeightMin(40);
+		competitiveType5.setWeightMax(45);
+		competitiveTypes.add(competitiveType5);
+		CompetitiveType competitiveType6 = new CompetitiveType();
+		competitiveType6.setId(6);
+		competitiveType6.setGender(true);
+		competitiveType6.setWeightMin(50);
+		competitiveType6.setWeightMax(55);
+		competitiveTypes.add(competitiveType6);
+		
+		Tournament tournament = tournament();
+		tournament.setCompetitiveTypes(new HashSet<>(competitiveTypes));
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		ResponseMessage response = competitiveService.getAllCompetitiveType(1);
 		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
 	public void testGetAllTypeCaseException() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
-		ResponseMessage response = competitiveTypeService.getAllType(10);
+		ResponseMessage response = competitiveService.getAllCompetitiveType(10);
 		assertEquals(response.getData().size(), 0);
 	}
 	
-	@Test
-	public void testGetAllTypeByTournament() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		Set<CompetitiveType> competitiveTypes = competitiveTypeService.getAllTypeByTournament(1);
-		assertEquals(competitiveTypes.size(), 1);
-	}
-	
-	@Test
-	public void testGetAllTypeByTournamentCaseException() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(null);
-		Set<CompetitiveType> competitiveTypes = competitiveTypeService.getAllTypeByTournament(1);
-		assertNull(competitiveTypes);
-	}
 	
 	@Test
 	public void testGetListNotJoinCompetitive() {
@@ -203,14 +274,21 @@ public class CompetitiveTypeServiceTest {
 		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(createUser()));
 		when(tournamentPlayerRepository.getPlayerByTournamentId(anyInt())).thenReturn(tournamentPlayers);
 		when(competitivePlayerRepository.findByTournamentPlayerId(anyInt())).thenReturn(Optional.of(competitivePlayer()));
-		ResponseMessage response = competitiveTypeService.getListNotJoinCompetitive(1);
+		ResponseMessage response = competitiveService.getListNotJoinCompetitive(1);
 		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testGetListNotJoinCompetitiveCaseEmpty() {
+		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.empty());
+		ResponseMessage response = competitiveService.getListNotJoinCompetitive(1);
+		assertEquals(response.getData().size(), 0);
 	}
 	
 	@Test
 	public void testGetListNotJoinCompetitiveCaseException() {
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(null);
-		ResponseMessage response = competitiveTypeService.getListNotJoinCompetitive(1);
+		ResponseMessage response = competitiveService.getListNotJoinCompetitive(1);
 		assertEquals(response.getData().size(), 0);
 	}
 	

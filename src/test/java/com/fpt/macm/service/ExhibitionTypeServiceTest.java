@@ -6,7 +6,10 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -25,16 +28,32 @@ import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.ExhibitionPlayerRepository;
+import com.fpt.macm.repository.ExhibitionTypeRepository;
+import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
+import com.fpt.macm.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class ExhibitionTypeServiceTest {
 	
 	@InjectMocks
-	ExhibitionTypeService exhibitionTypeService = new ExhibitionTypeServiceImpl();
+	ExhibitionService exhibitionTypeService = new ExhibitionServiceImpl();
 	
 	@Mock
 	TournamentRepository tournamentRepository;
+	
+	@Mock
+	ExhibitionTypeRepository exhibitionTypeRepository;
+	
+	@Mock
+	UserRepository userRepository;
+	
+	@Mock
+	TournamentPlayerRepository tournamentPlayerRepository;
+	
+	@Mock
+	ExhibitionPlayerRepository exhibitionPlayerRepository;
 	
 	private Set<CompetitiveType> competitiveTypes() {
 		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();
@@ -153,6 +172,29 @@ public class ExhibitionTypeServiceTest {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
 		
 		ResponseMessage responseMessage = exhibitionTypeService.getAllExhibitionType(1);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void getListNotJoinExhibitionCaseSuccess() {
+		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
+		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<>(exhibitionPlayers());
+		
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(tournamentPlayerRepository.getPlayerByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentPlayer()));
+		when(exhibitionPlayerRepository.findByTournamentPlayerAndType(anyInt(), anyInt())).thenReturn(Optional.of(exhibitionPlayers.get(0)));
+		
+		ResponseMessage responseMessage = exhibitionTypeService.getListNotJoinExhibition(exhibitionTypes.get(0).getId());
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getListNotJoinExhibitionCaseException() {
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(null);
+		
+		ResponseMessage responseMessage = exhibitionTypeService.getListNotJoinExhibition(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 

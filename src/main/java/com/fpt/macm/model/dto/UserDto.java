@@ -122,6 +122,8 @@ public class UserDto implements Comparable<UserDto> {
 		this.roleName = roleName;
 	}
 
+
+
 	public String getMessageError() {
 		return messageError;
 	}
