@@ -235,14 +235,14 @@ public class TournamentController {
 				userTournamentOrganizingCommitteesDto, tournamentId), HttpStatus.OK);
 	}
 
-	@GetMapping("headclub/getallusernotjointournament/{tournamentId}")
+	@GetMapping("/headclub/getallusernotjointournament/{tournamentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> getAllUserNotJoinTournament(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllUserNotJoinTournament(tournamentId),
 				HttpStatus.OK);
 	}
 
-	@DeleteMapping("headclub/deletetournamentorganizingcommittee/{tournamentOrganizingCommitteeId}")
+	@DeleteMapping("/headclub/deletetournamentorganizingcommittee/{tournamentOrganizingCommitteeId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> deleteTournamentOrganizingCommittee(
 			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId) {
@@ -250,7 +250,7 @@ public class TournamentController {
 				tournamentService.deleteTournamentOrganizingCommittee(tournamentOrganizingCommitteeId), HttpStatus.OK);
 	}
 
-	@GetMapping("gettournamentresult/{tournamentId}")
+	@GetMapping("/gettournamentresult/{tournamentId}")
 	ResponseEntity<ResponseMessage> getTournamentResult(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getResultOfTournament(tournamentId),
 				HttpStatus.OK);

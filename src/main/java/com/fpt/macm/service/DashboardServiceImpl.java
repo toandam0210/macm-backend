@@ -3,6 +3,7 @@ package com.fpt.macm.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import com.fpt.macm.model.dto.AttendanceReportDto;
 import com.fpt.macm.model.dto.EventDashboardDto;
 import com.fpt.macm.model.dto.FeeBalanceDashboardDto;
 import com.fpt.macm.model.dto.FeeDashboardDto;
+import com.fpt.macm.model.dto.UpcomingActivityDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.ClubFundReport;
@@ -23,6 +25,7 @@ import com.fpt.macm.model.entity.EventPaymentStatusReport;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MembershipPaymentStatusReport;
 import com.fpt.macm.model.entity.Semester;
+import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommitteePaymentStatusReport;
 import com.fpt.macm.model.entity.TournamentPlayerPaymentStatusReport;
 import com.fpt.macm.model.entity.TrainingSchedule;
@@ -90,6 +93,9 @@ public class DashboardServiceImpl implements DashboardService {
 	
 	@Autowired
 	ClubFundRepository clubFundRepository;
+	
+	@Autowired
+	TournamentService tournamentService;
 
 	@Override
 	public ResponseMessage getCollaboratorReport() {
@@ -343,5 +349,54 @@ public class DashboardServiceImpl implements DashboardService {
 	private double getClubFund() {
 		ClubFund clubFund = clubFundRepository.findById(1).get();
 		return clubFund.getFundAmount();
+	}
+	
+	@Override
+	public ResponseMessage getAllUpcomingActivities(String semesterName) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<UpcomingActivityDto> upcomingActivitiesDto = new ArrayList<UpcomingActivityDto>();
+			List<Event> events = eventRepository.findBySemesterOrderByIdAsc(semesterName);
+			if (!events.isEmpty()) {
+				for (Event event : events) {
+					LocalDate startDate = eventService.getStartDate(event.getId());
+					if (startDate != null && startDate.isAfter(LocalDate.now())) {
+						UpcomingActivityDto upcomingActivityDto = new UpcomingActivityDto();
+						upcomingActivityDto.setId(event.getId());
+						upcomingActivityDto.setName(event.getName());
+						upcomingActivityDto.setDate(startDate);
+						upcomingActivityDto.setType(1);
+						upcomingActivitiesDto.add(upcomingActivityDto);
+					}
+				}
+			}
+
+			List<Tournament> tournaments = tournamentRepository.findBySemester(semesterName);
+			if (!tournaments.isEmpty()) {
+				for (Tournament tournament : tournaments) {
+					LocalDate startDate = tournamentService.getStartDate(tournament.getId());
+					if (startDate != null && startDate.isAfter(LocalDate.now())) {
+						UpcomingActivityDto upcomingActivityDto = new UpcomingActivityDto();
+						upcomingActivityDto.setId(tournament.getId());
+						upcomingActivityDto.setName(tournament.getName());
+						upcomingActivityDto.setDate(startDate);
+						upcomingActivityDto.setType(2);
+						upcomingActivitiesDto.add(upcomingActivityDto);
+					}
+				}
+			}
+
+			if (!upcomingActivitiesDto.isEmpty()) {
+				Collections.sort(upcomingActivitiesDto);
+				responseMessage.setData(upcomingActivitiesDto);
+				responseMessage.setTotalResult(upcomingActivitiesDto.size());
+				responseMessage.setMessage("Lấy hoạt động sắp tới thành công");
+			} else {
+				responseMessage.setMessage("Sắp tới không có hoạt động nào");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 }
