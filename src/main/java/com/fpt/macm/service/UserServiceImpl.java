@@ -575,7 +575,7 @@ public class UserServiceImpl implements UserService {
 						String messageStudentId = Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
 						messageError += System.lineSeparator() + messageStudentId;
 					} else {
-						String messageEmail = Constant.MSG_049 + userFromExcel.getStudentId() + Constant.MSG_050;
+						String messageEmail = Constant.MSG_049 + userFromExcel.getEmail() + Constant.MSG_050;
 						messageError += System.lineSeparator() + messageEmail;
 					}
 					checkInalid = false;
