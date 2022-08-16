@@ -563,7 +563,7 @@ public class UserServiceImpl implements UserService {
 				}
 				
 				if(userFromExcel.getGeneration() < 1) {
-					String messageInvalidGen = "Vui lòng nhập số lớn hơn 0";
+					String messageInvalidGen = "Vui lòng nhập Generation lớn hơn 0";
 					messageError += System.lineSeparator() + messageInvalidGen;
 					checkInalid = false;
 				}
@@ -575,7 +575,7 @@ public class UserServiceImpl implements UserService {
 						String messageStudentId = Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
 						messageError += System.lineSeparator() + messageStudentId;
 					} else {
-						String messageEmail = Constant.MSG_049 + userFromExcel.getStudentId() + Constant.MSG_050;
+						String messageEmail = Constant.MSG_049 + userFromExcel.getEmail() + Constant.MSG_050;
 						messageError += System.lineSeparator() + messageEmail;
 					}
 					checkInalid = false;
