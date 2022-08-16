@@ -58,4 +58,6 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	
 	Optional<User> findByStudentIdAndEmail(String studentId, String email);
 	
+	List<User> findByRoleIdAndIsActive(int roleId, boolean isActive);
+	
 }
