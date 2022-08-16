@@ -563,7 +563,7 @@ public class UserServiceImpl implements UserService {
 				}
 				
 				if(userFromExcel.getGeneration() < 1) {
-					String messageInvalidGen = "Vui lòng nhập số lớn hơn 0";
+					String messageInvalidGen = "Vui lòng nhập Generation lớn hơn 0";
 					messageError += System.lineSeparator() + messageInvalidGen;
 					checkInalid = false;
 				}
