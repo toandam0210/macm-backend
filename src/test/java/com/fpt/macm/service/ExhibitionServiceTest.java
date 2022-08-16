@@ -398,59 +398,6 @@ public class ExhibitionServiceTest {
 	}
 	
 	@Test
-	public void getTop3TeamByTypeCaseExhibitionResultNull() {
-		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType()));
-		
-		ResponseMessage responseMessage = exhibitionTypeService.getTop3TeamByType(1);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void getTop3TeamByTypeCaseExhibitionScoreNull() {
-		ExhibitionResult exhibitionResult = exhibitionResult();
-		exhibitionResult.setScore(null);
-		
-		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType()));
-		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult));
-		
-		ResponseMessage responseMessage = exhibitionTypeService.getTop3TeamByType(1);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void getTop3TeamByTypeCaseExhibitionScoreNotNull() {
-		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType()));
-		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
-		
-		ResponseMessage responseMessage = exhibitionTypeService.getTop3TeamByType(1);
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void getTop3TeamByTypeCaseExhibitionTeamMemberCountGreaterThan3() {
-		ExhibitionType exhibitionType = exhibitionType();
-		Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
-		exhibitionTeams.add(exhibitionTeam());
-		exhibitionTeams.add(exhibitionTeam());
-		exhibitionTeams.add(exhibitionTeam());
-		exhibitionTeams.add(exhibitionTeam());
-		
-		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType));
-		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
-		
-		ResponseMessage responseMessage = exhibitionTypeService.getTop3TeamByType(1);
-		assertEquals(responseMessage.getData().size(), 2);
-	}
-	
-	@Test
-	public void getTop3TeamByTypeCaseException() {
-		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(null);
-		
-		ResponseMessage responseMessage = exhibitionTypeService.getTop3TeamByType(1);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
 	public void getListExhibitionResultCaseExhibitionTypeIdNotNull() {
 		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionType()));
 		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
