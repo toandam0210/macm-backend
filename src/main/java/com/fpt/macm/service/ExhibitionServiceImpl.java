@@ -224,51 +224,6 @@ public class ExhibitionServiceImpl implements ExhibitionService{
 	}
 
 	@Override
-	public ResponseMessage getTop3TeamByType(int exhibitionTypeId) {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			ExhibitionType getType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
-			Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
-			List<ExhibitionTeamDto> getTeamDto = new ArrayList<ExhibitionTeamDto>();
-			boolean isDone = true;
-			for (ExhibitionTeam exhibitionTeam : getTeams) {
-				Optional<ExhibitionResult> getResultOp = exhibitionResultRepository.findByTeam(exhibitionTeam.getId());
-				if (getResultOp.isPresent()) {
-					if (getResultOp.get().getScore() == null) {
-						isDone = false;
-						break;
-					}
-					ExhibitionTeamDto newExhibitionTeamDto = new ExhibitionTeamDto();
-					newExhibitionTeamDto.setId(exhibitionTeam.getId());
-					newExhibitionTeamDto.setTeamName(exhibitionTeam.getTeamName());
-					newExhibitionTeamDto.setScore(getResultOp.get().getScore());
-					getTeamDto.add(newExhibitionTeamDto);
-				} else {
-					isDone = false;
-					break;
-				}
-			}
-			if (isDone) {
-				Collections.sort(getTeamDto);
-				if (getTeamDto.size() >= 3) {
-					responseMessage.setData(getTeamDto.subList(0, 2));
-				} else {
-					responseMessage.setData(getTeamDto);
-				}
-				responseMessage.setMessage("Danh sách các đội đạt giải nội dung " + getType.getName());
-			} else {
-				responseMessage.setMessage("Nội dung này vẫn còn đội biểu diễn chưa thi");
-			}
-
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
 	public ResponseMessage updateTeam(int exhibitionTeamId, List<User> teamUsers) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
