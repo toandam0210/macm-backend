@@ -429,7 +429,7 @@ public class NotificationServiceImpl implements NotificationService {
 
 			List<Tournament> tournaments = tournamentRepository.findAll();
 			for (Tournament tournament : tournaments) {
-				if (tournament.isStatus()) {
+				if (tournament.isStatus() && tournament.getFeePlayerPay() > 0) {
 					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
 					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
 						if (studentId.equals(tournamentPlayer.getUser().getStudentId())
