@@ -417,9 +417,8 @@ public class NotificationServiceImpl implements NotificationService {
 						if (tournamentOrganizingCommittee.getTournament().isStatus()) {
 							if (!tournamentOrganizingCommittee.isPaymentStatus()) {
 								String message = "Giải đấu " + tournamentOrganizingCommittee.getTournament().getName()
-										+ ": "
-										+ nf.format(
-												tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay())
+										+ ": " + nf.format(tournamentOrganizingCommittee.getTournament()
+												.getFeeOrganizingCommiteePay())
 										+ " VND";
 								messages.add(message);
 							}
@@ -444,9 +443,13 @@ public class NotificationServiceImpl implements NotificationService {
 				}
 			}
 
-			responseMessage.setData(messages);
-			responseMessage.setMessage(
-					"Lấy trạng thái đóng tiền của " + user.getName() + " - " + user.getStudentId() + " thành công");
+			if (!messages.isEmpty()) {
+				responseMessage.setData(messages);
+				responseMessage.setMessage(
+						"Lấy trạng thái đóng tiền của " + user.getName() + " - " + user.getStudentId() + " thành công");
+			} else {
+				responseMessage.setMessage("Không có khoản nào phải đóng");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

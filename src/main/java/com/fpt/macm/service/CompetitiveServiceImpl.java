@@ -194,11 +194,8 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 
 						int index = 0;
 						for (CompetitiveMatchDto competitiveMatchDto : listMatchDto) {
-							if ((competitiveMatchDto.getFirstPlayer() == null
-									|| competitiveMatchDto.getSecondPlayer() == null)
-									&& competitiveMatchDto.getRound() == 1) {
-
-							} else {
+							if (competitiveMatchDto.getRound() != 1 || (competitiveMatchDto.getFirstPlayer() != null
+									&& competitiveMatchDto.getSecondPlayer() != null)) {
 								index++;
 							}
 							competitiveMatchDto.setMatchNo(index);
@@ -515,11 +512,13 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 					getCompetitivePlayer.setUpdatedOn(LocalDateTime.now());
 					if (weight >= getType.getWeightMin() && weight <= getType.getWeightMax()) {
 						getCompetitivePlayer.setIsEligible(true);
+						competitivePlayerRepository.save(getCompetitivePlayer);
+						autoSpawnMatchs(getType.getId());
 					} else {
 						getCompetitivePlayer.setIsEligible(false);
+						competitivePlayerRepository.save(getCompetitivePlayer);
 						autoSpawnMatchs(getType.getId());
 					}
-					competitivePlayerRepository.save(getCompetitivePlayer);
 					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
 					responseMessage.setMessage("Cập nhật cân nặng thành công. Tuyển thủ"
 							+ (getCompetitivePlayer.getIsEligible() ? " " : " không ")
@@ -555,6 +554,13 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 					if (getCompetitivePlayer.getIsEligible()) {
 						responseMessage
 								.setMessage("Không thể xóa. Tuyển thủ đã nằm trong danh sách thi đấu chính thức");
+<<<<<<< HEAD
+=======
+					} else {
+						competitivePlayerRepository.delete(getCompetitivePlayer);
+						responseMessage.setMessage("Xóa tuyển thủ thành công");
+						responseMessage.setData(Arrays.asList(getCompetitivePlayer));
+>>>>>>> develop
 					}
 				}
 			} else {

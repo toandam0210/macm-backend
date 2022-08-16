@@ -26,6 +26,7 @@ import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TrainingSchedule;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.entity.UserStatusReport;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AttendanceStatusRepository;
@@ -42,6 +43,7 @@ import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentPlayerPaymentStatusReportRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
+import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.repository.UserStatusReportRepository;
 
 @Service
@@ -97,6 +99,9 @@ public class DashboardServiceImpl implements DashboardService {
 
 	@Autowired
 	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
+
+	@Autowired
+	UserRepository userRepository;
 
 	@Override
 	public ResponseMessage getCollaboratorReport() {
@@ -236,7 +241,7 @@ public class DashboardServiceImpl implements DashboardService {
 					int totalIncome = 0;
 					int totalSpend = 0;
 					double latestBalance = 0;
-					
+
 					LocalDateTime startDate = LocalDateTime.of(year, i, 1, 0, 0, 0);
 					LocalDate startDateTemp = startDate.toLocalDate();
 					LocalDateTime endDate = LocalDateTime.of(year, i,
@@ -256,8 +261,7 @@ public class DashboardServiceImpl implements DashboardService {
 								totalIncome += fundChange;
 							}
 						}
-						latestBalance = clubFundReports.get(clubFundReports.size() - 1)
-								.getFundBalance();
+						latestBalance = clubFundReports.get(clubFundReports.size() - 1).getFundBalance();
 					}
 
 					FeeDashboardDto feeDashboardDto = new FeeDashboardDto();
@@ -343,42 +347,47 @@ public class DashboardServiceImpl implements DashboardService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<Event> events = eventRepository.findBySemesterOrderByIdAsc(semesterName);
-			double totalMemberJoinEvent = 0;
-			double totalOrganizingEvent = 0;
-			int totalEvent = events.size();
+			int totalJoinEvent = 0;
+			int totalEvent = 0;
 			for (Event event : events) {
 				if (event.isStatus()) {
+					totalEvent++;
 					List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(event.getId(),
 							true);
-					for (MemberEvent memberEvent : membersEvent) {
-						if (memberEvent.getRoleEvent().getId() == 1) {
-							totalMemberJoinEvent++;
-						} else {
-							totalOrganizingEvent++;
-						}
-					}
+					totalJoinEvent += membersEvent.size();
 				}
 			}
 
 			List<Tournament> tournaments = tournamentRepository.findBySemester(semesterName);
-			double totalMemberJoinTournament = 0;
-			double totalOrganizingTournament = 0;
-			int totalTournament = tournaments.size();
+			int totalJoinTournament = 0;
+			int totalTournament = 0;
 			for (Tournament tournament : tournaments) {
 				if (tournament.isStatus()) {
-					totalMemberJoinTournament += tournament.getTournamentPlayers().size();
+					totalTournament++;
+					totalJoinTournament += tournament.getTournamentPlayers().size();
 					List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
 							.findByTournamentId(tournament.getId());
-					totalOrganizingTournament += tournamentOrganizingCommittees.size();
+					totalJoinTournament += tournamentOrganizingCommittees.size();
 				}
 			}
 
+			List<User> users = userRepository.findAllActiveUser();
+
 			ActivityReportDto activityReportDto = new ActivityReportDto();
-			activityReportDto.setTotalTournamentAndEvent(totalEvent + totalTournament);
-			activityReportDto.setAverageMembersPerTournamentAndEvent((int) Math
-					.round((totalMemberJoinEvent + totalMemberJoinTournament) / (totalEvent + totalTournament)));
-			activityReportDto.setAverageCommitteePerTournamentAndEvent((int) Math
-					.round((totalOrganizingEvent + totalOrganizingTournament) / (totalEvent + totalTournament)));
+			activityReportDto.setTotalTournament(totalTournament);
+			activityReportDto.setTotalEvent(totalEvent);
+			if (totalTournament != 0) {
+				activityReportDto.setAverageJoinTournament(Math.round(
+						(double) totalJoinTournament * 100 / ((double) users.size() * (double) totalTournament)));
+			} else {
+				activityReportDto.setAverageJoinTournament(0);
+			}
+			if (totalEvent != 0) {
+				activityReportDto.setAverageJoinEvent(
+						Math.round((double) totalJoinEvent * 100 / ((double) users.size() * (double) totalEvent)));
+			} else {
+				activityReportDto.setAverageJoinEvent(0);
+			}
 
 			responseMessage.setData(Arrays.asList(activityReportDto));
 			responseMessage.setMessage("Lấy báo cáo tổng quan cho ban chuyên môn thành công");

@@ -34,14 +34,20 @@ import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
+import com.fpt.macm.model.entity.Area;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CommonSchedule;
+import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
+import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.CompetitiveTypeSample;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
+import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
+import com.fpt.macm.model.entity.ExhibitionTypeSample;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.RoleEvent;
 import com.fpt.macm.model.entity.Semester;
@@ -55,15 +61,20 @@ import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AreaRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
+import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
+import com.fpt.macm.repository.CompetitiveTypeSampleRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
+import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
+import com.fpt.macm.repository.ExhibitionTypeSampleRepository;
 import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.RoleEventRepository;
 import com.fpt.macm.repository.SemesterRepository;
@@ -159,12 +170,27 @@ public class TournamentServiceTest {
 
 	@Mock
 	CompetitiveService competitiveService;
-	
+
 	@Mock
 	ExhibitionService exhibitionService;
-	
+
 	@Mock
 	ClubFundService clubFundService;
+
+	@Mock
+	CompetitiveResultRepository competitiveResultRepository;
+
+	@Mock
+	ExhibitionResultRepository exhibitionResultRepository;
+
+	@Mock
+	AreaRepository areaRepository;
+	
+	@Mock
+	CompetitiveTypeSampleRepository competitiveTypeSampleRepository;
+	
+	@Mock
+	ExhibitionTypeSampleRepository exhibitionTypeSampleRepository;
 
 	private Set<CompetitiveType> competitiveTypes() {
 		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();
@@ -173,6 +199,7 @@ public class TournamentServiceTest {
 		competitiveType.setGender(true);
 		competitiveType.setWeightMax(60);
 		competitiveType.setWeightMin(57);
+		competitiveType.setStatus(3);
 		competitiveTypes.add(competitiveType);
 		return competitiveTypes;
 	}
@@ -196,6 +223,24 @@ public class TournamentServiceTest {
 		exhibitionTeam.setId(1);
 		exhibitionTeam.setTeamName("Team 1");
 		exhibitionTeams.add(exhibitionTeam);
+		
+		ExhibitionTeam exhibitionTeam2 = new ExhibitionTeam();
+		exhibitionTeam2.setExhibitionPlayers(exhibitionPlayers());
+		exhibitionTeam2.setId(1);
+		exhibitionTeam2.setTeamName("Team 1");
+		exhibitionTeams.add(exhibitionTeam2);
+		
+		ExhibitionTeam exhibitionTeam4 = new ExhibitionTeam();
+		exhibitionTeam4.setExhibitionPlayers(exhibitionPlayers());
+		exhibitionTeam4.setId(1);
+		exhibitionTeam4.setTeamName("Team 1");
+		exhibitionTeams.add(exhibitionTeam4);
+		
+		ExhibitionTeam exhibitionTeam3 = new ExhibitionTeam();
+		exhibitionTeam3.setExhibitionPlayers(exhibitionPlayers());
+		exhibitionTeam3.setId(1);
+		exhibitionTeam3.setTeamName("Team 1");
+		exhibitionTeams.add(exhibitionTeam3);
 		return exhibitionTeams;
 	}
 
@@ -248,6 +293,7 @@ public class TournamentServiceTest {
 		tournament.setExhibitionTypes(exhibitionTypes());
 		tournament.setFeeOrganizingCommiteePay(100000);
 		tournament.setFeePlayerPay(100000);
+		tournament.setTotalAmountFromClubEstimate(10000);
 		tournament.setId(1);
 		tournament.setName("FNC");
 		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.now().plusDays(10));
@@ -492,6 +538,65 @@ public class TournamentServiceTest {
 		return attendanceStatus;
 	}
 
+	private CompetitiveMatch competitiveMatch() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		CompetitiveType competitiveType = listCompetitive.get(0);
+		CompetitiveMatch competitiveMatch = new CompetitiveMatch();
+		competitiveMatch.setCompetitiveType(competitiveType);
+		competitiveMatch.setFirstStudentId("HE140855");
+		competitiveMatch.setId(1);
+		competitiveMatch.setLoseMatchId(1);
+		competitiveMatch.setNextIsFirst(true);
+		competitiveMatch.setNextMatchId(1);
+		competitiveMatch.setRound(1);
+		competitiveMatch.setSecondStudentId("HE140856");
+		competitiveMatch.setStatus(true);
+		return competitiveMatch;
+	}
+
+	private CompetitiveResult competitiveResult() {
+		CompetitiveResult competitiveResult = new CompetitiveResult();
+		competitiveResult.setArea(area());
+		competitiveResult.setFirstPoint(3);
+		competitiveResult.setId(1);
+		competitiveResult.setMatch(competitiveMatch());
+		competitiveResult.setSecondPoint(5);
+		competitiveResult.setTime(LocalDateTime.now());
+		return competitiveResult;
+	}
+
+	private Area area() {
+		Area area = new Area();
+		area.setId(1);
+		area.setName("Sân 1");
+		return area;
+	}
+
+	private ExhibitionResult exhibitionResult() {
+		ExhibitionResult exhibitionResult = new ExhibitionResult();
+		for (ExhibitionTeam exhibitionTeam : exhibitionTeams()) {
+			exhibitionResult.setId(1);
+			exhibitionResult.setTeam(exhibitionTeam);
+			exhibitionResult.setScore(0.0);
+			exhibitionResult.setTime(LocalDateTime.now());
+			exhibitionResult.setArea(area());
+		}
+		return exhibitionResult;
+	}
+	
+	private CompetitiveTypeSample competitiveTypeSample() {
+		CompetitiveTypeSample competitiveTypeSample = new CompetitiveTypeSample();
+		competitiveTypeSample.setId(1);
+		return competitiveTypeSample;
+	}
+	
+	private ExhibitionTypeSample exhibitionTypeSample() {
+		ExhibitionTypeSample exhibitionTypeSample = new ExhibitionTypeSample();
+		exhibitionTypeSample.setId(1);
+		return exhibitionTypeSample;
+	}
+
 	@Test
 	public void testCreateTournamentCaseSuccess() {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -723,6 +828,9 @@ public class TournamentServiceTest {
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
 		when(commonScheduleRepository.findByDate(any())).thenReturn(Optional.of(commonSchedule()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
 
 		ResponseMessage response = tournamentService.deleteTournamentById(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
@@ -965,14 +1073,14 @@ public class TournamentServiceTest {
 	public void testGetAllExhibitionTeam() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		ResponseMessage response = tournamentService.getAllExhibitionTeam(1, 1);
-		assertEquals(response.getData().size(), 1);
+		assertEquals(response.getData().size(), 4);
 	}
 
 	@Test
 	public void testGetAllExhibitionTeamCaseTypeEq0() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		ResponseMessage response = tournamentService.getAllExhibitionTeam(1, 0);
-		assertEquals(response.getData().size(), 1);
+		assertEquals(response.getData().size(), 4);
 	}
 
 	@Test
@@ -1219,7 +1327,7 @@ public class TournamentServiceTest {
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(tournamentRepository.findByTournamentPlayers(any())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		
+
 		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -1233,7 +1341,7 @@ public class TournamentServiceTest {
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
 		when(tournamentRepository.findByTournamentPlayers(any())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		
+
 		ResponseMessage response = tournamentService.updateTournamentPlayerPaymentStatus(user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -1586,7 +1694,7 @@ public class TournamentServiceTest {
 				.thenReturn(Optional.of(tournamentPlayer()));
 		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(Arrays.asList(exhibitionPlayer()));
 		ResponseMessage response = tournamentService.getAllUserExhibitionPlayer(1, "HE140855");
-		assertEquals(response.getData().size(), 1);
+		assertEquals(response.getData().size(), 4);
 	}
 
 	@Test
@@ -1604,7 +1712,7 @@ public class TournamentServiceTest {
 				.thenReturn(Optional.of(tournamentPlayer()));
 		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
 		ResponseMessage response = tournamentService.getAllUserExhibitionPlayer(1, "HE140855");
-		assertEquals(response.getData().size(), 1);
+		assertEquals(response.getData().size(), 4);
 	}
 
 	@Test
@@ -1620,7 +1728,7 @@ public class TournamentServiceTest {
 				.thenReturn(Optional.of(tournamentPlayer()));
 		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
 		ResponseMessage response = tournamentService.getAllUserExhibitionPlayer(1, "HE140855");
-		assertEquals(response.getData().size(), 2);
+		assertEquals(response.getData().size(), 8);
 	}
 
 	@Test
@@ -2176,4 +2284,859 @@ public class TournamentServiceTest {
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
+	@Test
+	public void spawnTimeAndAreaCaseSuccess() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatch.setRound(1);
+		competitiveMatch.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch);
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(2);
+		competitiveMatch2.setRound(0);
+		competitiveMatchs.add(competitiveMatch2);
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(3);
+		competitiveMatch3.setRound(1);
+		competitiveMatch3.setSecondStudentId(null);
+		competitiveMatchs.add(competitiveMatch3);
+		
+		List<Area> areas = new ArrayList<Area>();
+		areas.add(area());
+		Area area = new Area();
+		area.setId(2);
+		areas.add(area);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(areaRepository.findAll()).thenReturn(areas);
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
+
+		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void spawnTimeAndAreaCaseSuccess2() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatch.setRound(2);
+		competitiveMatch.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch);
+		
+//		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+//		competitiveMatch2.setId(2);
+//		competitiveMatch2.setRound(0);
+//		competitiveMatchs.add(competitiveMatch2);
+		
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(3);
+		competitiveMatch3.setRound(1);
+		competitiveMatch3.setSecondStudentId(null);
+		competitiveMatchs.add(competitiveMatch3);
+		
+		CompetitiveMatch competitiveMatch4 = competitiveMatch();
+		competitiveMatch4.setRound(2);
+		competitiveMatch4.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch4);
+		
+		CompetitiveMatch competitiveMatch5 = competitiveMatch();
+		competitiveMatch5.setRound(2);
+		competitiveMatch5.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch5);
+		
+		CompetitiveMatch competitiveMatch6 = competitiveMatch();
+		competitiveMatch6.setRound(2);
+		competitiveMatch6.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch6);
+		
+		CompetitiveMatch competitiveMatch7 = competitiveMatch();
+		competitiveMatch7.setRound(2);
+		competitiveMatch7.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch7);
+		
+		CompetitiveMatch competitiveMatch8 = competitiveMatch();
+		competitiveMatch8.setRound(2);
+		competitiveMatch8.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch8);
+		
+		
+			
+		
+		List<Area> areas = new ArrayList<Area>();
+		areas.add(area());
+//		Area area = new Area();
+//		area.setId(2);
+//		areas.add(area);
+		
+		List<TournamentSchedule> tournamentSchedules = new ArrayList<TournamentSchedule>();
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setStartTime(LocalTime.of(18, 0));
+		tournamentSchedule.setFinishTime(LocalTime.of(18, 55));
+		tournamentSchedule.setDate(LocalDate.now().minusDays(1));
+		tournamentSchedules.add(tournamentSchedule);
+		tournamentSchedules.add(tournamentSchedule());
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(areaRepository.findAll()).thenReturn(areas);
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(tournamentSchedules);
+
+		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void spawnTimeAndAreaCaseSuccess3() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatch.setRound(2);
+		competitiveMatch.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch);
+		
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(2);
+		competitiveMatch2.setRound(0);
+		competitiveMatchs.add(competitiveMatch2);
+		
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(3);
+		competitiveMatch3.setRound(1);
+		competitiveMatch3.setSecondStudentId(null);
+		competitiveMatchs.add(competitiveMatch3);
+		
+		CompetitiveMatch competitiveMatch4 = competitiveMatch();
+		competitiveMatch4.setRound(2);
+		competitiveMatch4.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch4);
+		
+		CompetitiveMatch competitiveMatch5 = competitiveMatch();
+		competitiveMatch5.setRound(2);
+		competitiveMatch5.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch5);
+		
+		CompetitiveMatch competitiveMatch6 = competitiveMatch();
+		competitiveMatch6.setRound(2);
+		competitiveMatch6.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch6);
+		
+		CompetitiveMatch competitiveMatch7 = competitiveMatch();
+		competitiveMatch7.setRound(2);
+		competitiveMatch7.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch7);
+		
+		CompetitiveMatch competitiveMatch8 = competitiveMatch();
+		competitiveMatch8.setRound(2);
+		competitiveMatch8.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch8);
+		
+		
+			
+		
+		List<Area> areas = new ArrayList<Area>();
+		areas.add(area());
+		Area area = new Area();
+		area.setId(2);
+		areas.add(area);
+		
+		List<TournamentSchedule> tournamentSchedules = new ArrayList<TournamentSchedule>();
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setStartTime(LocalTime.of(18, 0));
+		tournamentSchedule.setFinishTime(LocalTime.of(18, 50));
+		tournamentSchedule.setDate(LocalDate.now().minusDays(1));
+		tournamentSchedules.add(tournamentSchedule);
+		tournamentSchedules.add(tournamentSchedule());
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(areaRepository.findAll()).thenReturn(areas);
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(tournamentSchedules);
+
+		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void spawnTimeAndAreaCaseSuccess4() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatch.setRound(2);
+		competitiveMatch.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch);
+		
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(2);
+		competitiveMatch2.setRound(0);
+		competitiveMatchs.add(competitiveMatch2);
+		
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(3);
+		competitiveMatch3.setRound(1);
+		competitiveMatch3.setSecondStudentId(null);
+		competitiveMatchs.add(competitiveMatch3);
+		
+		CompetitiveMatch competitiveMatch4 = competitiveMatch();
+		competitiveMatch4.setRound(2);
+		competitiveMatch4.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch4);
+		
+		CompetitiveMatch competitiveMatch5 = competitiveMatch();
+		competitiveMatch5.setRound(2);
+		competitiveMatch5.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch5);
+		
+		CompetitiveMatch competitiveMatch6 = competitiveMatch();
+		competitiveMatch6.setRound(2);
+		competitiveMatch6.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch6);
+		
+		CompetitiveMatch competitiveMatch7 = competitiveMatch();
+		competitiveMatch7.setRound(2);
+		competitiveMatch7.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch7);
+		
+		CompetitiveMatch competitiveMatch8 = competitiveMatch();
+		competitiveMatch8.setRound(2);
+		competitiveMatch8.setFirstStudentId(null);
+		competitiveMatchs.add(competitiveMatch8);
+		
+		
+			
+		
+		List<Area> areas = new ArrayList<Area>();
+		areas.add(area());
+		Area area = new Area();
+		area.setId(2);
+		areas.add(area);
+		
+		List<TournamentSchedule> tournamentSchedules = new ArrayList<TournamentSchedule>();
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setStartTime(LocalTime.of(18, 0));
+		tournamentSchedule.setFinishTime(LocalTime.of(18, 50));
+		tournamentSchedule.setDate(LocalDate.now().minusDays(1));
+		tournamentSchedules.add(tournamentSchedule);
+		TournamentSchedule tournamentSchedule2 = tournamentSchedule();
+		tournamentSchedule2.setStartTime(LocalTime.of(18, 0));
+		tournamentSchedule2.setFinishTime(LocalTime.of(18, 10));
+		tournamentSchedules.add(tournamentSchedule2);
+		TournamentSchedule tournamentSchedule3 = tournamentSchedule();
+		tournamentSchedule3.setStartTime(LocalTime.of(18, 0));
+		tournamentSchedule3.setFinishTime(LocalTime.of(23, 59));
+		tournamentSchedule3.setDate(LocalDate.now().plusDays(1));
+		tournamentSchedules.add(tournamentSchedule3);
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(areaRepository.findAll()).thenReturn(areas);
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(tournamentSchedules);
+
+		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void spawnTimeAndAreaCaseFail() {
+		List<CompetitiveMatch> competitiveMatchs = new ArrayList<CompetitiveMatch>();
+		CompetitiveMatch competitiveMatch = competitiveMatch();
+		competitiveMatchs.add(competitiveMatch);
+		CompetitiveMatch competitiveMatch1 = competitiveMatch();
+		competitiveMatch1.setId(2);
+		competitiveMatchs.add(competitiveMatch1);
+		CompetitiveMatch competitiveMatch2 = competitiveMatch();
+		competitiveMatch2.setId(3);
+		competitiveMatchs.add(competitiveMatch2);
+		CompetitiveMatch competitiveMatch3 = competitiveMatch();
+		competitiveMatch3.setId(4);
+		competitiveMatchs.add(competitiveMatch3);
+
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setStartTime(LocalTime.now());
+		tournamentSchedule.setFinishTime(LocalTime.now().plusMinutes(1));
+
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(areaRepository.findAll()).thenReturn(Arrays.asList(area()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+
+		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void spawnTimeAndAreaCaseException() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(null);
+
+		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void updateAfterTournamentCaseFail1() {
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setFirstPoint(null);
+
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseFail1Female() {
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setFirstPoint(null);
+		
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		for (CompetitiveType competitiveType : competitiveTypes) {
+			competitiveType.setGender(false);
+		}
+		
+		Tournament tournament = tournament();
+		tournament.setCompetitiveTypes(competitiveTypes);
+
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void updateAfterTournamentCaseFail2() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.empty());
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseFail2Female() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		for (CompetitiveType competitiveType : competitiveTypes) {
+			competitiveType.setGender(false);
+		}
+		
+		Tournament tournament = tournament();
+		tournament.setCompetitiveTypes(competitiveTypes);
+		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.empty());
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void updateAfterTournamentCaseFail3() {
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setScore(null);
+
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseFail4() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.empty());
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void updateAfterTournamentCaseSuccess1() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentId(anyInt()))
+				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseSuccess2() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentId(anyInt()))
+				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000000);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseTournamentEmpty() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseException() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(null);
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 10000000);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionDuplicateWithCompetitiveInArea1() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(20,
+				exhibitionResult);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseSuccess() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 15, 18, 0));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(20,
+				exhibitionResult);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseDuplicate2() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(20,
+				exhibitionResult);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseSuccess2() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(20,
+				exhibitionResult);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseDuplicate3() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 6));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(20,
+				exhibitionResult);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseNotExistedDuplicateExhibition() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		List<ExhibitionResult> exhibitionResults = new ArrayList<ExhibitionResult>();
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult);
+		ExhibitionResult exhibitionResult2 = exhibitionResult();
+		exhibitionResult2.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult2);
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(exhibitionResults);
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
+				exhibitionResult);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseNotExisted() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		List<ExhibitionResult> exhibitionResults = new ArrayList<ExhibitionResult>();
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult);
+		ExhibitionResult exhibitionResult2 = exhibitionResult();
+		exhibitionResult2.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult2);
+		ExhibitionResult exhibitionResult3 = exhibitionResult();
+		exhibitionResult3.setTime(LocalDateTime.of(2022, 8, 16, 19, 4));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(exhibitionResults);
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
+				exhibitionResult3);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseNotExistedDuplicateExhibition2() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		List<ExhibitionResult> exhibitionResults = new ArrayList<ExhibitionResult>();
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult);
+		ExhibitionResult exhibitionResult2 = exhibitionResult();
+		exhibitionResult2.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult2);
+		ExhibitionResult exhibitionResult3 = exhibitionResult();
+		exhibitionResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 5));
+	//	when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(exhibitionResults);
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
+				exhibitionResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseNotExistedDuplicate3() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		List<ExhibitionResult> exhibitionResults = new ArrayList<ExhibitionResult>();
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult);
+		ExhibitionResult exhibitionResult2 = exhibitionResult();
+		exhibitionResult2.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult2);
+		ExhibitionResult exhibitionResult3 = exhibitionResult();
+		exhibitionResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 3));
+	//	when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(exhibitionResults);
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
+				exhibitionResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseNotExisted3() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		List<ExhibitionResult> exhibitionResults = new ArrayList<ExhibitionResult>();
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult);
+		ExhibitionResult exhibitionResult2 = exhibitionResult();
+		exhibitionResult2.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult2);
+		ExhibitionResult exhibitionResult3 = exhibitionResult();
+		exhibitionResult3.setTime(LocalDateTime.of(2022, 8, 16, 17, 3));
+	//	when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(exhibitionResults);
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
+				exhibitionResult3);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseException() {
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.now().plusDays(1));
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		List<ExhibitionResult> exhibitionResults = new ArrayList<ExhibitionResult>();
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult);
+		ExhibitionResult exhibitionResult2 = exhibitionResult();
+		exhibitionResult2.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		exhibitionResults.add(exhibitionResult2);
+		ExhibitionResult exhibitionResult3 = exhibitionResult();
+		exhibitionResult3.setTime(LocalDateTime.of(2022, 8, 16, 17, 3));
+	//	when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(null);
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
+				exhibitionResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseExisted() {
+		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		competitiveResults.add(competitiveResult);
+		CompetitiveResult competitiveResult2 = competitiveResult();
+		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		competitiveResults.add(competitiveResult2);
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
+				competitiveResult);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseDuplicateCompetitive1() {
+		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		competitiveResults.add(competitiveResult);
+		CompetitiveResult competitiveResult2 = competitiveResult();
+		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		competitiveResults.add(competitiveResult2);
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
+				competitiveResult);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseDuplicateCompetitive2() {
+		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 10));
+		competitiveResults.add(competitiveResult);
+		CompetitiveResult competitiveResult2 = competitiveResult();
+		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 19, 10));
+		competitiveResults.add(competitiveResult2);
+		CompetitiveResult competitiveResult3 = competitiveResult();
+		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 19, 18));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
+				competitiveResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseSuccess() {
+		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		competitiveResults.add(competitiveResult);
+		CompetitiveResult competitiveResult2 = competitiveResult();
+		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		competitiveResults.add(competitiveResult2);
+		CompetitiveResult competitiveResult3 = competitiveResult();
+		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 17, 18, 0));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
+				competitiveResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseSuccess2() {
+		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+		competitiveResults.add(competitiveResult);
+		CompetitiveResult competitiveResult2 = competitiveResult();
+		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+		competitiveResults.add(competitiveResult2);
+		CompetitiveResult competitiveResult3 = competitiveResult();
+		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 17, 18, 0));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
+		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
+				competitiveResult3);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseDuplicate4() {
+		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+		competitiveResults.add(competitiveResult);
+		CompetitiveResult competitiveResult2 = competitiveResult();
+		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+		competitiveResults.add(competitiveResult2);
+		CompetitiveResult competitiveResult3 = competitiveResult();
+		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 17, 18, 0));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
+				competitiveResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseDuplicateExhibition() {
+//		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+//		competitiveResults.add(competitiveResult);
+//		CompetitiveResult competitiveResult2 = competitiveResult();
+//		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+//		competitiveResults.add(competitiveResult2);
+		CompetitiveResult competitiveResult3 = competitiveResult();
+		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
+				competitiveResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseDuplicateExhibition2() {
+//		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+//		competitiveResults.add(competitiveResult);
+//		CompetitiveResult competitiveResult2 = competitiveResult();
+//		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+//		competitiveResults.add(competitiveResult2);
+		CompetitiveResult competitiveResult3 = competitiveResult();
+		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 58));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
+				competitiveResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseSuccess3() {
+//		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+//		competitiveResults.add(competitiveResult);
+//		CompetitiveResult competitiveResult2 = competitiveResult();
+//		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+//		competitiveResults.add(competitiveResult2);
+		CompetitiveResult competitiveResult3 = competitiveResult();
+		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 50));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult));
+		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
+				competitiveResult3);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseDuplicateExhibition3() {
+//		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+//		competitiveResults.add(competitiveResult);
+//		CompetitiveResult competitiveResult2 = competitiveResult();
+//		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+//		competitiveResults.add(competitiveResult2);
+		CompetitiveResult competitiveResult3 = competitiveResult();
+		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
+				competitiveResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+			
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseSuccess4() {
+//		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+//		CompetitiveResult competitiveResult = competitiveResult();
+//		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+//		competitiveResults.add(competitiveResult);
+//		CompetitiveResult competitiveResult2 = competitiveResult();
+//		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+//		competitiveResults.add(competitiveResult2);
+		CompetitiveResult competitiveResult3 = competitiveResult();
+		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 30));
+		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult));
+		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
+				competitiveResult3);
+		assertEquals(responseMessage.getData().size(), 1);
 }
+	
+	@Test
+	public void testGetAllSuggestType() {
+		when(competitiveTypeSampleRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(competitiveTypeSample()));
+		when(exhibitionTypeSampleRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(exhibitionTypeSample()));
+		ResponseMessage responseMessage = tournamentService.getAllSuggestType();
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+}
+	
