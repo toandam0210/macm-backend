@@ -369,6 +369,17 @@ public class ExhibitionServiceTest {
 		ResponseMessage responseMessage = exhibitionTypeService.registerTeam(1, "Team 1", listStudentId);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
+	
+	@Test
+	public void registerTeamCaseEmpty() {
+		List<String> listStudentId = new ArrayList<>();
+		listStudentId.add("HE140855");
+
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.empty());
+
+		ResponseMessage responseMessage = exhibitionTypeService.registerTeam(1, "Team 1", listStudentId);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
 
 	@Test
 	public void registerTeamCaseException() {
@@ -387,6 +398,14 @@ public class ExhibitionServiceTest {
 		
 		ResponseMessage responseMessage = exhibitionTypeService.getTeamByType(1);
 		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void getTeamByTypeCaseEmpty() {
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.empty());
+		
+		ResponseMessage responseMessage = exhibitionTypeService.getTeamByType(1);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 	@Test
@@ -432,6 +451,14 @@ public class ExhibitionServiceTest {
 	}
 	
 	@Test
+	public void getListExhibitionResultCaseEmpty() {
+		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.empty());
+		
+		ResponseMessage responseMessage = exhibitionTypeService.getListExhibitionResult(1, "");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
 	public void getListExhibitionResultCaseException() {
 		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(null);
 		
@@ -446,6 +473,14 @@ public class ExhibitionServiceTest {
 		
 		ResponseMessage responseMessage = exhibitionTypeService.updateExhibitionResult(1, 100);
 		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void updateExhibitionResultCaseEmpty() {
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.empty());
+		
+		ResponseMessage responseMessage = exhibitionTypeService.updateExhibitionResult(1, 100);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 	@Test
