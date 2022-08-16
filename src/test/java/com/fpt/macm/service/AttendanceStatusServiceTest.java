@@ -2,6 +2,7 @@ package com.fpt.macm.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -298,7 +299,7 @@ public class AttendanceStatusServiceTest {
 		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(attendanceStatus());
 		
-		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName());
+		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName(), 0);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -308,22 +309,22 @@ public class AttendanceStatusServiceTest {
 		attendanceStatus.setStatus(1);
 		
 		when(semesterRepository.findByName(anyString())).thenReturn(Optional.of(semester()));
-		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(userRepository.findByRoleIdAndIsActive(anyInt(), anyBoolean())).thenReturn(Arrays.asList(user()));
 		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(attendanceStatus);
 		
-		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName());
+		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName(), 1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
 	@Test
 	public void getAttendanceTrainingStatisticCaseAttendanceStatusNull() {
 		when(semesterRepository.findByName(anyString())).thenReturn(Optional.of(semester()));
-		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(userRepository.findAllMembersActive()).thenReturn(Arrays.asList(user()));
 		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(null);
 		
-		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName());
+		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName(), -1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -337,11 +338,11 @@ public class AttendanceStatusServiceTest {
 		
 		when(semesterRepository.findByName(anyString())).thenReturn(Optional.empty());
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
-		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(userRepository.findAllCollaboratorsActive()).thenReturn(Arrays.asList(user()));
 		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(attendanceStatus);
 		
-		ResponseMessage response = attendanceStatusService.getAttendanceTrainingStatistic("");
+		ResponseMessage response = attendanceStatusService.getAttendanceTrainingStatistic("", -2);
 		assertEquals(response.getData().size(), 1);
 	}
 	
@@ -349,7 +350,7 @@ public class AttendanceStatusServiceTest {
 	public void getAttendanceTrainingStatisticCaseException() {
 		when(semesterRepository.findByName(anyString())).thenReturn(null);
 		
-		ResponseMessage response = attendanceStatusService.getAttendanceTrainingStatistic("");
+		ResponseMessage response = attendanceStatusService.getAttendanceTrainingStatistic("", 0);
 		assertEquals(response.getData().size(), 0);
 	}
 	

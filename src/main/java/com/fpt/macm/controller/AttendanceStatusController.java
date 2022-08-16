@@ -60,10 +60,12 @@ public class AttendanceStatusController {
 				attendanceStatusService.getListOldTrainingScheduleToTakeAttendanceBySemester(semesterName),
 				HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/getattendancetrainingstatistic/{semesterName}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> getAttendanceTrainingStatistic(@PathVariable(name = "semesterName") String semesterName){
-		return new ResponseEntity<ResponseMessage>(attendanceStatusService.getAttendanceTrainingStatistic(semesterName), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getAttendanceTrainingStatistic(
+			@PathVariable(name = "semesterName") String semesterName, @RequestParam(defaultValue = "0") int roleId) {
+		return new ResponseEntity<ResponseMessage>(
+				attendanceStatusService.getAttendanceTrainingStatistic(semesterName, roleId), HttpStatus.OK);
 	}
 }

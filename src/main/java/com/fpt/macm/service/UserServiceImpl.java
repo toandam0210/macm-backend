@@ -186,7 +186,11 @@ public class UserServiceImpl implements UserService {
 			if (currentUserRole.getName().equals(ERole.ROLE_HeadClub.name())
 					&& !roleOptional.get().getName().equals(currentUserRole.getName())) {
 				responseMessage.setMessage(Constant.MSG_035);
-			} else {
+			} else if(userDto.getRoleId() > 0 && userDto.getRoleId() < 10){
+				responseMessage.setMessage("CTV không thể cập nhật lên làm ban chủ nhiệm");
+			}
+				else {
+			
 				for (User currentUser : users) {
 					if (currentUser.getStudentId().equals(userDto.getStudentId())) {
 						checkDuplicateStudentId = true;
@@ -563,7 +567,7 @@ public class UserServiceImpl implements UserService {
 				}
 				
 				if(userFromExcel.getGeneration() < 1) {
-					String messageInvalidGen = "Vui lòng nhập số lớn hơn 0";
+					String messageInvalidGen = "Vui lòng nhập Generation lớn hơn 0";
 					messageError += System.lineSeparator() + messageInvalidGen;
 					checkInalid = false;
 				}
@@ -575,7 +579,7 @@ public class UserServiceImpl implements UserService {
 						String messageStudentId = Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
 						messageError += System.lineSeparator() + messageStudentId;
 					} else {
-						String messageEmail = Constant.MSG_049 + userFromExcel.getStudentId() + Constant.MSG_050;
+						String messageEmail = Constant.MSG_049 + userFromExcel.getEmail() + Constant.MSG_050;
 						messageError += System.lineSeparator() + messageEmail;
 					}
 					checkInalid = false;

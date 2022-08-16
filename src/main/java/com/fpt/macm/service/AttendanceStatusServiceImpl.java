@@ -242,9 +242,11 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 			for (TrainingSchedule trainingSchedule : trainingSchedules) {
 				if (trainingSchedule.getDate().isBefore(LocalDate.now())) {
-					List<AttendanceStatus> listAttendance = attendanceStatusRepository.findByTrainingScheduleIdAndStatus(trainingSchedule.getId(), 1);
-					List<AttendanceStatus> attendancesStatus = attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(trainingSchedule.getId());
-					
+					List<AttendanceStatus> listAttendance = attendanceStatusRepository
+							.findByTrainingScheduleIdAndStatus(trainingSchedule.getId(), 1);
+					List<AttendanceStatus> attendancesStatus = attendanceStatusRepository
+							.findByTrainingScheduleIdOrderByIdAsc(trainingSchedule.getId());
+
 					TrainingScheduleDto trainingScheduleDto = new TrainingScheduleDto();
 					trainingScheduleDto.setId(trainingSchedule.getId());
 					trainingScheduleDto.setDate(trainingSchedule.getDate());
@@ -258,8 +260,8 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 
 			if (!oldTrainingSchedules.isEmpty()) {
 				responseMessage.setData(oldTrainingSchedules);
-				responseMessage.setMessage(
-						"Lấy danh sách các buổi tập đã qua của kỳ " + semester.getName() + " để điểm danh lại thành công");
+				responseMessage.setMessage("Lấy danh sách các buổi tập đã qua của kỳ " + semester.getName()
+						+ " để điểm danh lại thành công");
 			} else {
 				responseMessage.setMessage("Không có buổi tập nào đã qua để điểm danh lại");
 			}
@@ -270,7 +272,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	}
 
 	@Override
-	public ResponseMessage getAttendanceTrainingStatistic(String semesterName) {
+	public ResponseMessage getAttendanceTrainingStatistic(String semesterName, int roleId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Semester semester = new Semester();
@@ -280,22 +282,37 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			} else {
 				semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			}
-			
+
 			List<Map<String, String>> listAttendanceStatistics = new ArrayList<Map<String, String>>();
-			
-			List<User> users = userRepository.findAllActiveUser();
+
+			List<User> users = new ArrayList<User>();
+
+			if (roleId == 0) {
+				users = userRepository.findAllActiveUser();
+			} else if (roleId == -1) {
+				users = userRepository.findAllMembersActive();
+			} else if (roleId == -2) {
+				users = userRepository.findAllCollaboratorsActive();
+			} else {
+				users = userRepository.findByRoleIdAndIsActive(roleId, true);
+			}
 			for (User user : users) {
+				Utils.convertNameOfRole(user.getRole());
+
 				Map<String, String> attendanceStatistics = new LinkedHashMap<String, String>();
-				
+
 				attendanceStatistics.put("id", String.valueOf(user.getId()));
 				attendanceStatistics.put("name", user.getName());
 				attendanceStatistics.put("studentId", user.getStudentId());
-				
+				attendanceStatistics.put("roleName", user.getRole().getName());
+
 				int totalAbsent = 0;
-				
-				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
+
+				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
+						.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 				for (TrainingSchedule trainingSchedule : trainingSchedules) {
-					AttendanceStatus attendanceStatus = attendanceStatusRepository.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+					AttendanceStatus attendanceStatus = attendanceStatusRepository
+							.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
 					if (attendanceStatus != null) {
 						if (attendanceStatus.getStatus() == 0) {
 							totalAbsent++;
@@ -309,17 +326,16 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 						attendanceStatistics.put(trainingSchedule.getDate().toString(), "-");
 					}
 				}
-				
-				double percentAbsent = Math
-						.ceil(((double) totalAbsent / (double) trainingSchedules.size()) * 100);
-				
+
+				double percentAbsent = Math.ceil(((double) totalAbsent / (double) trainingSchedules.size()) * 100);
+
 				attendanceStatistics.put("totalAbsent", String.valueOf(totalAbsent));
 				attendanceStatistics.put("totalSession", String.valueOf(trainingSchedules.size()));
-				attendanceStatistics.put("percentAbsent", String.valueOf(percentAbsent));
-				
+				attendanceStatistics.put("percentAbsent", String.valueOf(percentAbsent) + "%");
+
 				listAttendanceStatistics.add(attendanceStatistics);
 			}
-			
+
 			responseMessage.setData(listAttendanceStatistics);
 			responseMessage.setMessage("Lấy thống kê điểm danh thành công");
 		} catch (Exception e) {

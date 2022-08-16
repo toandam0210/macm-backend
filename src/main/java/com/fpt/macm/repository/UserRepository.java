@@ -58,4 +58,12 @@ public interface UserRepository extends PagingAndSortingRepository<User, Integer
 	
 	Optional<User> findByStudentIdAndEmail(String studentId, String email);
 	
+	List<User> findByRoleIdAndIsActive(int roleId, boolean isActive);
+	
+	@Query(value = "select * from \"user\" where is_active and role_id in (10,11,12)", nativeQuery = true)
+	List<User> findAllMembersActive();
+	
+	@Query(value = "select * from \"user\" where is_active and role_id in (13,14,15)", nativeQuery = true)
+	List<User> findAllCollaboratorsActive();
+	
 }
