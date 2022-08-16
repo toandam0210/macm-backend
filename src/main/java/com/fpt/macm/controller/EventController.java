@@ -1,6 +1,7 @@
 package com.fpt.macm.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.EventCreateDto;
+import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.EventService;
@@ -121,4 +123,12 @@ public class EventController {
 			@RequestParam(defaultValue = "10") int pageSize) {
 		return new ResponseEntity<ResponseMessage>(eventService.getAllClosedEvent(pageNo, pageSize), HttpStatus.OK);
 	}
+
+	@PutMapping("/headculture/editroleevent/{eventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> editRoleEvent(@PathVariable(name = "eventId") int eventId,
+			@RequestBody List<RoleEventDto> rolesEventDto) {
+		return new ResponseEntity<ResponseMessage>(eventService.editRoleEvent(eventId, rolesEventDto), HttpStatus.OK);
+	}
+
 }

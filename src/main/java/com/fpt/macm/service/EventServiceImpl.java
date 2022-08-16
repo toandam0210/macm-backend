@@ -868,4 +868,63 @@ public class EventServiceImpl implements EventService {
 		}
 		return responseMessage;
 	}
+
+	@Override
+	public ResponseMessage editRoleEvent(int eventId, List<RoleEventDto> rolesEventDto) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Event event = eventRepository.findById(eventId).get();
+
+			List<EventRole> eventRoles = eventRoleRepository.findByEventId(eventId);
+			for (EventRole eventRole : eventRoles) {
+				boolean isExist = false;
+				for (RoleEventDto roleEventDto : rolesEventDto) {
+					if (roleEventDto.getName().equals(eventRole.getRoleEvent().getName())) {
+						isExist = true;
+						break;
+					}
+				}
+				if (!isExist) {
+					eventRoleRepository.delete(eventRole);
+				}
+			}
+
+			for (RoleEventDto roleEventDto : rolesEventDto) {
+				Optional<EventRole> eventRoleOp = eventRoleRepository.findByRoleEventIdAndEventId(roleEventDto.getId(),
+						eventId);
+				if (eventRoleOp.isPresent()) {
+					EventRole eventRole = eventRoleOp.get();
+					eventRole.setQuantity(roleEventDto.getMaxQuantity());
+					eventRoleRepository.save(eventRole);
+				} else {
+					Optional<RoleEvent> roleEventOp = roleEventRepository.findByName(roleEventDto.getName());
+					if (roleEventOp.isPresent()) {
+						RoleEvent roleEvent = roleEventOp.get();
+						EventRole eventRole = new EventRole();
+						eventRole.setEvent(event);
+						eventRole.setQuantity(roleEventDto.getMaxQuantity());
+						eventRole.setRoleEvent(roleEvent);
+						eventRoleRepository.save(eventRole);
+					} else {
+						RoleEvent roleEvent = new RoleEvent();
+						roleEvent.setName(roleEventDto.getName());
+						roleEventRepository.save(roleEvent);
+
+						RoleEvent newRoleEvent = roleEventRepository.findAll(Sort.by("id").descending()).get(0);
+						EventRole eventRole = new EventRole();
+						eventRole.setEvent(event);
+						eventRole.setRoleEvent(newRoleEvent);
+						eventRole.setQuantity(roleEventDto.getMaxQuantity());
+						eventRoleRepository.save(eventRole);
+					}
+				}
+			}
+			responseMessage.setData(rolesEventDto);
+			responseMessage.setMessage("Chỉnh sửa vai trò BTC trong sự kiện thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }
