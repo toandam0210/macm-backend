@@ -285,11 +285,14 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			
 			List<User> users = userRepository.findAllActiveUser();
 			for (User user : users) {
+				Utils.convertNameOfRole(user.getRole());
+				
 				Map<String, String> attendanceStatistics = new LinkedHashMap<String, String>();
 				
 				attendanceStatistics.put("id", String.valueOf(user.getId()));
 				attendanceStatistics.put("name", user.getName());
 				attendanceStatistics.put("studentId", user.getStudentId());
+				attendanceStatistics.put("roleName", user.getRole().getName());
 				
 				int totalAbsent = 0;
 				
