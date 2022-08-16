@@ -2296,4 +2296,61 @@ public class TournamentServiceImpl implements TournamentService {
 			responseMessage.setMessage("Lấy danh sách các thể thức thi đấu thành công");
 		return responseMessage;
 	}
+
+	@Override
+	public ResponseMessage editRoleTournament(int tournamentId, List<RoleEventDto> rolesEventDto) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Tournament tournament = tournamentRepository.findById(tournamentId).get();
+			
+			List<TournamentRole> tournamentRoles = tournamentRoleRepository.findByTournamentId(tournamentId);
+			for (TournamentRole tournamentRole : tournamentRoles) {
+				boolean isExist = false;
+				for (RoleEventDto roleEventDto : rolesEventDto) {
+					if (roleEventDto.getName().equals(tournamentRole.getRoleEvent().getName())) {
+						isExist = true;
+						break;
+					}
+				}
+				if (!isExist) {
+					tournamentRoleRepository.delete(tournamentRole);
+				}
+			}
+			
+			for (RoleEventDto roleEventDto : rolesEventDto) {
+				Optional<TournamentRole> tournamentRoleOp = tournamentRoleRepository.findByRoleEventIdAndTournamentId(roleEventDto.getId(), tournamentId);
+				if (tournamentRoleOp.isPresent()) {
+					TournamentRole tournamentRole = tournamentRoleOp.get();
+					tournamentRole.setQuantity(roleEventDto.getMaxQuantity());
+					tournamentRoleRepository.save(tournamentRole);
+				} else {
+					Optional<RoleEvent> roleEventOp = roleEventRepository.findByName(roleEventDto.getName());
+					if (roleEventOp.isPresent()) {
+						RoleEvent roleEvent = roleEventOp.get();
+						TournamentRole tournamentRole = new TournamentRole();
+						tournamentRole.setTournament(tournament);
+						tournamentRole.setQuantity(roleEventDto.getMaxQuantity());
+						tournamentRole.setRoleEvent(roleEvent);
+						tournamentRoleRepository.save(tournamentRole);
+					} else {
+						RoleEvent roleEvent = new RoleEvent();
+						roleEvent.setName(roleEventDto.getName());
+						roleEventRepository.save(roleEvent);
+						
+						RoleEvent newRoleEvent = roleEventRepository.findAll(Sort.by("id").descending()).get(0);
+						TournamentRole tournamentRole = new TournamentRole();
+						tournamentRole.setTournament(tournament);
+						tournamentRole.setRoleEvent(newRoleEvent);
+						tournamentRole.setQuantity(roleEventDto.getMaxQuantity());
+						tournamentRoleRepository.save(tournamentRole);
+					}
+				}
+			}
+			responseMessage.setData(rolesEventDto);
+			responseMessage.setMessage("Chỉnh sửa vai trò BTC trong giải đấu thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
 }

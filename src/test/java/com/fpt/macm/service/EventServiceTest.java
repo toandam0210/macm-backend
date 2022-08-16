@@ -1052,4 +1052,53 @@ public class EventServiceTest {
 		LocalDate date = eventService.getStartDate(1);
 		assertEquals(date, null);
 	}
+	
+	@Test
+	public void editRoleEventCaseDelete() {
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
+		when(eventRoleRepository.findByEventId(anyInt())).thenReturn(Arrays.asList(eventRole()));
+		
+		ResponseMessage responseMessage = eventService.editRoleEvent(event().getId(), Arrays.asList());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void editRoleEventCaseUpdateQuantity() {
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
+		when(eventRoleRepository.findByEventId(anyInt())).thenReturn(Arrays.asList(eventRole()));
+		when(eventRoleRepository.findByRoleEventIdAndEventId(anyInt(), anyInt())).thenReturn(Optional.of(eventRole()));
+		
+		ResponseMessage responseMessage = eventService.editRoleEvent(event().getId(), Arrays.asList(roleEventDto()));
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void editRoleEventCaseCreateEventRole() {
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
+		when(eventRoleRepository.findByEventId(anyInt())).thenReturn(Arrays.asList(eventRole()));
+		when(eventRoleRepository.findByRoleEventIdAndEventId(anyInt(), anyInt())).thenReturn(Optional.empty());
+		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.of(roleEvent()));
+		ResponseMessage responseMessage = eventService.editRoleEvent(event().getId(), Arrays.asList(roleEventDto()));
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void editRoleEventCaseCreateRoleEvent() {
+		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
+		when(eventRoleRepository.findByEventId(anyInt())).thenReturn(Arrays.asList(eventRole()));
+		when(eventRoleRepository.findByRoleEventIdAndEventId(anyInt(), anyInt())).thenReturn(Optional.empty());
+		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.empty());
+		when(roleEventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(roleEvent()));
+		
+		ResponseMessage responseMessage = eventService.editRoleEvent(event().getId(), Arrays.asList(roleEventDto()));
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void editRoleEventCaseException() {
+		when(eventRepository.findById(anyInt())).thenReturn(null);
+		
+		ResponseMessage responseMessage = eventService.editRoleEvent(event().getId(), Arrays.asList(roleEventDto()));
+		assertEquals(responseMessage.getData().size(), 0);
+	}
 }

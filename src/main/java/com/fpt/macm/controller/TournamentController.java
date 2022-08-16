@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.ActiveUserDto;
+import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
@@ -286,5 +287,11 @@ public class TournamentController {
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> getAllSuggestType() {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllSuggestType(), HttpStatus.OK);
+	}
+	
+	@PutMapping("headclub/editroletournament/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> editRoleTournament(@PathVariable(name = "tournamentId") int tournamentId, @RequestBody List<RoleEventDto> rolesEventDto){
+		return new ResponseEntity<ResponseMessage>(tournamentService.editRoleTournament(tournamentId, rolesEventDto), HttpStatus.OK);
 	}
 }
