@@ -230,21 +230,6 @@ public class ExhibitionControllerTest {
 	}
 	
 	@Test
-	public void getTop3TeamByTypeSuccess() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(exhibitionTeamsDto()));
-		
-		when(exhibitionService.getTop3TeamByType(anyInt())).thenReturn(responseMessage);
-		
-		this.mockMvc.perform(get("/api/exhibition/headclub/gettop3teambytype/{exhibitionTypeId}", "1"))
-		.andExpect(status().isOk())
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
-	
-	
-	
-	@Test
 	public void getListExhibitionTypeSuccess() throws Exception {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(exhibitionTypes()));

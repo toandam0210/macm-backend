@@ -41,13 +41,6 @@ public class ExhibitionController {
 				HttpStatus.OK);
 	}
 
-	@GetMapping("/headclub/gettop3teambytype/{exhibitionTypeId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
-	ResponseEntity<ResponseMessage> getTop3TeamByType(@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId) {
-		return new ResponseEntity<ResponseMessage>(exhibitionService.getTop3TeamByType(exhibitionTypeId),
-				HttpStatus.OK);
-	}
-
 	@GetMapping("/getlistexhibitiontype/{tournamentId}")
 	ResponseEntity<ResponseMessage> getListExhibitionType(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(exhibitionService.getAllExhibitionType(tournamentId),
