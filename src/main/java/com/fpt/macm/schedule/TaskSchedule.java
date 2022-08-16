@@ -211,61 +211,93 @@ public class TaskSchedule {
 		}
 		logger.info("report oke");
 	}
-
-	@Scheduled(cron = "1 1 0 * * *")
-	public void addUserBySemester() {
-		if (LocalDate.now().getDayOfMonth() > 7 && LocalDate.now().getDayOfMonth() <= 14
-				&& LocalDate.now().getMonthValue() % 4 == 1
-				&& LocalDate.now().getDayOfWeek().toString().compareTo("MONDAY") == 0) {
-			List<User> members = userRepository.findMemberWithoutPaging();
-			List<User> admins = userRepository.findAllAdmin();
-			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-			UserStatusReport userStatusReport = new UserStatusReport();
-			userStatusReport.setSemester(semester.getName());
-			int numberUserActive = 0;
-			int numberUserDeactive = 0;
-			for (User user : members) {
-				if (user.isActive()) {
-					numberUserActive++;
-					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository.findByUserIdAndSemester(user.getId(), semester.getName());
-					if (!memberSemesterOp.isPresent()) {
-						MemberSemester statusSemester = new MemberSemester();
-						statusSemester.setUser(user);
-						statusSemester.setSemester(semester.getName());
-						statusSemester.setStatus(user.isActive());
-						memberSemesterRepository.save(statusSemester);
+	
+	@Scheduled(cron = "0 0 6 * * *")
+	public void updateStatusMemberToDeactive() {
+		Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+		if(LocalDate.now().isEqual(currentSemester.getStartDate())) {
+			List<User> users = userRepository.findMembersAndAdmin();
+			for (User user : users) {
+				if (user.getRole().getId() > 9 && user.getRole().getId() < 13) {
+					user.setActive(false);
+					userRepository.save(user);
+					if (user.getRole().getId() > 9 && user.getRole().getId() < 13) {
+						MemberSemester memberSemester = new MemberSemester();
+						memberSemester.setSemester(currentSemester.getName());
+						memberSemester.setStatus(false);
+						memberSemester.setUser(user);
+						memberSemesterRepository.save(memberSemester);
 						logger.info("add member oke");
 					}
-				} else {
-					numberUserDeactive++;
 				}
-			}
-			for (User user : admins) {
-				numberUserActive++;
-				Optional<AdminSemester> adminSemesterOp = adminSemesterRepository.findByUserId(user.getId(), semester.getName());
-				if (!adminSemesterOp.isPresent()) {
+				if (user.getRole().getId() > 0 && user.getRole().getId() < 10) {
 					AdminSemester adminSemester = new AdminSemester();
-					adminSemester.setUser(user);
-					adminSemester.setSemester(semester.getName());
 					adminSemester.setRole(user.getRole());
+					adminSemester.setSemester(currentSemester.getName());
+					adminSemester.setUser(user);
 					adminSemesterRepository.save(adminSemester);
 					logger.info("add admin oke");
 				}
 			}
-			
-			Optional<UserStatusReport> userStatusReportOp = userStatusReportRepository.findBySemester(semester.getName());
-			if (userStatusReportOp.isPresent()) {
-				userStatusReport = userStatusReportOp.get();
-			}
-			
-			userStatusReport.setNumberActiveInSemester(numberUserActive);
-			userStatusReport.setNumberDeactiveInSemester(numberUserDeactive);
-			userStatusReport.setTotalNumberUserInSemester(numberUserActive + numberUserDeactive);
-			userStatusReportRepository.save(userStatusReport);
-			
-			logger.info("loi roi");
 		}
+		logger.info("oke roi");
 	}
+	
+
+//	@Scheduled(cron = "1 1 0 * * *")
+//	public void addUserBySemester() {
+//		if (LocalDate.now().getDayOfMonth() > 7 && LocalDate.now().getDayOfMonth() <= 14
+//				&& LocalDate.now().getMonthValue() % 4 == 1
+//				&& LocalDate.now().getDayOfWeek().toString().compareTo("MONDAY") == 0) {
+//			List<User> members = userRepository.findMemberWithoutPaging();
+//			List<User> admins = userRepository.findAllAdmin();
+//			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+//			UserStatusReport userStatusReport = new UserStatusReport();
+//			userStatusReport.setSemester(semester.getName());
+//			int numberUserActive = 0;
+//			int numberUserDeactive = 0;
+//			for (User user : members) {
+//				if (user.isActive()) {
+//					numberUserActive++;
+//					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository.findByUserIdAndSemester(user.getId(), semester.getName());
+//					if (!memberSemesterOp.isPresent()) {
+//						MemberSemester statusSemester = new MemberSemester();
+//						statusSemester.setUser(user);
+//						statusSemester.setSemester(semester.getName());
+//						statusSemester.setStatus(user.isActive());
+//						memberSemesterRepository.save(statusSemester);
+//						logger.info("add member oke");
+//					}
+//				} else {
+//					numberUserDeactive++;
+//				}
+//			}
+//			for (User user : admins) {
+//				numberUserActive++;
+//				Optional<AdminSemester> adminSemesterOp = adminSemesterRepository.findByUserId(user.getId(), semester.getName());
+//				if (!adminSemesterOp.isPresent()) {
+//					AdminSemester adminSemester = new AdminSemester();
+//					adminSemester.setUser(user);
+//					adminSemester.setSemester(semester.getName());
+//					adminSemester.setRole(user.getRole());
+//					adminSemesterRepository.save(adminSemester);
+//					logger.info("add admin oke");
+//				}
+//			}
+//			
+//			Optional<UserStatusReport> userStatusReportOp = userStatusReportRepository.findBySemester(semester.getName());
+//			if (userStatusReportOp.isPresent()) {
+//				userStatusReport = userStatusReportOp.get();
+//			}
+//			
+//			userStatusReport.setNumberActiveInSemester(numberUserActive);
+//			userStatusReport.setNumberDeactiveInSemester(numberUserDeactive);
+//			userStatusReport.setTotalNumberUserInSemester(numberUserActive + numberUserDeactive);
+//			userStatusReportRepository.save(userStatusReport);
+//			
+//			logger.info("loi roi");
+//		}
+//	}
 
 //	@Scheduled(cron = "1 2 0 * * *")
 //	public void addListAttendanceStatus() {
