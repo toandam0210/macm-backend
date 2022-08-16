@@ -320,11 +320,11 @@ public class AttendanceStatusServiceTest {
 	@Test
 	public void getAttendanceTrainingStatisticCaseAttendanceStatusNull() {
 		when(semesterRepository.findByName(anyString())).thenReturn(Optional.of(semester()));
-		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(userRepository.findAllMembersActive()).thenReturn(Arrays.asList(user()));
 		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(null);
 		
-		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName(), 0);
+		ResponseMessage responseMessage = attendanceStatusService.getAttendanceTrainingStatistic(semester().getName(), -1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -338,11 +338,11 @@ public class AttendanceStatusServiceTest {
 		
 		when(semesterRepository.findByName(anyString())).thenReturn(Optional.empty());
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
-		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(user()));
+		when(userRepository.findAllCollaboratorsActive()).thenReturn(Arrays.asList(user()));
 		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(attendanceStatus);
 		
-		ResponseMessage response = attendanceStatusService.getAttendanceTrainingStatistic("", 0);
+		ResponseMessage response = attendanceStatusService.getAttendanceTrainingStatistic("", -2);
 		assertEquals(response.getData().size(), 1);
 	}
 	

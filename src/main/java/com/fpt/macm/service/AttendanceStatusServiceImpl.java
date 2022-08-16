@@ -289,6 +289,10 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 
 			if (roleId == 0) {
 				users = userRepository.findAllActiveUser();
+			} else if (roleId == -1) {
+				users = userRepository.findAllMembersActive();
+			} else if (roleId == -2) {
+				users = userRepository.findAllCollaboratorsActive();
 			} else {
 				users = userRepository.findByRoleIdAndIsActive(roleId, true);
 			}
