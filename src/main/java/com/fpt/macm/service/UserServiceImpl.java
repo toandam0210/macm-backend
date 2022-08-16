@@ -186,7 +186,11 @@ public class UserServiceImpl implements UserService {
 			if (currentUserRole.getName().equals(ERole.ROLE_HeadClub.name())
 					&& !roleOptional.get().getName().equals(currentUserRole.getName())) {
 				responseMessage.setMessage(Constant.MSG_035);
-			} else {
+			} else if(userDto.getRoleId() > 0 && userDto.getRoleId() < 10){
+				responseMessage.setMessage("CTV không thể cập nhật lên làm ban chủ nhiệm");
+			}
+				else {
+			
 				for (User currentUser : users) {
 					if (currentUser.getStudentId().equals(userDto.getStudentId())) {
 						checkDuplicateStudentId = true;
