@@ -554,13 +554,10 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 					if (getCompetitivePlayer.getIsEligible()) {
 						responseMessage
 								.setMessage("Không thể xóa. Tuyển thủ đã nằm trong danh sách thi đấu chính thức");
-<<<<<<< HEAD
-=======
 					} else {
 						competitivePlayerRepository.delete(getCompetitivePlayer);
 						responseMessage.setMessage("Xóa tuyển thủ thành công");
 						responseMessage.setData(Arrays.asList(getCompetitivePlayer));
->>>>>>> develop
 					}
 				}
 			} else {
