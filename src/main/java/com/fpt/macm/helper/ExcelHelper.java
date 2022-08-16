@@ -179,7 +179,7 @@ public class ExcelHelper {
 
 				row.createCell(0).setCellValue(user.getStudentId());
 				row.createCell(1).setCellValue(user.getName());
-				if(user.getDateOfBirth().equals(null)) {
+				if(user.getDateOfBirth() == null) {
 					row.createCell(2).setCellValue("Error");
 				}else {
 					row.createCell(2).setCellValue(user.getDateOfBirth().toString());
@@ -187,14 +187,14 @@ public class ExcelHelper {
 				
 				row.createCell(3).setCellValue(user.getPhone());
 				row.createCell(4).setCellValue(user.getEmail());
-				if (user.isGender().equals(null)) {
+				if (user.isGender() == null) {
 					row.createCell(5).setCellValue("Error");
 				} else if (user.isGender()) {
 					row.createCell(5).setCellValue("Nam");
 				} else {
 					row.createCell(5).setCellValue("Nữ");
 				}
-				if (user.isActive().equals(null)) {
+				if (user.isActive() == null) {
 					row.createCell(6).setCellValue("Error");
 				} else if (user.isActive()) {
 					row.createCell(6).setCellValue("Hoạt động");
