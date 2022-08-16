@@ -186,7 +186,7 @@ public class UserServiceImpl implements UserService {
 			if (currentUserRole.getName().equals(ERole.ROLE_HeadClub.name())
 					&& !roleOptional.get().getName().equals(currentUserRole.getName())) {
 				responseMessage.setMessage("CTV không thể cập nhật lên làm ban chủ nhiệm");
-			} else if(userDto.getRoleId() > 0 && userDto.getRoleId() < 10){
+			} else if(userDto.getRoleId() > 1 && userDto.getRoleId() < 10){
 				responseMessage.setMessage(Constant.MSG_035);
 			}
 				else {
