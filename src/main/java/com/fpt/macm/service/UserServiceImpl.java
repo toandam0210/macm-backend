@@ -247,12 +247,20 @@ public class UserServiceImpl implements UserService {
 							adminSemester.setRole(roleOptional.get());
 							adminSemester.setSemester(semester.getName());
 							adminSemesterRepository.save(adminSemester);
-						}else {
-							AdminSemester adminSemester = new AdminSemester();
-							adminSemester.setUser(user);
-							adminSemester.setRole(roleOptional.get());
-							adminSemester.setSemester(semester.getName());
-							adminSemesterRepository.save(adminSemester);
+						} else {
+							if (!adminSemesterOp.isPresent()) {
+								AdminSemester adminSemester = new AdminSemester();
+								adminSemester.setUser(user);
+								adminSemester.setRole(roleOptional.get());
+								adminSemester.setSemester(semester.getName());
+								adminSemesterRepository.save(adminSemester);
+							}else {
+								AdminSemester adminSemester = adminSemesterOp.get();
+								adminSemester.setUser(user);
+								adminSemester.setRole(roleOptional.get());
+								adminSemester.setSemester(semester.getName());
+								adminSemesterRepository.save(adminSemester);
+							}
 						}
 					}
 
