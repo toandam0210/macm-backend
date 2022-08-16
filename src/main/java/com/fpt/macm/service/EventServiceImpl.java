@@ -874,19 +874,24 @@ public class EventServiceImpl implements EventService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Event event = eventRepository.findById(eventId).get();
-			
+
 			List<EventRole> eventRoles = eventRoleRepository.findByEventId(eventId);
-			for (RoleEventDto roleEventDto : rolesEventDto) {
-				for (EventRole eventRole : eventRoles) {
-					if (!roleEventDto.getName().equals(eventRole.getRoleEvent().getName())) {
-						eventRoleRepository.delete(eventRole);
+			for (EventRole eventRole : eventRoles) {
+				boolean isExist = false;
+				for (RoleEventDto roleEventDto : rolesEventDto) {
+					if (roleEventDto.getName().equals(eventRole.getRoleEvent().getName())) {
+						isExist = true;
 						break;
 					}
 				}
+				if (!isExist) {
+					eventRoleRepository.delete(eventRole);
+				}
 			}
-			
+
 			for (RoleEventDto roleEventDto : rolesEventDto) {
-				Optional<EventRole> eventRoleOp = eventRoleRepository.findByRoleEventIdAndEventId(roleEventDto.getId(), eventId);
+				Optional<EventRole> eventRoleOp = eventRoleRepository.findByRoleEventIdAndEventId(roleEventDto.getId(),
+						eventId);
 				if (eventRoleOp.isPresent()) {
 					EventRole eventRole = eventRoleOp.get();
 					eventRole.setQuantity(roleEventDto.getMaxQuantity());
@@ -904,7 +909,7 @@ public class EventServiceImpl implements EventService {
 						RoleEvent roleEvent = new RoleEvent();
 						roleEvent.setName(roleEventDto.getName());
 						roleEventRepository.save(roleEvent);
-						
+
 						RoleEvent newRoleEvent = roleEventRepository.findAll(Sort.by("id").descending()).get(0);
 						EventRole eventRole = new EventRole();
 						eventRole.setEvent(event);
@@ -914,10 +919,12 @@ public class EventServiceImpl implements EventService {
 					}
 				}
 			}
+			responseMessage.setData(rolesEventDto);
+			responseMessage.setMessage("Chỉnh sửa vai trò BTC trong sự kiện thành công");
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
 	}
-	
+
 }

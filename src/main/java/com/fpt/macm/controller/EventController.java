@@ -125,6 +125,7 @@ public class EventController {
 	}
 
 	@PutMapping("/headculture/editroleevent/{eventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> editRoleEvent(@PathVariable(name = "eventId") int eventId,
 			@RequestBody List<RoleEventDto> rolesEventDto) {
 		return new ResponseEntity<ResponseMessage>(eventService.editRoleEvent(eventId, rolesEventDto), HttpStatus.OK);
