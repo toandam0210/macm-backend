@@ -3138,5 +3138,55 @@ public class TournamentServiceTest {
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
+	@Test
+	public void editRoleEventCaseDelete() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(tournamentRoleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentRole()));
+		
+		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void editRoleEventCaseUpdateQuantity() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(tournamentRoleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentRole()));
+		when(tournamentRoleRepository.findByRoleEventIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.of(tournamentRole()));
+		
+		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(roleEventDto()));
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void editRoleEventCaseCreateEventRole() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(tournamentRoleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentRole()));
+		when(tournamentRoleRepository.findByRoleEventIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.empty());
+		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.of(roleEvent()));
+		
+		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(roleEventDto()));
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void editRoleEventCaseCreateRoleEvent() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(tournamentRoleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentRole()));
+		when(tournamentRoleRepository.findByRoleEventIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.empty());
+		when(roleEventRepository.findByName(anyString())).thenReturn(Optional.empty());
+		when(roleEventRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(roleEvent()));
+		
+		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(roleEventDto()));
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void editRoleEventCaseException() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(null);
+		
+		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(roleEventDto()));
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
 }
 	
