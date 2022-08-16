@@ -257,7 +257,15 @@ public class TournamentController {
 	}
 
 	@PostMapping("/headclub/spawntimeandarea/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> spawnTimeAndArea(@PathVariable(name = "tournamentId") int tournamentId) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.spawnTimeAndArea(tournamentId), HttpStatus.OK);
+	}
+	
+	@PutMapping("/headclub/updateaftertournament/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	ResponseEntity<ResponseMessage> updateAfterTournament(@PathVariable(name = "tournamentId") int id, @RequestParam double totalAmountActual) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.updateAfterTournament(id, totalAmountActual),
+				HttpStatus.OK);
 	}
 }
