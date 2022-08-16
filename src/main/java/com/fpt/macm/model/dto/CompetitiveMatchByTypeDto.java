@@ -7,8 +7,6 @@ public class CompetitiveMatchByTypeDto {
 	
 	private Integer status;
 	
-	private Boolean changed;
-	
 	List<CompetitiveMatchDto> listMatchDto;
 
 	public String getName() {
@@ -25,14 +23,6 @@ public class CompetitiveMatchByTypeDto {
 
 	public void setStatus(Integer status) {
 		this.status = status;
-	}
-
-	public Boolean getChanged() {
-		return changed;
-	}
-
-	public void setChanged(Boolean changed) {
-		this.changed = changed;
 	}
 
 	public List<CompetitiveMatchDto> getListMatchDto() {

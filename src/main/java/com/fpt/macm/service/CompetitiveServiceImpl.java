@@ -207,7 +207,6 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 						CompetitiveMatchByTypeDto competitiveMatchByTypeDto = new CompetitiveMatchByTypeDto();
 						competitiveMatchByTypeDto.setName((getType.isGender() ? "Nam " : "Nữ ") + getType.getWeightMin()
 								+ " - " + getType.getWeightMax());
-						competitiveMatchByTypeDto.setChanged(getType.isChanged());
 						competitiveMatchByTypeDto.setStatus(getType.getStatus());
 						competitiveMatchByTypeDto.setListMatchDto(listMatchDto);
 						responseMessage.setData(Arrays.asList(competitiveMatchByTypeDto));
@@ -481,9 +480,9 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							newCompetitivePlayer.setUpdatedOn(LocalDateTime.now());
 							competitivePlayerRepository.save(newCompetitivePlayer);
 							listUsers.add(user.getName() + " - " + user.getStudentId());
-							autoSpawnMatchs(competitiveTypeId);
 						}
 					}
+					autoSpawnMatchs(competitiveTypeId);
 					responseMessage.setData(listUsers);
 					responseMessage.setMessage(
 							"Danh sách đăng ký tham gia thi đấu thể thức " + (getType.isGender() ? "Nam: " : "Nữ: ")
