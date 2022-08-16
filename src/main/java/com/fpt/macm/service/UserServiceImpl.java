@@ -185,9 +185,9 @@ public class UserServiceImpl implements UserService {
 			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
 			if (currentUserRole.getName().equals(ERole.ROLE_HeadClub.name())
 					&& !roleOptional.get().getName().equals(currentUserRole.getName())) {
-				responseMessage.setMessage(Constant.MSG_035);
-			} else if(userDto.getRoleId() > 0 && userDto.getRoleId() < 10){
 				responseMessage.setMessage("CTV không thể cập nhật lên làm ban chủ nhiệm");
+			} else if(userDto.getRoleId() > 0 && userDto.getRoleId() < 10){
+				responseMessage.setMessage(Constant.MSG_035);
 			}
 				else {
 			
@@ -443,6 +443,10 @@ public class UserServiceImpl implements UserService {
 				if (memberSemesterOp.isPresent()) {
 					MemberSemester memberSemester = memberSemesterOp.get();
 					memberSemester.setStatus(!memberSemester.isStatus());
+					memberSemesterRepository.save(memberSemester);
+				}else {
+					MemberSemester memberSemester = new MemberSemester();
+					memberSemester.setStatus(true);
 					memberSemesterRepository.save(memberSemester);
 				}
 				userRepository.save(user);
@@ -720,9 +724,10 @@ public class UserServiceImpl implements UserService {
 				if (collaborators.size() > 0) {
 					for (User collaborator : collaborators) {
 						if (semester.equals(currentSemester.getName())) {
-							UserDto collaboratorDto = convertUserToUserDto(collaborator);
-							usersDto.add(collaboratorDto);
-							if (!collaborator.isActive()) {
+							if (collaborator.isActive()) {
+								UserDto collaboratorDto = convertUserToUserDto(collaborator);
+								usersDto.add(collaboratorDto);
+							} else {
 								countDeactive++;
 							}
 						}
