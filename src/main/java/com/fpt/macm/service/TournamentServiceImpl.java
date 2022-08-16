@@ -182,7 +182,6 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ExhibitionResultRepository exhibitionResultRepository;
-	
 
 	@Override
 	public ResponseMessage createTournament(TournamentCreateDto tournamentCreateDto, boolean isOverwritten) {
@@ -1783,9 +1782,9 @@ public class TournamentServiceImpl implements TournamentService {
 					List<ExhibitionTeam> getTeams = new ArrayList<ExhibitionTeam>(exhibitionType.getExhibitionTeams());
 					listExhibitionTeams.addAll(getTeams);
 				}
-				
+
 				tournamentRepository.save(getTournament);
-				
+
 				List<TournamentSchedule> listTournamentSchedules = tournamentScheduleRepository
 						.findByTournamentId(tournamentId);
 
@@ -1932,25 +1931,69 @@ public class TournamentServiceImpl implements TournamentService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<TournamentSchedule> listSchedule = tournamentScheduleRepository.findByTournamentId(tournamentId);
-			if (listSchedule.size() > 0
-					&& listSchedule.get(listSchedule.size() - 1).getDate().compareTo(LocalDate.now()) > 0) {
-				responseMessage.setMessage("Không thành công. Không thể tổng kết giải đấu chưa kết thúc");
-			} else {
-				Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			if (tournamentOp.isPresent()) {
 				Tournament getTournament = tournamentOp.get();
+				Set<CompetitiveType> listCompetitiveTypes = getTournament.getCompetitiveTypes();
+				for (CompetitiveType competitiveType : listCompetitiveTypes) {
+					List<CompetitiveMatch> listMatchs = competitiveMatchRepository
+							.listMatchsByType(competitiveType.getId());
+					for (CompetitiveMatch competitiveMatch : listMatchs) {
+						Optional<CompetitiveResult> getResultOp = competitiveResultRepository
+								.findByMatchId(competitiveMatch.getId());
+						if (getResultOp.isPresent()) {
+							CompetitiveResult getResult = getResultOp.get();
+							if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
+								responseMessage.setMessage("Không thể tổng kết. Thể thức "
+										+ (competitiveType.isGender() ? "Nam " : "Nữ ") + competitiveType.getWeightMin()
+										+ " - " + competitiveType.getWeightMax()
+										+ " vẫn còn trận đấu đối kháng chưa kết thúc");
+								return responseMessage;
+							}
+						} else {
+							responseMessage.setMessage(
+									"Không thể tổng kết. Thể thức " + (competitiveType.isGender() ? "Nam " : "Nữ ")
+											+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
+											+ " vẫn còn trận đấu đối kháng chưa kết thúc");
+							return responseMessage;
+						}
+					}
+				}
+				Set<ExhibitionType> listExhibitionTypes = getTournament.getExhibitionTypes();
+				for (ExhibitionType exhibitionType : listExhibitionTypes) {
+					Set<ExhibitionTeam> listTeams = exhibitionType.getExhibitionTeams();
+					for (ExhibitionTeam exhibitionTeam : listTeams) {
+						Optional<ExhibitionResult> getResultOp = exhibitionResultRepository
+								.findByTeam(exhibitionTeam.getId());
+						if (getResultOp.isPresent()) {
+							ExhibitionResult getResult = getResultOp.get();
+							if (getResult.getScore() == null) {
+								responseMessage.setMessage("Không thành công. Thể thức " + exhibitionType.getName()
+										+ " vẫn còn đội chưa biểu diễn");
+								return responseMessage;
+							}
+						} else {
+							responseMessage.setMessage("Không thành công. Thể thức " + exhibitionType.getName()
+									+ " vẫn còn đội chưa biểu diễn");
+							return responseMessage;
+						}
+					}
+				}
 				int countPlayer = getTournament.getTournamentPlayers().size();
-				List<TournamentOrganizingCommittee> listCommittee = tournamentOrganizingCommitteeRepository.findByTournamentId(tournamentId);
-				double totalProceedsActual = countPlayer * getTournament.getFeePlayerPay() + listCommittee.size() * getTournament.getFeeOrganizingCommiteePay();
-				
+				List<TournamentOrganizingCommittee> listCommittee = tournamentOrganizingCommitteeRepository
+						.findByTournamentId(tournamentId);
+				double totalProceedsActual = countPlayer * getTournament.getFeePlayerPay()
+						+ listCommittee.size() * getTournament.getFeeOrganizingCommiteePay();
+
 				getTournament.setTotalAmount(totalAmountActual);
 				getTournament.setTotalAmountFromClubActual(totalAmountActual - totalProceedsActual);
-					
+
 				List<ClubFund> clubFunds = clubFundRepository.findAll();
 				ClubFund clubFund = clubFunds.get(0);
-				clubFund.setFundAmount(clubFund.getFundAmount() - (getTournament.getTotalAmountFromClubActual()) + getTournament.getTotalAmountEstimate());
+				clubFund.setFundAmount(clubFund.getFundAmount() - (getTournament.getTotalAmountFromClubActual())
+						+ getTournament.getTotalAmountEstimate());
 				clubFundRepository.save(clubFund);
-			
+
 				getTournament.setUpdatedBy("LinhLHN");
 				getTournament.setUpdatedOn(LocalDateTime.now());
 				tournamentRepository.save(getTournament);
