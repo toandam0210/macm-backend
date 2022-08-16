@@ -632,8 +632,14 @@ public class UserServiceImpl implements UserService {
 
 				}
 			}
+			if(usersDto.size() == 0) {
+				responseMessage.setMessage("Thêm thành công "+usersFromExcel.size()+ "/"+usersFromExcel.size()+ " người");
+			}else if(usersFromExcel.size() - usersDto.size() == 0) {
+				responseMessage.setMessage("Thêm thất bại "+usersFromExcel.size()+ "/"+usersFromExcel.size()+ " người. Vui lòng tải file Excel để sửa lại.");
+			}else if(usersDto.size() > 0) {
+				responseMessage.setMessage("Thêm thành công "+(usersFromExcel.size()- usersDto.size())+ "/"+usersFromExcel.size()+ " người. Vui lòng tải file Excel để sửa lại.");
+			}
 			responseMessage.setData(usersDto);
-			responseMessage.setMessage(Constant.MSG_006);
 			responseMessage.setTotalResult(usersFromExcel.size());
 			responseMessage.setTotalActive(countAddSuccess);
 			responseMessage.setTotalDeactive(countAddFail);
