@@ -1886,11 +1886,11 @@ public class TournamentServiceImpl implements TournamentService {
 						}
 					}
 					Area getArea = listArea.get(0);
-					for (TournamentSchedule tournamentSchedule : listTournamentSchedules) {
+					for (int i = 0; i < listTournamentSchedules.size(); i++) {
 						if (continueSpawnCompetitive) {
-							LocalDate date = tournamentSchedule.getDate();
-							LocalTime startTime = tournamentSchedule.getStartTime();
-							LocalTime finishTime = tournamentSchedule.getFinishTime();
+							LocalDate date = listTournamentSchedules.get(i).getDate();
+							LocalTime startTime = listTournamentSchedules.get(i).getStartTime();
+							LocalTime finishTime = listTournamentSchedules.get(i).getFinishTime();
 							while (startTime.isBefore(finishTime)) {
 								if (continueSpawnCompetitive) {
 									for (Area area : listArea) {
@@ -1919,7 +1919,7 @@ public class TournamentServiceImpl implements TournamentService {
 												if (startTime.plusMinutes(10).compareTo(finishTime) <= 0) {
 													doneSpawnCompetitiveTime = startTime.plusMinutes(10);
 												} else {
-													doneSpawnCompetitiveDate = date.plusDays(1);
+													doneSpawnCompetitiveDate = listTournamentSchedules.get(i+1).getDate();
 												}
 											}
 										} else {
@@ -1934,9 +1934,9 @@ public class TournamentServiceImpl implements TournamentService {
 						}
 						if (!continueSpawnCompetitive) {
 							index = 0;
-							LocalDate getDate = tournamentSchedule.getDate();
-							LocalTime startTime = tournamentSchedule.getStartTime();
-							LocalTime finishTime = tournamentSchedule.getFinishTime();
+							LocalDate getDate = listTournamentSchedules.get(i).getDate();
+							LocalTime startTime = listTournamentSchedules.get(i).getStartTime();
+							LocalTime finishTime = listTournamentSchedules.get(i).getFinishTime();
 							if (getDate.isEqual(doneSpawnCompetitiveDate)) {
 								while (startTime.isBefore(doneSpawnCompetitiveTime)) {
 									startTime = startTime.plusMinutes(10);
@@ -1946,8 +1946,8 @@ public class TournamentServiceImpl implements TournamentService {
 								continue;
 							}
 							while (true) {
-								int countMatchCanHeld = ((tournamentSchedule.getFinishTime().getHour()
-										- startTime.getHour()) * 60 + tournamentSchedule.getFinishTime().getMinute()
+								int countMatchCanHeld = ((listTournamentSchedules.get(i).getFinishTime().getHour()
+										- startTime.getHour()) * 60 + listTournamentSchedules.get(i).getFinishTime().getMinute()
 										- startTime.getMinute()) / 5;
 								if (listTypeNeedHeld.get(index).getExhibitionTeams().size() > countMatchCanHeld) {
 									break;
@@ -2283,7 +2283,6 @@ public class TournamentServiceImpl implements TournamentService {
 	@Override
 	public ResponseMessage getAllSuggestType() {
 		ResponseMessage responseMessage = new ResponseMessage();
-		try {
 			List<CompetitiveTypeSample> competitiveTypeSamples = competitiveTypeSampleRepository
 					.findAll(Sort.by("id").ascending());
 			List<ExhibitionTypeSample> exhibitionTypeSamples = exhibitionTypeSampleRepository
@@ -2295,9 +2294,6 @@ public class TournamentServiceImpl implements TournamentService {
 
 			responseMessage.setData(Arrays.asList(tournamentSampleTypeDto));
 			responseMessage.setMessage("Lấy danh sách các thể thức thi đấu thành công");
-		} catch (Exception e) {
-			responseMessage.setMessage(e.getMessage());
-		}
 		return responseMessage;
 	}
 }
