@@ -182,6 +182,7 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ExhibitionResultRepository exhibitionResultRepository;
+	
 
 	@Override
 	public ResponseMessage createTournament(TournamentCreateDto tournamentCreateDto, boolean isOverwritten) {
@@ -1999,6 +2000,9 @@ public class TournamentServiceImpl implements TournamentService {
 				tournamentRepository.save(getTournament);
 				responseMessage.setData(Arrays.asList(getTournament));
 				responseMessage.setMessage(Constant.MSG_129);
+			}
+			else {
+				responseMessage.setMessage("Không tìm thấy giải đấu");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
