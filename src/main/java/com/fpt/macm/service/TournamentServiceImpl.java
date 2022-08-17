@@ -2070,13 +2070,13 @@ public class TournamentServiceImpl implements TournamentService {
 						+ listCommittee.size() * getTournament.getFeeOrganizingCommiteePay();
 
 				getTournament.setTotalAmount(totalAmountActual);
-				getTournament.setTotalAmountFromClubActual(totalAmountActual - totalProceedsActual);
+				getTournament.setTotalAmountFromClubActual((totalAmountActual > totalProceedsActual)? (totalAmountActual - totalProceedsActual) : 0);
 
-				if (getTournament.getTotalAmountFromClubActual() > getTournament.getTotalAmountEstimate()) {
+				if (totalAmountActual > totalProceedsActual) {
 					clubFundService.withdrawFromClubFund(user.getStudentId(),
 							(getTournament.getTotalAmountFromClubActual() - getTournament.getTotalAmountEstimate()),
 							"Phát sinh thêm từ giải đấu " + getTournament.getName());
-				} else if (getTournament.getTotalAmountFromClubActual() < getTournament.getTotalAmountEstimate()) {
+				} else if (getTournament.getTotalAmount() < getTournament.getTotalAmountEstimate()) {
 					clubFundService.depositToClubFund(user.getStudentId(),
 							(getTournament.getTotalAmountEstimate() - getTournament.getTotalAmountFromClubActual()),
 							"Tiền dư từ giải đấu " + getTournament.getName());
