@@ -66,6 +66,12 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 					AttendanceStatus attendanceStatus = attendanceStatusRepository
 							.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
 					if (attendanceStatus != null) {
+						
+						if (attendanceStatus.getStatus() == status) {
+							responseMessage.setMessage(user.getStudentId() + " - " + user.getName() + " đã được điểm danh!");
+							return responseMessage;
+						}
+						
 						attendanceStatus.setStatus(status);
 						attendanceStatus.setUpdatedOn(LocalDateTime.now());
 						attendanceStatus.setUpdatedBy("toandv");

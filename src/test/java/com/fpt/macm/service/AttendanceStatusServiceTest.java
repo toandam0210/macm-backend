@@ -112,6 +112,22 @@ public class AttendanceStatusServiceTest {
 	}
 	
 	@Test
+	public void testTakeAttendanceByStudentIdCaseAlreadyAttend() {
+		TrainingSchedule trainingSchedule = trainingSchedule();
+		trainingSchedule.setDate(LocalDate.now().minusDays(1));
+		
+		AttendanceStatus attendanceStatus = attendanceStatus();
+		attendanceStatus.setStatus(1);
+		
+		when(trainingScheduleRepository.findById(anyInt())).thenReturn(Optional.of(trainingSchedule));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(attendanceStatus);
+		
+		ResponseMessage responseMessage = attendanceStatusService.takeAttendanceByStudentId(user().getStudentId(), 1, trainingSchedule().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
 	public void testTakeAttendanceByStudentIdCaseTrainingScheduleInPast() {
 		TrainingSchedule trainingSchedule = trainingSchedule();
 		trainingSchedule.setDate(LocalDate.now().minusDays(1));
