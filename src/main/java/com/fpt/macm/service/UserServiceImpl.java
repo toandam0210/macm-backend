@@ -183,7 +183,7 @@ public class UserServiceImpl implements UserService {
 			boolean checkDuplicateStudentId = false;
 			Role currentUserRole = user.getRole();
 			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
-			if (currentUserRole.getId() > 12 && currentUserRole.getId() < 15
+			if (currentUserRole.getId() > 12 && currentUserRole.getId() < 16
 					&& roleOptional.get().getId() > 0 && roleOptional.get().getId() < 10) {
 				responseMessage.setMessage("CTV không thể cập nhật lên làm ban chủ nhiệm");
 			} else if(currentUserRole.getName().equals(ERole.ROLE_HeadClub.name()) && userDto.getRoleId() > 1 && userDto.getRoleId() < 10){
