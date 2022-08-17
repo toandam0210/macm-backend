@@ -547,8 +547,8 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findById(competitivePlayerId);
-			List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
 			if (competitivePlayerOp.isPresent()) {
+				List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
 				CompetitivePlayer getCompetitivePlayer = competitivePlayerOp.get();
 				CompetitiveType getType = getCompetitivePlayer.getCompetitiveType();
 				if (getType.getStatus() < 2) {
