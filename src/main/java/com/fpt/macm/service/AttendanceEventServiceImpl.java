@@ -68,6 +68,12 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 							.findByEventIdAndUserId(event.getId(), user.getId());
 					if (attendanceEventOp.isPresent()) {
 						AttendanceEvent attendanceEvent = attendanceEventOp.get();
+						
+						if (attendanceEvent.getStatus() == status) {
+							responseMessage.setMessage(user.getStudentId() + " - " + user.getName() + " đã được điểm danh!");
+							return responseMessage;
+						}
+						
 						attendanceEvent.setStatus(status);
 						attendanceEvent.setUpdatedBy("toandv");
 						attendanceEvent.setUpdatedOn(LocalDateTime.now());
