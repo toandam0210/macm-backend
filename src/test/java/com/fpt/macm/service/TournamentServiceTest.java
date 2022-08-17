@@ -109,7 +109,7 @@ public class TournamentServiceTest {
 	ExhibitionTypeRepository exhibitionTypeRepository;
 
 	@Mock
-	SemesterRepository semesterRepository;
+	SemesterRepository semesterRepository; 
 
 	@Mock
 	TournamentScheduleRepository tournamentScheduleRepository;
@@ -294,6 +294,8 @@ public class TournamentServiceTest {
 		tournament.setFeeOrganizingCommiteePay(100000);
 		tournament.setFeePlayerPay(100000);
 		tournament.setTotalAmountFromClubEstimate(10000);
+		tournament.setTotalAmount(10000000);
+		tournament.setTotalAmountEstimate(100000);
 		tournament.setId(1);
 		tournament.setName("FNC");
 		tournament.setRegistrationOrganizingCommitteeDeadline(LocalDateTime.now().plusDays(10));
@@ -2689,6 +2691,21 @@ public class TournamentServiceTest {
 
 		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
 				tournament().getId(), 10000000);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+	
+	@Test
+	public void updateAfterTournamentCaseSuccess3() {
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentId(anyInt()))
+				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
+
+		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
+				tournament().getId(), 95000);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	

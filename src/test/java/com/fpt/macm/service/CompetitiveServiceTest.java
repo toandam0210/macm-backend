@@ -39,6 +39,7 @@ import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
+import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -69,6 +70,10 @@ public class CompetitiveServiceTest {
 
 	@Mock
 	CompetitiveResultRepository competitiveResultRepository;
+	
+	@Mock
+	ExhibitionPlayerRepository exhibitionPlayerRepository;
+	
 	
 	private Tournament tournament() {
 		Tournament tournament = new Tournament();
@@ -1150,7 +1155,24 @@ public class CompetitiveServiceTest {
 		listCompetitive.get(0).setStatus(0);
 		CompetitivePlayer competitivePlayer = competitivePlayer();
 		competitivePlayer.setCompetitiveType(listCompetitive.get(0));
+		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<ExhibitionPlayer>(exhibitionPlayers());
+		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
+		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
+		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test
+	public void testDeleteCompetitivePlayerCaseDeletePlayer() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		listCompetitive.get(0).setStatus(0);
+		CompetitivePlayer competitivePlayer = competitivePlayer();
+		competitivePlayer.setCompetitiveType(listCompetitive.get(0));
+		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<ExhibitionPlayer>();
+		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
+		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
+		when(tournamentPlayerRepository.findById(anyInt())).thenReturn(Optional.of(tournamentPlayer()));
 		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -1168,6 +1190,8 @@ public class CompetitiveServiceTest {
 		assertEquals(response.getData().size(), 0);
 	}
 	
+	
+	
 	@Test
 	public void testDeleteCompetitivePlayerCaseStatusEq3NotEligible() {
 		Set<CompetitiveType> competitiveTypes = competitiveTypes();
@@ -1176,7 +1200,9 @@ public class CompetitiveServiceTest {
 		CompetitivePlayer competitivePlayer = competitivePlayer();
 		competitivePlayer.setCompetitiveType(listCompetitive.get(0));
 		competitivePlayer.setIsEligible(false);
+		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<ExhibitionPlayer>(exhibitionPlayers());
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
+		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
 		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
 		assertEquals(response.getData().size(), 1);
 	}

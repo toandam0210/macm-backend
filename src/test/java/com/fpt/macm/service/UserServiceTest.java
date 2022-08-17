@@ -28,6 +28,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.InforInQrCode;
 import com.fpt.macm.model.dto.UserDto;
 import com.fpt.macm.model.entity.AdminSemester;
@@ -386,8 +387,37 @@ public class UserServiceTest {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(semesters);
 		UserDto userDto = createUserDto();
-		userDto.setRoleId(1);
-		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		userDto.setRoleId(9);
+		User user = createUser();
+		user.setStudentId("HE140855");
+		Role role = role();
+		role.setId(1);
+		role.setName(Constant.ROLE_HEAD_CLUB);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
+		when(userRepository.findAll()).thenReturn(iterable);
+		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role));
+		ResponseMessage result = userService.updateUser("HE140855", userDto);
+		assertEquals(result.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateUserCaseCollabToAdmin() {
+		Role roleCtv = role();
+		roleCtv.setId(15);
+		List<User> users = Arrays.asList(createUser());
+		Iterable<User> iterable = users;
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		UserDto userDto = createUserDto();
+		userDto.setRoleId(9);
+		User user = createUser();
+		user.setStudentId("HE140855");
+		user.setRole(roleCtv);
+		Role role = role();
+		role.setId(1);
+		role.setName(Constant.ROLE_HEAD_CLUB);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user));
 		when(userRepository.findAll()).thenReturn(iterable);
 		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role()));
 		ResponseMessage result = userService.updateUser("HE140855", userDto);
@@ -433,6 +463,24 @@ public class UserServiceTest {
 	}
 	
 	@Test
+	public void testUpdateUser5() {
+		List<User> users = Arrays.asList(createUser());
+		Iterable<User> iterable = users;
+		List<Semester> semesters = Arrays.asList(semester());
+		ResponseMessage responseMessage = new ResponseMessage();
+		responseMessage.setData(semesters);
+		UserDto userDto = createUserDto();
+		userDto.setRoleId(13);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(userRepository.findAll()).thenReturn(iterable);
+		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role()));
+		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
+		when(memberSemesterRepository.findByUserIdAndSemester(anyInt(), anyString())).thenReturn(Optional.empty());
+		ResponseMessage result = userService.updateUser("HE140855", createUserDto());
+		assertEquals(result.getData().size(), 1);
+	}
+	
+	@Test
 	public void testUpdateUser4() {
 		List<User> users = Arrays.asList(createUser());
 		Iterable<User> iterable = users;
@@ -451,26 +499,6 @@ public class UserServiceTest {
 		ResponseMessage result = userService.updateUser("HE140855", userDto);
 		assertEquals(result.getData().size(), 1);
 	}
-	
-	@Test
-	public void testUpdateUserRoleHeadClub() {
-		List<User> users = Arrays.asList(createUser());
-		Iterable<User> iterable = users;
-		List<Semester> semesters = Arrays.asList(semester());
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(semesters);
-		UserDto userDto = createUserDto();
-		userDto.setRoleId(10);
-		Role role = role();
-		role.setId(10);
-		role.setName("ABC");
-		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
-		when(userRepository.findAll()).thenReturn(iterable);
-		when(roleRepository.findById(anyInt())).thenReturn(Optional.of(role));
-		ResponseMessage result = userService.updateUser("HE140855", userDto);
-		assertEquals(result.getData().size(), 0);
-	}
-	
 	
 	@Test
 	public void testUpdateUserFail() {

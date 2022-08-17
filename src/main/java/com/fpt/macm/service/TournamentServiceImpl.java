@@ -2071,6 +2071,7 @@ public class TournamentServiceImpl implements TournamentService {
 						+ listCommittee.size() * getTournament.getFeeOrganizingCommiteePay();
 
 				getTournament.setTotalAmount(totalAmountActual);
+
 				getTournament.setTotalAmountFromClubActual(
 						(totalAmountActual > totalProceedsActual) ? (totalAmountActual - totalProceedsActual) : 0);
 
@@ -2110,23 +2111,25 @@ public class TournamentServiceImpl implements TournamentService {
 			if (getMatchOp.isPresent()) {
 				CompetitiveType getType = getMatchOp.get().getCompetitiveType();
 
-				List<TournamentSchedule> getListSchedules = tournamentScheduleRepository.findByTournamentId(competitiveTypeRepository.findTournamentOfType(getType.getId()));
+				List<TournamentSchedule> getListSchedules = tournamentScheduleRepository
+						.findByTournamentId(competitiveTypeRepository.findTournamentOfType(getType.getId()));
 				for (TournamentSchedule tournamentSchedule : getListSchedules) {
-					if(tournamentSchedule.getDate().equals(getDate)) {
+					if (tournamentSchedule.getDate().equals(getDate)) {
 						LocalDateTime getDateTimeStart = LocalDateTime.of(getDate, tournamentSchedule.getStartTime());
-						if(newResult.getTime().compareTo(getDateTimeStart) < 0) {
-							responseMessage.setMessage("Quá sớm. Thời gian tổ chức giải đấu trong ngày đã chưa bắt đầu");
+						if (newResult.getTime().compareTo(getDateTimeStart) < 0) {
+							responseMessage
+									.setMessage("Quá sớm. Thời gian tổ chức giải đấu trong ngày đã chưa bắt đầu");
 							return responseMessage;
 						}
 						LocalDateTime getDateTimeFinish = LocalDateTime.of(getDate, tournamentSchedule.getFinishTime());
-						if(newResult.getTime().plusMinutes(10).compareTo(getDateTimeFinish) > 0) {
+						if (newResult.getTime().plusMinutes(10).compareTo(getDateTimeFinish) > 0) {
 							responseMessage.setMessage("Quá muộn. Thời gian tổ chức giải đấu trong ngày đã trôi qua");
 							return responseMessage;
 						}
 						break;
 					}
 				}
-				
+
 				List<CompetitiveResult> listCompetitiveResults = competitiveResultRepository
 						.listCompetitiveResultByAreaOrderTime(newResult.getArea().getId(), getDate.getDayOfYear(),
 								getDate.getYear());
@@ -2225,25 +2228,28 @@ public class TournamentServiceImpl implements TournamentService {
 					newResult.getTime().getDayOfMonth());
 
 			Optional<ExhibitionTeam> getTeamOp = exhibitionTeamRepository.findById(teamId);
-			if(getTeamOp.isPresent()) {
-				List<TournamentSchedule> getListSchedules = tournamentScheduleRepository.findByTournamentId(exhibitionTypeRepository.findTournamentOfType(exhibitionTeamRepository.findTypeOfExhibitionTeam(teamId)));
-				
+			if (getTeamOp.isPresent()) {
+				List<TournamentSchedule> getListSchedules = tournamentScheduleRepository
+						.findByTournamentId(exhibitionTypeRepository
+								.findTournamentOfType(exhibitionTeamRepository.findTypeOfExhibitionTeam(teamId)));
+
 				for (TournamentSchedule tournamentSchedule : getListSchedules) {
-					if(tournamentSchedule.getDate().equals(getDate)) {
+					if (tournamentSchedule.getDate().equals(getDate)) {
 						LocalDateTime getDateTimeStart = LocalDateTime.of(getDate, tournamentSchedule.getStartTime());
-						if(newResult.getTime().compareTo(getDateTimeStart) < 0) {
-							responseMessage.setMessage("Quá sớm. Thời gian tổ chức giải đấu trong ngày đã chưa bắt đầu");
+						if (newResult.getTime().compareTo(getDateTimeStart) < 0) {
+							responseMessage
+									.setMessage("Quá sớm. Thời gian tổ chức giải đấu trong ngày đã chưa bắt đầu");
 							return responseMessage;
 						}
 						LocalDateTime getDateTimeFinish = LocalDateTime.of(getDate, tournamentSchedule.getFinishTime());
-						if(newResult.getTime().plusMinutes(5).compareTo(getDateTimeFinish) > 0) {
+						if (newResult.getTime().plusMinutes(5).compareTo(getDateTimeFinish) > 0) {
 							responseMessage.setMessage("Quá muộn. Thời gian tổ chức giải đấu trong ngày đã trôi qua");
 							return responseMessage;
 						}
 						break;
 					}
 				}
-				
+
 				List<CompetitiveResult> listCompetitiveResults = competitiveResultRepository
 						.listCompetitiveResultByAreaOrderTime(newResult.getArea().getId(), getDate.getDayOfYear(),
 								getDate.getYear());
@@ -2254,7 +2260,8 @@ public class TournamentServiceImpl implements TournamentService {
 								+ Utils.ConvertLocalDateTimeToString(listCompetitiveResults.get(i).getTime()));
 						return responseMessage;
 					} else if (listCompetitiveResults.get(i).getTime().compareTo(newResult.getTime()) < 0) {
-						if (listCompetitiveResults.get(i).getTime().plusMinutes(10).compareTo(newResult.getTime()) <= 0) {
+						if (listCompetitiveResults.get(i).getTime().plusMinutes(10)
+								.compareTo(newResult.getTime()) <= 0) {
 							continue;
 						} else {
 							responseMessage.setMessage("Bị trùng với trận đối kháng khác diễn ra trên cùng sân vào lúc "
@@ -2262,7 +2269,8 @@ public class TournamentServiceImpl implements TournamentService {
 							return responseMessage;
 						}
 					} else {
-						if (listCompetitiveResults.get(i).getTime().compareTo(newResult.getTime().plusMinutes(5)) >= 0) {
+						if (listCompetitiveResults.get(i).getTime()
+								.compareTo(newResult.getTime().plusMinutes(5)) >= 0) {
 							break;
 						} else {
 							responseMessage.setMessage("Bị trùng với trận đối kháng khác diễn ra trên cùng sân vào lúc "
