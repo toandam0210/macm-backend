@@ -21,6 +21,7 @@ import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
@@ -29,6 +30,7 @@ import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
+import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -56,6 +58,9 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 
 	@Autowired
 	CompetitiveResultRepository competitiveResultRepository;
+	
+	@Autowired 
+	ExhibitionPlayerRepository exhibitionPlayerRepository;
 
 	@Override
 	public ResponseMessage getAllCompetitiveType(int tournamentId) {
@@ -542,6 +547,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findById(competitivePlayerId);
+			List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
 			if (competitivePlayerOp.isPresent()) {
 				CompetitivePlayer getCompetitivePlayer = competitivePlayerOp.get();
 				CompetitiveType getType = getCompetitivePlayer.getCompetitiveType();
@@ -550,6 +556,10 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 					responseMessage.setMessage("Xóa tuyển thủ thành công");
 					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
 					autoSpawnMatchs(getType.getId());
+					if(exhibitionPlayers.size() == 0) {
+					TournamentPlayer tournamentPlayer = tournamentPlayerRepository.findById(getCompetitivePlayer.getTournamentPlayer().getId()).get();
+					tournamentPlayerRepository.delete(tournamentPlayer);
+					}
 				} else {
 					if (getCompetitivePlayer.getIsEligible()) {
 						responseMessage
