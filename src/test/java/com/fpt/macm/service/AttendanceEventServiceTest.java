@@ -175,6 +175,22 @@ public class AttendanceEventServiceTest {
 	}
 	
 	@Test
+	public void takeAttendanceByStudentIdCaseAlreadyAttend() {
+		EventSchedule eventSchedule = eventSchedule();
+		eventSchedule.setDate(LocalDate.now().minusDays(1));
+		
+		AttendanceEvent attendanceEvent = attendanceEvent();
+		attendanceEvent.setStatus(1);
+		
+		when(eventScheduleRepository.findByEventId(anyInt())).thenReturn(Arrays.asList(eventSchedule));
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(), anyInt())).thenReturn(Optional.of(attendanceEvent));
+		
+		ResponseMessage responseMessage = attendanceEventService.takeAttendanceByStudentId(user().getStudentId(), 1, event().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
 	public void takeAttendanceByStudentIdCaseEventInPast() {
 		EventSchedule eventSchedule = eventSchedule();
 		eventSchedule.setDate(LocalDate.now().minusDays(1));
