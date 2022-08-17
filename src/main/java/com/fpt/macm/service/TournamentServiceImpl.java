@@ -1880,8 +1880,7 @@ public class TournamentServiceImpl implements TournamentService {
 					boolean continueSpawnExhibition = true;
 					List<ExhibitionType> listTypeNeedHeld = new ArrayList<ExhibitionType>();
 					for (ExhibitionType exhibitionType : listExhibitionTypes) {
-
-						if (exhibitionType.getExhibitionTeams().size() > 0) {
+						if (exhibitionType.getExhibitionTeams().size() > 2) {
 							listTypeNeedHeld.add(exhibitionType);
 						}
 					}
