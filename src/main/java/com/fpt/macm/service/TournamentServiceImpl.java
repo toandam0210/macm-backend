@@ -1925,6 +1925,10 @@ public class TournamentServiceImpl implements TournamentService {
 										LocalDateTime timeMatch = LocalDateTime.of(date, startTime);
 										if (continueSpawnCompetitive) {
 											CompetitiveResult newResult = new CompetitiveResult();
+											Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(listCompetitiveMatchs.get(index).getId());
+											if(getResultOp.isPresent()) {
+												newResult = getResultOp.get();
+											}
 											newResult.setMatch(listCompetitiveMatchs.get(index));
 											if (index > 0
 													&& oldResult.getMatch().getRound() < newResult.getMatch().getRound()
@@ -1990,6 +1994,10 @@ public class TournamentServiceImpl implements TournamentService {
 								}
 								for (ExhibitionTeam exhibitionTeam : getTeams) {
 									ExhibitionResult newResult = new ExhibitionResult();
+									Optional<ExhibitionResult> getResultOp = exhibitionResultRepository.findByTeam(exhibitionTeam.getId());
+									if(getResultOp.isPresent()) {
+										newResult = getResultOp.get();
+									}
 									newResult.setTeam(exhibitionTeam);
 									newResult.setArea(getArea);
 									LocalDateTime getTime = LocalDateTime.of(getDate, startTime);
@@ -2017,7 +2025,7 @@ public class TournamentServiceImpl implements TournamentService {
 							}
 						}
 					}
-					responseMessage.setMessage("Phân chia thời gian cho tất cả thể loại");
+					responseMessage.setMessage("Phân chia lịch cho tất cả thể thức thành công");
 					for (CompetitiveType competitiveType : listCompetitiveTypes) {
 						competitiveType.setStatus(3);
 					}
@@ -2026,8 +2034,7 @@ public class TournamentServiceImpl implements TournamentService {
 					}
 					tournamentRepository.save(getTournament);
 				} else {
-					responseMessage.setMessage("Không thành công. Chỉ đủ thời gian để tổ chức " + timeMatchCanHeld + "/"
-							+ timeMatchNeedHeld + " trận đấu");
+					responseMessage.setMessage("Không đủ thời gian xếp lịch trận đấu. Vui lòng tạo thêm " + (timeMatchNeedHeld - timeMatchCanHeld) + "phút để xếp lịch trận đấu");
 				}
 			}
 		} catch (Exception e) {
