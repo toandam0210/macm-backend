@@ -455,6 +455,8 @@ public class UserServiceImpl implements UserService {
 				}else {
 					MemberSemester memberSemester = new MemberSemester();
 					memberSemester.setStatus(true);
+					memberSemester.setUser(user);
+					memberSemester.setSemester(semester);
 					memberSemesterRepository.save(memberSemester);
 				}
 				userRepository.save(user);
