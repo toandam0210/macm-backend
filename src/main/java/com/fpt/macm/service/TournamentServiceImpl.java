@@ -1988,7 +1988,7 @@ public class TournamentServiceImpl implements TournamentService {
 							}
 						}
 					}
-					responseMessage.setMessage("Phân chia thời gian cho tất cả thể loại");
+					responseMessage.setMessage("Phân chia lịch cho tất cả thể thức thành công");
 					for (CompetitiveType competitiveType : listCompetitiveTypes) {
 						competitiveType.setStatus(3);
 					}
@@ -1997,8 +1997,7 @@ public class TournamentServiceImpl implements TournamentService {
 					}
 					tournamentRepository.save(getTournament);
 				} else {
-					responseMessage.setMessage("Không thành công. Chỉ đủ thời gian để tổ chức " + timeMatchCanHeld + "/"
-							+ timeMatchNeedHeld + " trận đấu");
+					responseMessage.setMessage("Không đủ thời gian xếp lịch trận đấu. Vui lòng tạo thêm " + (timeMatchNeedHeld - timeMatchCanHeld) + "phút để xếp lịch trận đấu");
 				}
 			}
 		} catch (Exception e) {
