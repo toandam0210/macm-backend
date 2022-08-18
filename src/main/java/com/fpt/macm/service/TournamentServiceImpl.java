@@ -492,6 +492,7 @@ public class TournamentServiceImpl implements TournamentService {
 							competitiveTypes.add(convertCompetitiveTypeDto(competitiveTypeDto));
 							for (CompetitiveType competitiveType : competitiveTypes) {
 								competitiveType.setStatus(0);
+								competitiveType.setCanDelete(true);
 								competitiveTypesNew.add(competitiveType);
 							}
 						}
