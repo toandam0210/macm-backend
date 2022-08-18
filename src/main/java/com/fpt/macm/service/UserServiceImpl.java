@@ -448,16 +448,22 @@ public class UserServiceImpl implements UserService {
 				user.setActive(!user.isActive());
 				Optional<MemberSemester> memberSemesterOp = memberSemesterRepository
 						.findByUserIdAndSemester(user.getId(), semester);
-				if (memberSemesterOp.isPresent()) {
-					MemberSemester memberSemester = memberSemesterOp.get();
-					memberSemester.setStatus(!memberSemester.isStatus());
-					memberSemesterRepository.save(memberSemester);
-				}else {
-					MemberSemester memberSemester = new MemberSemester();
-					memberSemester.setStatus(true);
-					memberSemester.setUser(user);
-					memberSemester.setSemester(semester);
-					memberSemesterRepository.save(memberSemester);
+				if (user.isActive()) {
+					if (memberSemesterOp.isPresent()) {
+						MemberSemester memberSemester = memberSemesterOp.get();
+						memberSemester.setStatus(!memberSemester.isStatus());
+						memberSemesterRepository.save(memberSemester);
+					} else {
+						MemberSemester memberSemester = new MemberSemester();
+						memberSemester.setStatus(true);
+						memberSemester.setUser(user);
+						memberSemester.setSemester(semester);
+						memberSemesterRepository.save(memberSemester);
+					}
+				} else {
+					if (memberSemesterOp.isPresent()) {
+						memberSemesterRepository.delete(memberSemesterOp.get());
+					}
 				}
 				userRepository.save(user);
 
