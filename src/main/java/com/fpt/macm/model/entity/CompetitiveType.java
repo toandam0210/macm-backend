@@ -43,6 +43,9 @@ public class CompetitiveType {
 	
 	@Column
 	private Boolean changed;
+	
+	@Column
+	private Boolean canDelete;
 
 	public int getId() {
 		return id;
@@ -123,5 +126,15 @@ public class CompetitiveType {
 	public void setChanged(Boolean changed) {
 		this.changed = changed;
 	}
+
+	public Boolean getCanDelete() {
+		return canDelete;
+	}
+
+	public void setCanDelete(Boolean canDelete) {
+		this.canDelete = canDelete;
+	}
+	
+	
 	
 }
