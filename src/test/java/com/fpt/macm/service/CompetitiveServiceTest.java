@@ -1125,12 +1125,15 @@ public class CompetitiveServiceTest {
 	
 	@Test
 	public void testDeleteCompetitivePlayerCaseDeletePlayer() {
+		Tournament tournament = tournament();
+		tournament.setStage(1);
 		Set<CompetitiveType> competitiveTypes = competitiveTypes();
 		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
 		listCompetitive.get(0).setStatus(0);
 		CompetitivePlayer competitivePlayer = competitivePlayer();
 		competitivePlayer.setCompetitiveType(listCompetitive.get(0));
 		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<ExhibitionPlayer>();
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
 		when(tournamentPlayerRepository.findById(anyInt())).thenReturn(Optional.of(tournamentPlayer()));
@@ -1146,6 +1149,9 @@ public class CompetitiveServiceTest {
 		CompetitivePlayer competitivePlayer = competitivePlayer();
 		competitivePlayer.setCompetitiveType(listCompetitive.get(0));
 		competitivePlayer.setIsEligible(true);
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
 		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
 		assertEquals(response.getData().size(), 0);
@@ -1161,6 +1167,9 @@ public class CompetitiveServiceTest {
 		CompetitivePlayer competitivePlayer = competitivePlayer();
 		competitivePlayer.setCompetitiveType(listCompetitive.get(0));
 		competitivePlayer.setIsEligible(false);
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<ExhibitionPlayer>(exhibitionPlayers());
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
 		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
