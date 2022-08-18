@@ -1896,6 +1896,10 @@ public class TournamentServiceImpl implements TournamentService {
 										LocalDateTime timeMatch = LocalDateTime.of(date, startTime);
 										if (continueSpawnCompetitive) {
 											CompetitiveResult newResult = new CompetitiveResult();
+											Optional<CompetitiveResult> getResultOp = competitiveResultRepository.findByMatchId(listCompetitiveMatchs.get(index).getId());
+											if(getResultOp.isPresent()) {
+												newResult = getResultOp.get();
+											}
 											newResult.setMatch(listCompetitiveMatchs.get(index));
 											if (index > 0
 													&& oldResult.getMatch().getRound() < newResult.getMatch().getRound()
@@ -1961,6 +1965,10 @@ public class TournamentServiceImpl implements TournamentService {
 								}
 								for (ExhibitionTeam exhibitionTeam : getTeams) {
 									ExhibitionResult newResult = new ExhibitionResult();
+									Optional<ExhibitionResult> getResultOp = exhibitionResultRepository.findByTeam(exhibitionTeam.getId());
+									if(getResultOp.isPresent()) {
+										newResult = getResultOp.get();
+									}
 									newResult.setTeam(exhibitionTeam);
 									newResult.setArea(getArea);
 									LocalDateTime getTime = LocalDateTime.of(getDate, startTime);
