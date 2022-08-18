@@ -448,7 +448,6 @@ public class TournamentServiceImpl implements TournamentService {
 				Set<ExhibitionTypeDto> exhibitionTypeDtos = tournamentDto.getExhibitionTypesDto();
 				Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
 				Set<CompetitiveTypeDto> competitiveTypeDtosRemove = new HashSet<CompetitiveTypeDto>();
-				Set<ExhibitionTypeDto> exhibitionTypeDtosRemove = new HashSet<ExhibitionTypeDto>();
 				competitiveTypes.removeIf(
 						a -> !competitiveTypeDtos.stream().anyMatch(b -> Objects.equals(a.getId(), b.getId())));
 				for (CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
@@ -471,31 +470,61 @@ public class TournamentServiceImpl implements TournamentService {
 					competitiveType.setUpdatedOn(LocalDateTime.now());
 					competitiveTypes.add(competitiveType);
 				}
-
-				exhibitionTypes.removeIf(
-						a -> !exhibitionTypeDtos.stream().anyMatch(b -> Objects.equals(a.getId(), b.getId())));
-				for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
-					for (ExhibitionType exhibitionType : exhibitionTypes) {
-						if (exhibitionTypeDto.getId() == exhibitionType.getId()) {
-							exhibitionType = convertExhibitionTypeDto(exhibitionTypeDto);
-							exhibitionType.setStatus(0);
-							exhibitionType.setUpdatedBy("toandv");
-							exhibitionType.setUpdatedOn(LocalDateTime.now());
-							exhibitionTypeRepository.save(exhibitionType);
-							exhibitionTypeDtosRemove.add(exhibitionTypeDto);
+				
+				for (ExhibitionType exhibitionType : exhibitionTypes) {
+					boolean isExist = false;
+					for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
+						if (exhibitionTypeDto.getName().equals(exhibitionType.getName())
+								&& exhibitionTypeDto.getNumberMale() == exhibitionTypeDto.getNumberMale()
+								&& exhibitionType.getNumberFemale() == exhibitionTypeDto.getNumberFemale()) {
+							isExist = true;
+							break;
 						}
 					}
+					if (isExist == false) {
+						exhibitionTypes.remove(exhibitionType);
+					}
 				}
-				exhibitionTypeDtos.removeAll(exhibitionTypeDtosRemove);
 				for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
-					ExhibitionType exhibitionType = convertExhibitionTypeDto(exhibitionTypeDto);
-					exhibitionType.setUpdatedBy("toandv");
-					exhibitionType.setStatus(0);
-					exhibitionType.setUpdatedOn(LocalDateTime.now());
-					exhibitionTypes.add(exhibitionType);
+					boolean isExist = false;
+					for (ExhibitionType exhibitionType : exhibitionTypes) {
+						if (exhibitionTypeDto.getName().equals(exhibitionType.getName())
+								&& exhibitionTypeDto.getNumberMale() == exhibitionTypeDto.getNumberMale()
+								&& exhibitionType.getNumberFemale() == exhibitionTypeDto.getNumberFemale()) {
+							isExist = true;
+							break;
+						}
+					}
+					if (isExist == false) {
+						exhibitionTypes.add(convertExhibitionTypeDto(exhibitionTypeDto));
+					}
 				}
-				tournament.setCompetitiveTypes(competitiveTypes);
+				
 				tournament.setExhibitionTypes(exhibitionTypes);
+
+//				exhibitionTypes.removeIf(
+//						a -> !exhibitionTypeDtos.stream().anyMatch(b -> Objects.equals(a.getId(), b.getId())));
+//				for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
+//					for (ExhibitionType exhibitionType : exhibitionTypes) {
+//						if (exhibitionTypeDto.getId() == exhibitionType.getId()) {
+//							exhibitionType = convertExhibitionTypeDto(exhibitionTypeDto);
+//							exhibitionType.setStatus(0);
+//							exhibitionType.setUpdatedBy("toandv");
+//							exhibitionType.setUpdatedOn(LocalDateTime.now());
+//							exhibitionTypeRepository.save(exhibitionType);
+//							exhibitionTypeDtosRemove.add(exhibitionTypeDto);
+//						}
+//					}
+//				}
+//				exhibitionTypeDtos.removeAll(exhibitionTypeDtosRemove);
+//				for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
+//					ExhibitionType exhibitionType = convertExhibitionTypeDto(exhibitionTypeDto);
+//					exhibitionType.setUpdatedBy("toandv");
+//					exhibitionType.setStatus(0);
+//					exhibitionType.setUpdatedOn(LocalDateTime.now());
+//					exhibitionTypes.add(exhibitionType);
+//				}
+				tournament.setCompetitiveTypes(competitiveTypes);
 				tournamentRepository.save(tournament);
 				responseMessage.setData(Arrays.asList(tournament));
 				responseMessage.setCode(200);
