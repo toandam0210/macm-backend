@@ -23,6 +23,7 @@ import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
@@ -31,6 +32,7 @@ import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
+import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -58,9 +60,12 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 
 	@Autowired
 	CompetitiveResultRepository competitiveResultRepository;
-	
-	@Autowired 
+
+	@Autowired
 	ExhibitionPlayerRepository exhibitionPlayerRepository;
+
+	@Autowired
+	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
 
 	@Override
 	public ResponseMessage getAllCompetitiveType(int tournamentId) {
@@ -119,6 +124,13 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 						userJoined.add(getUser);
 					}
 				}
+
+				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+						.findByTournamentId(getTournament.getId());
+				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+					userJoined.add(tournamentOrganizingCommittee.getUser());
+				}
+
 				List<User> userNotJoined = new ArrayList<User>();
 				for (User user : listActive) {
 					if (!userJoined.contains(user) && getType.isGender() == user.isGender()) {
@@ -548,7 +560,8 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 		try {
 			Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findById(competitivePlayerId);
 			if (competitivePlayerOp.isPresent()) {
-				List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
+				List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository
+						.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
 				CompetitivePlayer getCompetitivePlayer = competitivePlayerOp.get();
 				CompetitiveType getType = getCompetitivePlayer.getCompetitiveType();
 				if (getType.getStatus() < 2) {
@@ -556,9 +569,10 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 					responseMessage.setMessage("Xóa tuyển thủ thành công");
 					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
 					autoSpawnMatchs(getType.getId());
-					if(exhibitionPlayers.size() == 0) {
-					TournamentPlayer tournamentPlayer = tournamentPlayerRepository.findById(getCompetitivePlayer.getTournamentPlayer().getId()).get();
-					tournamentPlayerRepository.delete(tournamentPlayer);
+					if (exhibitionPlayers.size() == 0) {
+						TournamentPlayer tournamentPlayer = tournamentPlayerRepository
+								.findById(getCompetitivePlayer.getTournamentPlayer().getId()).get();
+						tournamentPlayerRepository.delete(tournamentPlayer);
 					}
 				} else {
 					if (getCompetitivePlayer.getIsEligible()) {
