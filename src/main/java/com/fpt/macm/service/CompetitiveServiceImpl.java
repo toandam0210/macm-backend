@@ -497,6 +497,8 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 						}
 					}
 					autoSpawnMatchs(competitiveTypeId);
+					getType.setCanDelete(false);
+					competitiveTypeRepository.save(getType);
 					responseMessage.setData(listUsers);
 					responseMessage.setMessage(
 							"Danh sách đăng ký tham gia thi đấu thể thức " + (getType.isGender() ? "Nam: " : "Nữ: ")
