@@ -16,8 +16,6 @@ public interface CompetitiveService {
 
 	ResponseMessage updateListMatchsPlayer(List<CompetitiveMatchDto> listUpdated);
 
-	ResponseMessage confirmListMatchsPlayer(int competitiveTypeId);
-
 	void autoSpawnMatchs(int competitiveTypeId);
 
 	ResponseMessage addNewCompetitivePlayer(List<User> users, int competitiveTypeId);

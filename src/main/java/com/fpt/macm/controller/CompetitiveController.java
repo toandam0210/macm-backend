@@ -78,13 +78,6 @@ public class CompetitiveController {
 				HttpStatus.OK);
 	}
 
-	@PutMapping("/headclub/confirmlistmatchsplayer/{tournamentId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
-	ResponseEntity<ResponseMessage> confirmListMatchsPlayer(@PathVariable(name = "tournamentId") int tournamentId) {
-		return new ResponseEntity<ResponseMessage>(competitiveService.confirmListMatchsPlayer(tournamentId),
-				HttpStatus.OK);
-	}
-
 	@GetMapping("/headclub/listusernotjoincompetitive/{competitiveTypeId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> listUserNotJoinCompetitive(

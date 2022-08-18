@@ -31,7 +31,9 @@ import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.Role;
+import com.fpt.macm.model.entity.RoleEvent;
 import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
@@ -40,6 +42,7 @@ import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
+import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -74,6 +77,9 @@ public class CompetitiveServiceTest {
 	@Mock
 	ExhibitionPlayerRepository exhibitionPlayerRepository;
 	
+	@Mock
+	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
+	
 	
 	private Tournament tournament() {
 		Tournament tournament = new Tournament();
@@ -88,6 +94,7 @@ public class CompetitiveServiceTest {
 		tournament.setRegistrationPlayerDeadline(LocalDateTime.of(2022, 8, 1, 18, 0));
 		tournament.setSemester("Summer2022");
 		tournament.setStatus(true);
+		tournament.setStage(3);
 		tournament.setTournamentPlayers(tournamentPlayers());
 		return tournament;
 	}
@@ -234,6 +241,23 @@ public class CompetitiveServiceTest {
 		return playerMatchDto;
 	}
 	
+	private RoleEvent roleEvent() {
+		RoleEvent roleEvent = new RoleEvent();
+		roleEvent.setId(2);
+		roleEvent.setName("Ban van hoa");
+		return roleEvent;
+	}
+	
+	private TournamentOrganizingCommittee tournamentOrganizingCommittee() {
+		TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
+		tournamentOrganizingCommittee.setId(1);
+		tournamentOrganizingCommittee.setPaymentStatus(true);
+		tournamentOrganizingCommittee.setRoleEvent(roleEvent());
+		tournamentOrganizingCommittee.setTournament(tournament());
+		tournamentOrganizingCommittee.setUser(createUser());
+		return tournamentOrganizingCommittee;
+	}
+	
 	@Test
 	public void testGetAllType() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
@@ -350,6 +374,7 @@ public class CompetitiveServiceTest {
 		when(userRepository.findAllActiveUser()).thenReturn(Arrays.asList(createUser()));
 		when(tournamentPlayerRepository.getPlayerByTournamentId(anyInt())).thenReturn(tournamentPlayers);
 		when(competitivePlayerRepository.findByTournamentPlayerId(anyInt())).thenReturn(Optional.of(competitivePlayer()));
+		when(tournamentOrganizingCommitteeRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
 		ResponseMessage response = competitiveService.getListNotJoinCompetitive(1);
 		assertEquals(response.getData().size(), 1);
 	}
@@ -548,47 +573,6 @@ public class CompetitiveServiceTest {
 	public void testListMatchsCaseListCaseException() {
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(null);
 		ResponseMessage response = competitiveService.listMatchs(1);
-		assertEquals(response.getData().size(), 0);
-	}
-	
-	@Test
-	public void testConfirmListMatchsPlayer() {
-		Set<CompetitiveType> competitiveTypes = competitiveTypes();
-		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
-		CompetitiveType competitiveType = listCompetitive.get(0);
-		competitiveType.setStatus(1);
-		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
-		ResponseMessage response = competitiveService.confirmListMatchsPlayer(1);
-		assertEquals(response.getData().size(), 1);
-	}
-	
-	@Test
-	public void testConfirmListMatchsPlayerCaseFemale() {
-		Set<CompetitiveType> competitiveTypes = competitiveTypes();
-		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
-		CompetitiveType competitiveType = listCompetitive.get(0);
-		competitiveType.setStatus(1);
-		competitiveType.setGender(false);
-		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
-		ResponseMessage response = competitiveService.confirmListMatchsPlayer(1);
-		assertEquals(response.getData().size(), 1);
-	}
-	
-	@Test
-	public void testConfirmListMatchsPlayerCaseFail() {
-		Set<CompetitiveType> competitiveTypes = competitiveTypes();
-		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
-		CompetitiveType competitiveType = listCompetitive.get(0);
-		competitiveType.setStatus(1);
-		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.empty());
-		ResponseMessage response = competitiveService.confirmListMatchsPlayer(1);
-		assertEquals(response.getData().size(), 0);
-	}
-	
-	@Test
-	public void testConfirmListMatchsPlayerCaseException() {
-		when(competitiveTypeRepository.findById(anyInt())).thenReturn(null);
-		ResponseMessage response = competitiveService.confirmListMatchsPlayer(1);
 		assertEquals(response.getData().size(), 0);
 	}
 	
@@ -816,7 +800,8 @@ public class CompetitiveServiceTest {
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		when(competitiveMatchRepository.listMatchsByTypeDesc(anyInt())).thenReturn(listMatchs);
 		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult));
-//		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		//		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
 		
 		ResponseMessage responseMessage = competitiveService.getResultByType(competitiveType.getId());
 		assertEquals(responseMessage.getData().size(), 1);
@@ -840,7 +825,7 @@ public class CompetitiveServiceTest {
 		when(competitiveMatchRepository.listMatchsByTypeDesc(anyInt())).thenReturn(listMatchs);
 		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult));
 //		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
-		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		ResponseMessage responseMessage = competitiveService.getResultByType(competitiveType.getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
@@ -862,7 +847,7 @@ public class CompetitiveServiceTest {
 		CompetitiveResult competitiveResult2 = competitiveResult();
 		competitiveResult2.setFirstPoint(5);
 		competitiveResult2.setSecondPoint(4);
-		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		when(competitiveMatchRepository.listMatchsByTypeDesc(anyInt())).thenReturn(listMatchs);
 		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult1));
@@ -890,7 +875,7 @@ public class CompetitiveServiceTest {
 		CompetitiveResult competitiveResult2 = competitiveResult();
 		competitiveResult2.setFirstPoint(4);
 		competitiveResult2.setSecondPoint(5);
-		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		when(competitiveMatchRepository.listMatchsByTypeDesc(anyInt())).thenReturn(listMatchs);
 		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult1));
@@ -919,7 +904,7 @@ public class CompetitiveServiceTest {
 		CompetitiveResult competitiveResult2 = competitiveResult();
 		competitiveResult2.setFirstPoint(4);
 		competitiveResult2.setSecondPoint(5);
-		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		when(competitiveMatchRepository.listMatchsByTypeDesc(anyInt())).thenReturn(listMatchs);
 		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult1));
@@ -947,7 +932,7 @@ public class CompetitiveServiceTest {
 		CompetitiveResult competitiveResult2 = competitiveResult();
 		competitiveResult2.setFirstPoint(null);
 		competitiveResult2.setSecondPoint(5);
-		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		when(competitiveMatchRepository.listMatchsByTypeDesc(anyInt())).thenReturn(listMatchs);
 		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult1));
@@ -957,43 +942,16 @@ public class CompetitiveServiceTest {
 		ResponseMessage responseMessage = competitiveService.getResultByType(competitiveType.getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
-	@Test
-	public void getResultByTypeCaseResult2SecondPointNull() {
-		List<CompetitiveType> competitiveTypes = new ArrayList<>(competitiveTypes());
-		CompetitiveType competitiveType = competitiveTypes.get(0);
-		competitiveType.setStatus(3);
 		
-		List<CompetitiveMatch> listMatchs = new ArrayList<CompetitiveMatch>();
-		listMatchs.add(competitiveMatch());
-		listMatchs.add(competitiveMatch());
-		
-		CompetitiveResult competitiveResult1 = competitiveResult();
-		competitiveResult1.setFirstPoint(4);
-		competitiveResult1.setSecondPoint(5);
-		
-		CompetitiveResult competitiveResult2 = competitiveResult();
-		competitiveResult2.setFirstPoint(4);
-		competitiveResult2.setSecondPoint(null);
-		
-		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
-		when(competitiveMatchRepository.listMatchsByTypeDesc(anyInt())).thenReturn(listMatchs);
-		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult1));
-		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult2));
-		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
-		
-		ResponseMessage responseMessage = competitiveService.getResultByType(competitiveType.getId());
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
 	@Test
 	public void getResultByTypeCaseTypeNotStarted() {
 		List<CompetitiveType> competitiveTypes = new ArrayList<>(competitiveTypes());
 		CompetitiveType competitiveType = competitiveTypes.get(0);
 		competitiveType.setStatus(1);
-		
+		Tournament tournament = tournament();
+		tournament.setStage(1);
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
-		
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		ResponseMessage responseMessage = competitiveService.getResultByType(competitiveType.getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
@@ -1155,8 +1113,11 @@ public class CompetitiveServiceTest {
 		listCompetitive.get(0).setStatus(0);
 		CompetitivePlayer competitivePlayer = competitivePlayer();
 		competitivePlayer.setCompetitiveType(listCompetitive.get(0));
+		Tournament tournament = tournament();
+		tournament.setStage(1);
 		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<ExhibitionPlayer>(exhibitionPlayers());
 		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
 		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
 		assertEquals(response.getData().size(), 1);
