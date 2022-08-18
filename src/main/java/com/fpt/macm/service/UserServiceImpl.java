@@ -448,6 +448,7 @@ public class UserServiceImpl implements UserService {
 				user.setActive(!user.isActive());
 				Optional<MemberSemester> memberSemesterOp = memberSemesterRepository
 						.findByUserIdAndSemester(user.getId(), semester);
+				userRepository.save(user);
 				if (user.isActive()) {
 					if (memberSemesterOp.isPresent()) {
 						MemberSemester memberSemester = memberSemesterOp.get();
@@ -465,8 +466,6 @@ public class UserServiceImpl implements UserService {
 						memberSemesterRepository.delete(memberSemesterOp.get());
 					}
 				}
-				userRepository.save(user);
-
 				List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
 				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 						.findAllFutureTrainingSchedule(LocalDate.now());
