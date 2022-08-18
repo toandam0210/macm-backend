@@ -546,8 +546,8 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				Tournament tournament = tournamentRepository.findById(competitiveTypeRepository.findTournamentOfType(getType.getId())).get();
 				if (tournament.getStage() < 2) {
 					competitivePlayerRepository.delete(getCompetitivePlayer);
-					List<TournamentPlayer> tournamentPlayers = tournamentPlayerRepository.getPlayerByTournamentId(tournament.getId());
-					if(tournamentPlayers.size() == 0) {
+					List<CompetitivePlayer> competitivePlayers = competitivePlayerRepository.findByCompetitiveTypeId(getType.getId());
+					if(competitivePlayers.size() == 0) {
 						getType.setCanDelete(true);
 						competitiveTypeRepository.save(getType);
 					}
@@ -567,8 +567,8 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 						competitivePlayerRepository.delete(getCompetitivePlayer);
 						responseMessage.setMessage("Xóa tuyển thủ thành công");
 						responseMessage.setData(Arrays.asList(getCompetitivePlayer));
-						List<TournamentPlayer> tournamentPlayers = tournamentPlayerRepository.getPlayerByTournamentId(tournament.getId());
-						if(tournamentPlayers.size() == 0) {
+						List<CompetitivePlayer> competitivePlayers = competitivePlayerRepository.findByCompetitiveTypeId(getType.getId());
+						if(competitivePlayers.size() == 0) {
 							getType.setCanDelete(true);
 							competitiveTypeRepository.save(getType);
 						}
