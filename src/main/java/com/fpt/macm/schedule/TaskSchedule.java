@@ -581,6 +581,7 @@ public class TaskSchedule {
 		if (!listTournaments.isEmpty()) {
 			for (Tournament tournament : listTournaments) {
 				logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
+				tournament.setStage(1);
 				Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
 				for (CompetitiveType competitiveType : listCompetitiveTypes) {
 					if (competitiveType.getStatus() == 0) {
@@ -613,6 +614,7 @@ public class TaskSchedule {
 		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now());
 		if (tournamentSchedule != null) {
 			Tournament tournament = tournamentSchedule.getTournament();
+			tournament.setStage(3);
 			logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
 			Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
 			for (CompetitiveType competitiveType : listCompetitiveTypes) {

@@ -70,6 +70,9 @@ public class Tournament {
 	private boolean status;
 	
 	@Column
+	private Integer stage;
+	
+	@Column
 	private String createdBy;
 
 	@Column
@@ -239,6 +242,14 @@ public class Tournament {
 
 	public void setStatus(boolean status) {
 		this.status = status;
+	}
+
+	public Integer getStage() {
+		return stage;
+	}
+
+	public void setStage(Integer stage) {
+		this.stage = stage;
 	}
 
 }
