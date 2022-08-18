@@ -559,6 +559,11 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 								.findById(getCompetitivePlayer.getTournamentPlayer().getId()).get();
 						tournamentPlayerRepository.delete(tournamentPlayer);
 					}
+					List<TournamentPlayer> tournamentPlayers = tournamentPlayerRepository.getPlayerByTournamentId(tournament.getId());
+					if(tournamentPlayers.size() == 0) {
+						getType.setCanDelete(true);
+						competitiveTypeRepository.save(getType);
+					}
 				} else {
 					if (getCompetitivePlayer.getIsEligible()) {
 						responseMessage
