@@ -123,14 +123,14 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 						User getUser = tournamentPlayer.getUser();
 						userJoined.add(getUser);
 					}
-
-					Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
-							.findByTournamentIdAndUserId(getTournament.getId(), tournamentPlayer.getUser().getId());
-					if (tournamentOrganizingCommitteeOp.isPresent()) {
-						User getUser = tournamentPlayer.getUser();
-						userJoined.add(getUser);
-					}
 				}
+
+				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+						.findByTournamentId(getTournament.getId());
+				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+					userJoined.add(tournamentOrganizingCommittee.getUser());
+				}
+
 				List<User> userNotJoined = new ArrayList<User>();
 				for (User user : listActive) {
 					if (!userJoined.contains(user) && getType.isGender() == user.isGender()) {
