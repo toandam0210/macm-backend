@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -450,27 +451,53 @@ public class TournamentServiceImpl implements TournamentService {
 					Set<ExhibitionTypeDto> exhibitionTypeDtos = tournamentDto.getExhibitionTypesDto();
 					Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
 					Set<CompetitiveTypeDto> competitiveTypeDtosRemove = new HashSet<CompetitiveTypeDto>();
-					competitiveTypes.removeIf(
-							a -> !competitiveTypeDtos.stream().anyMatch(b -> Objects.equals(a.getId(), b.getId())));
-					for (CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
-						for (CompetitiveType competitiveType : competitiveTypes) {
-							if (competitiveTypeDto.getId() == competitiveType.getId()) {
-								competitiveType = convertCompetitiveTypeDto(competitiveTypeDto);
-								competitiveType.setStatus(0);
-								competitiveType.setUpdatedBy("toandv");
-								competitiveType.setUpdatedOn(LocalDateTime.now());
-								competitiveTypeRepository.save(competitiveType);
-								competitiveTypeDtosRemove.add(competitiveTypeDto);
+//					competitiveTypes.removeIf(
+//							a -> !competitiveTypeDtos.stream().anyMatch(b -> Objects.equals(a.getId(), b.getId())));
+//					for (CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
+//						for (CompetitiveType competitiveType : competitiveTypes) {
+//							if (competitiveTypeDto.getId() == competitiveType.getId()) {
+//								competitiveType = convertCompetitiveTypeDto(competitiveTypeDto);
+//								competitiveType.setStatus(0);
+//								competitiveType.setUpdatedBy("toandv");
+//								competitiveType.setUpdatedOn(LocalDateTime.now());
+//								competitiveTypeRepository.save(competitiveType);
+//								competitiveTypeDtosRemove.add(competitiveTypeDto);
+//							}
+//						}
+//					}
+//					competitiveTypeDtos.removeAll(competitiveTypeDtosRemove);
+//					for (CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
+//						CompetitiveType competitiveType = convertCompetitiveTypeDto(competitiveTypeDto);
+//						competitiveType.setStatus(0);
+//						competitiveType.setUpdatedBy("toandv");
+//						competitiveType.setUpdatedOn(LocalDateTime.now());
+//						competitiveTypes.add(competitiveType);
+//					}
+					for (CompetitiveType competitiveType : competitiveTypes) {
+						boolean isExist = false;
+						for(CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
+							if(competitiveTypeDto.getWeightMin() == competitiveType.getWeightMin() && competitiveTypeDto.getWeightMax() == competitiveType.getWeightMax() && (competitiveTypeDto.isGender() == competitiveType.isGender())) {
+								isExist = true;
+								break;
 							}
 						}
+						if(isExist == false) {
+							competitiveTypes.remove(competitiveType);
+						}
 					}
-					competitiveTypeDtos.removeAll(competitiveTypeDtosRemove);
 					for (CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
-						CompetitiveType competitiveType = convertCompetitiveTypeDto(competitiveTypeDto);
-						competitiveType.setStatus(0);
-						competitiveType.setUpdatedBy("toandv");
-						competitiveType.setUpdatedOn(LocalDateTime.now());
-						competitiveTypes.add(competitiveType);
+						boolean isExist = false;
+						for (CompetitiveType competitiveType : competitiveTypes) {
+							if (competitiveTypeDto.getWeightMin() == competitiveType.getWeightMin()
+									&& competitiveTypeDto.getWeightMax() == competitiveType.getWeightMax()
+									&& (competitiveTypeDto.isGender() == competitiveType.isGender())) {
+								isExist = true;
+								break;
+							}
+						}
+						if (isExist == false) {
+							competitiveTypes.add(convertCompetitiveTypeDto(competitiveTypeDto));
+						}
 					}
 
 					for (ExhibitionType exhibitionType : exhibitionTypes) {
@@ -501,7 +528,7 @@ public class TournamentServiceImpl implements TournamentService {
 							exhibitionTypes.add(convertExhibitionTypeDto(exhibitionTypeDto));
 						}
 					}
-
+					tournament.setCompetitiveTypes(competitiveTypes);
 					tournament.setExhibitionTypes(exhibitionTypes);
 					tournament.setCompetitiveTypes(competitiveTypes);
 					tournamentRepository.save(tournament);
