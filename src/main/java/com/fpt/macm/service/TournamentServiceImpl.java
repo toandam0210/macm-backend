@@ -482,6 +482,21 @@ public class TournamentServiceImpl implements TournamentService {
 							}
 						}
 						if(isExist == false) {
+							List<CompetitiveMatch> competitiveMatchs = competitiveMatchRepository.listMatchsByType(competitiveType.getId());
+							competitiveMatchRepository.deleteAll(competitiveMatchs);
+							List<CompetitivePlayer> competitivePlayers = competitivePlayerRepository.findByCompetitiveTypeId(competitiveType.getId());
+							competitivePlayerRepository.deleteAll(competitivePlayers);
+							List<TournamentPlayer> tournamentPlayers = new ArrayList<TournamentPlayer>();
+							for (CompetitivePlayer competitivePlayer : competitivePlayers) {
+								tournamentPlayers.add(competitivePlayer.getTournamentPlayer());
+							}
+							for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+								List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository.findAllByPlayerId(tournamentPlayer.getId());
+								if(exhibitionPlayers.size() == 0) {
+									tournamentPlayerRepository.delete(tournamentPlayer);
+								}
+							}
+							
 							competitiveTypes.remove(competitiveType);
 						}
 					}
