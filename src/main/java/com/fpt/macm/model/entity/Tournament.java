@@ -30,7 +30,7 @@ public class Tournament {
 	@Column
 	private String semester;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
 	@JoinColumn(name = "tournament_id")
 	private Set<CompetitiveType> competitiveTypes;
 
