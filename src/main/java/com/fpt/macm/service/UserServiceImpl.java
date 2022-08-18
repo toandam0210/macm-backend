@@ -489,7 +489,9 @@ public class UserServiceImpl implements UserService {
 					for (TrainingSchedule trainingSchedule : trainingSchedules) {
 						AttendanceStatus attendanceStatus = attendanceStatusRepository
 								.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+						if(attendanceStatus != null) {
 						listAttendanceStatus.add(attendanceStatus);
+						}
 					}
 					if (!listAttendanceStatus.isEmpty()) {
 						attendanceStatusRepository.deleteAll(listAttendanceStatus);
