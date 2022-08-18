@@ -587,8 +587,8 @@ public class EventServiceImpl implements EventService {
 						clubFundService.withdrawFromClubFund(user.getStudentId(), money,
 								("Phát sinh từ sự kiện " + getEvent.getName()));
 					} else {
-						double amountPerMore = money / countMemberEvent;
-						getEvent.setAmountPerRegisterActual(getEvent.getAmountPerRegisterEstimated() + amountPerMore);
+						double amountPerRegisterActual = Math.round((totalProceedsActual + money)/(countMemberEvent*1000))*1000;
+						getEvent.setAmountPerRegisterActual(amountPerRegisterActual);
 					}
 				} else {
 					// cộng tiền vào clb
