@@ -450,7 +450,6 @@ public class TournamentServiceImpl implements TournamentService {
 					Set<ExhibitionTypeDto> exhibitionTypeDtos = tournamentDto.getExhibitionTypesDto();
 					Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
 					Set<CompetitiveTypeDto> competitiveTypeDtosRemove = new HashSet<CompetitiveTypeDto>();
-					Set<ExhibitionTypeDto> exhibitionTypeDtosRemove = new HashSet<ExhibitionTypeDto>();
 					competitiveTypes.removeIf(
 							a -> !competitiveTypeDtos.stream().anyMatch(b -> Objects.equals(a.getId(), b.getId())));
 					for (CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
@@ -474,34 +473,43 @@ public class TournamentServiceImpl implements TournamentService {
 						competitiveTypes.add(competitiveType);
 					}
 
-					exhibitionTypes.removeIf(
-							a -> !exhibitionTypeDtos.stream().anyMatch(b -> Objects.equals(a.getId(), b.getId())));
-					for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
-						for (ExhibitionType exhibitionType : exhibitionTypes) {
-							if (exhibitionTypeDto.getId() == exhibitionType.getId()) {
-								exhibitionType = convertExhibitionTypeDto(exhibitionTypeDto);
-								exhibitionType.setStatus(0);
-								exhibitionType.setUpdatedBy("toandv");
-								exhibitionType.setUpdatedOn(LocalDateTime.now());
-								exhibitionTypeRepository.save(exhibitionType);
-								exhibitionTypeDtosRemove.add(exhibitionTypeDto);
+					for (ExhibitionType exhibitionType : exhibitionTypes) {
+						boolean isExist = false;
+						for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
+							if (exhibitionTypeDto.getName().equals(exhibitionType.getName())
+									&& exhibitionTypeDto.getNumberMale() == exhibitionTypeDto.getNumberMale()
+									&& exhibitionType.getNumberFemale() == exhibitionTypeDto.getNumberFemale()) {
+								isExist = true;
+								break;
 							}
 						}
+						if (isExist == false) {
+							exhibitionTypes.remove(exhibitionType);
+						}
 					}
-					exhibitionTypeDtos.removeAll(exhibitionTypeDtosRemove);
 					for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
-						ExhibitionType exhibitionType = convertExhibitionTypeDto(exhibitionTypeDto);
-						exhibitionType.setUpdatedBy("toandv");
-						exhibitionType.setStatus(0);
-						exhibitionType.setUpdatedOn(LocalDateTime.now());
-						exhibitionTypes.add(exhibitionType);
+						boolean isExist = false;
+						for (ExhibitionType exhibitionType : exhibitionTypes) {
+							if (exhibitionTypeDto.getName().equals(exhibitionType.getName())
+									&& exhibitionTypeDto.getNumberMale() == exhibitionTypeDto.getNumberMale()
+									&& exhibitionType.getNumberFemale() == exhibitionTypeDto.getNumberFemale()) {
+								isExist = true;
+								break;
+							}
+						}
+						if (isExist == false) {
+							exhibitionTypes.add(convertExhibitionTypeDto(exhibitionTypeDto));
+						}
 					}
-					tournament.setCompetitiveTypes(competitiveTypes);
+
 					tournament.setExhibitionTypes(exhibitionTypes);
+					tournament.setCompetitiveTypes(competitiveTypes);
 					tournamentRepository.save(tournament);
 					responseMessage.setData(Arrays.asList(tournament));
 					responseMessage.setCode(200);
 					responseMessage.setMessage(Constant.MSG_101);
+				} else {
+					responseMessage.setMessage("Đã qua giai đoạn chỉnh sửa giải đấu");
 				}
 			}
 		} catch (Exception e) {
@@ -1328,6 +1336,7 @@ public class TournamentServiceImpl implements TournamentService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
+
 			if (LocalDateTime.now().isBefore(tournament.getRegistrationPlayerDeadline())) {
 				User user = userRepository.findByStudentId(studentId).get();
 
@@ -1835,11 +1844,13 @@ public class TournamentServiceImpl implements TournamentService {
 			Optional<Tournament> getTournamentOp = tournamentRepository.findById(tournamentId);
 			if (getTournamentOp.isPresent()) {
 				Tournament getTournament = getTournamentOp.get();
-				if (getTournament.getStage() < 2) {
+
+				if (getTournament.getStage() <= 1) {
 					List<CompetitiveMatch> listCompetitiveMatchs = new ArrayList<CompetitiveMatch>();
 					Set<CompetitiveType> listCompetitiveTypes = getTournament.getCompetitiveTypes();
 					List<Area> listArea = areaRepository.findAll();
 					for (CompetitiveType competitiveType : listCompetitiveTypes) {
+						competitiveType.setStatus(2);
 						List<CompetitiveMatch> listMatchByType = competitiveMatchRepository
 								.listMatchsByType(competitiveType.getId());
 						for (CompetitiveMatch competitiveMatch : listMatchByType) {
@@ -1855,10 +1866,13 @@ public class TournamentServiceImpl implements TournamentService {
 					List<ExhibitionTeam> listExhibitionTeams = new ArrayList<ExhibitionTeam>();
 					Set<ExhibitionType> listExhibitionTypes = getTournament.getExhibitionTypes();
 					for (ExhibitionType exhibitionType : listExhibitionTypes) {
+						exhibitionType.setStatus(2);
 						List<ExhibitionTeam> getTeams = new ArrayList<ExhibitionTeam>(
 								exhibitionType.getExhibitionTeams());
 						listExhibitionTeams.addAll(getTeams);
 					}
+
+					tournamentRepository.save(getTournament);
 
 					List<TournamentSchedule> listTournamentSchedules = tournamentScheduleRepository
 							.findByTournamentId(tournamentId);
@@ -2011,6 +2025,8 @@ public class TournamentServiceImpl implements TournamentService {
 						responseMessage.setMessage("Không đủ thời gian xếp lịch trận đấu. Vui lòng tạo thêm "
 								+ (timeMatchNeedHeld - timeMatchCanHeld) + "phút để xếp lịch trận đấu");
 					}
+				} else {
+					responseMessage.setMessage("Đã qua giai đoạn khởi tạo thời gian đia điểm");
 				}
 			}
 		} catch (Exception e) {
@@ -2103,6 +2119,8 @@ public class TournamentServiceImpl implements TournamentService {
 					tournamentRepository.save(getTournament);
 					responseMessage.setData(Arrays.asList(getTournament));
 					responseMessage.setMessage(Constant.MSG_129);
+				} else {
+					responseMessage.setMessage("Giải đấu chưa bắt đầu không thể tổng kết");
 				}
 			} else {
 				responseMessage.setMessage("Không tìm thấy giải đấu");
@@ -2127,8 +2145,8 @@ public class TournamentServiceImpl implements TournamentService {
 
 				Tournament getTournament = tournamentRepository
 						.findById(competitiveTypeRepository.findTournamentOfType(getType.getId())).get();
-				
-				if (getTournament.getStage() >= 2) {
+
+				if (getTournament.getStage() == 2) {
 					List<TournamentSchedule> getListSchedules = tournamentScheduleRepository
 							.findByTournamentId(getTournament.getId());
 					for (TournamentSchedule tournamentSchedule : getListSchedules) {
@@ -2236,7 +2254,7 @@ public class TournamentServiceImpl implements TournamentService {
 					responseMessage.setData(Arrays.asList(getResult));
 					responseMessage.setMessage("Cập nhật thời gian và địa điểm thành công");
 				} else {
-					responseMessage.setMessage("Giai đoạn này không thể cập nhật thời gian và địa điểm");
+					responseMessage.setMessage("Giai đoạn này không thể cập nhật thời gian địa điểm cho trận đấu");
 				}
 			} else {
 				responseMessage.setMessage("Không tìm thấy trận đấu");
@@ -2258,20 +2276,18 @@ public class TournamentServiceImpl implements TournamentService {
 
 			Optional<ExhibitionTeam> getTeamOp = exhibitionTeamRepository.findById(teamId);
 			if (getTeamOp.isPresent()) {
-				int getTypeId = exhibitionTeamRepository.findTypeOfExhibitionTeam(teamId);
-				
 				Tournament getTournament = tournamentRepository.findById(exhibitionTypeRepository
-								.findTournamentOfType(getTypeId)).get();
-				if(getTournament.getStage() >= 2) {
-					List<TournamentSchedule> getListSchedules = tournamentScheduleRepository
-							.findByTournamentId(getTournament.getId());
+						.findTournamentOfType(exhibitionTeamRepository.findTypeOfExhibitionTeam(teamId))).get();
+				
+				if(getTournament.getStage() == 2) {
+					List<TournamentSchedule> getListSchedules = tournamentScheduleRepository.findByTournamentId(getTournament.getId());
 
 					for (TournamentSchedule tournamentSchedule : getListSchedules) {
 						if (tournamentSchedule.getDate().equals(getDate)) {
 							LocalDateTime getDateTimeStart = LocalDateTime.of(getDate, tournamentSchedule.getStartTime());
 							if (newResult.getTime().compareTo(getDateTimeStart) < 0) {
 								responseMessage
-										.setMessage("Quá sớm. Thời gian tổ chức giải đấu trong ngày chưa bắt đầu");
+										.setMessage("Quá sớm. Thời gian tổ chức giải đấu trong ngày đã chưa bắt đầu");
 								return responseMessage;
 							}
 							LocalDateTime getDateTimeFinish = LocalDateTime.of(getDate, tournamentSchedule.getFinishTime());
@@ -2363,11 +2379,8 @@ public class TournamentServiceImpl implements TournamentService {
 					responseMessage.setMessage("Cập nhật thời gian và địa điểm thành công");
 				}
 				else {
-					responseMessage.setMessage("Giai đoạn này không thể cập nhật thời gian và địa điểm");
+					responseMessage.setMessage("Giai đoạn này không thể cập nhật thời gian địa điểm cho đội biểu diễn");
 				}
-			}
-			else {
-				responseMessage.setMessage("Không tìm thấy đội");
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
