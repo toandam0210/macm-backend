@@ -302,6 +302,7 @@ public class TournamentServiceTest {
 		tournament.setRegistrationPlayerDeadline(LocalDateTime.now().plusDays(10));
 		tournament.setSemester("Summer2022");
 		tournament.setStatus(true);
+		tournament.setStage(0);
 		tournament.setTournamentPlayers(tournamentPlayers());
 		return tournament;
 	}
@@ -362,21 +363,43 @@ public class TournamentServiceTest {
 	private Set<CompetitiveTypeDto> competitiveTypesDto() {
 		Set<CompetitiveTypeDto> competitiveTypesDto = new HashSet<CompetitiveTypeDto>();
 		CompetitiveTypeDto competitiveTypeDto = new CompetitiveTypeDto();
-		competitiveTypeDto.setId(1);
 		competitiveTypeDto.setGender(true);
 		competitiveTypeDto.setWeightMax(60);
 		competitiveTypeDto.setWeightMin(57);
 		competitiveTypesDto.add(competitiveTypeDto);
+		
+		CompetitiveTypeDto competitiveTypeDto1 = new CompetitiveTypeDto();
+		competitiveTypeDto1.setGender(true);
+		competitiveTypeDto1.setWeightMax(50);
+		competitiveTypeDto1.setWeightMin(47);
+		competitiveTypesDto.add(competitiveTypeDto1);
 		return competitiveTypesDto;
+		
+//		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();
+//		CompetitiveType competitiveType = new CompetitiveType();
+//		competitiveType.setGender(true);
+//		competitiveType.setWeightMax(50);
+//		competitiveType.setWeightMin(47);
+//		competitiveTypes.add(competitiveType);
+//		CompetitiveType competitiveType2 = new CompetitiveType();
+//		competitiveType2.setGender(true);
+//		competitiveType2.setWeightMax(70);
+//		competitiveType2.setWeightMin(68);
+//		competitiveTypes.add(competitiveType2);
 	}
 
 	private Set<ExhibitionTypeDto> exhibitionTypesDtos() {
 		Set<ExhibitionTypeDto> exhibitionTypes = new HashSet<ExhibitionTypeDto>();
 		ExhibitionTypeDto exhibitionType = new ExhibitionTypeDto();
-		exhibitionType.setId(1);
-		exhibitionType.setName("Long ho quyen");
-		exhibitionType.setNumberFemale(0);
+		exhibitionType.setName("Bao sat");
+		exhibitionType.setNumberFemale(2);
 		exhibitionType.setNumberMale(1);
+		exhibitionTypes.add(exhibitionType);
+		ExhibitionTypeDto exhibitionType1 = new ExhibitionTypeDto();
+		exhibitionType1.setName("Long ho quyen");
+		exhibitionType1.setNumberFemale(0);
+		exhibitionType1.setNumberMale(1);
+		exhibitionTypes.add(exhibitionType1);
 		exhibitionTypes.add(exhibitionType);
 		return exhibitionTypes;
 	}
@@ -805,13 +828,21 @@ public class TournamentServiceTest {
 		exhibitionType.setName("Bao sat");
 		exhibitionType.setNumberFemale(1);
 		exhibitionType.setNumberMale(2);
-
+		ExhibitionType exhibitionType2 = new ExhibitionType();
+		exhibitionType.setName("Bao sat 2");
+		exhibitionType.setNumberFemale(1);
+		exhibitionType.setNumberMale(2);
+		exhibitionTypes.add(exhibitionType2);
+		exhibitionTypes.add(exhibitionType);
 		Tournament tournament = tournament();
 		tournament.setCompetitiveTypes(competitiveTypes);
 		tournament.setExhibitionTypes(exhibitionTypes);
+		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(competitivePlayerRepository.findByCompetitiveTypeId(anyInt()))
+		.thenReturn(Arrays.asList(competitivePlayer()));
 		ResponseMessage response = tournamentService.updateTournament(1, tournamentDto());
-		assertEquals(response.getData().size(), 1);
+		assertEquals(response.getData().size(), 0);
 	}
 
 	@Test
@@ -820,14 +851,22 @@ public class TournamentServiceTest {
 		ResponseMessage response = tournamentService.updateTournament(1, tournamentDto());
 		assertEquals(response.getData().size(), 0);
 	}
+	
+	@Test
+	public void testUpdateTournamentCaseStage0() {
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		ResponseMessage response = tournamentService.updateTournament(1, tournamentDto());
+		assertEquals(response.getData().size(), 0);
+	}
 
 	@Test
 	public void testDeleteTournamentById() {
 		TournamentSchedule tournamentSchedule = tournamentSchedule();
 		tournamentSchedule.setDate(LocalDate.now().plusMonths(1));
-
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(commonScheduleRepository.findByDate(any())).thenReturn(Optional.of(commonSchedule()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
@@ -2447,12 +2486,13 @@ public class TournamentServiceTest {
 		tournamentSchedule.setDate(LocalDate.now().minusDays(1));
 		tournamentSchedules.add(tournamentSchedule);
 		tournamentSchedules.add(tournamentSchedule());
-		
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setScore(null);
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(areaRepository.findAll()).thenReturn(areas);
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(tournamentSchedules);
-
+		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult));
 		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
@@ -2525,12 +2565,13 @@ public class TournamentServiceTest {
 		tournamentSchedule3.setFinishTime(LocalTime.of(23, 59));
 		tournamentSchedule3.setDate(LocalDate.now().plusDays(1));
 		tournamentSchedules.add(tournamentSchedule3);
-		
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setFirstPoint(null);
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(areaRepository.findAll()).thenReturn(areas);
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(tournamentSchedules);
-
+		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult));
 		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
@@ -2570,15 +2611,23 @@ public class TournamentServiceTest {
 		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
+	@Test
+	public void spawnTimeAndAreaCaseStageEq0() {
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+
+		ResponseMessage responseMessage = tournamentService.spawnTimeAndArea(tournament().getId());
+		assertEquals(responseMessage.getData().size(), 0);
+	}
 
 	@Test
 	public void updateAfterTournamentCaseFail1() {
 		CompetitiveResult competitiveResult = competitiveResult();
 		competitiveResult.setFirstPoint(null);
-
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
-		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 
 		ResponseMessage responseMessage = tournamentService.updateAfterTournament(user().getStudentId(),
 				tournament().getId(), 10000);
@@ -2597,7 +2646,7 @@ public class TournamentServiceTest {
 		
 		Tournament tournament = tournament();
 		tournament.setCompetitiveTypes(competitiveTypes);
-
+		tournament.setStage(3);
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
 		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult));
@@ -2609,7 +2658,9 @@ public class TournamentServiceTest {
 
 	@Test
 	public void updateAfterTournamentCaseFail2() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
 		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.empty());
 
@@ -2627,7 +2678,7 @@ public class TournamentServiceTest {
 		
 		Tournament tournament = tournament();
 		tournament.setCompetitiveTypes(competitiveTypes);
-		
+		tournament.setStage(3);
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
 		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.empty());
@@ -2641,8 +2692,9 @@ public class TournamentServiceTest {
 	public void updateAfterTournamentCaseFail3() {
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setScore(null);
-
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
 		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult));
@@ -2654,7 +2706,9 @@ public class TournamentServiceTest {
 	
 	@Test
 	public void updateAfterTournamentCaseFail4() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
 		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.empty());
@@ -2666,7 +2720,9 @@ public class TournamentServiceTest {
 
 	@Test
 	public void updateAfterTournamentCaseSuccess1() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
 		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
@@ -2681,7 +2737,9 @@ public class TournamentServiceTest {
 	
 	@Test
 	public void updateAfterTournamentCaseSuccess2() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
 		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
@@ -2696,7 +2754,9 @@ public class TournamentServiceTest {
 	
 	@Test
 	public void updateAfterTournamentCaseSuccess3() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(Arrays.asList(competitiveMatch()));
 		when(competitiveResultRepository.findByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
@@ -2735,6 +2795,12 @@ public class TournamentServiceTest {
 		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(20,
 				exhibitionResult);
@@ -2749,6 +2815,12 @@ public class TournamentServiceTest {
 		competitiveResult.setTime(LocalDateTime.of(2022, 8, 15, 18, 0));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult()));
 		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
@@ -2765,6 +2837,12 @@ public class TournamentServiceTest {
 		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(20,
 				exhibitionResult);
@@ -2779,6 +2857,12 @@ public class TournamentServiceTest {
 		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult()));
 		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
@@ -2795,6 +2879,12 @@ public class TournamentServiceTest {
 		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 6));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(20,
 				exhibitionResult);
@@ -2814,6 +2904,12 @@ public class TournamentServiceTest {
 		ExhibitionResult exhibitionResult2 = exhibitionResult();
 		exhibitionResult2.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
 		exhibitionResults.add(exhibitionResult2);
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(exhibitionResults);
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
@@ -2836,6 +2932,12 @@ public class TournamentServiceTest {
 		exhibitionResults.add(exhibitionResult2);
 		ExhibitionResult exhibitionResult3 = exhibitionResult();
 		exhibitionResult3.setTime(LocalDateTime.of(2022, 8, 16, 19, 4));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(exhibitionResults);
 		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
@@ -2859,6 +2961,12 @@ public class TournamentServiceTest {
 		exhibitionResults.add(exhibitionResult2);
 		ExhibitionResult exhibitionResult3 = exhibitionResult();
 		exhibitionResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 5));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 	//	when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(exhibitionResults);
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
@@ -2881,6 +2989,12 @@ public class TournamentServiceTest {
 		exhibitionResults.add(exhibitionResult2);
 		ExhibitionResult exhibitionResult3 = exhibitionResult();
 		exhibitionResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 3));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 	//	when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(exhibitionResults);
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
@@ -2903,12 +3017,16 @@ public class TournamentServiceTest {
 		exhibitionResults.add(exhibitionResult2);
 		ExhibitionResult exhibitionResult3 = exhibitionResult();
 		exhibitionResult3.setTime(LocalDateTime.of(2022, 8, 16, 17, 3));
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 	//	when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
-		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(exhibitionResults);
-		when(exhibitionResultRepository.findByTeam(anyInt())).thenReturn(Optional.of(exhibitionResult()));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
 				exhibitionResult3);
-		assertEquals(responseMessage.getData().size(), 1);
+		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 	@Test
@@ -2926,10 +3044,69 @@ public class TournamentServiceTest {
 		exhibitionResults.add(exhibitionResult2);
 		ExhibitionResult exhibitionResult3 = exhibitionResult();
 		exhibitionResult3.setTime(LocalDateTime.of(2022, 8, 16, 17, 3));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 	//	when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(null);
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(1,
 				exhibitionResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseEarly() {
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		tournamentSchedule.setStartTime(LocalTime.of(18, 50));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(20,
+				exhibitionResult);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseLate() {
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 9));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 4));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		List<ExhibitionTeam> exhibitionTeams = new ArrayList<ExhibitionTeam>(exhibitionTeams());
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		tournamentSchedule.setFinishTime(LocalTime.of(17, 50));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeams.get(0)));
+		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaExhibition(20,
+				exhibitionResult);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaExhibitionCaseStage3() {
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
+				competitiveResult());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
@@ -2944,7 +3121,15 @@ public class TournamentServiceTest {
 		competitiveResults.add(competitiveResult2);
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
-		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		tournamentSchedule.setFinishTime(LocalTime.of(17, 50));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(competitiveTypeRepository.findTournamentOfType(anyInt())).thenReturn(1);
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
 				competitiveResult);
 		assertEquals(responseMessage.getData().size(), 0);
@@ -2961,6 +3146,13 @@ public class TournamentServiceTest {
 		competitiveResults.add(competitiveResult2);
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
 				competitiveResult);
@@ -2980,6 +3172,13 @@ public class TournamentServiceTest {
 		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 19, 18));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
 				competitiveResult3);
@@ -2999,6 +3198,13 @@ public class TournamentServiceTest {
 		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 17, 18, 0));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
 				competitiveResult3);
@@ -3018,7 +3224,14 @@ public class TournamentServiceTest {
 		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 0));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 17, 18, 0));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
 				competitiveResult3);
@@ -3038,7 +3251,40 @@ public class TournamentServiceTest {
 		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 17, 18, 0));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(competitiveResults);
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
+				competitiveResult3);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseLate() {
+		List<CompetitiveResult> competitiveResults = new ArrayList<CompetitiveResult>();
+		CompetitiveResult competitiveResult = competitiveResult();
+		competitiveResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+		competitiveResults.add(competitiveResult);
+		CompetitiveResult competitiveResult2 = competitiveResult();
+		competitiveResult2.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+		competitiveResults.add(competitiveResult2);
+		CompetitiveResult competitiveResult3 = competitiveResult();
+		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
+		ExhibitionResult exhibitionResult = exhibitionResult();
+		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 17, 18, 0));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		tournamentSchedule.setStartTime(LocalTime.of(20, 0));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
 				competitiveResult3);
 		assertEquals(responseMessage.getData().size(), 0);
@@ -3057,7 +3303,14 @@ public class TournamentServiceTest {
 		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
 				competitiveResult3);
@@ -3077,7 +3330,14 @@ public class TournamentServiceTest {
 		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 58));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult()));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
 				competitiveResult3);
@@ -3097,8 +3357,15 @@ public class TournamentServiceTest {
 		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 18, 50));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult()));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
 				competitiveResult3);
@@ -3118,12 +3385,34 @@ public class TournamentServiceTest {
 		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 0));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult()));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
 				competitiveResult3);
 		assertEquals(responseMessage.getData().size(), 0);
 			
+	}
+	
+	@Test
+	public void testUpdateTimeAndAreaCompetitiveCaseStage3() {
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		tournament.setId(1);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(1,
+				competitiveResult());
+		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 	@Test
@@ -3139,8 +3428,15 @@ public class TournamentServiceTest {
 		competitiveResult3.setTime(LocalDateTime.of(2022, 8, 16, 18, 59));
 		ExhibitionResult exhibitionResult = exhibitionResult();
 		exhibitionResult.setTime(LocalDateTime.of(2022, 8, 16, 19, 30));
+		Tournament tournament = tournament();
+		tournament.setStage(2);
+		TournamentSchedule tournamentSchedule = tournamentSchedule();
+		tournamentSchedule.setDate(LocalDate.of(2022,8, 16));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule));
 		when(competitiveResultRepository.listCompetitiveResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(competitiveResult()));
 		when(exhibitionResultRepository.listExhibitionResultByAreaOrderTime(anyInt(), anyInt(), anyInt())).thenReturn(Arrays.asList(exhibitionResult));
+		when(competitiveMatchRepository.findById(anyInt())).thenReturn(Optional.of(competitiveMatch()));
 		when(competitiveResultRepository.findResultByMatchId(anyInt())).thenReturn(Optional.of(competitiveResult()));
 		ResponseMessage responseMessage = tournamentService.updateTimeAndAreaCompetitive(20,
 				competitiveResult3);

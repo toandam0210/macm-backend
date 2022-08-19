@@ -283,6 +283,8 @@ public class CompetitiveServiceTest {
 		assertEquals(response.getData().size(), 1);
 	}
 	
+	
+	
 	@Test
 	public void testgetAllCompetitiveTypeCaseSort2() {
 		List<CompetitiveType> competitiveTypes = new ArrayList<>(competitiveTypes());
@@ -300,6 +302,7 @@ public class CompetitiveServiceTest {
 		ResponseMessage response = competitiveService.getAllCompetitiveType(1);
 		assertEquals(response.getData().size(), 1);
 	}
+
 
 	@Test
 	public void testgetAllCompetitiveTypeCaseSort3() {
@@ -582,6 +585,9 @@ public class CompetitiveServiceTest {
 		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
 		CompetitiveType competitiveType = listCompetitive.get(0);
 		competitiveType.setStatus(1);
+		Tournament tournament = tournament();
+		tournament.setStage(0);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		competitiveService.autoSpawnMatchs(1);
 		
@@ -605,6 +611,10 @@ public class CompetitiveServiceTest {
 		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
 		CompetitiveType competitiveType = listCompetitive.get(0);
 		competitiveType.setStatus(1);
+		competitiveType.setStatus(1);
+		Tournament tournament = tournament();
+		tournament.setStage(0);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
 		competitiveService.autoSpawnMatchs(1);
@@ -644,6 +654,10 @@ public class CompetitiveServiceTest {
 		CompetitiveMatch competitiveMatch4 = competitiveMatch();
 		competitiveMatch4.setId(5);
 		competitiveMatchs.add(competitiveMatch4);
+		competitiveType.setStatus(1);
+		Tournament tournament = tournament();
+		tournament.setStage(0);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
 		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(competitivePlayers);
@@ -687,6 +701,9 @@ public class CompetitiveServiceTest {
 		CompetitiveMatch competitiveMatch3 = competitiveMatch();
 		competitiveMatch3.setId(4);
 		competitiveMatchs.add(competitiveMatch3);
+		Tournament tournament = tournament();
+		tournament.setStage(0);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(competitiveType));
 		when(competitiveMatchRepository.listMatchsByType(anyInt())).thenReturn(competitiveMatchs);
 		when(competitivePlayerRepository.findEligibleByCompetitiveTypeId(anyInt())).thenReturn(competitivePlayers);
@@ -991,8 +1008,10 @@ public class CompetitiveServiceTest {
 		Set<CompetitiveType> competitiveTypes = competitiveTypes();
 		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
 		listCompetitive.get(0).setStatus(0);
+		Tournament tournament = tournament();
+		tournament.setStage(0);
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(listCompetitive.get(0)));
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(userRepository.findById(anyInt())).thenReturn(Optional.of(createUser()));
 		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.of(tournamentPlayer()));
 		ResponseMessage response = competitiveService.addNewCompetitivePlayer(Arrays.asList(createUser()), 1);
@@ -1005,9 +1024,11 @@ public class CompetitiveServiceTest {
 		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
 		listCompetitive.get(0).setStatus(0);
 		listCompetitive.get(0).setGender(false);
-		
+		Tournament tournament = tournament();
+		tournament.setStage(0);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(listCompetitive.get(0)));
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		
 		ResponseMessage response = competitiveService.addNewCompetitivePlayer(Arrays.asList(createUser()), 1);
 		assertEquals(response.getData().size(), 0);
@@ -1018,6 +1039,9 @@ public class CompetitiveServiceTest {
 		Set<CompetitiveType> competitiveTypes = competitiveTypes();
 		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
 		listCompetitive.get(0).setStatus(1);
+		Tournament tournament = tournament();
+		tournament.setStage(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(listCompetitive.get(0)));
 		ResponseMessage response = competitiveService.addNewCompetitivePlayer(Arrays.asList(createUser()), 1);
 		assertEquals(response.getData().size(), 0);
@@ -1029,8 +1053,12 @@ public class CompetitiveServiceTest {
 		Set<CompetitiveType> competitiveTypes = competitiveTypes();
 		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
 		listCompetitive.get(0).setStatus(0);
+		Tournament tournament = tournament();
+		tournament.setStage(0);
+		when(competitiveTypeRepository.findTournamentOfType(anyInt())).thenReturn(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitiveTypeRepository.findById(anyInt())).thenReturn(Optional.of(listCompetitive.get(0)));
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.of(tournamentPlayer()));
 		ResponseMessage response = competitiveService.addNewCompetitivePlayer(Arrays.asList(createUser()), 1);
 		assertEquals(response.getData().size(), 1);
@@ -1061,6 +1089,9 @@ public class CompetitiveServiceTest {
 		CompetitivePlayer competitivePlayer = competitivePlayer();
 		competitivePlayer.setCompetitiveType(listCompetitive.get(0));
 		competitivePlayer.setIsEligible(true);
+		Tournament tournament = tournament();
+		tournament.setStage(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
 		ResponseMessage response = competitiveService.updateWeightForCompetitivePlayer(1, 58);
 		assertEquals(response.getData().size(), 1);
@@ -1074,9 +1105,28 @@ public class CompetitiveServiceTest {
 		CompetitivePlayer competitivePlayer = competitivePlayer();
 		competitivePlayer.setCompetitiveType(listCompetitive.get(0));
 		competitivePlayer.setIsEligible(true);
+		Tournament tournament = tournament();
+		tournament.setStage(1);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
 		ResponseMessage response = competitiveService.updateWeightForCompetitivePlayer(1, 40);
 		assertEquals(response.getData().size(), 1);
+	}
+	
+	@Test 
+	public void testUpdateWeightForCompetitivePlayerCaseOverTime1() {
+		Set<CompetitiveType> competitiveTypes = competitiveTypes();
+		List<CompetitiveType> listCompetitive = new ArrayList<CompetitiveType>(competitiveTypes);
+		listCompetitive.get(0).setStatus(3);
+		CompetitivePlayer competitivePlayer = competitivePlayer();
+		competitivePlayer.setCompetitiveType(listCompetitive.get(0));
+		competitivePlayer.setIsEligible(true);
+		Tournament tournament = tournament();
+		tournament.setStage(3);
+		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
+		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
+		ResponseMessage response = competitiveService.updateWeightForCompetitivePlayer(1, 40);
+		assertEquals(response.getData().size(), 0);
 	}
 	
 	@Test 
