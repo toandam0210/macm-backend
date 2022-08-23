@@ -469,7 +469,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
 							newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
 							newCompetitivePlayer.setWeight(0);
-							newCompetitivePlayer.setIsEligible(true);
+							newCompetitivePlayer.setIsEligible(false);
 							newCompetitivePlayer.setCompetitiveType(getType);
 							newCompetitivePlayer.setCreatedBy("LinhLHN");
 							newCompetitivePlayer.setCreatedOn(LocalDateTime.now());
@@ -479,7 +479,6 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							listUsers.add(user.getName() + " - " + user.getStudentId());
 						}
 					}
-					autoSpawnMatchs(competitiveTypeId);
 					getType.setCanDelete(false);
 					competitiveTypeRepository.save(getType);
 					responseMessage.setData(listUsers);
@@ -695,7 +694,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				User getUser = new User();
 				User[] listResult = new User[3];
 				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
-				CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(listMatchs.get(1).getId())
+				CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(listMatchs.get(0).getId())
 						.get();
 				if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
 					responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
@@ -704,7 +703,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							? listMatchs.get(0).getFirstStudentId()
 							: listMatchs.get(0).getSecondStudentId()).get();
 					listResult[2] = getUser;
-					getResult = competitiveResultRepository.findByMatchId(listMatchs.get(0).getId()).get();
+					getResult = competitiveResultRepository.findByMatchId(listMatchs.get(1).getId()).get();
 					if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
 						responseMessage.setMessage("Trận chung kết chưa diễn ra");
 					} else {
