@@ -81,7 +81,7 @@ public class SemesterServiceImpl implements SemesterService {
 			Optional<Semester> semesterOp = semesterRepository.findByName(semesterName);
 			if (semesterOp.isPresent()) {
 				Semester semester = semesterOp.get();
-				for (LocalDate date = semester.getStartDate(); date.isBefore(semester.getEndDate()); date.plusMonths(1)) {
+				for (LocalDate date = semester.getStartDate(); date.isBefore(semester.getEndDate()); date = date.plusMonths(1)) {
 					listMonth.add(date.getMonthValue());
 				}
 			}
