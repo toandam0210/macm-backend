@@ -695,7 +695,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				User getUser = new User();
 				User[] listResult = new User[3];
 				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
-				CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(listMatchs.get(1).getId())
+				CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(listMatchs.get(0).getId())
 						.get();
 				if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
 					responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
@@ -704,7 +704,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							? listMatchs.get(0).getFirstStudentId()
 							: listMatchs.get(0).getSecondStudentId()).get();
 					listResult[2] = getUser;
-					getResult = competitiveResultRepository.findByMatchId(listMatchs.get(0).getId()).get();
+					getResult = competitiveResultRepository.findByMatchId(listMatchs.get(1).getId()).get();
 					if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
 						responseMessage.setMessage("Trận chung kết chưa diễn ra");
 					} else {

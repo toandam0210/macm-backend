@@ -43,6 +43,7 @@ public class AreaServiceImpl implements AreaService{
 		area.setCreatedOn(LocalDateTime.now());
 		area.setUpdatedBy("LinhLHN");
 		area.setUpdatedOn(LocalDateTime.now());
+		area.setIsActive(true);
 		areaRepository.save(area);
 		responseMessage.setData(Arrays.asList(area));
 		responseMessage.setMessage("Thêm sân đấu " + area.getName());
@@ -61,6 +62,7 @@ public class AreaServiceImpl implements AreaService{
 				for (Area newArea : newListArea) {
 					if(currentArea.getName().equals(newArea.getName())) {
 						isExisted = true;
+						currentArea.setIsActive(true);
 						currentArea.setUpdatedBy("LinhLHN");
 						currentArea.setUpdatedOn(LocalDateTime.now());
 						areaRepository.save(currentArea);
@@ -68,7 +70,10 @@ public class AreaServiceImpl implements AreaService{
 					}
 				}
 				if(!isExisted) {
-					areaRepository.delete(currentArea);
+					currentArea.setIsActive(false);
+					currentArea.setUpdatedBy("LinhLHN");
+					currentArea.setUpdatedOn(LocalDateTime.now());
+					areaRepository.save(currentArea);
 				}
 			}
 			for (Area newArea : newListArea) {
@@ -79,6 +84,7 @@ public class AreaServiceImpl implements AreaService{
 					}
 				}
 				if(!isExisted) {
+					newArea.setIsActive(true);
 					newArea.setCreatedBy("LinhLHN");
 					newArea.setCreatedOn(LocalDateTime.now());
 					newArea.setUpdatedBy("LinhLHN");
