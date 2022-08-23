@@ -17,6 +17,7 @@ public class UserAttendanceStatusDto {
 	private LocalTime endTimeEvent;
 	private int type;
 	private int id;
+	private int activityId;
 
 	public String getUserName() {
 		return userName;
@@ -112,6 +113,14 @@ public class UserAttendanceStatusDto {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public int getActivityId() {
+		return activityId;
+	}
+
+	public void setActivityId(int activityId) {
+		this.activityId = activityId;
 	}
 
 }

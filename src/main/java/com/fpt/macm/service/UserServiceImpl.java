@@ -1045,6 +1045,7 @@ public class UserServiceImpl implements UserService {
 					EventSchedule endEventSchedule = eventSchedules.get(eventSchedules.size() - 1);
 					userAttendanceStatusDto.setEndDateEvent(endEventSchedule.getDate());
 					userAttendanceStatusDto.setEndTimeEvent(endEventSchedule.getFinishTime());
+					userAttendanceStatusDto.setActivityId(eventSchedule.getEvent().getId());
 					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 				} else {
 					Optional<MemberEvent> memberEventOp = memberEventRepository
@@ -1068,11 +1069,12 @@ public class UserServiceImpl implements UserService {
 								userAttendanceStatusDto.setDescription(eventSchedule.getEvent().getDescription());
 								userAttendanceStatusDto.setType(1);
 								userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
-								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 								List<EventSchedule> eventSchedules = eventScheduleRepository.findByEventId(eventSchedule.getEvent().getId());
 								EventSchedule endEventSchedule = eventSchedules.get(eventSchedules.size() - 1);
 								userAttendanceStatusDto.setEndDateEvent(endEventSchedule.getDate());
 								userAttendanceStatusDto.setEndTimeEvent(endEventSchedule.getFinishTime());
+								userAttendanceStatusDto.setActivityId(eventSchedule.getEvent().getId());
+								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 							} else {
 								UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
 								userAttendanceStatusDto.setUserName(user.getName());
@@ -1085,11 +1087,12 @@ public class UserServiceImpl implements UserService {
 								userAttendanceStatusDto.setDescription(eventSchedule.getEvent().getDescription());
 								userAttendanceStatusDto.setType(1);
 								userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
-								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 								List<EventSchedule> eventSchedules = eventScheduleRepository.findByEventId(eventSchedule.getEvent().getId());
 								EventSchedule endEventSchedule = eventSchedules.get(eventSchedules.size() - 1);
 								userAttendanceStatusDto.setEndDateEvent(endEventSchedule.getDate());
 								userAttendanceStatusDto.setEndTimeEvent(endEventSchedule.getFinishTime());
+								userAttendanceStatusDto.setActivityId(eventSchedule.getEvent().getId());
+								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 							}
 						} else {
 							UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
@@ -1103,11 +1106,12 @@ public class UserServiceImpl implements UserService {
 							userAttendanceStatusDto.setDescription(eventSchedule.getEvent().getDescription());
 							userAttendanceStatusDto.setType(1);
 							userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
-							listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 							List<EventSchedule> eventSchedules = eventScheduleRepository.findByEventId(eventSchedule.getEvent().getId());
 							EventSchedule endEventSchedule = eventSchedules.get(eventSchedules.size() - 1);
 							userAttendanceStatusDto.setEndDateEvent(endEventSchedule.getDate());
 							userAttendanceStatusDto.setEndTimeEvent(endEventSchedule.getFinishTime());
+							userAttendanceStatusDto.setActivityId(eventSchedule.getEvent().getId());
+							listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 						}
 					} else {
 						UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
@@ -1121,11 +1125,12 @@ public class UserServiceImpl implements UserService {
 						userAttendanceStatusDto.setDescription(eventSchedule.getEvent().getDescription());
 						userAttendanceStatusDto.setType(1);
 						userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
-						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 						List<EventSchedule> eventSchedules = eventScheduleRepository.findByEventId(eventSchedule.getEvent().getId());
 						EventSchedule endEventSchedule = eventSchedules.get(eventSchedules.size() - 1);
 						userAttendanceStatusDto.setEndDateEvent(endEventSchedule.getDate());
 						userAttendanceStatusDto.setEndTimeEvent(endEventSchedule.getFinishTime());
+						userAttendanceStatusDto.setActivityId(eventSchedule.getEvent().getId());
+						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 					}
 				}
 			}
@@ -1143,6 +1148,7 @@ public class UserServiceImpl implements UserService {
 				userAttendanceStatusDto.setDescription(tournamentSchedule.getTournament().getDescription());
 				userAttendanceStatusDto.setType(2);
 				userAttendanceStatusDto.setId(tournamentSchedule.getTournament().getId());
+				userAttendanceStatusDto.setActivityId(tournamentSchedule.getTournament().getId());
 				listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 			}
 
