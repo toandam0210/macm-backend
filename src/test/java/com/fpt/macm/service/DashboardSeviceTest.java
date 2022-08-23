@@ -534,7 +534,7 @@ public class DashboardSeviceTest {
 		when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament()));
 		when(tournamentService.getStartDate(anyInt())).thenReturn(LocalDate.now().plusMonths(1));
 
-		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities();
+		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities(0);
 		assertEquals(responseMessage.getData().size(), 2);
 	}
 
@@ -545,7 +545,7 @@ public class DashboardSeviceTest {
 		when(tournamentRepository.findAll()).thenReturn(Arrays.asList(tournament()));
 		when(tournamentService.getStartDate(anyInt())).thenReturn(LocalDate.now().minusMonths(1));
 
-		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities();
+		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities(0);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -553,7 +553,7 @@ public class DashboardSeviceTest {
 	public void getAllUpcomingActivitiesCaseException() {
 		when(eventRepository.findAll()).thenReturn(null);
 
-		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities();
+		ResponseMessage responseMessage = dashboardService.getAllUpcomingActivities(0);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 

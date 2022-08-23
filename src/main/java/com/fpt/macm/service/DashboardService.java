@@ -8,7 +8,7 @@ public interface DashboardService {
 	ResponseMessage eventReport();
 	ResponseMessage statusMemberReport();
 	ResponseMessage feeReport(String semester);
-	ResponseMessage getAllUpcomingActivities();
+	ResponseMessage getAllUpcomingActivities(int filterIndex);
 	ResponseMessage activityReport(String semester);
 	
 }
