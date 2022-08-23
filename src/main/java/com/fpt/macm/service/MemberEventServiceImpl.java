@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventPaymentStatusReport;
 import com.fpt.macm.model.entity.EventRole;
 import com.fpt.macm.model.entity.MemberEvent;
+import com.fpt.macm.model.entity.Notification;
 import com.fpt.macm.model.entity.RoleEvent;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
@@ -31,6 +33,7 @@ import com.fpt.macm.repository.EventPaymentStatusReportRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventRoleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
+import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.RoleEventRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
@@ -64,6 +67,12 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 	@Autowired
 	ClubFundService clubFundService;
+
+	@Autowired
+	NotificationRepository notificationRepository;
+
+	@Autowired
+	NotificationService notificationService;
 
 	@Override
 	public ResponseMessage updateListMemberEventRole(List<MemberEventDto> membersEventDto) {
@@ -714,6 +723,21 @@ public class MemberEventServiceImpl implements MemberEventService {
 				attendanceEvent.setCreatedOn(LocalDateTime.now());
 				attendanceEventRepository.save(attendanceEvent);
 
+				Notification notification = new Notification();
+				notification.setMessage("Yêu cầu đăng ký tham gia sự kiện " + memberEvent.getEvent().getName()
+						+ " của bạn đã được chấp nhận");
+				notification.setCreatedOn(LocalDateTime.now());
+				notification.setNotificationType(1);
+				notification.setNotificationTypeId(memberEvent.getEvent().getId());
+				notificationRepository.save(notification);
+
+				Iterable<Notification> notificationIterable = notificationRepository
+						.findAll(Sort.by("id").descending());
+				List<Notification> notifications = IterableUtils.toList(notificationIterable);
+				Notification newNotification = notifications.get(0);
+
+				notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
+
 				responseMessage.setData(Arrays.asList(memberEvent));
 				responseMessage.setMessage("Từ chối đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
 						+ " - " + memberEvent.getUser().getStudentId());
@@ -744,6 +768,21 @@ public class MemberEventServiceImpl implements MemberEventService {
 					AttendanceEvent attendanceEvent = attendanceEventOp.get();
 					attendanceEventRepository.delete(attendanceEvent);
 				}
+				
+				Notification notification = new Notification();
+				notification.setMessage("Yêu cầu đăng ký tham gia sự kiện " + memberEvent.getEvent().getName()
+						+ " của bạn đã bị từ chối");
+				notification.setCreatedOn(LocalDateTime.now());
+				notification.setNotificationType(1);
+				notification.setNotificationTypeId(memberEvent.getEvent().getId());
+				notificationRepository.save(notification);
+
+				Iterable<Notification> notificationIterable = notificationRepository
+						.findAll(Sort.by("id").descending());
+				List<Notification> notifications = IterableUtils.toList(notificationIterable);
+				Notification newNotification = notifications.get(0);
+
+				notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
 
 				responseMessage.setData(Arrays.asList(memberEvent));
 				responseMessage.setMessage("Từ chối đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
@@ -776,6 +815,20 @@ public class MemberEventServiceImpl implements MemberEventService {
 						AttendanceEvent attendanceEvent = attendanceEventOp.get();
 						attendanceEventRepository.delete(attendanceEvent);
 					}
+					
+					Notification notification = new Notification();
+					notification.setMessage("Bạn đã bị xóa khỏi sự kiện " + memberEvent.getEvent().getName());
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(1);
+					notification.setNotificationTypeId(memberEvent.getEvent().getId());
+					notificationRepository.save(notification);
+
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
+
+					notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
 
 					responseMessage.setData(Arrays.asList(memberEvent));
 					responseMessage.setMessage("Xóa " + memberEvent.getUser().getName() + " - "
