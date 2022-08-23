@@ -12,6 +12,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.CompetitiveMatchByTypeDto;
 import com.fpt.macm.model.dto.CompetitiveMatchDto;
 import com.fpt.macm.model.dto.CompetitivePlayerByTypeDto;
@@ -128,7 +129,11 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
 						.findByTournamentId(getTournament.getId());
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					userJoined.add(tournamentOrganizingCommittee.getUser());
+					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							|| tournamentOrganizingCommittee.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+						userJoined.add(tournamentOrganizingCommittee.getUser());
+					}
 				}
 
 				List<User> userNotJoined = new ArrayList<User>();

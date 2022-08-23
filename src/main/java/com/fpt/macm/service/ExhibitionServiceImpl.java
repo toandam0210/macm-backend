@@ -13,6 +13,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ExhibitionPlayerDto;
 import com.fpt.macm.model.dto.ExhibitionResultByTypeDto;
 import com.fpt.macm.model.dto.ExhibitionTeamDto;
@@ -21,6 +22,7 @@ import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
@@ -28,6 +30,7 @@ import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
+import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -55,6 +58,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
 	@Autowired
 	ExhibitionResultRepository exhibitionResultRepository;
+	
+	@Autowired
+	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
 
 	@Override
 	public ResponseMessage getAllExhibitionType(int tournamentId) {
@@ -98,6 +104,17 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 						userJoined.add(getUser);
 					}
 				}
+				
+				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+						.findByTournamentId(getTournament.getId());
+				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							|| tournamentOrganizingCommittee.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+						userJoined.add(tournamentOrganizingCommittee.getUser());
+					}
+				}
+				
 				List<User> userNotJoined = new ArrayList<User>();
 				for (User user : listActive) {
 					if (!userJoined.contains(user)) {
