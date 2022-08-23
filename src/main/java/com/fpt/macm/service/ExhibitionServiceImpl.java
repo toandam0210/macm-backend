@@ -1,6 +1,5 @@
 package com.fpt.macm.service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -14,6 +13,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.model.dto.ExhibitionPlayerDto;
 import com.fpt.macm.model.dto.ExhibitionResultByTypeDto;
 import com.fpt.macm.model.dto.ExhibitionTeamDto;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
@@ -31,32 +31,31 @@ import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
-import com.fpt.macm.utils.Utils;
 
 @Service
-public class ExhibitionServiceImpl implements ExhibitionService{
+public class ExhibitionServiceImpl implements ExhibitionService {
 
 	@Autowired
 	TournamentRepository tournamentRepository;
-	
+
 	@Autowired
 	ExhibitionTypeRepository exhibitionTypeRepository;
-	
+
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
 	TournamentPlayerRepository tournamentPlayerRepository;
-	
+
 	@Autowired
 	ExhibitionPlayerRepository exhibitionPlayerRepository;
-	
+
 	@Autowired
 	ExhibitionTeamRepository exhibitionTeamRepository;
-	
+
 	@Autowired
 	ExhibitionResultRepository exhibitionResultRepository;
-	
+
 	@Override
 	public ResponseMessage getAllExhibitionType(int tournamentId) {
 		// TODO Auto-generated method stub
@@ -83,42 +82,46 @@ public class ExhibitionServiceImpl implements ExhibitionService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<ExhibitionType> getTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
-			if(getTypeOp.isPresent()) {
+			if (getTypeOp.isPresent()) {
 				ExhibitionType getType = getTypeOp.get();
-				Tournament getTournament = tournamentRepository.findById(exhibitionTypeRepository.findTournamentOfType(exhibitionTypeId)).get();
-				List<User> userJoined= new ArrayList<User>();
+				Tournament getTournament = tournamentRepository
+						.findById(exhibitionTypeRepository.findTournamentOfType(exhibitionTypeId)).get();
+				List<User> userJoined = new ArrayList<User>();
 				List<User> listActive = userRepository.findAllActiveUser();
-				List<TournamentPlayer> listPlayers = tournamentPlayerRepository.getPlayerByTournamentId(getTournament.getId());
+				List<TournamentPlayer> listPlayers = tournamentPlayerRepository
+						.getPlayerByTournamentId(getTournament.getId());
 				for (TournamentPlayer tournamentPlayer : listPlayers) {
-					Optional<ExhibitionPlayer> getExhibitionPlayerOp = exhibitionPlayerRepository.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionTypeId);
-					if(getExhibitionPlayerOp.isPresent()) {
+					Optional<ExhibitionPlayer> getExhibitionPlayerOp = exhibitionPlayerRepository
+							.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionTypeId);
+					if (getExhibitionPlayerOp.isPresent()) {
 						User getUser = tournamentPlayer.getUser();
 						userJoined.add(getUser);
 					}
 				}
-				List<User> userNotJoined= new ArrayList<User>();
+				List<User> userNotJoined = new ArrayList<User>();
 				for (User user : listActive) {
-					if(!userJoined.contains(user)) {
+					if (!userJoined.contains(user)) {
 						userNotJoined.add(user);
 					}
 				}
 				responseMessage.setData(userNotJoined);
 				responseMessage.setTotalResult(userNotJoined.size());
-				responseMessage.setMessage("Danh sách thành viên chưa đăng ký tham gia thi đấu biểu diễn thể thức " + getType.getName());
+				responseMessage.setMessage(
+						"Danh sách thành viên chưa đăng ký tham gia thi đấu biểu diễn thể thức " + getType.getName());
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
 	public ResponseMessage registerTeam(int exhibitionTypeId, String name, List<String> listStudentId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<ExhibitionType> getTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
-			if(getTypeOp.isPresent()) {
+			if (getTypeOp.isPresent()) {
 				ExhibitionType getType = getTypeOp.get();
 				ExhibitionTeam newTeam = new ExhibitionTeam();
 				newTeam.setTeamName(name);
@@ -142,8 +145,8 @@ public class ExhibitionServiceImpl implements ExhibitionService{
 								.findByTournamentPlayerAndType(getTournamentPlayer.getId(), getType.getId());
 						if (getExhibitionPlayerOp.isPresent()) {
 							isRegister = false;
-							responseMessage.setMessage("Thành viên " + getUser.getName() + " - " + getUser.getStudentId()
-									+ " đã đăng ký nội dung này");
+							responseMessage.setMessage("Thành viên " + getUser.getName() + " - "
+									+ getUser.getStudentId() + " đã đăng ký nội dung này");
 							return responseMessage;
 						} else {
 							continue;
@@ -202,8 +205,7 @@ public class ExhibitionServiceImpl implements ExhibitionService{
 					responseMessage.setData(Arrays.asList(newTeam));
 					responseMessage.setMessage("Đăng ký thành công");
 				}
-			}
-			else {
+			} else {
 				responseMessage.setMessage("Không tìm thấy thể thức");
 			}
 		} catch (Exception e) {
@@ -219,17 +221,15 @@ public class ExhibitionServiceImpl implements ExhibitionService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<ExhibitionType> getTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
-			if(getTypeOp.isPresent()) {
+			if (getTypeOp.isPresent()) {
 				ExhibitionType getType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
 				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
 				responseMessage.setData(Arrays.asList(getTeams));
 				responseMessage.setMessage("Danh sách các đội biểu diễn nội dung " + getType.getName());
-			}
-			else {
+			} else {
 				responseMessage.setMessage("Không tìm thấy thể thức");
 			}
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
@@ -309,34 +309,53 @@ public class ExhibitionServiceImpl implements ExhibitionService{
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
-	public ResponseMessage getListExhibitionResult(int exhibitionTypeId, String date) {
+	public ResponseMessage getListExhibitionResult(int exhibitionTypeId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<ExhibitionResult> listResult = new ArrayList<ExhibitionResult>();
-			if (exhibitionTypeId != 0) {
-				Optional<ExhibitionType> getTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
-				if(getTypeOp.isPresent()) {
-					ExhibitionType getType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
-					Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
-					for (ExhibitionTeam exhibitionTeam : getTeams) {
-						ExhibitionResult getResult = exhibitionResultRepository.findByTeam(exhibitionTeam.getId()).get();
-						listResult.add(getResult);
+			Optional<ExhibitionType> getTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
+			if (getTypeOp.isPresent()) {
+				ExhibitionType getType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
+				ExhibitionResultByTypeDto resultByTypeDto = new ExhibitionResultByTypeDto();
+				List<ExhibitionTeamDto> listTeamDto = new ArrayList<ExhibitionTeamDto>();
+				resultByTypeDto.setExhibitionType(getType);
+				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
+				for (ExhibitionTeam exhibitionTeam : getTeams) {
+					ExhibitionTeamDto teamDto = new ExhibitionTeamDto();
+					teamDto.setId(exhibitionTeam.getId());
+					teamDto.setTeamName(exhibitionTeam.getTeamName());
+					teamDto.setExhibitionTypeId(exhibitionTypeId);
+					teamDto.setExhibitionTypeName(getType.getName());
+					Set<ExhibitionPlayerDto> listExhibitionPlayerDtos = new HashSet<ExhibitionPlayerDto>();
+					for (ExhibitionPlayer exhibitionPlayer : exhibitionTeam.getExhibitionPlayers()) {
+						ExhibitionPlayerDto exhibitionPlayerDto = new ExhibitionPlayerDto();
+						exhibitionPlayerDto.setId(exhibitionPlayer.getId());
+						exhibitionPlayerDto.setPlayerGender(exhibitionPlayer.getTournamentPlayer().getUser().isGender());
+						exhibitionPlayerDto.setPlayerId(exhibitionPlayer.getTournamentPlayer().getId());
+						exhibitionPlayerDto.setPlayerName(exhibitionPlayer.getTournamentPlayer().getUser().getName());
+						exhibitionPlayerDto.setPlayerStudentId(exhibitionPlayer.getTournamentPlayer().getUser().getStudentId());
+						exhibitionPlayerDto.setRoleInTeam(exhibitionPlayer.isRoleInTeam());
+						listExhibitionPlayerDtos.add(exhibitionPlayerDto);
 					}
-				}
-				else {
-					responseMessage.setMessage("Không tìm thấy thể thức");
-				}
-			} else if (date != "") {
-				LocalDate getDate = Utils.ConvertStringToLocalDate(date);
-				List<ExhibitionResult> listAll = exhibitionResultRepository.findAll();
-				for (ExhibitionResult exhibitionResult : listAll) {
-					if (exhibitionResult.getTime().toLocalDate().equals(getDate)) {
-						listResult.add(exhibitionResult);
+					teamDto.setExhibitionPlayersDto(listExhibitionPlayerDtos);
+					Optional<ExhibitionResult> getResultOp = exhibitionResultRepository.findByTeam(exhibitionTeam.getId());
+					if(getResultOp.isPresent()) {
+						ExhibitionResult getResult = getResultOp.get();
+						teamDto.setScore(getResult.getScore());
+						teamDto.setTime(getResult.getTime());
+						teamDto.setAreaName(getResult.getArea().getName());
 					}
+					
+					listTeamDto.add(teamDto);
 				}
+				resultByTypeDto.setListResult(listTeamDto);
+				responseMessage.setData(Arrays.asList(resultByTypeDto));
+				responseMessage.setMessage("Danh sách trận đấu biểu diễn thể thức " + getType.getName());
+			} else {
+				responseMessage.setMessage("Không tìm thấy thể thức");
 			}
 			if (listResult.size() > 0) {
 				Collections.sort(listResult, new Comparator<ExhibitionResult>() {
@@ -364,17 +383,16 @@ public class ExhibitionServiceImpl implements ExhibitionService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<ExhibitionResult> getResultOp = exhibitionResultRepository.findByTeam(exhibitionTeamId);
-			if(getResultOp.isPresent()) {
+			if (getResultOp.isPresent()) {
 				ExhibitionResult getResult = getResultOp.get();
 				getResult.setScore(score);
 				getResult.setUpdatedBy("LinhLHN");
 				getResult.setUpdatedOn(LocalDateTime.now());
 				exhibitionResultRepository.save(getResult);
 				responseMessage.setData(Arrays.asList(getResult));
-				responseMessage.setMessage(
-						"Cập nhật điểm cho đội " + exhibitionTeamRepository.findById(exhibitionTeamId).get().getTeamName());
-			}
-			else {
+				responseMessage.setMessage("Cập nhật điểm cho đội "
+						+ exhibitionTeamRepository.findById(exhibitionTeamId).get().getTeamName());
+			} else {
 				responseMessage.setMessage("Không tìm thấy đội");
 			}
 		} catch (Exception e) {
@@ -390,18 +408,19 @@ public class ExhibitionServiceImpl implements ExhibitionService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<ExhibitionType> getTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
-			if(getTypeOp.isPresent()) {
+			if (getTypeOp.isPresent()) {
 				ExhibitionResultByTypeDto exhibitionResultByTypeDto = new ExhibitionResultByTypeDto();
 				ExhibitionType getType = getTypeOp.get();
 				exhibitionResultByTypeDto.setExhibitionType(getType);
-				//responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
+				// responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
 				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
 				List<ExhibitionTeamDto> listResult = new ArrayList<ExhibitionTeamDto>();
 				for (ExhibitionTeam exhibitionTeam : getTeams) {
-					Optional<ExhibitionResult> exhibitionResultOp = exhibitionResultRepository.findByTeam(exhibitionTeam.getId());
-					if(exhibitionResultOp.isPresent()) {
+					Optional<ExhibitionResult> exhibitionResultOp = exhibitionResultRepository
+							.findByTeam(exhibitionTeam.getId());
+					if (exhibitionResultOp.isPresent()) {
 						ExhibitionResult exhibitionResult = exhibitionResultOp.get();
-						if(exhibitionResult.getScore() == null) {
+						if (exhibitionResult.getScore() == null) {
 							responseMessage.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa có điểm");
 							return responseMessage;
 						} else {
@@ -410,22 +429,22 @@ public class ExhibitionServiceImpl implements ExhibitionService{
 							exhibitionTeamDto.setScore(exhibitionResult.getScore());
 							listResult.add(exhibitionTeamDto);
 						}
-					}
-					else {
-						responseMessage.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa được xếp lịch thi đấu");
+					} else {
+						responseMessage
+								.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa được xếp lịch thi đấu");
 						return responseMessage;
 					}
 				}
 				Collections.sort(listResult);
 				List<Double> listScore = new ArrayList<Double>();
 				for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
-					if(!listScore.contains(exhibitionTeamDto.getScore())) {
+					if (!listScore.contains(exhibitionTeamDto.getScore())) {
 						listScore.add(exhibitionTeamDto.getScore());
 					}
 				}
 				for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
 					for (int i = 0; i < listScore.size(); i++) {
-						if(exhibitionTeamDto.getScore().equals(listScore.get(i))) {
+						if (exhibitionTeamDto.getScore().equals(listScore.get(i))) {
 							exhibitionTeamDto.setRank(i + 1);
 						}
 					}
