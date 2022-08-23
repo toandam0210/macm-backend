@@ -20,4 +20,6 @@ public interface TournamentOrganizingCommitteeRepository extends JpaRepository<T
 	
 	@Query(value = "Select * from tournament_organizing_committee where tournament_id = ?1 and role_in_tournament = ?2", nativeQuery = true)
 	List<TournamentOrganizingCommittee> findByTournamentIdAndRoleInTournament(int tournamentId, int roleInTournament);
+	
+	List<TournamentOrganizingCommittee> findByTournamentIdAndRegisterStatus(int tournamentId, String registerStatus);
 }

@@ -35,6 +35,9 @@ public class TournamentOrganizingCommittee {
 	private boolean paymentStatus;
 
 	@Column
+	private String registerStatus;
+
+	@Column
 	private String createdBy;
 
 	@Column
@@ -116,6 +119,14 @@ public class TournamentOrganizingCommittee {
 
 	public void setPaymentStatus(boolean paymentStatus) {
 		this.paymentStatus = paymentStatus;
+	}
+
+	public String getRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(String registerStatus) {
+		this.registerStatus = registerStatus;
 	}
 
 }
