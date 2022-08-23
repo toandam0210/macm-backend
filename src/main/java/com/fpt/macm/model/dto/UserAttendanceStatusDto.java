@@ -9,9 +9,12 @@ public class UserAttendanceStatusDto {
 	private String studentId;
 	private int status;
 	private String title;
+	private String description;
 	private LocalDate date;
 	private LocalTime startTime;
 	private LocalTime finishTime;
+	private LocalDate endDateEvent;
+	private LocalTime endTimeEvent;
 	private int type;
 	private int id;
 
@@ -85,6 +88,30 @@ public class UserAttendanceStatusDto {
 
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public LocalDate getEndDateEvent() {
+		return endDateEvent;
+	}
+
+	public void setEndDateEvent(LocalDate endDateEvent) {
+		this.endDateEvent = endDateEvent;
+	}
+
+	public LocalTime getEndTimeEvent() {
+		return endTimeEvent;
+	}
+
+	public void setEndTimeEvent(LocalTime endTimeEvent) {
+		this.endTimeEvent = endTimeEvent;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }
