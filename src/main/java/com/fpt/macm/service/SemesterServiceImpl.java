@@ -94,4 +94,25 @@ public class SemesterServiceImpl implements SemesterService {
 		return responseMessage;
 	}
 
+	@Override
+	public ResponseMessage updateSemester(int semesterId, Semester semester) {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Semester> getSemesterOp = semesterRepository.findById(semesterId);
+			if(getSemesterOp.isPresent()) {
+				Semester getSemester = getSemesterOp.get();
+				getSemester.setStartDate(semester.getStartDate());
+				getSemester.setEndDate(semester.getEndDate());
+				semesterRepository.save(getSemester);
+				responseMessage.setData(Arrays.asList(getSemester));
+				responseMessage.setMessage("Thay đổi thời gian của kỳ");
+			}
+		} catch (Exception e) {
+			// TODO: handle exception
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
 }
