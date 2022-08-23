@@ -66,12 +66,13 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 					AttendanceStatus attendanceStatus = attendanceStatusRepository
 							.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
 					if (attendanceStatus != null) {
-						
+
 						if (attendanceStatus.getStatus() == status) {
-							responseMessage.setMessage(user.getStudentId() + " - " + user.getName() + " đã được điểm danh!");
+							responseMessage
+									.setMessage(user.getStudentId() + " - " + user.getName() + " đã được điểm danh!");
 							return responseMessage;
 						}
-						
+
 						attendanceStatus.setStatus(status);
 						attendanceStatus.setUpdatedOn(LocalDateTime.now());
 						attendanceStatus.setUpdatedBy("toandv");
@@ -191,7 +192,8 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	}
 
 	@Override
-	public ResponseMessage getAllAttendanceStatusByStudentIdAndSemester(String studentId, String semesterName, int month) {
+	public ResponseMessage getAllAttendanceStatusByStudentIdAndSemester(String studentId, String semesterName,
+			int month) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			User user = userRepository.findByStudentId(studentId).get();
@@ -201,8 +203,8 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 
 			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
-			for (TrainingSchedule trainingSchedule : trainingSchedules) {
-				if (trainingSchedule.getDate().getMonthValue() == month) {
+			if (month == 0) {
+				for (TrainingSchedule trainingSchedule : trainingSchedules) {
 					UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
 					userAttendanceStatusDto.setUserName(user.getName());
 					userAttendanceStatusDto.setStudentId(user.getStudentId());
@@ -221,8 +223,29 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 					}
 					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 				}
-			}
+			} else {
+				for (TrainingSchedule trainingSchedule : trainingSchedules) {
+					if (trainingSchedule.getDate().getMonthValue() == month) {
+						UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+						userAttendanceStatusDto.setUserName(user.getName());
+						userAttendanceStatusDto.setStudentId(user.getStudentId());
+						userAttendanceStatusDto.setDate(trainingSchedule.getDate());
+						userAttendanceStatusDto.setStartTime(trainingSchedule.getStartTime());
+						userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
+						userAttendanceStatusDto.setTitle("Lịch tập");
+						userAttendanceStatusDto.setType(0);
 
+						AttendanceStatus attendanceStatus = attendanceStatusRepository
+								.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+						if (attendanceStatus != null) {
+							userAttendanceStatusDto.setStatus(attendanceStatus.getStatus());
+						} else {
+							userAttendanceStatusDto.setStatus(2);
+						}
+						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
+					}
+				}
+			}
 			responseMessage.setData(listUserAttendanceStatusDto);
 			responseMessage.setMessage(
 					"Lấy báo cáo điểm danh cho " + user.getName() + " - " + user.getStudentId() + " thành công.");
