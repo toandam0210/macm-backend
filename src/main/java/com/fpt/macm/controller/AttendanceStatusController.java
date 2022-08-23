@@ -46,9 +46,9 @@ public class AttendanceStatusController {
 
 	@GetMapping("/getallattendancestatusbystudentidandsemester/{studentId}")
 	ResponseEntity<ResponseMessage> getAllAttendanceStatusByStudentIdAndSemester(
-			@PathVariable(name = "studentId") String studentId, @RequestParam String semester) {
+			@PathVariable(name = "studentId") String studentId, @RequestParam String semester, @RequestParam int month) {
 		return new ResponseEntity<ResponseMessage>(
-				attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester(studentId, semester),
+				attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester(studentId, semester, month),
 				HttpStatus.OK);
 	}
 

@@ -191,7 +191,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	}
 
 	@Override
-	public ResponseMessage getAllAttendanceStatusByStudentIdAndSemester(String studentId, String semesterName) {
+	public ResponseMessage getAllAttendanceStatusByStudentIdAndSemester(String studentId, String semesterName, int month) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			User user = userRepository.findByStudentId(studentId).get();
@@ -202,23 +202,25 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
 					.listTrainingScheduleByTime(semester.getStartDate(), semester.getEndDate());
 			for (TrainingSchedule trainingSchedule : trainingSchedules) {
-				UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
-				userAttendanceStatusDto.setUserName(user.getName());
-				userAttendanceStatusDto.setStudentId(user.getStudentId());
-				userAttendanceStatusDto.setDate(trainingSchedule.getDate());
-				userAttendanceStatusDto.setStartTime(trainingSchedule.getStartTime());
-				userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
-				userAttendanceStatusDto.setTitle("Lịch tập");
-				userAttendanceStatusDto.setType(0);
+				if (trainingSchedule.getDate().getMonthValue() == month) {
+					UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
+					userAttendanceStatusDto.setUserName(user.getName());
+					userAttendanceStatusDto.setStudentId(user.getStudentId());
+					userAttendanceStatusDto.setDate(trainingSchedule.getDate());
+					userAttendanceStatusDto.setStartTime(trainingSchedule.getStartTime());
+					userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
+					userAttendanceStatusDto.setTitle("Lịch tập");
+					userAttendanceStatusDto.setType(0);
 
-				AttendanceStatus attendanceStatus = attendanceStatusRepository
-						.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
-				if (attendanceStatus != null) {
-					userAttendanceStatusDto.setStatus(attendanceStatus.getStatus());
-				} else {
-					userAttendanceStatusDto.setStatus(2);
+					AttendanceStatus attendanceStatus = attendanceStatusRepository
+							.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+					if (attendanceStatus != null) {
+						userAttendanceStatusDto.setStatus(attendanceStatus.getStatus());
+					} else {
+						userAttendanceStatusDto.setStatus(2);
+					}
+					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 				}
-				listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 			}
 
 			responseMessage.setData(listUserAttendanceStatusDto);

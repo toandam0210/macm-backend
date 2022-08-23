@@ -242,7 +242,7 @@ public class AttendanceStatusServiceTest {
 		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(attendanceStatus());
 	
-		ResponseMessage responseMessage = attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester("HE140856", "Summer2022");
+		ResponseMessage responseMessage = attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester("HE140856", "Summer2022", 1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -253,7 +253,7 @@ public class AttendanceStatusServiceTest {
 		when(trainingScheduleRepository.listTrainingScheduleByTime(any(), any())).thenReturn(Arrays.asList(trainingSchedule()));
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(), anyInt())).thenReturn(null);
 	
-		ResponseMessage responseMessage = attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester("HE140856", "Summer2022");
+		ResponseMessage responseMessage = attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester("HE140856", "Summer2022", 1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -261,7 +261,7 @@ public class AttendanceStatusServiceTest {
 	public void getAllAttendanceStatusByStudentIdAndSemesterCaseException() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(null);
 	
-		ResponseMessage responseMessage = attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester("HE140856", "Summer2022");
+		ResponseMessage responseMessage = attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester("HE140856", "Summer2022", 1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
