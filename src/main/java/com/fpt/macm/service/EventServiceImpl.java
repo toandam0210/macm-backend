@@ -576,7 +576,7 @@ public class EventServiceImpl implements EventService {
 				Optional<Event> eventOp = eventRepository.findById(eventId);
 				Event getEvent = eventOp.get();
 				if (isIncurred) {
-					int countMemberEvent = memberEventRepository.findMemberEventByEventId(eventId).size();
+					int countMemberEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId, Constant.REQUEST_STATUS_APPROVED).size();
 					double totalProceedsActual = countMemberEvent * getEvent.getAmountPerRegisterEstimated();
 					double totalAmountActual = totalProceedsActual + money + getEvent.getAmountFromClub();
 					getEvent.setTotalAmountActual(totalAmountActual);
