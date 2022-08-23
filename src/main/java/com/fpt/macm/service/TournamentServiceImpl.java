@@ -1961,7 +1961,7 @@ public class TournamentServiceImpl implements TournamentService {
 				if (getTournament.getStage() <= 1) {
 					List<CompetitiveMatch> listCompetitiveMatchs = new ArrayList<CompetitiveMatch>();
 					Set<CompetitiveType> listCompetitiveTypes = getTournament.getCompetitiveTypes();
-					List<Area> listArea = areaRepository.findAll();
+					List<Area> listArea = areaRepository.listActiveArea();
 					for (CompetitiveType competitiveType : listCompetitiveTypes) {
 						competitiveType.setStatus(2);
 						List<CompetitiveMatch> listMatchByType = competitiveMatchRepository

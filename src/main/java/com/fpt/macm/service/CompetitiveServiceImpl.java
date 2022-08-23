@@ -469,7 +469,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
 							newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
 							newCompetitivePlayer.setWeight(0);
-							newCompetitivePlayer.setIsEligible(true);
+							newCompetitivePlayer.setIsEligible(false);
 							newCompetitivePlayer.setCompetitiveType(getType);
 							newCompetitivePlayer.setCreatedBy("LinhLHN");
 							newCompetitivePlayer.setCreatedOn(LocalDateTime.now());
@@ -479,7 +479,6 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							listUsers.add(user.getName() + " - " + user.getStudentId());
 						}
 					}
-					autoSpawnMatchs(competitiveTypeId);
 					getType.setCanDelete(false);
 					competitiveTypeRepository.save(getType);
 					responseMessage.setData(listUsers);
