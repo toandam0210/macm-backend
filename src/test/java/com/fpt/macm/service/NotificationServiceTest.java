@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Sort;
 
+import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
@@ -147,7 +148,7 @@ public class NotificationServiceTest {
 	private MemberEvent memberEvent() {
 		MemberEvent memberEvent = new MemberEvent();
 		memberEvent.setId(1);
-		memberEvent.setRegisterStatus(true);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 		memberEvent.setEvent(event());
 		memberEvent.setRoleEvent(roleEvent());
 		memberEvent.setUser(user());

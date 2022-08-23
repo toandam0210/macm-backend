@@ -377,7 +377,7 @@ public class NotificationServiceImpl implements NotificationService {
 			if (!membersEvent.isEmpty()) {
 				for (MemberEvent memberEvent : membersEvent) {
 					if (memberEvent.getEvent().isStatus()) {
-						if (memberEvent.isRegisterStatus()) {
+						if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
 							Event event = memberEvent.getEvent();
 							double amountPerRegisterEstimate = event.getAmountPerRegisterEstimated();
 							double amountPerRegisterActual = event.getAmountPerRegisterActual();

@@ -646,7 +646,7 @@ public class EventServiceImpl implements EventService {
 									.findMemberEventByEventAndUser(event.getId(), user.getId());
 							if (memberEventOp.isPresent()) {
 								MemberEvent memberEvent = memberEventOp.get();
-								if (memberEvent.isRegisterStatus()) {
+								if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
 									userEventSemesterDto.setJoin(true);
 								} else {
 									userEventSemesterDto.setJoin(false);
@@ -715,7 +715,7 @@ public class EventServiceImpl implements EventService {
 			if (!memberEvents.isEmpty()) {
 				List<EventDto> eventsDto = new ArrayList<EventDto>();
 				for (MemberEvent memberEvent : memberEvents) {
-					if (memberEvent.getEvent().isStatus() && memberEvent.isRegisterStatus()) {
+					if (memberEvent.getEvent().isStatus() && memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
 						Event event = memberEvent.getEvent();
 						eventsDto.add(convertToEventDto(event));
 					}
