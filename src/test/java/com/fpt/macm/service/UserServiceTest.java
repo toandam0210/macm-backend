@@ -1024,67 +1024,61 @@ public class UserServiceTest {
 	@Test 
 	public void testSearchByMultipleFieldCaseName() {
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"toan","","","",null,null,"","","");
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"toan","","","",null,null,"",null);
 		assertEquals(response.getData().size(), 2);
 	}
 	
 	@Test 
 	public void testSearchByMultipleFieldCaseStudentId() {
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","HE","","",null,null,"","","");
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","HE","","",null,null,"",null);
 		assertEquals(response.getData().size(), 2);
 	}
 	
 	@Test 
 	public void testSearchByMultipleFieldCaseEmail() {
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","toandv","",null,null,"","","");
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","toandv","",null,null,"",null);
 		assertEquals(response.getData().size(), 2);
 	}
 	
 	@Test 
 	public void testSearchByMultipleFieldCaseGender() {
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","true",null,null,"","","");
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","true",null,null,"",null);
 		assertEquals(response.getData().size(), 2);
 	}
 	@Test 
 	public void testSearchByMultipleFieldCaseGeneration() {
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",1,null,"","","");
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",1,null,"",null);
 		assertEquals(response.getData().size(), 0);
 	}
 	
 	@Test 
 	public void testSearchByMultipleFieldCaseRoleId() {
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,1,"","","");
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,1,"",null);
 		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test 
 	public void testSearchByMultipleFieldCaseIsActive() {
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"true","","");
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"true",null);
 		assertEquals(response.getData().size(), 2);
 	}
 	@Test 
 	public void testSearchByMultipleFieldCaseDateFrom() {
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"","2000-02-11","");
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"",1);
 		assertEquals(response.getData().size(), 0);
 	}
-	@Test 
-	public void testSearchByMultipleFieldCaseDateTo() {
-		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"","","2000-02-09");
-		assertEquals(response.getData().size(), 0);
-	}
-	
+
 	@Test 
 	public void testSearchByMultipleFieldCaseDateToException() {
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"","","09/02/2022");
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"",1);
 		assertEquals(response.getData().size(), 0);
 	}
 	
