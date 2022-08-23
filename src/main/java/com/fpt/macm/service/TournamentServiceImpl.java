@@ -361,7 +361,7 @@ public class TournamentServiceImpl implements TournamentService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-					.findByTournamentId(tournamentId);
+					.findByTournamentIdAndRegisterStatus(tournamentId, Constant.REQUEST_STATUS_APPROVED);
 			if (!tournamentOrganizingCommittees.isEmpty()) {
 				List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
@@ -369,6 +369,7 @@ public class TournamentServiceImpl implements TournamentService {
 							tournamentOrganizingCommittee);
 					tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
 				}
+				Collections.sort(tournamentOrganizingCommitteesDto);
 				responseMessage.setData(tournamentOrganizingCommitteesDto);
 				responseMessage.setTotalResult(tournamentOrganizingCommitteesDto.size());
 				responseMessage.setMessage(Constant.MSG_097);
@@ -953,10 +954,16 @@ public class TournamentServiceImpl implements TournamentService {
 		List<TournamentOrganizingCommittee> organizingCommittees = tournamentOrganizingCommitteeRepository
 				.findByTournamentIdAndRoleInTournament(tournamentId, tournamentRole.getRoleEvent().getId());
 		if (!organizingCommittees.isEmpty()) {
-			if (tournamentRole.getQuantity() - organizingCommittees.size() < 0) {
+			int count = 0;
+			for (TournamentOrganizingCommittee tournamentOrganizingCommittee : organizingCommittees) {
+				if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED) || tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+					count++;
+				}
+			}
+			if (tournamentRole.getQuantity() - count < 0) {
 				return 0;
 			} else {
-				return tournamentRole.getQuantity() - organizingCommittees.size();
+				return tournamentRole.getQuantity() - count;
 			}
 		} else {
 			return tournamentRole.getQuantity();
@@ -1038,7 +1045,7 @@ public class TournamentServiceImpl implements TournamentService {
 				Tournament tournament = tournamentOp.get();
 				if (tournament.getFeeOrganizingCommiteePay() > 0) {
 					List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-							.findByTournamentId(tournamentId);
+							.findByTournamentIdAndRegisterStatus(tournamentId, Constant.REQUEST_STATUS_APPROVED);
 					if (!tournamentOrganizingCommittees.isEmpty()) {
 						List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
 						for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
