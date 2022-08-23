@@ -13,6 +13,8 @@ public class UserAttendanceStatusDto {
 	private LocalDate date;
 	private LocalTime startTime;
 	private LocalTime finishTime;
+	private LocalDate startDateEvent;
+	private LocalTime startTimeEvent;
 	private LocalDate endDateEvent;
 	private LocalTime endTimeEvent;
 	private int type;
@@ -112,6 +114,22 @@ public class UserAttendanceStatusDto {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public LocalDate getStartDateEvent() {
+		return startDateEvent;
+	}
+
+	public void setStartDateEvent(LocalDate startDateEvent) {
+		this.startDateEvent = startDateEvent;
+	}
+
+	public LocalTime getStartTimeEvent() {
+		return startTimeEvent;
+	}
+
+	public void setStartTimeEvent(LocalTime startTimeEvent) {
+		this.startTimeEvent = startTimeEvent;
 	}
 
 }
