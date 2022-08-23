@@ -109,7 +109,8 @@ public class MemberEventServiceImpl implements MemberEventService {
 	public ResponseMessage getAllMemberCancelJoinEvent(int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId, Constant.REQUEST_STATUS_DECLINED);
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId,
+					Constant.REQUEST_STATUS_DECLINED);
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			if (!membersEvent.isEmpty()) {
 				for (MemberEvent memberEvent : membersEvent) {
@@ -412,10 +413,18 @@ public class MemberEventServiceImpl implements MemberEventService {
 		List<MemberEvent> organizingCommittees = memberEventRepository.findOrganizingCommitteeByEventId(eventId,
 				eventRole.getRoleEvent().getId());
 		if (!organizingCommittees.isEmpty()) {
-			if (eventRole.getQuantity() - organizingCommittees.size() < 0) {
+			int count = 0;
+			for (MemberEvent memberEvent : organizingCommittees) {
+				if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+						|| memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+					count++;
+				}
+			}
+
+			if (eventRole.getQuantity() - count < 0) {
 				return 0;
 			} else {
-				return eventRole.getQuantity() - organizingCommittees.size();
+				return eventRole.getQuantity() - count;
 			}
 		} else {
 			return eventRole.getQuantity();
@@ -768,7 +777,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 					AttendanceEvent attendanceEvent = attendanceEventOp.get();
 					attendanceEventRepository.delete(attendanceEvent);
 				}
-				
+
 				Notification notification = new Notification();
 				notification.setMessage("Yêu cầu đăng ký tham gia sự kiện " + memberEvent.getEvent().getName()
 						+ " của bạn đã bị từ chối");
@@ -815,7 +824,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 						AttendanceEvent attendanceEvent = attendanceEventOp.get();
 						attendanceEventRepository.delete(attendanceEvent);
 					}
-					
+
 					Notification notification = new Notification();
 					notification.setMessage("Bạn đã bị xóa khỏi sự kiện " + memberEvent.getEvent().getName());
 					notification.setCreatedOn(LocalDateTime.now());
