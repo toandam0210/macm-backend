@@ -102,7 +102,7 @@ public class DashboardServiceImpl implements DashboardService {
 
 	@Autowired
 	UserRepository userRepository;
-
+	
 	@Override
 	public ResponseMessage getCollaboratorReport() {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -294,15 +294,32 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public ResponseMessage getAllUpcomingActivities() {
+	public ResponseMessage getAllUpcomingActivities(int filterIndex) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<UpcomingActivityDto> upcomingActivitiesDto = new ArrayList<UpcomingActivityDto>();
+			LocalDate endDateFilter;
+			switch (filterIndex) {
+			case 0:
+				endDateFilter = LocalDate.now().plusWeeks(1);
+				break;
+			case 1:
+				endDateFilter = LocalDate.now().plusMonths(1);
+				break;
+			case 2:
+				Semester semester = semesterRepository.findTop3Semester().get(0);
+				endDateFilter = semester.getEndDate();
+				break;
+			default:
+				endDateFilter = LocalDate.now().plusWeeks(1);
+				break;
+			}
+			
 			List<Event> events = eventRepository.findAll();
 			if (!events.isEmpty()) {
 				for (Event event : events) {
 					LocalDate startDate = eventService.getStartDate(event.getId());
-					if (startDate != null && startDate.isAfter(LocalDate.now())) {
+					if (startDate != null && startDate.isAfter(LocalDate.now()) && startDate.isBefore(endDateFilter)) {
 						UpcomingActivityDto upcomingActivityDto = new UpcomingActivityDto();
 						upcomingActivityDto.setId(event.getId());
 						upcomingActivityDto.setName(event.getName());
@@ -317,7 +334,7 @@ public class DashboardServiceImpl implements DashboardService {
 			if (!tournaments.isEmpty()) {
 				for (Tournament tournament : tournaments) {
 					LocalDate startDate = tournamentService.getStartDate(tournament.getId());
-					if (startDate != null && startDate.isAfter(LocalDate.now())) {
+					if (startDate != null && startDate.isAfter(LocalDate.now()) && startDate.isBefore(endDateFilter)) {
 						UpcomingActivityDto upcomingActivityDto = new UpcomingActivityDto();
 						upcomingActivityDto.setId(tournament.getId());
 						upcomingActivityDto.setName(tournament.getName());
