@@ -361,13 +361,17 @@ public class TournamentServiceImpl implements TournamentService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-					.findByTournamentIdAndRegisterStatus(tournamentId, Constant.REQUEST_STATUS_APPROVED);
+					.findByTournamentId(tournamentId);
 			if (!tournamentOrganizingCommittees.isEmpty()) {
 				List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertToTournamentOrganizingCommitteeDto(
-							tournamentOrganizingCommittee);
-					tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
+					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							|| tournamentOrganizingCommittee.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+						TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertToTournamentOrganizingCommitteeDto(
+								tournamentOrganizingCommittee);
+						tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
+					}
 				}
 				Collections.sort(tournamentOrganizingCommitteesDto);
 				responseMessage.setData(tournamentOrganizingCommitteesDto);
@@ -1408,7 +1412,7 @@ public class TournamentServiceImpl implements TournamentService {
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
 	public ResponseMessage declineRequestToJoinTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId) {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -1424,9 +1428,9 @@ public class TournamentServiceImpl implements TournamentService {
 
 				responseMessage.setData(
 						Arrays.asList(convertToTournamentOrganizingCommitteeDto(tournamentOrganizingCommittee)));
-				responseMessage.setMessage("Từ chối yêu cầu tham gia BTC giải đấu của "
-						+ tournamentOrganizingCommittee.getUser().getName() + " - "
-						+ tournamentOrganizingCommittee.getUser().getStudentId() + " thành công");
+				responseMessage.setMessage(
+						"Từ chối yêu cầu tham gia BTC giải đấu của " + tournamentOrganizingCommittee.getUser().getName()
+								+ " - " + tournamentOrganizingCommittee.getUser().getStudentId() + " thành công");
 			} else {
 				responseMessage.setMessage("Sai id truyền vào rồi");
 			}
