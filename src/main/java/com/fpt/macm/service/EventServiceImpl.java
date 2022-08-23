@@ -646,13 +646,14 @@ public class EventServiceImpl implements EventService {
 									.findMemberEventByEventAndUser(event.getId(), user.getId());
 							if (memberEventOp.isPresent()) {
 								MemberEvent memberEvent = memberEventOp.get();
-								if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
-									userEventSemesterDto.setJoin(true);
-								} else {
-									userEventSemesterDto.setJoin(false);
-								}
+//								if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
+//									userEventSemesterDto.setJoin(true);
+//								} else {
+//									userEventSemesterDto.setJoin(false);
+//								}
+								userEventSemesterDto.setRegisterStatus(memberEvent.getRegisterStatus());
 							} else {
-								userEventSemesterDto.setJoin(false);
+								userEventSemesterDto.setRegisterStatus("Chưa đang ký tham gia");
 							}
 
 							EventDto eventDto = new EventDto();
