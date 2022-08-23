@@ -69,7 +69,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 						"/**/*.html", "/**/*.css", "/**/*.js")
 				.permitAll().antMatchers("/auth/**", "/oauth2/**").permitAll()
 				// permit all
-				.antMatchers("/api/tournamentschedule/getalltournamentschedule","/api/admin/dashboard/getallupcomingactivities", "/api/contact/getallcontact",
+				.antMatchers("/api/tournamentschedule/getalltournamentschedule","/api/admin/dashboard/getallupcomingactivities/**", "/api/contact/getallcontact",
 						"/api/contact/getallsocialnetwork", "/api/rule/getallrule", "/api/semester/currentsemester",
 						"/api/semester/getTop3Semesters", "/api/semester/getlistmonths", "/api/commonschedule/**",
 						"/api/event/geteventbyid/**", "/api/event/geteventsbyname", "/api/event/geteventsbydate",
