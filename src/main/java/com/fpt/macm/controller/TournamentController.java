@@ -178,6 +178,24 @@ public class TournamentController {
 				HttpStatus.OK);
 	}
 
+	@PutMapping("/acceptrequesttojointournamentorganizingcommittee/{tournamentOrganizingCommitteeId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> acceptRequestToJoinTournamentOrganizingCommittee(
+			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.acceptRequestToJoinTournamentOrganizingCommittee(tournamentOrganizingCommitteeId),
+				HttpStatus.OK);
+	}
+	
+	@PutMapping("/declinerequesttojointournamentorganizingcommittee/{tournamentOrganizingCommitteeId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> declineRequestToJoinTournamentOrganizingCommittee(
+			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.declineRequestToJoinTournamentOrganizingCommittee(tournamentOrganizingCommitteeId),
+				HttpStatus.OK);
+	}
+
 	@PostMapping("/registertojointournamentcompetitivetype/{tournamentId}/{studentId}")
 	ResponseEntity<ResponseMessage> registerToJoinTournamentCompetitveType(
 			@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId,
@@ -288,10 +306,12 @@ public class TournamentController {
 	ResponseEntity<ResponseMessage> getAllSuggestType() {
 		return new ResponseEntity<ResponseMessage>(tournamentService.getAllSuggestType(), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("headclub/editroletournament/{tournamentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
-	ResponseEntity<ResponseMessage> editRoleTournament(@PathVariable(name = "tournamentId") int tournamentId, @RequestBody List<RoleEventDto> rolesEventDto){
-		return new ResponseEntity<ResponseMessage>(tournamentService.editRoleTournament(tournamentId, rolesEventDto), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> editRoleTournament(@PathVariable(name = "tournamentId") int tournamentId,
+			@RequestBody List<RoleEventDto> rolesEventDto) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.editRoleTournament(tournamentId, rolesEventDto),
+				HttpStatus.OK);
 	}
 }
