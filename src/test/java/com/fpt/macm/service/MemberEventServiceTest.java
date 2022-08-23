@@ -20,8 +20,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
+import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.MemberEventDto;
-import com.fpt.macm.model.dto.MemberNotJoinEventDto;
 import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.ClubFund;
@@ -107,7 +107,7 @@ public class MemberEventServiceTest {
 	private MemberEvent memberEvent() {
 		MemberEvent memberEvent = new MemberEvent();
 		memberEvent.setId(1);
-		memberEvent.setRegisterStatus(true);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 		memberEvent.setEvent(event());
 		memberEvent.setRoleEvent(roleEvent());
 		memberEvent.setUser(user());
@@ -153,18 +153,6 @@ public class MemberEventServiceTest {
 		clubFund.setId(1);
 		clubFund.setFundAmount(100000000);
 		return clubFund;
-	}
-
-	private MemberNotJoinEventDto memberNotJoinEventDto() {
-		MemberNotJoinEventDto memberNotJoinEventDto = new MemberNotJoinEventDto();
-		memberNotJoinEventDto.setRegisteredStatus(false);
-		memberNotJoinEventDto.setRoleEventDto(roleEventDto());
-		memberNotJoinEventDto.setUserId(user().getId());
-		memberNotJoinEventDto.setUserMail(user().getEmail());
-		memberNotJoinEventDto.setUserName(user().getName());
-		memberNotJoinEventDto.setUserStudentId(user().getStudentId());
-		memberNotJoinEventDto.setRoleInClub(user().getRole().getName());
-		return memberNotJoinEventDto;
 	}
 
 	private EventPaymentStatusReport eventPaymentStatusReport() {
@@ -432,7 +420,7 @@ public class MemberEventServiceTest {
 	@Test
 	public void getAllMemberJoinEventByRoleEventIdCaseRegisterStatusFalseAndFilter0() {
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(memberEventRepository.findByEventIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(memberEvent));
 
@@ -451,7 +439,7 @@ public class MemberEventServiceTest {
 	@Test
 	public void getAllMemberJoinEventByRoleEventIdCaseRegisterStatusFalseAndFilter1() {
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(memberEventRepository.findByEventIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(memberEvent));
 
@@ -484,7 +472,7 @@ public class MemberEventServiceTest {
 	@Test
 	public void getAllMemberJoinEventByRoleEventIdCaseRegisterStatusFalseAndFilter2() {
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(memberEventRepository.findByEventIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(memberEvent));
 
@@ -514,7 +502,7 @@ public class MemberEventServiceTest {
 	@Test
 	public void getAllMemberJoinEventByRoleEventIdCaseFilterDefaultAndRegisterStatusFalse() {
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(memberEventRepository.findByEventIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(memberEvent));
 
@@ -656,7 +644,7 @@ public class MemberEventServiceTest {
 	@Test
 	public void getListMemberEventToUpdateRoleCaseRegisterStatusFalse() {
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(memberEventRepository.findByEventIdOrderByIdAsc(anyInt())).thenReturn(Arrays.asList(memberEvent));
 
@@ -694,13 +682,13 @@ public class MemberEventServiceTest {
 	@Test
 	public void getListMemberNotJoinEventCaseSuccess() {
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(userRepository.findAll()).thenReturn(Arrays.asList(user()));
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
 				.thenReturn(Optional.of(memberEvent));
 
-		ResponseMessage responseMessage = memberEventService.getListMemberNotJoinEvent(event().getId(), 0, 1000);
+		ResponseMessage responseMessage = memberEventService.getListMemberNotJoinEvent(event().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -710,7 +698,7 @@ public class MemberEventServiceTest {
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
 				.thenReturn(Optional.of(memberEvent()));
 
-		ResponseMessage responseMessage = memberEventService.getListMemberNotJoinEvent(event().getId(), 0, 1000);
+		ResponseMessage responseMessage = memberEventService.getListMemberNotJoinEvent(event().getId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -722,7 +710,7 @@ public class MemberEventServiceTest {
 		when(userRepository.findAll()).thenReturn(users);
 		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
 
-		ResponseMessage responseMessage = memberEventService.getListMemberNotJoinEvent(event().getId(), 0, 1);
+		ResponseMessage responseMessage = memberEventService.getListMemberNotJoinEvent(event().getId());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
@@ -730,7 +718,7 @@ public class MemberEventServiceTest {
 	public void getListMemberNotJoinEventCaseException() {
 		when(userRepository.findAll()).thenReturn(null);
 
-		ResponseMessage responseMessage = memberEventService.getListMemberNotJoinEvent(event().getId(), 0, 1000);
+		ResponseMessage responseMessage = memberEventService.getListMemberNotJoinEvent(event().getId());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -741,15 +729,15 @@ public class MemberEventServiceTest {
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent()));
 
 		ResponseMessage responseMessage = memberEventService.addListMemberJoinEvent(event().getId(),
-				Arrays.asList(memberNotJoinEventDto()));
+				Arrays.asList(memberEventDto()));
 		;
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 
 	@Test
 	public void addListMemberJoinEventCaseRegisterStatusTrue() {
-		MemberNotJoinEventDto memberNotJoinEventDto = memberNotJoinEventDto();
-		memberNotJoinEventDto.setRegisteredStatus(true);
+		MemberEventDto memberNotJoinEventDto = memberEventDto();
+		memberNotJoinEventDto.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(userRepository.findById(anyInt())).thenReturn(Optional.of(user()));
@@ -768,7 +756,7 @@ public class MemberEventServiceTest {
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 
 		ResponseMessage responseMessage = memberEventService.addListMemberJoinEvent(event().getId(),
-				new ArrayList<MemberNotJoinEventDto>());
+				new ArrayList<MemberEventDto>());
 		;
 		assertEquals(responseMessage.getData().size(), 0);
 	}
@@ -778,7 +766,7 @@ public class MemberEventServiceTest {
 		when(eventRepository.findById(anyInt())).thenReturn(null);
 
 		ResponseMessage responseMessage = memberEventService.addListMemberJoinEvent(event().getId(),
-				new ArrayList<MemberNotJoinEventDto>());
+				new ArrayList<MemberEventDto>());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
@@ -809,7 +797,7 @@ public class MemberEventServiceTest {
 	@Test
 	public void registerToJoinEventCaseHaveCanceled() {
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
@@ -911,7 +899,7 @@ public class MemberEventServiceTest {
 		eventRole.setRoleEvent(roleEvent);
 
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent));
@@ -935,7 +923,7 @@ public class MemberEventServiceTest {
 		eventRole.setQuantity(0);
 
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
 		when(roleEventRepository.findById(anyInt())).thenReturn(Optional.of(roleEvent));
@@ -957,73 +945,73 @@ public class MemberEventServiceTest {
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 
-	@Test
-	public void cancelToJoinEventCaseSuccess() {
-		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
-				.thenReturn(Optional.of(memberEvent()));
-		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(), anyInt()))
-				.thenReturn(Optional.of(attendanceEvent()));
-
-		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-
-	@Test
-	public void cancelToJoinEventCaseAttendanceEventEmpty() {
-		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
-				.thenReturn(Optional.of(memberEvent()));
-		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(), anyInt())).thenReturn(Optional.empty());
-
-		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-
-	@Test
-	public void cancelToJoinEventCaseRoleOrganizingCommittee() {
-		MemberEvent memberEvent = memberEvent();
-		memberEvent.getRoleEvent().setId(2);
-
-		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
-				.thenReturn(Optional.of(memberEvent));
-
-		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-
-	@Test
-	public void cancelToJoinEventCaseMemberEventEmpty() {
-		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
-		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
-
-		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-
-	@Test
-	public void cancelToJoinEventCaseAfterDeadline() {
-		Event event = event();
-		event.setRegistrationMemberDeadline(LocalDateTime.now().minusDays(1));
-
-		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event));
-
-		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-
-	@Test
-	public void cancelToJoinEventCaseException() {
-		when(eventRepository.findById(anyInt())).thenReturn(null);
-
-		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
-		assertEquals(responseMessage.getData().size(), 0);
-	}
+//	@Test
+//	public void cancelToJoinEventCaseSuccess() {
+//		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
+//		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+//		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+//				.thenReturn(Optional.of(memberEvent()));
+//		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(), anyInt()))
+//				.thenReturn(Optional.of(attendanceEvent()));
+//
+//		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
+//
+//	@Test
+//	public void cancelToJoinEventCaseAttendanceEventEmpty() {
+//		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
+//		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+//		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+//				.thenReturn(Optional.of(memberEvent()));
+//		when(attendanceEventRepository.findByEventIdAndUserId(anyInt(), anyInt())).thenReturn(Optional.empty());
+//
+//		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
+//
+//	@Test
+//	public void cancelToJoinEventCaseRoleOrganizingCommittee() {
+//		MemberEvent memberEvent = memberEvent();
+//		memberEvent.getRoleEvent().setId(2);
+//
+//		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
+//		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+//		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt()))
+//				.thenReturn(Optional.of(memberEvent));
+//
+//		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
+//		assertEquals(responseMessage.getData().size(), 0);
+//	}
+//
+//	@Test
+//	public void cancelToJoinEventCaseMemberEventEmpty() {
+//		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event()));
+//		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
+//		when(memberEventRepository.findMemberEventByEventAndUser(anyInt(), anyInt())).thenReturn(Optional.empty());
+//
+//		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
+//		assertEquals(responseMessage.getData().size(), 0);
+//	}
+//
+//	@Test
+//	public void cancelToJoinEventCaseAfterDeadline() {
+//		Event event = event();
+//		event.setRegistrationMemberDeadline(LocalDateTime.now().minusDays(1));
+//
+//		when(eventRepository.findById(anyInt())).thenReturn(Optional.of(event));
+//
+//		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
+//		assertEquals(responseMessage.getData().size(), 0);
+//	}
+//
+//	@Test
+//	public void cancelToJoinEventCaseException() {
+//		when(eventRepository.findById(anyInt())).thenReturn(null);
+//
+//		ResponseMessage responseMessage = memberEventService.cancelToJoinEvent(event().getId(), user().getStudentId());
+//		assertEquals(responseMessage.getData().size(), 0);
+//	}
 
 	@Test
 	public void getAllEventByStudentIdCaseSuccess() {
@@ -1037,7 +1025,7 @@ public class MemberEventServiceTest {
 	@Test
 	public void getAllEventByStudentIdCaseRegisterStatusFalse() {
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(memberEventRepository.findByUserId(anyInt())).thenReturn(Arrays.asList(memberEvent));

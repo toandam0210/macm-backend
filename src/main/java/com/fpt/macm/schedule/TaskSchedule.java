@@ -424,7 +424,7 @@ public class TaskSchedule {
 					Notification newNotification = notifications.get(0);
 
 					for (MemberEvent member : membersEvent) {
-						if (member.isRegisterStatus()) {
+						if (member.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
 							User user = member.getUser();
 							notificationService.sendNotificationToAnUser(user, newNotification);
 						}

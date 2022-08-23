@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
 
+import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.EventCreateDto;
 import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.dto.ScheduleDto;
@@ -175,7 +176,7 @@ public class EventServiceTest {
 	private MemberEvent memberEvent() {
 		MemberEvent memberEvent = new MemberEvent();
 		memberEvent.setId(1);
-		memberEvent.setRegisterStatus(true);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 		memberEvent.setEvent(event());
 		memberEvent.setRoleEvent(roleEvent());
 		memberEvent.setUser(user());
@@ -722,7 +723,7 @@ public class EventServiceTest {
 	@Test
 	public void getEventsBySemesterAndStudentIdCaseCancelJoinEvent() {
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));

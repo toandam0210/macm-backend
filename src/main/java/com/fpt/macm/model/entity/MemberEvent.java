@@ -31,7 +31,7 @@ public class MemberEvent {
 	private RoleEvent roleEvent;
 
 	@Column
-	private boolean registerStatus;
+	private String registerStatus;
 
 	@Column
 	private double paymentValue;
@@ -83,11 +83,11 @@ public class MemberEvent {
 		this.roleEvent = roleEvent;
 	}
 
-	public boolean isRegisterStatus() {
+	public String getRegisterStatus() {
 		return registerStatus;
 	}
 
-	public void setRegisterStatus(boolean registerStatus) {
+	public void setRegisterStatus(String registerStatus) {
 		this.registerStatus = registerStatus;
 	}
 

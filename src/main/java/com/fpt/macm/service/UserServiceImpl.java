@@ -1051,7 +1051,7 @@ public class UserServiceImpl implements UserService {
 							.findMemberEventByEventAndUser(eventSchedule.getEvent().getId(), user.getId());
 					if (memberEventOp.isPresent()) {
 						MemberEvent memberEvent = memberEventOp.get();
-						if (memberEvent.isRegisterStatus()) {
+						if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
 							Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
 									.findByEventIdAndUserId(eventSchedule.getEvent().getId(),
 											user.getId());

@@ -21,6 +21,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.ClubFundReport;
@@ -199,7 +200,7 @@ public class DashboardSeviceTest {
 	private MemberEvent memberEvent() {
 		MemberEvent memberEvent = new MemberEvent();
 		memberEvent.setId(1);
-		memberEvent.setRegisterStatus(true);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 		memberEvent.setEvent(event());
 		memberEvent.setRoleEvent(roleEvent());
 		memberEvent.setUser(user());

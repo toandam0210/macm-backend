@@ -274,7 +274,7 @@ public class UserServiceTest {
 	private MemberEvent memberEvent() {
 		MemberEvent memberEvent = new MemberEvent();
 		memberEvent.setId(1);
-		memberEvent.setRegisterStatus(true);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 		return memberEvent;
 
 	}
@@ -1227,7 +1227,7 @@ public class UserServiceTest {
 	@Test
 	public void testGetAllUserAttendanceStatusCaseRegisterStatusFalse() {
 		MemberEvent memberEvent = memberEvent();
-		memberEvent.setRegisterStatus(false);
+		memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
 		when(trainingScheduleRepository.findAll()).thenReturn(Arrays.asList(trainingSchedule()));
 		when(attendanceStatusRepository.findByUserIdAndTrainingScheduleId(anyInt(),anyInt())).thenReturn(attendanceStatus());
