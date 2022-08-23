@@ -2,7 +2,6 @@ package com.fpt.macm.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -203,7 +202,7 @@ public class MemberEventServiceTest {
 
 	@Test
 	public void getAllMemberCancelJoinEventCaseSuccess() {
-		when(memberEventRepository.findByEventIdAndRegisterStatus(anyInt(), anyBoolean()))
+		when(memberEventRepository.findByEventIdAndRegisterStatus(anyInt(), anyString()))
 				.thenReturn(Arrays.asList(memberEvent()));
 
 		ResponseMessage responseMessage = memberEventService.getAllMemberCancelJoinEvent(event().getId());
@@ -212,7 +211,7 @@ public class MemberEventServiceTest {
 
 	@Test
 	public void getAllMemberCancelJoinEventCaseListEmpty() {
-		when(memberEventRepository.findByEventIdAndRegisterStatus(anyInt(), anyBoolean()))
+		when(memberEventRepository.findByEventIdAndRegisterStatus(anyInt(), anyString()))
 				.thenReturn(new ArrayList<MemberEvent>());
 
 		ResponseMessage responseMessage = memberEventService.getAllMemberCancelJoinEvent(event().getId());
@@ -221,7 +220,7 @@ public class MemberEventServiceTest {
 
 	@Test
 	public void getAllMemberCancelJoinEventCaseException() {
-		when(memberEventRepository.findByEventIdAndRegisterStatus(anyInt(), anyBoolean())).thenReturn(null);
+		when(memberEventRepository.findByEventIdAndRegisterStatus(anyInt(), anyString())).thenReturn(null);
 
 		ResponseMessage responseMessage = memberEventService.getAllMemberCancelJoinEvent(event().getId());
 		assertEquals(responseMessage.getData().size(), 0);
