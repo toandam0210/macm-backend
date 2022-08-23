@@ -31,12 +31,13 @@ import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.MembershipPaymentStatusReportRepository;
 import com.fpt.macm.repository.MembershipShipInforRepository;
 import com.fpt.macm.repository.MembershipStatusRepository;
+import com.fpt.macm.repository.UserRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class MembershipServiceTest {
 	@InjectMocks
 	MembershipService membershipService = new MembershipServiceImpl();
-	
+
 	@Mock
 	MembershipStatusRepository membershipStatusRepository;
 
@@ -48,7 +49,13 @@ public class MembershipServiceTest {
 
 	@Mock
 	MembershipPaymentStatusReportRepository membershipPaymentStatusReportRepository;
+
+	@Mock
+	ClubFundService clubFundService;
 	
+	@Mock
+	UserRepository userRepository;
+
 	private MembershipStatus membershipStatus() {
 		MembershipStatus membershipStatus = new MembershipStatus();
 		membershipStatus.setId(1);
@@ -57,7 +64,7 @@ public class MembershipServiceTest {
 		membershipStatus.setUser(createUser());
 		return membershipStatus;
 	}
-	
+
 	private MembershipInfo membershipInfo() {
 		MembershipInfo membershipInfo = new MembershipInfo();
 		membershipInfo.setAmount(100000);
@@ -65,7 +72,7 @@ public class MembershipServiceTest {
 		membershipInfo.setSemester("Summer2022");
 		return membershipInfo;
 	}
-	
+
 	private User createUser() {
 		User user = new User();
 		user.setStudentId("HE140856");
@@ -87,14 +94,14 @@ public class MembershipServiceTest {
 		user.setCreatedBy("toandv");
 		return user;
 	}
-	
+
 	private ClubFund clubFund() {
 		ClubFund clubFund = new ClubFund();
 		clubFund.setFundAmount(10000000);
 		clubFund.setId(1);
 		return clubFund;
 	}
-	
+
 	private MembershipPaymentStatusReport membershipPaymentStatusReport() {
 		MembershipPaymentStatusReport membershipPaymentStatusReport = new MembershipPaymentStatusReport();
 		membershipPaymentStatusReport.setFundBalance(15000000);
@@ -105,103 +112,134 @@ public class MembershipServiceTest {
 		membershipPaymentStatusReport.setUser(createUser());
 		return membershipPaymentStatusReport;
 	}
-	
+
 	@Test
 	public void testGetListMemberPayMembershipBySemester() {
 		when(membershipStatusRepository.findByMembershipInfoId(anyInt())).thenReturn(Arrays.asList(membershipStatus()));
 		ResponseMessage responseMessage = membershipService.getListMemberPayMembershipBySemester(1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testGetListMemberPayMembershipBySemesterCaseSizeEq0() {
 		when(membershipStatusRepository.findByMembershipInfoId(anyInt())).thenReturn(Arrays.asList());
 		ResponseMessage responseMessage = membershipService.getListMemberPayMembershipBySemester(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetListMemberPayMembershipBySemesterCaseException() {
 		when(membershipStatusRepository.findByMembershipInfoId(anyInt())).thenReturn(null);
 		ResponseMessage responseMessage = membershipService.getListMemberPayMembershipBySemester(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testUpdateStatusPaymenMembershipById() {
 		when(membershipStatusRepository.findById(anyInt())).thenReturn(Optional.of(membershipStatus()));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
-		ResponseMessage responseMessage = membershipService.updateStatusPaymenMembershipById(1);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+
+		ResponseMessage responseMessage = membershipService
+				.updateStatusPaymenMembershipById(createUser().getStudentId(), 1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testUpdateStatusPaymenMembershipByIdCaseStatusFalse() {
 		MembershipStatus membershipStatus = membershipStatus();
 		membershipStatus.setStatus(false);
 		when(membershipStatusRepository.findById(anyInt())).thenReturn(Optional.of(membershipStatus));
 		when(clubFundRepository.findAll()).thenReturn(Arrays.asList(clubFund()));
-		ResponseMessage responseMessage = membershipService.updateStatusPaymenMembershipById(1);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+
+		ResponseMessage responseMessage = membershipService
+				.updateStatusPaymenMembershipById(createUser().getStudentId(), 1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testUpdateStatusPaymenMembershipByIdCaseException() {
 		when(membershipStatusRepository.findById(anyInt())).thenReturn(null);
-		ResponseMessage responseMessage = membershipService.updateStatusPaymenMembershipById(1);
+		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(createUser()));
+
+		ResponseMessage responseMessage = membershipService
+				.updateStatusPaymenMembershipById(createUser().getStudentId(), 1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testUpdateMembershipBySemester() {
 		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(Optional.of(membershipInfo()));
 		ResponseMessage responseMessage = membershipService.updateMembershipBySemester(150000, "Summer2022");
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
+	@Test
+	public void testUpdateMembershipBySemesterCaseEmpty() {
+		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(Optional.empty());
+		ResponseMessage responseMessage = membershipService.updateMembershipBySemester(150000, "Summer2022");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
 	@Test
 	public void testUpdateMembershipBySemesterCaseException() {
 		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(null);
 		ResponseMessage responseMessage = membershipService.updateMembershipBySemester(150000, "Summer2022");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetMembershipInfoBySemester() {
 		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(Optional.of(membershipInfo()));
 		ResponseMessage responseMessage = membershipService.getMembershipInfoBySemester("Summer2022");
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
+	@Test
+	public void testGetMembershipInfoBySemesterCaseEmpty() {
+		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(Optional.empty());
+		ResponseMessage responseMessage = membershipService.getMembershipInfoBySemester("Summer2022");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
 	@Test
 	public void testGetMembershipInfoBySemesterCaseException() {
 		when(membershipShipInforRepository.findBySemester(anyString())).thenReturn(null);
 		ResponseMessage responseMessage = membershipService.getMembershipInfoBySemester("Summer2022");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetReportMembershipPaymentStatus() {
-		List<MembershipPaymentStatusReport> membershipPaymentStatusReports = Arrays.asList(membershipPaymentStatusReport());
-		Page<MembershipPaymentStatusReport> pages = new PageImpl<MembershipPaymentStatusReport>(membershipPaymentStatusReports);
+		List<MembershipPaymentStatusReport> membershipPaymentStatusReports = Arrays
+				.asList(membershipPaymentStatusReport());
+		Page<MembershipPaymentStatusReport> pages = new PageImpl<MembershipPaymentStatusReport>(
+				membershipPaymentStatusReports);
 		when(membershipPaymentStatusReportRepository.findByMembershipInfoId(anyInt(), any())).thenReturn(pages);
-		ResponseMessage responseMessage = membershipService.getReportMembershipPaymentStatus(1,0,10,"id");
+		ResponseMessage responseMessage = membershipService.getReportMembershipPaymentStatus(1, 0, 10, "id");
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void testGetReportMembershipPaymentStatusCaseEmpty() {
 		List<MembershipPaymentStatusReport> membershipPaymentStatusReports = new ArrayList<MembershipPaymentStatusReport>();
-		Page<MembershipPaymentStatusReport> pages = new PageImpl<MembershipPaymentStatusReport>(membershipPaymentStatusReports);
+		Page<MembershipPaymentStatusReport> pages = new PageImpl<MembershipPaymentStatusReport>(
+				membershipPaymentStatusReports);
 		when(membershipPaymentStatusReportRepository.findByMembershipInfoId(anyInt(), any())).thenReturn(pages);
-		ResponseMessage responseMessage = membershipService.getReportMembershipPaymentStatus(1,0,10,"id");
+		ResponseMessage responseMessage = membershipService.getReportMembershipPaymentStatus(1, 0, 10, "id");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void testGetReportMembershipPaymentStatusCaseNull() {
-		when(membershipPaymentStatusReportRepository.findByMembershipInfoId(anyInt(), any())).thenReturn(null);
-		ResponseMessage responseMessage = membershipService.getReportMembershipPaymentStatus(1,0,10,"id");
+		ResponseMessage responseMessage = membershipService.getReportMembershipPaymentStatus(0, 0, 10, "id");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void testGetReportMembershipPaymentStatusCaseException() {
+		ResponseMessage responseMessage = membershipService.getReportMembershipPaymentStatus(0, 0, -10, "id");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 }

@@ -22,25 +22,25 @@ public class ClubFundController {
 	ClubFundService clubFundService;
 	
 	@GetMapping("/getclubfund")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')") 
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')") 
 	ResponseEntity<ResponseMessage> getClubFund(){
 		return new ResponseEntity<ResponseMessage>(clubFundService.getClubFund(), HttpStatus.OK);
 	}
 	
-	@PutMapping("/deposittoclubfund/{amount}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')") 
-	ResponseEntity<ResponseMessage> depositToClubFund(@PathVariable(name = "amount") int amount, @RequestParam(defaultValue = "") String note){
-		return new ResponseEntity<ResponseMessage>(clubFundService.depositToClubFund(amount, note), HttpStatus.OK);
+	@PutMapping("/deposittoclubfund/{amount}/{studentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')") 
+	ResponseEntity<ResponseMessage> depositToClubFund(@PathVariable(name = "amount") int amount, @PathVariable(name = "studentId") String studentId, @RequestParam(defaultValue = "") String note){
+		return new ResponseEntity<ResponseMessage>(clubFundService.depositToClubFund(studentId, amount, note), HttpStatus.OK);
 	}
 	
-	@PutMapping("/withdrawfromclubfund/{amount}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')") 
-	ResponseEntity<ResponseMessage> withdrawFromClubFund(@PathVariable(name = "amount") int amount, @RequestParam(defaultValue = "") String note){
-		return new ResponseEntity<ResponseMessage>(clubFundService.withdrawFromClubFund(amount, note), HttpStatus.OK);
+	@PutMapping("/withdrawfromclubfund/{amount}/{studentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')") 
+	ResponseEntity<ResponseMessage> withdrawFromClubFund(@PathVariable(name = "amount") int amount, @PathVariable(name = "studentId") String studentId, @RequestParam(defaultValue = "") String note){
+		return new ResponseEntity<ResponseMessage>(clubFundService.withdrawFromClubFund(studentId, amount, note), HttpStatus.OK);
 	}
 	
 	@GetMapping("/getclubfundreport")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')") 
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')") 
 	ResponseEntity<ResponseMessage> getClubFundReport(){
 		return new ResponseEntity<ResponseMessage>(clubFundService.getClubFundReport(), HttpStatus.OK);
 	}

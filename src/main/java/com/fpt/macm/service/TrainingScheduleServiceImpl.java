@@ -13,13 +13,17 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.TrainingSchedule;
+import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
+import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -42,6 +46,12 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 
 	@Autowired
 	NotificationService notificationService;
+
+	@Autowired
+	UserRepository userRepository;
+
+	@Autowired
+	AttendanceStatusRepository attendanceStatusRepository;
 
 	@Override
 	public ResponseMessage createPreviewTrainingSchedule(String startDate, String finishDate, List<String> dayOfWeek,
@@ -110,7 +120,9 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 				responseMessage.setMessage(Constant.MSG_038);
 			} else {
 				if (trainingSchedule.getDate().compareTo(LocalDate.now()) > 0) {
-					if (commonScheduleService.getCommonSessionByDate(trainingSchedule.getDate()) == null) {
+					CommonSchedule commonSchedule = commonScheduleService
+							.getCommonSessionByDate(trainingSchedule.getDate());
+					if (commonSchedule == null) {
 						trainingSchedule.setCreatedBy("LinhLHN");
 						trainingSchedule.setCreatedOn(LocalDateTime.now());
 						trainingSchedule.setUpdatedBy("LinhLHN");
@@ -128,9 +140,50 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 						commonSession.setType(0);
 						commonScheduleRepository.save(commonSession);
 
+						// Thêm data điểm danh
+						List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
+						List<User> users = userRepository.findAllActiveUser();
+						if (!users.isEmpty()) {
+							Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository
+									.findByDate(trainingSchedule.getDate());
+							if (trainingScheduleOp.isPresent()) {
+								for (User user : users) {
+									AttendanceStatus attendanceStatus = new AttendanceStatus();
+									attendanceStatus.setUser(user);
+									attendanceStatus.setTrainingSchedule(trainingScheduleOp.get());
+									attendanceStatus.setCreatedOn(LocalDateTime.now());
+									attendanceStatus.setCreatedBy("toandv");
+									attendanceStatus.setStatus(2);
+									listAttendanceStatus.add(attendanceStatus);
+								}
+							}
+						}
+
+						if (!listAttendanceStatus.isEmpty()) {
+							attendanceStatusRepository.saveAll(listAttendanceStatus);
+						}
+
+						// Gửi thông báo đến cho user khi tạo 1 buổi tập mới
 						notificationService.createTrainingSessionCreateNotification(trainingSchedule.getDate());
 					} else {
-						responseMessage.setMessage(Constant.MSG_041);
+						switch (commonSchedule.getType()) {
+						case 0:
+							responseMessage.setMessage(
+									"Không thành công. Đã có " + commonSchedule.getTitle() + " trong ngày này.");
+							break;
+						case 1:
+							responseMessage.setMessage("Không thành công. Đã có sự kiện " + commonSchedule.getTitle()
+									+ " trong ngày này.");
+							break;
+						case 2:
+							responseMessage.setMessage("Không thành công. Đã có giải đấu " + commonSchedule.getTitle()
+									+ " trong ngày này.");
+							break;
+						default:
+							responseMessage.setMessage("Không thành công. Vui lòng thử lại.");
+							break;
+						}
+
 					}
 				} else {
 					responseMessage.setMessage(Constant.MSG_039);
@@ -149,8 +202,10 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<TrainingSchedule> listSchedule = trainingScheduleRepository.findAll();
-			responseMessage.setData(listSchedule);
-			responseMessage.setMessage("Danh sách lịch tập");
+			if (listSchedule.size() > 0) {
+				responseMessage.setData(listSchedule);
+				responseMessage.setMessage("Danh sách lịch tập");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
@@ -166,23 +221,25 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
 			if (getDate.compareTo(LocalDate.now()) > 0) {
 				TrainingSchedule getTrainingSession = getTrainingScheduleByDate(getDate);
-				CommonSchedule commonSession = commonScheduleService
-						.getCommonSessionByDate(getTrainingSession.getDate());
-				if (getTrainingSession != null && commonSession.getType() == 0) {
-					getTrainingSession.setStartTime(updateCommonSession.getStartTime());
-					getTrainingSession.setFinishTime(updateCommonSession.getFinishTime());
-					getTrainingSession.setUpdatedBy("LinhLHN");
-					getTrainingSession.setUpdatedOn(LocalDateTime.now());
-					trainingScheduleRepository.save(getTrainingSession);
-					commonSession.setStartTime(updateCommonSession.getStartTime());
-					commonSession.setFinishTime(updateCommonSession.getFinishTime());
-					commonSession.setUpdatedOn(LocalDateTime.now());
-					commonScheduleRepository.save(commonSession);
-					responseMessage.setData(Arrays.asList(getTrainingSession));
-					responseMessage.setMessage(Constant.MSG_042);
+				if (getTrainingSession != null) {
+					CommonSchedule commonSession = commonScheduleService
+							.getCommonSessionByDate(getTrainingSession.getDate());
+					if (commonSession.getType() == 0) {
+						getTrainingSession.setStartTime(updateCommonSession.getStartTime());
+						getTrainingSession.setFinishTime(updateCommonSession.getFinishTime());
+						getTrainingSession.setUpdatedBy("LinhLHN");
+						getTrainingSession.setUpdatedOn(LocalDateTime.now());
+						trainingScheduleRepository.save(getTrainingSession);
+						commonSession.setStartTime(updateCommonSession.getStartTime());
+						commonSession.setFinishTime(updateCommonSession.getFinishTime());
+						commonSession.setUpdatedOn(LocalDateTime.now());
+						commonScheduleRepository.save(commonSession);
+						responseMessage.setData(Arrays.asList(getTrainingSession));
+						responseMessage.setMessage(Constant.MSG_042);
 
-					notificationService.createTrainingSessionUpdateNotification(getDate,
-							updateCommonSession.getStartTime(), updateCommonSession.getFinishTime());
+						notificationService.createTrainingSessionUpdateNotification(getDate,
+								updateCommonSession.getStartTime(), updateCommonSession.getFinishTime());
+					}
 				}
 			} else {
 				responseMessage.setMessage(Constant.MSG_043);
@@ -202,15 +259,25 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
 			if (getDate.compareTo(LocalDate.now()) > 0) {
 				TrainingSchedule getTrainingSession = getTrainingScheduleByDate(getDate);
-				CommonSchedule commonSession = commonScheduleService
-						.getCommonSessionByDate(getTrainingSession.getDate());
-				if (getTrainingSession != null && commonSession.getType() == 0) {
-					trainingScheduleRepository.delete(getTrainingSession);
-					commonScheduleRepository.delete(commonSession);
-					responseMessage.setData(Arrays.asList(getTrainingSession));
-					responseMessage.setMessage(Constant.MSG_044);
+				if (getTrainingSession != null) {
+					CommonSchedule commonSession = commonScheduleService
+							.getCommonSessionByDate(getTrainingSession.getDate());
+					if (commonSession.getType() == 0) {
+						List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
+								.findByTrainingScheduleIdOrderByIdAsc(getTrainingSession.getId());
+						if (!listAttendanceStatus.isEmpty()) {
+							attendanceStatusRepository.deleteAll(listAttendanceStatus);
+						}
 
-					notificationService.createTrainingSessionDeleteNotification(getDate);
+						trainingScheduleRepository.delete(getTrainingSession);
+						commonScheduleRepository.delete(commonSession);
+						responseMessage.setData(Arrays.asList(getTrainingSession));
+						responseMessage.setMessage(Constant.MSG_044);
+
+						notificationService.createTrainingSessionDeleteNotification(getDate);
+					}
+				} else {
+					responseMessage.setMessage("Không có buổi tập này");
 				}
 			} else {
 				responseMessage.setMessage(Constant.MSG_045);
@@ -278,6 +345,31 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 				commonScheduleRepository.saveAll(listCommon);
 				responseMessage.setData(listTraining);
 				responseMessage.setMessage(Constant.MSG_036);
+
+				// Thêm data điểm danh
+				List<User> users = userRepository.findAllActiveUser();
+				List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
+				if (!users.isEmpty()) {
+					for (TrainingSchedule trainingSchedule : listTraining) {
+						Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository
+								.findByDate(trainingSchedule.getDate());
+						if (trainingScheduleOp.isPresent()) {
+							for (User user : users) {
+								AttendanceStatus attendanceStatus = new AttendanceStatus();
+								attendanceStatus.setUser(user);
+								attendanceStatus.setTrainingSchedule(trainingScheduleOp.get());
+								attendanceStatus.setCreatedOn(LocalDateTime.now());
+								attendanceStatus.setCreatedBy("toandv");
+								attendanceStatus.setStatus(2);
+								listAttendanceStatus.add(attendanceStatus);
+							}
+						}
+					}
+				}
+
+				if (!listAttendanceStatus.isEmpty()) {
+					attendanceStatusRepository.saveAll(listAttendanceStatus);
+				}
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

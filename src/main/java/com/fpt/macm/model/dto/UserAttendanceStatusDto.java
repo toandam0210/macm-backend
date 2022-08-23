@@ -13,6 +13,7 @@ public class UserAttendanceStatusDto {
 	private LocalTime startTime;
 	private LocalTime finishTime;
 	private int type;
+	private int id;
 
 	public String getUserName() {
 		return userName;
@@ -76,6 +77,14 @@ public class UserAttendanceStatusDto {
 
 	public void setType(int type) {
 		this.type = type;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
 	}
 
 }

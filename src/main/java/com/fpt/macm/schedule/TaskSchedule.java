@@ -2,6 +2,7 @@ package com.fpt.macm.schedule;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,8 +20,10 @@ import com.fpt.macm.model.entity.AdminSemester;
 import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CollaboratorReport;
+import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventSchedule;
+import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MemberSemester;
 import com.fpt.macm.model.entity.MembershipInfo;
@@ -42,6 +45,7 @@ import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CollaboratorReportRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.EventRepository;
+import com.fpt.macm.repository.EventScheduleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.MembershipShipInforRepository;
@@ -54,7 +58,6 @@ import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.repository.UserStatusReportRepository;
-import com.fpt.macm.service.EventScheduleService;
 import com.fpt.macm.service.EventService;
 import com.fpt.macm.service.NotificationService;
 import com.fpt.macm.service.SemesterService;
@@ -120,7 +123,7 @@ public class TaskSchedule {
 	CompetitiveMatchRepository competitiveMatchRepository;
 
 	@Autowired
-	EventScheduleService eventScheduleService;
+	EventScheduleRepository eventScheduleRepository;
 
 	@Autowired
 	TournamentScheduleService tournamentScheduleService;
@@ -208,99 +211,142 @@ public class TaskSchedule {
 		}
 		logger.info("report oke");
 	}
-
-	@Scheduled(cron = "1 1 0 * * *")
-	public void addUserBySemester() {
-		if (LocalDate.now().getDayOfMonth() > 7 && LocalDate.now().getDayOfMonth() <= 14
-				&& LocalDate.now().getMonthValue() % 4 == 1
-				&& LocalDate.now().getDayOfWeek().toString().compareTo("MONDAY") == 0) {
-			List<User> members = userRepository.findMemberWithoutPaging();
-			List<User> admins = userRepository.findAllAdmin();
-			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-			UserStatusReport userStatusReport = new UserStatusReport();
-			userStatusReport.setSemester(semester.getName());
-			int numberUserActive = 0;
-			int numberUserDeactive = 0;
-			for (User user : members) {
-				if (user.isActive()) {
-					numberUserActive++;
-					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository.findByUserIdAndSemester(user.getId(), semester.getName());
-					if (memberSemesterOp.isEmpty()) {
-						MemberSemester statusSemester = new MemberSemester();
-						statusSemester.setUser(user);
-						statusSemester.setSemester(semester.getName());
-						statusSemester.setStatus(user.isActive());
-						memberSemesterRepository.save(statusSemester);
+	
+	@Scheduled(cron = "0 0 6 * * *")
+	public void updateStatusMemberToDeactive() {
+		Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+		if(LocalDate.now().isEqual(currentSemester.getStartDate())) {
+			List<User> users = userRepository.findMembersAndAdmin();
+			for (User user : users) {
+				if (user.getRole().getId() > 9 && user.getRole().getId() < 13) {
+					user.setActive(false);
+					userRepository.save(user);
+					if (user.getRole().getId() > 9 && user.getRole().getId() < 13) {
+						MemberSemester memberSemester = new MemberSemester();
+						memberSemester.setSemester(currentSemester.getName());
+						memberSemester.setStatus(false);
+						memberSemester.setUser(user);
+						memberSemesterRepository.save(memberSemester);
 						logger.info("add member oke");
 					}
-				} else {
-					numberUserDeactive++;
 				}
-			}
-			for (User user : admins) {
-				numberUserActive++;
-				Optional<AdminSemester> adminSemesterOp = adminSemesterRepository.findByUserId(user.getId(), semester.getName());
-				if (adminSemesterOp.isEmpty()) {
+				if (user.getRole().getId() > 0 && user.getRole().getId() < 10) {
 					AdminSemester adminSemester = new AdminSemester();
-					adminSemester.setUser(user);
-					adminSemester.setSemester(semester.getName());
 					adminSemester.setRole(user.getRole());
+					adminSemester.setSemester(currentSemester.getName());
+					adminSemester.setUser(user);
 					adminSemesterRepository.save(adminSemester);
 					logger.info("add admin oke");
 				}
 			}
-			userStatusReport.setNumberActiveInSemester(numberUserActive);
-			userStatusReport.setNumberDeactiveInSemester(numberUserDeactive);
-			userStatusReport.setTotalNumberUserInSemester(numberUserActive + numberUserDeactive);
-			userStatusReportRepository.save(userStatusReport);
-			logger.info("loi roi");
 		}
+		logger.info("oke roi");
 	}
+	
 
-	@Scheduled(cron = "1 2 0 * * *")
-	public void addListAttendanceStatus() {
-		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
-		if (trainingSchedule != null) {
-			List<User> users = (List<User>) userRepository.findAll();
-			for (User user : users) {
-				if (user.isActive()) {
-					AttendanceStatus attendanceStatus = new AttendanceStatus();
-					attendanceStatus.setUser(user);
-					attendanceStatus.setTrainingSchedule(trainingSchedule);
-					attendanceStatus.setCreatedOn(LocalDateTime.now());
-					attendanceStatus.setCreatedBy("toandv");
-					attendanceStatus.setStatus(2);
-					attendanceStatusRepository.save(attendanceStatus);
-					logger.info("atten oke");
-				}
-			}
-		}
-	}
+//	@Scheduled(cron = "1 1 0 * * *")
+//	public void addUserBySemester() {
+//		if (LocalDate.now().getDayOfMonth() > 7 && LocalDate.now().getDayOfMonth() <= 14
+//				&& LocalDate.now().getMonthValue() % 4 == 1
+//				&& LocalDate.now().getDayOfWeek().toString().compareTo("MONDAY") == 0) {
+//			List<User> members = userRepository.findMemberWithoutPaging();
+//			List<User> admins = userRepository.findAllAdmin();
+//			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+//			UserStatusReport userStatusReport = new UserStatusReport();
+//			userStatusReport.setSemester(semester.getName());
+//			int numberUserActive = 0;
+//			int numberUserDeactive = 0;
+//			for (User user : members) {
+//				if (user.isActive()) {
+//					numberUserActive++;
+//					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository.findByUserIdAndSemester(user.getId(), semester.getName());
+//					if (!memberSemesterOp.isPresent()) {
+//						MemberSemester statusSemester = new MemberSemester();
+//						statusSemester.setUser(user);
+//						statusSemester.setSemester(semester.getName());
+//						statusSemester.setStatus(user.isActive());
+//						memberSemesterRepository.save(statusSemester);
+//						logger.info("add member oke");
+//					}
+//				} else {
+//					numberUserDeactive++;
+//				}
+//			}
+//			for (User user : admins) {
+//				numberUserActive++;
+//				Optional<AdminSemester> adminSemesterOp = adminSemesterRepository.findByUserId(user.getId(), semester.getName());
+//				if (!adminSemesterOp.isPresent()) {
+//					AdminSemester adminSemester = new AdminSemester();
+//					adminSemester.setUser(user);
+//					adminSemester.setSemester(semester.getName());
+//					adminSemester.setRole(user.getRole());
+//					adminSemesterRepository.save(adminSemester);
+//					logger.info("add admin oke");
+//				}
+//			}
+//			
+//			Optional<UserStatusReport> userStatusReportOp = userStatusReportRepository.findBySemester(semester.getName());
+//			if (userStatusReportOp.isPresent()) {
+//				userStatusReport = userStatusReportOp.get();
+//			}
+//			
+//			userStatusReport.setNumberActiveInSemester(numberUserActive);
+//			userStatusReport.setNumberDeactiveInSemester(numberUserDeactive);
+//			userStatusReport.setTotalNumberUserInSemester(numberUserActive + numberUserDeactive);
+//			userStatusReportRepository.save(userStatusReport);
+//			
+//			logger.info("loi roi");
+//		}
+//	}
 
-	@Scheduled(cron = "1 2 0 * * *")
-	public void addListMemberEventAttendanceStatus() {
-		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
-		if (eventSchedule != null) {
-			Event event = eventSchedule.getEvent();
-			LocalDate startDate = (LocalDate) eventService.getStartDateOfEvent(event.getId()).getData().get(0);
-			if (startDate.compareTo(LocalDate.now()) == 0) {
-				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository
-						.findByEventIdOrderByIdAsc(event.getId());
-				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.isRegisterStatus()) {
-						AttendanceEvent attendanceEvent = new AttendanceEvent();
-						attendanceEvent.setMemberEvent(memberEvent);
-						attendanceEvent.setEvent(event);
-						attendanceEvent.setCreatedOn(LocalDateTime.now());
-						attendanceEvent.setCreatedBy("toandv");
-						attendanceEvent.setStatus(2);
-						attendanceEventRepository.save(attendanceEvent);
-						logger.info("atten oke");
-					}
-				}
-			}
-		}
-	}
+//	@Scheduled(cron = "1 2 0 * * *")
+//	public void addListAttendanceStatus() {
+//		logger.info("bat dau chay");
+//		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
+//		if (trainingSchedule != null) {
+//			logger.info("Khac null");
+//			List<User> users = (List<User>) userRepository.findAll();
+//			for (User user : users) {
+//				logger.info("vao for");
+//				if (user.isActive()) {
+//					AttendanceStatus attendanceStatus = new AttendanceStatus();
+//					attendanceStatus.setUser(user);
+//					attendanceStatus.setTrainingSchedule(trainingSchedule);
+//					attendanceStatus.setCreatedOn(LocalDateTime.now());
+//					attendanceStatus.setCreatedBy("toandv");
+//					attendanceStatus.setStatus(2);
+//					attendanceStatusRepository.save(attendanceStatus);
+//					logger.info("atten oke");
+//				}
+//			}
+//		}
+//		logger.info("Chay xong");
+//	}
+
+//	@Scheduled(cron = "1 2 0 * * *")
+//	public void addListMemberEventAttendanceStatus() {
+//		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
+//		if (eventSchedule != null) {
+//			Event event = eventSchedule.getEvent();
+//			LocalDate startDate = (LocalDate) eventService.getStartDateOfEvent(event.getId()).getData().get(0);
+//			if (startDate.compareTo(LocalDate.now()) == 0) {
+//				List<MemberEvent> membersEvent = (List<MemberEvent>) memberEventRepository
+//						.findByEventIdOrderByIdAsc(event.getId());
+//				for (MemberEvent memberEvent : membersEvent) {
+//					if (memberEvent.isRegisterStatus()) {
+//						AttendanceEvent attendanceEvent = new AttendanceEvent();
+//						attendanceEvent.setMemberEvent(memberEvent);
+//						attendanceEvent.setEvent(event);
+//						attendanceEvent.setCreatedOn(LocalDateTime.now());
+//						attendanceEvent.setCreatedBy("toandv");
+//						attendanceEvent.setStatus(2);
+//						attendanceEventRepository.save(attendanceEvent);
+//						logger.info("atten oke");
+//					}
+//				}
+//			}
+//		}
+//	}
 
 	@Scheduled(cron = "1 0 0 * * *")
 	public void addListMembershipStatus() {
@@ -395,6 +441,7 @@ public class TaskSchedule {
 		List<Tournament> tournaments = tournamentRepository.findAll();
 		for (Tournament tournament : tournaments) {
 			LocalDate getStartDate = tournamentService.getStartDate(tournament.getId());
+
 			if (getStartDate != null) {
 				logger.info(getStartDate.toString());
 				if (LocalDate.now().plusDays(1).isEqual(getStartDate)) {
@@ -493,7 +540,7 @@ public class TaskSchedule {
 		TrainingSchedule trainingSchedule = trainingScheduleService.getTrainingScheduleByDate(LocalDate.now());
 		if (trainingSchedule != null) {
 			List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
-					.findByTrainingScheduleId(trainingSchedule.getId());
+					.findByTrainingScheduleIdOrderByIdAsc(trainingSchedule.getId());
 			for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
 				if (attendanceStatus.getStatus() == 2) {
 					attendanceStatus.setStatus(0);
@@ -505,8 +552,9 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 59 23 * * *")
 	public void changeStatusAttendanceEvent() {
-		EventSchedule eventSchedule = eventScheduleService.getEventScheduleByDate(LocalDate.now());
-		if (eventSchedule != null) {
+		Optional<EventSchedule> eventScheduleOp = eventScheduleRepository.findByDate(LocalDate.now());
+		if (eventScheduleOp.isPresent()) {
+			EventSchedule eventSchedule = eventScheduleOp.get();
 			List<AttendanceEvent> listAttendanceEvent = attendanceEventRepository
 					.findByEventId(eventSchedule.getEvent().getId());
 			for (AttendanceEvent attendanceEvent : listAttendanceEvent) {
@@ -520,15 +568,41 @@ public class TaskSchedule {
 
 	@Scheduled(cron = "1 0 0 * * *")
 	public void changeStatusTournamentForUpdatePlayer() {
-		List<Tournament> listTournaments = tournamentService
-				.listTournamentsByRegistrationPlayerDeadline(LocalDateTime.now());
-		if (listTournaments != null) {
+		
+		List<Tournament> tournaments = tournamentRepository.findAll();
+		List<Tournament> listTournaments = new ArrayList<Tournament>();
+		for (Tournament tournament : tournaments) {
+			if (tournament.getRegistrationPlayerDeadline().toLocalDate().isEqual(LocalDateTime.now().toLocalDate())
+					&& tournament.getRegistrationPlayerDeadline().getHour() == LocalDateTime.now().getHour()) {
+				listTournaments.add(tournament);
+			}
+		}
+		
+		if (!listTournaments.isEmpty()) {
 			for (Tournament tournament : listTournaments) {
-				if (tournament.getStatus() == 0) {
-					tournament.setStatus(1);
-					tournamentRepository.save(tournament);
-					logger.info("Chuyển thành 1");
+				logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
+				tournament.setStage(1);
+				Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
+				for (CompetitiveType competitiveType : listCompetitiveTypes) {
+					if (competitiveType.getStatus() == 0) {
+						competitiveType.setStatus(1);
+						logger.info("Trạng thái của " + (competitiveType.isGender() ? "Nam " : "Nữ ")
+								+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
+								+ " thay đổi từ 0 thành 1");
+					}
 				}
+				tournament.setCompetitiveTypes(listCompetitiveTypes);
+				Set<ExhibitionType> listExhibitionTypes = tournament.getExhibitionTypes();
+				for (ExhibitionType exhibitionType : listExhibitionTypes) {
+					if (exhibitionType.getStatus() == 0) {
+						exhibitionType.setStatus(1);
+						logger.info("Trạng thái của " + exhibitionType.getName() + " thay đổi từ 0 thành 1");
+					}
+				}
+				tournament.setExhibitionTypes(listExhibitionTypes);
+
+				logger.info("Dừng thay đổi trạng thái của giải đấu " + tournament.getName());
+				tournamentRepository.save(tournament);
 			}
 		} else {
 			logger.info("Không có giải đấu");
@@ -539,12 +613,32 @@ public class TaskSchedule {
 	public void changeStatusTournamentForUpdateResult() {
 		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now());
 		if (tournamentSchedule != null) {
-			Tournament getTournament = tournamentSchedule.getTournament();
-			if (getTournament.getStatus() == 2) {
-				getTournament.setStatus(3);
-				tournamentRepository.save(getTournament);
-				logger.info("Chuyển thành 3");
+			Tournament tournament = tournamentSchedule.getTournament();
+			tournament.setStage(3);
+			logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
+			Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
+			for (CompetitiveType competitiveType : listCompetitiveTypes) {
+				if (competitiveType.getStatus() == 2) {
+					competitiveType.setStatus(3);
+					logger.info("Trạng thái của " + (competitiveType.isGender() ? "Nam " : "Nữ ")
+							+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
+							+ " thay đổi từ 2 thành 3");
+				}
 			}
+			tournament.setCompetitiveTypes(listCompetitiveTypes);
+			Set<ExhibitionType> listExhibitionTypes = tournament.getExhibitionTypes();
+			for (ExhibitionType exhibitionType : listExhibitionTypes) {
+				if (exhibitionType.getStatus() == 0) {
+					exhibitionType.setStatus(1);
+					logger.info("Trạng thái của " + exhibitionType.getName() + " thay đổi từ 2 thành 3");
+				}
+			}
+			tournament.setExhibitionTypes(listExhibitionTypes);
+
+			logger.info("Dừng thay đổi trạng thái của giải đấu " + tournament.getName());
+			tournamentRepository.save(tournament);
+		} else {
+			logger.info("Không có giải đấu");
 		}
 	}
 }

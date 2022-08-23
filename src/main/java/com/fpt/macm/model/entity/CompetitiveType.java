@@ -37,6 +37,15 @@ public class CompetitiveType {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
+	@Column
+	private Integer status;
+	
+	@Column
+	private Boolean changed;
+	
+	@Column
+	private Boolean canDelete;
 
 	public int getId() {
 		return id;
@@ -100,6 +109,30 @@ public class CompetitiveType {
 
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public Boolean isChanged() {
+		return changed;
+	}
+
+	public void setChanged(Boolean changed) {
+		this.changed = changed;
+	}
+
+	public Boolean getCanDelete() {
+		return canDelete;
+	}
+
+	public void setCanDelete(Boolean canDelete) {
+		this.canDelete = canDelete;
 	}
 	
 	

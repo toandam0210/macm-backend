@@ -1,13 +1,15 @@
 package com.fpt.macm.service;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -181,10 +183,14 @@ public class UserServiceImpl implements UserService {
 			boolean checkDuplicateStudentId = false;
 			Role currentUserRole = user.getRole();
 			Optional<Role> roleOptional = roleRepository.findById(userDto.getRoleId());
-			if (currentUserRole.getName().equals(ERole.ROLE_HeadClub.name())
-					&& !roleOptional.get().getName().equals(currentUserRole.getName())) {
+			if (currentUserRole.getId() > 12 && currentUserRole.getId() < 16
+					&& roleOptional.get().getId() > 0 && roleOptional.get().getId() < 10) {
+				responseMessage.setMessage("CTV không thể cập nhật lên làm ban chủ nhiệm");
+			} else if(currentUserRole.getName().equals(ERole.ROLE_HeadClub.name()) && userDto.getRoleId() > 1 && userDto.getRoleId() < 10){
 				responseMessage.setMessage(Constant.MSG_035);
-			} else {
+			}
+				else {
+			
 				for (User currentUser : users) {
 					if (currentUser.getStudentId().equals(userDto.getStudentId())) {
 						checkDuplicateStudentId = true;
@@ -206,7 +212,7 @@ public class UserServiceImpl implements UserService {
 					user.setUpdatedOn(LocalDateTime.now());
 					user.setGeneration(userDto.getGeneration());
 					userRepository.save(user);
-					responseMessage.setData(Arrays.asList(user));
+					responseMessage.setData(Arrays.asList(convertUserToUserDto(user)));
 					responseMessage.setMessage(Constant.MSG_005);
 
 					Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
@@ -216,6 +222,46 @@ public class UserServiceImpl implements UserService {
 						AdminSemester adminSemester = adminSemesterOp.get();
 						adminSemester.setRole(roleOptional.get());
 						adminSemesterRepository.save(adminSemester);
+					}
+
+					Optional<MemberSemester> memberSemesterOp = memberSemesterRepository
+							.findByUserIdAndSemester(user.getId(), semester.getName());
+					if (roleOptional.get().getId() > 12 && roleOptional.get().getId() < 16) {
+						if (memberSemesterOp.isPresent()) {
+							MemberSemester memberSemester = memberSemesterOp.get();
+							memberSemesterRepository.delete(memberSemester);
+						}
+					} else if (roleOptional.get().getId() > 9 && roleOptional.get().getId() < 13) {
+						if (!memberSemesterOp.isPresent()) {
+							MemberSemester memberSemester = new MemberSemester();
+							memberSemester.setSemester(semester.getName());
+							memberSemester.setStatus(user.isActive());
+							memberSemester.setUser(user);
+							memberSemesterRepository.save(memberSemester);
+						}
+					}else {
+						if(memberSemesterOp.isPresent()) {
+							memberSemesterRepository.delete(memberSemesterOp.get());
+							AdminSemester adminSemester = new AdminSemester();
+							adminSemester.setUser(user);
+							adminSemester.setRole(roleOptional.get());
+							adminSemester.setSemester(semester.getName());
+							adminSemesterRepository.save(adminSemester);
+						} else {
+							if (!adminSemesterOp.isPresent()) {
+								AdminSemester adminSemester = new AdminSemester();
+								adminSemester.setUser(user);
+								adminSemester.setRole(roleOptional.get());
+								adminSemester.setSemester(semester.getName());
+								adminSemesterRepository.save(adminSemester);
+							}else {
+								AdminSemester adminSemester = adminSemesterOp.get();
+								adminSemester.setUser(user);
+								adminSemester.setRole(roleOptional.get());
+								adminSemester.setSemester(semester.getName());
+								adminSemesterRepository.save(adminSemester);
+							}
+						}
 					}
 
 				} else {
@@ -307,7 +353,31 @@ public class UserServiceImpl implements UserService {
 					memberSemester.setSemester(semester.getName());
 					memberSemesterRepository.save(memberSemester);
 				}
-				responseMessage.setData(Arrays.asList(user));
+
+				Optional<User> newUserOp = userRepository.findByStudentId(user.getStudentId());
+				List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
+				if (newUserOp.isPresent()) {
+					User newUser = newUserOp.get();
+					UserDto newUserDto = convertUserToUserDto(newUser);
+					responseMessage.setData(Arrays.asList(newUserDto));
+
+					List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
+							.findAllFutureTrainingSchedule(LocalDate.now());
+					for (TrainingSchedule trainingSchedule : trainingSchedules) {
+						AttendanceStatus attendanceStatus = new AttendanceStatus();
+						attendanceStatus.setUser(newUser);
+						attendanceStatus.setTrainingSchedule(trainingSchedule);
+						attendanceStatus.setCreatedOn(LocalDateTime.now());
+						attendanceStatus.setCreatedBy("toandv");
+						attendanceStatus.setStatus(2);
+						listAttendanceStatus.add(attendanceStatus);
+					}
+				}
+				
+				if (!listAttendanceStatus.isEmpty()) {
+					attendanceStatusRepository.saveAll(listAttendanceStatus);
+				}
+				
 				responseMessage.setMessage(Constant.MSG_007);
 			} else {
 				String messageError = "";
@@ -378,12 +448,55 @@ public class UserServiceImpl implements UserService {
 				user.setActive(!user.isActive());
 				Optional<MemberSemester> memberSemesterOp = memberSemesterRepository
 						.findByUserIdAndSemester(user.getId(), semester);
-				if (memberSemesterOp.isPresent()) {
-					MemberSemester memberSemester = memberSemesterOp.get();
-					memberSemester.setStatus(!memberSemester.isStatus());
-					memberSemesterRepository.save(memberSemester);
-				}
 				userRepository.save(user);
+				if (user.isActive()) {
+					if (memberSemesterOp.isPresent()) {
+						MemberSemester memberSemester = memberSemesterOp.get();
+						memberSemester.setStatus(!memberSemester.isStatus());
+						memberSemesterRepository.save(memberSemester);
+					} else {
+						MemberSemester memberSemester = new MemberSemester();
+						memberSemester.setStatus(true);
+						memberSemester.setUser(user);
+						memberSemester.setSemester(semester);
+						memberSemesterRepository.save(memberSemester);
+					}
+				} else {
+					if (memberSemesterOp.isPresent()) {
+						memberSemesterRepository.delete(memberSemesterOp.get());
+					}
+				}
+				List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
+				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
+						.findAllFutureTrainingSchedule(LocalDate.now());
+				// Thêm data điểm danh khi active user
+				if (user.isActive()) {
+					for (TrainingSchedule trainingSchedule : trainingSchedules) {
+						AttendanceStatus attendanceStatus = new AttendanceStatus();
+						attendanceStatus.setUser(user);
+						attendanceStatus.setTrainingSchedule(trainingSchedule);
+						attendanceStatus.setCreatedOn(LocalDateTime.now());
+						attendanceStatus.setCreatedBy("toandv");
+						attendanceStatus.setStatus(2);
+						listAttendanceStatus.add(attendanceStatus);
+					}
+					if (!listAttendanceStatus.isEmpty()) {
+						attendanceStatusRepository.saveAll(listAttendanceStatus);
+					}
+				}
+				// Xóa data điểm danh khi deactive user
+				else {
+					for (TrainingSchedule trainingSchedule : trainingSchedules) {
+						AttendanceStatus attendanceStatus = attendanceStatusRepository
+								.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+						if(attendanceStatus != null) {
+						listAttendanceStatus.add(attendanceStatus);
+						}
+					}
+					if (!listAttendanceStatus.isEmpty()) {
+						attendanceStatusRepository.deleteAll(listAttendanceStatus);
+					}
+				}
 			}
 			responseMessage.setData(Arrays.asList(user));
 			responseMessage.setMessage(Constant.MSG_005);
@@ -437,15 +550,71 @@ public class UserServiceImpl implements UserService {
 		try {
 			List<User> usersFromExcel = ExcelHelper.excelToUsers(file.getInputStream());
 			List<UserDto> usersDto = new ArrayList<UserDto>();
+			List<TrainingSchedule> trainingSchedules = trainingScheduleRepository.findAllFutureTrainingSchedule(LocalDate.now());
+			int countAddSuccess = 0;
+			int countAddFail = 0;
 			for (User userFromExcel : usersFromExcel) {
+				boolean checkInalid = true;
+				String messageError = "";
+				if (userFromExcel.getDateOfBirth() == null) {
+					String messageInvalidFormatDate = "Vui lòng nhập đúng định dạng: yyyy-MM-dd";
+					messageError += messageInvalidFormatDate;
+					checkInalid = false;
+				}
+				if (!userFromExcel.getPhone().startsWith("0") || userFromExcel.getPhone().length() != 10) {
+					String messageInvalidPhone = "Vui lòng nhập đúng SĐT";
+					messageError += System.lineSeparator() + messageInvalidPhone;
+					checkInalid = false;
+				}
+				String regexEmail = "^[\\w]+@(fpt.edu.vn)\\b";
+				Pattern pattern = Pattern.compile(regexEmail);
+				Matcher matcher = pattern.matcher(userFromExcel.getEmail());
+				if (!matcher.matches()) {
+					String messageInvalidEmail = "Vui lòng nhập email FPT";
+					messageError += System.lineSeparator() + messageInvalidEmail;
+					checkInalid = false;
+				}
+				
+				if(userFromExcel.isGender() == null) {
+					String messageInvalidGener = "Vui lòng nhập: Nam/Nữ";
+					messageError += System.lineSeparator() + messageInvalidGener;
+					checkInalid = false;
+				}
+				
+				if(userFromExcel.isActive() == null) {
+					String messageInvalidActive = "Vui lòng nhập: Hoạt động/Không hoạt động";
+					messageError += System.lineSeparator() + messageInvalidActive;
+					checkInalid = false;
+				}
+				
+				if(userFromExcel.getGeneration() < 1) {
+					String messageInvalidGen = "Vui lòng nhập Generation lớn hơn 0";
+					messageError += System.lineSeparator() + messageInvalidGen;
+					checkInalid = false;
+				}
+				UserDto userDto = convertUserExcelToUserDto(userFromExcel);
 				Optional<User> userStudentId = userRepository.findByStudentId(userFromExcel.getStudentId());
 				Optional<User> userEmail = userRepository.findByEmail(userFromExcel.getEmail());
 				if (userStudentId.isPresent() || userEmail.isPresent()) {
-					usersDto.add(convertUserToUserDto(userFromExcel));
-				} else {
+					if (userStudentId.isPresent()) {
+						String messageStudentId = Constant.MSG_048 + userFromExcel.getStudentId() + Constant.MSG_050;
+						messageError += System.lineSeparator() + messageStudentId;
+					} else {
+						String messageEmail = Constant.MSG_049 + userFromExcel.getEmail() + Constant.MSG_050;
+						messageError += System.lineSeparator() + messageEmail;
+					}
+					checkInalid = false;
+					countAddFail++;
+				}
+				if(!checkInalid) {
+				usersDto.add(userDto);
+				userDto.setMessageError(messageError);
+				}else{
 					userFromExcel.setCreatedOn(LocalDate.now());
 					userFromExcel.setCreatedBy("toandv");
-					userRepository.saveAll(usersFromExcel);
+					userRepository.save(userFromExcel);
+					
+					countAddSuccess++;
 
 					if (userFromExcel.getRole().getId() > 9 && userFromExcel.getRole().getId() < 13) {
 						MemberSemester memberSemester = new MemberSemester();
@@ -464,19 +633,59 @@ public class UserServiceImpl implements UserService {
 						adminSemester.setSemester(currentSemester.getName());
 						adminSemesterRepository.save(adminSemester);
 					}
+					
+					// Thêm data điểm danh khi user active
+					List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
+					Optional<User> newUserOp = userRepository.findByStudentIdAndEmail(userFromExcel.getStudentId(), userFromExcel.getEmail());
+					if (newUserOp.isPresent()) {
+						User newUser = newUserOp.get();
+						if (newUser.isActive()) {
+							for (TrainingSchedule trainingSchedule : trainingSchedules) {
+								AttendanceStatus attendanceStatus = new AttendanceStatus();
+								attendanceStatus.setUser(newUser);
+								attendanceStatus.setTrainingSchedule(trainingSchedule);
+								attendanceStatus.setCreatedOn(LocalDateTime.now());
+								attendanceStatus.setCreatedBy("toandv");
+								attendanceStatus.setStatus(2);
+								listAttendanceStatus.add(attendanceStatus);
+							}
+							if (!listAttendanceStatus.isEmpty()) {
+								attendanceStatusRepository.saveAll(listAttendanceStatus);
+							}
+						}
+					}
+
 				}
 			}
+			if(usersDto.size() == 0) {
+				responseMessage.setMessage("Thêm thành công "+usersFromExcel.size()+ "/"+usersFromExcel.size()+ " người");
+			}else if(usersFromExcel.size() - usersDto.size() == 0) {
+				responseMessage.setMessage("Thêm thất bại "+usersFromExcel.size()+ "/"+usersFromExcel.size()+ " người. Vui lòng tải file Excel để sửa lại.");
+			}else if(usersDto.size() > 0) {
+				responseMessage.setMessage("Thêm thành công "+(usersFromExcel.size()- usersDto.size())+ "/"+usersFromExcel.size()+ " người. Vui lòng tải file Excel để sửa lại.");
+			}
 			responseMessage.setData(usersDto);
-			responseMessage.setMessage(Constant.MSG_006);
-			responseMessage.setTotalResult(usersDto.size());
+			responseMessage.setTotalResult(usersFromExcel.size());
+			responseMessage.setTotalActive(countAddSuccess);
+			responseMessage.setTotalDeactive(countAddFail);
 			return responseMessage;
-		} catch (IOException e) {
-			throw new RuntimeException("fail to store excel data: " + e.getMessage());
+//		} catch (IOException e) {
+//			throw new RuntimeException("fail to store excel data: " + e.getMessage());
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
 		}
+		return responseMessage;
 	}
-
+	
+	@Override
 	public ByteArrayInputStream exportUsersToExcel(List<UserDto> users) {
 		ByteArrayInputStream in = ExcelHelper.usersToExcel(users);
+		return in;
+	}
+	
+	@Override
+	public ByteArrayInputStream exportUsersToExcelWithError(List<UserDto> users) {
+		ByteArrayInputStream in = ExcelHelper.usersToExcelWithErrorMessage(users);
 		return in;
 	}
 
@@ -523,7 +732,7 @@ public class UserServiceImpl implements UserService {
 	public ResponseMessage getMembersBySemester(String semester) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberSemester> statusSemesters = memberSemesterRepository.findBySemester(semester);
+			List<MemberSemester> statusSemesters = memberSemesterRepository.findBySemesterOrderByIdDesc(semester);
 			Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			List<User> collaborators = userRepository.findCollaborator();
 			List<UserDto> usersDto = new ArrayList<UserDto>();
@@ -532,9 +741,10 @@ public class UserServiceImpl implements UserService {
 				if (collaborators.size() > 0) {
 					for (User collaborator : collaborators) {
 						if (semester.equals(currentSemester.getName())) {
-							UserDto collaboratorDto = convertUserToUserDto(collaborator);
-							usersDto.add(collaboratorDto);
-							if (!collaborator.isActive()) {
+							if (collaborator.isActive()) {
+								UserDto collaboratorDto = convertUserToUserDto(collaborator);
+								usersDto.add(collaboratorDto);
+							} else {
 								countDeactive++;
 							}
 						}
@@ -550,6 +760,7 @@ public class UserServiceImpl implements UserService {
 					UserDto userDto = convertUserToUserDto(user);
 					usersDto.add(userDto);
 				}
+				Collections.sort(usersDto);
 				responseMessage.setData(usersDto);
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(usersDto.size());
@@ -579,6 +790,7 @@ public class UserServiceImpl implements UserService {
 					UserDto userDto = convertUserToUserDto(user);
 					usersDto.add(userDto);
 				}
+				Collections.sort(usersDto);
 				responseMessage.setData(usersDto);
 				responseMessage.setMessage(Constant.MSG_001);
 				responseMessage.setTotalResult(usersDto.size());
@@ -605,6 +817,37 @@ public class UserServiceImpl implements UserService {
 		userDto.setActive(user.isActive());
 		userDto.setCurrentAddress(user.getCurrentAddress());
 		userDto.setDateOfBirth(user.getDateOfBirth());
+		userDto.setRoleId(user.getRole().getId());
+		userDto.setRoleName(Utils.convertRoleFromDbToExcel(user.getRole()));
+		return userDto;
+	}
+	
+	private UserDto convertUserExcelToUserDto(User user) {
+		UserDto userDto = new UserDto();
+		userDto.setId(user.getId());
+		userDto.setStudentId(user.getStudentId());
+		userDto.setEmail(user.getEmail());
+		if (user.isActive() == null) {
+			userDto.setActive(null);
+		} else {
+			userDto.setActive(user.isActive());
+		}
+		if (user.isGender() == null) {
+			userDto.setGender(null);
+		} else {
+			userDto.setGender(user.isGender());
+		}
+		if (user.getDateOfBirth() == null) {
+			userDto.setDateOfBirth(null);
+		} else {
+			userDto.setDateOfBirth(user.getDateOfBirth());
+		}
+		userDto.setGeneration(user.getGeneration());
+		userDto.setImage(user.getImage());
+		userDto.setName(user.getName());
+		userDto.setPhone(user.getPhone());
+
+		userDto.setCurrentAddress(user.getCurrentAddress());
 		userDto.setRoleId(user.getRole().getId());
 		userDto.setRoleName(Utils.convertRoleFromDbToExcel(user.getRole()));
 		return userDto;
@@ -755,6 +998,7 @@ public class UserServiceImpl implements UserService {
 					userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
 					userAttendanceStatusDto.setTitle("Lịch tập");
 					userAttendanceStatusDto.setType(0);
+					userAttendanceStatusDto.setId(trainingSchedule.getId());
 					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 				} else {
 					AttendanceStatus attendanceStatus = attendanceStatusRepository
@@ -769,6 +1013,7 @@ public class UserServiceImpl implements UserService {
 						userAttendanceStatusDto.setFinishTime(trainingSchedule.getFinishTime());
 						userAttendanceStatusDto.setTitle("Lịch tập");
 						userAttendanceStatusDto.setType(0);
+						userAttendanceStatusDto.setId(trainingSchedule.getId());
 						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 					} else {
 						UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
@@ -780,6 +1025,7 @@ public class UserServiceImpl implements UserService {
 						userAttendanceStatusDto.setFinishTime(attendanceStatus.getTrainingSchedule().getFinishTime());
 						userAttendanceStatusDto.setTitle("Lịch tập");
 						userAttendanceStatusDto.setType(0);
+						userAttendanceStatusDto.setId(trainingSchedule.getId());
 						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 					}
 				}
@@ -797,6 +1043,7 @@ public class UserServiceImpl implements UserService {
 					userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
 					userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 					userAttendanceStatusDto.setType(1);
+					userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
 					listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 				} else {
 					Optional<MemberEvent> memberEventOp = memberEventRepository
@@ -805,8 +1052,8 @@ public class UserServiceImpl implements UserService {
 						MemberEvent memberEvent = memberEventOp.get();
 						if (memberEvent.isRegisterStatus()) {
 							Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
-									.findByEventIdAndMemberEventId(eventSchedule.getEvent().getId(),
-											memberEvent.getId());
+									.findByEventIdAndUserId(eventSchedule.getEvent().getId(),
+											user.getId());
 							if (attendanceEventOp.isPresent()) {
 								AttendanceEvent attendanceEvent = attendanceEventOp.get();
 								UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
@@ -818,6 +1065,7 @@ public class UserServiceImpl implements UserService {
 								userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
 								userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 								userAttendanceStatusDto.setType(1);
+								userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
 								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 							} else {
 								UserAttendanceStatusDto userAttendanceStatusDto = new UserAttendanceStatusDto();
@@ -829,6 +1077,7 @@ public class UserServiceImpl implements UserService {
 								userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
 								userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 								userAttendanceStatusDto.setType(1);
+								userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
 								listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 							}
 						} else {
@@ -841,6 +1090,7 @@ public class UserServiceImpl implements UserService {
 							userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
 							userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 							userAttendanceStatusDto.setType(1);
+							userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
 							listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 						}
 					} else {
@@ -853,6 +1103,7 @@ public class UserServiceImpl implements UserService {
 						userAttendanceStatusDto.setFinishTime(eventSchedule.getFinishTime());
 						userAttendanceStatusDto.setTitle(eventSchedule.getEvent().getName());
 						userAttendanceStatusDto.setType(1);
+						userAttendanceStatusDto.setId(eventSchedule.getEvent().getId());
 						listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 					}
 				}
@@ -869,6 +1120,7 @@ public class UserServiceImpl implements UserService {
 				userAttendanceStatusDto.setFinishTime(tournamentSchedule.getFinishTime());
 				userAttendanceStatusDto.setTitle(tournamentSchedule.getTournament().getName());
 				userAttendanceStatusDto.setType(2);
+				userAttendanceStatusDto.setId(tournamentSchedule.getTournament().getId());
 				listUserAttendanceStatusDto.add(userAttendanceStatusDto);
 			}
 
@@ -881,5 +1133,4 @@ public class UserServiceImpl implements UserService {
 		}
 		return responseMessage;
 	}
-
 }

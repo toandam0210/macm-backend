@@ -154,25 +154,21 @@ public class NotificationServiceImpl implements NotificationService {
 	@Override
 	public ResponseMessage sendNotificationToAnUser(User user, Notification notification) {
 		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			NotificationToUser notificationToUser = new NotificationToUser();
+		NotificationToUser notificationToUser = new NotificationToUser();
 
-			notificationToUser.setNotification(notification);
-			notificationToUser.setUser(user);
-			notificationToUser.setRead(false);
-			notificationToUser.setCreatedOn(LocalDateTime.now());
-			notificationToUserRepository.save(notificationToUser);
+		notificationToUser.setNotification(notification);
+		notificationToUser.setUser(user);
+		notificationToUser.setRead(false);
+		notificationToUser.setCreatedOn(LocalDateTime.now());
+		notificationToUserRepository.save(notificationToUser);
 
-			responseMessage.setData(Arrays.asList(notificationToUser));
-			responseMessage.setMessage("Gửi thông báo đến người dùng thành công");
-		} catch (Exception e) {
-			responseMessage.setMessage(e.getMessage());
-		}
+		responseMessage.setData(Arrays.asList(notificationToUser));
+		responseMessage.setMessage("Gửi thông báo đến người dùng thành công");
 		return responseMessage;
 	}
 
 	@Override
-	public ResponseMessage createTournamentNotification(int tournamentId, String tournamentName) {
+	public ResponseMessage createTournamentCreateNotification(int tournamentId, String tournamentName) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Notification notification = new Notification();
@@ -197,11 +193,61 @@ public class NotificationServiceImpl implements NotificationService {
 	}
 
 	@Override
-	public ResponseMessage createEventNotification(int eventId, String eventName) {
+	public ResponseMessage createTournamentDeleteNotification(int tournamentId, String tournamentName) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Notification notification = new Notification();
+			notification.setMessage("Giải đấu " + tournamentName + " đã hủy.");
+			notification.setNotificationType(0);
+			notification.setNotificationTypeId(tournamentId);
+			notification.setCreatedOn(LocalDateTime.now());
+			notificationRepository.save(notification);
+
+			Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+			List<Notification> notifications = IterableUtils.toList(notificationIterable);
+			Notification newNotification = notifications.get(0);
+
+			sendNotificationToAllUser(newNotification);
+
+			responseMessage.setData(Arrays.asList(notification));
+			responseMessage.setMessage("Tạo thông báo cho giải đấu thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage createEventCreateNotification(int eventId, String eventName) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Notification notification = new Notification();
 			notification.setMessage("Sắp tới có sự kiện " + eventName + ".");
+			notification.setNotificationType(1);
+			notification.setNotificationTypeId(eventId);
+			notification.setCreatedOn(LocalDateTime.now());
+			notificationRepository.save(notification);
+
+			Iterable<Notification> notificationIterable = notificationRepository.findAll(Sort.by("id").descending());
+			List<Notification> notifications = IterableUtils.toList(notificationIterable);
+			Notification newNotification = notifications.get(0);
+
+			sendNotificationToAllUser(newNotification);
+
+			responseMessage.setData(Arrays.asList(notification));
+			responseMessage.setMessage("Tạo thông báo cho sự kiện thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage createEventDeleteNotification(int eventId, String eventName) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Notification notification = new Notification();
+			notification.setMessage("Sự kiện " + eventName + " đã hủy.");
 			notification.setNotificationType(1);
 			notification.setNotificationTypeId(eventId);
 			notification.setCreatedOn(LocalDateTime.now());
@@ -330,29 +376,31 @@ public class NotificationServiceImpl implements NotificationService {
 			List<MemberEvent> membersEvent = memberEventRepository.findByUserId(user.getId());
 			if (!membersEvent.isEmpty()) {
 				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.isRegisterStatus()) {
-						Event event = memberEvent.getEvent();
-						double amountPerRegisterEstimate = event.getAmountPerRegisterEstimated();
-						double amountPerRegisterActual = event.getAmountPerRegisterActual();
+					if (memberEvent.getEvent().isStatus()) {
+						if (memberEvent.isRegisterStatus()) {
+							Event event = memberEvent.getEvent();
+							double amountPerRegisterEstimate = event.getAmountPerRegisterEstimated();
+							double amountPerRegisterActual = event.getAmountPerRegisterActual();
 
-						if (amountPerRegisterEstimate != 0) {
-							if (amountPerRegisterActual == 0) {
-								if (memberEvent.getPaymentValue() == 0) {
-									String message = "Sự kiện " + event.getName() + ": "
-											+ nf.format(amountPerRegisterEstimate) + " VND";
-									messages.add(message);
-								}
-							} else {
-								if (memberEvent.getPaymentValue() == 0) {
-									String message = "Sự kiện " + event.getName() + ": "
-											+ nf.format(amountPerRegisterActual) + " VND";
-									messages.add(message);
-								} else if (amountPerRegisterActual > amountPerRegisterEstimate) {
-									if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
+							if (amountPerRegisterEstimate != 0) {
+								if (amountPerRegisterActual == 0) {
+									if (memberEvent.getPaymentValue() == 0) {
 										String message = "Sự kiện " + event.getName() + ": "
-												+ nf.format((amountPerRegisterActual - amountPerRegisterEstimate))
-												+ " VND";
+												+ nf.format(amountPerRegisterEstimate) + " VND";
 										messages.add(message);
+									}
+								} else {
+									if (memberEvent.getPaymentValue() == 0) {
+										String message = "Sự kiện " + event.getName() + ": "
+												+ nf.format(amountPerRegisterActual) + " VND";
+										messages.add(message);
+									} else if (amountPerRegisterActual > amountPerRegisterEstimate) {
+										if (memberEvent.getPaymentValue() == amountPerRegisterEstimate) {
+											String message = "Sự kiện " + event.getName() + ": "
+													+ nf.format((amountPerRegisterActual - amountPerRegisterEstimate))
+													+ " VND";
+											messages.add(message);
+										}
 									}
 								}
 							}
@@ -365,33 +413,43 @@ public class NotificationServiceImpl implements NotificationService {
 					.findByUserId(user.getId());
 			if (!tournamentOrganizingCommittees.isEmpty()) {
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
-							&& !tournamentOrganizingCommittee.isPaymentStatus()) {
-						String message = "Giải đấu " + tournamentOrganizingCommittee.getTournament().getName() + ": "
-								+ nf.format(tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay())
-								+ " VND";
-						messages.add(message);
+					if (tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay() > 0) {
+						if (tournamentOrganizingCommittee.getTournament().isStatus()) {
+							if (!tournamentOrganizingCommittee.isPaymentStatus()) {
+								String message = "Giải đấu " + tournamentOrganizingCommittee.getTournament().getName()
+										+ ": " + nf.format(tournamentOrganizingCommittee.getTournament()
+												.getFeeOrganizingCommiteePay())
+										+ " VND";
+								messages.add(message);
+							}
+						}
 					}
 				}
 			}
 
 			List<Tournament> tournaments = tournamentRepository.findAll();
 			for (Tournament tournament : tournaments) {
-				Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
-				for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
-					if (studentId.equals(tournamentPlayer.getUser().getStudentId())
-							&& !tournamentPlayer.isPaymentStatus()) {
-						String message = "Giải đấu " + tournament.getName() + ": "
-								+ nf.format(tournament.getFeePlayerPay()) + " VND";
-						messages.add(message);
-						break;
+				if (tournament.isStatus() && tournament.getFeePlayerPay() > 0) {
+					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+						if (studentId.equals(tournamentPlayer.getUser().getStudentId())
+								&& !tournamentPlayer.isPaymentStatus()) {
+							String message = "Giải đấu " + tournament.getName() + ": "
+									+ nf.format(tournament.getFeePlayerPay()) + " VND";
+							messages.add(message);
+							break;
+						}
 					}
 				}
 			}
 
-			responseMessage.setData(messages);
-			responseMessage.setMessage(
-					"Lấy trạng thái đóng tiền của " + user.getName() + " - " + user.getStudentId() + " thành công");
+			if (!messages.isEmpty()) {
+				responseMessage.setData(messages);
+				responseMessage.setMessage(
+						"Lấy trạng thái đóng tiền của " + user.getName() + " - " + user.getStudentId() + " thành công");
+			} else {
+				responseMessage.setMessage("Không có khoản nào phải đóng");
+			}
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());

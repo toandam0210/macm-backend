@@ -15,12 +15,13 @@ import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Semester;
-import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
+import com.fpt.macm.repository.TrainingScheduleRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
@@ -43,6 +44,15 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 
 	@Autowired
 	NotificationService notificationService;
+	
+	@Autowired
+	AttendanceStatusRepository attendanceStatusRepository;
+	
+	@Autowired
+	TrainingScheduleService trainingScheduleService;
+	
+	@Autowired
+	TrainingScheduleRepository trainingScheduleRepository;
 	
 	@Override
 	public ResponseMessage createPreviewTournamentSchedule(String tournamentName, String startDate, String finishDate,
@@ -104,88 +114,6 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 					"Danh sách lịch của giải đấu " + tournamentRepository.findById(tournamentId).get().getName());
 		} catch (Exception e) {
 			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
-	public ResponseMessage createTournamentSchedule(int tournamentId, List<ScheduleDto> listPreview,
-			Boolean isOverwritten) {
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<TournamentSchedule> listTournamentSchedule = new ArrayList<TournamentSchedule>();
-			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
-			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
-			Boolean isInterrupted = false;
-			String title = "";
-			Tournament tournament = tournamentRepository.findById(tournamentId).get();
-			for (ScheduleDto scheduleDto : listPreview) {
-				if (!scheduleDto.getExisted()) {
-					TournamentSchedule tournamentSchedule = new TournamentSchedule();
-					tournamentSchedule.setTournament(tournamentRepository.findById(tournamentId).get());
-					tournamentSchedule.setDate(scheduleDto.getDate());
-					tournamentSchedule.setStartTime(scheduleDto.getStartTime());
-					tournamentSchedule.setFinishTime(scheduleDto.getFinishTime());
-					tournamentSchedule.setCreatedBy("toandv");
-					tournamentSchedule.setCreatedOn(LocalDateTime.now());
-					listTournamentSchedule.add(tournamentSchedule);
-					CommonSchedule commonSession = new CommonSchedule();
-					commonSession.setTitle(tournamentSchedule.getTournament().getName());
-					commonSession.setDate(scheduleDto.getDate());
-					commonSession.setStartTime(scheduleDto.getStartTime());
-					commonSession.setFinishTime(scheduleDto.getFinishTime());
-					commonSession.setCreatedOn(LocalDateTime.now());
-					commonSession.setUpdatedOn(LocalDateTime.now());
-					commonSession.setType(2);
-					listCommon.add(commonSession);
-				} else {
-					if (isOverwritten) {
-						if (scheduleDto.getTitle().toString().equals("Trùng với Lịch tập")) {
-							TournamentSchedule tournamentSchedule = new TournamentSchedule();
-							tournamentSchedule.setTournament(tournamentRepository.findById(tournamentId).get());
-							tournamentSchedule.setDate(scheduleDto.getDate());
-							tournamentSchedule.setStartTime(scheduleDto.getStartTime());
-							tournamentSchedule.setFinishTime(scheduleDto.getFinishTime());
-							tournamentSchedule.setCreatedBy("toandv");
-							tournamentSchedule.setCreatedOn(LocalDateTime.now());
-							listTournamentSchedule.add(tournamentSchedule);
-							CommonSchedule commonSession = new CommonSchedule();
-							commonSession.setTitle(tournamentSchedule.getTournament().getName());
-							commonSession.setDate(scheduleDto.getDate());
-							commonSession.setStartTime(scheduleDto.getStartTime());
-							commonSession.setFinishTime(scheduleDto.getFinishTime());
-							commonSession.setCreatedOn(LocalDateTime.now());
-							commonSession.setUpdatedOn(LocalDateTime.now());
-							listCommon.add(commonSession);
-							CommonSchedule getCommonSession = commonScheduleService
-									.getCommonSessionByDate(scheduleDto.getDate());
-							listCommonOverwritten.add(getCommonSession);
-						} else {
-							isInterrupted = true;
-							title = scheduleDto.getTitle();
-							break;
-						}
-					}
-				}
-			}
-			if (isInterrupted) {
-				responseMessage.setMessage(Constant.MSG_093 + title);
-			} else {
-				if (listTournamentSchedule.isEmpty()) {
-					responseMessage.setMessage(Constant.MSG_040);
-				} else {
-					tournamentScheduleRepository.saveAll(listTournamentSchedule);
-					commonScheduleRepository.deleteAll(listCommonOverwritten);
-					commonScheduleRepository.saveAll(listCommon);
-					responseMessage.setData(listTournamentSchedule);
-					responseMessage.setMessage(Constant.MSG_100);
-					responseMessage.setTotalResult(listTournamentSchedule.size());
-					
-					notificationService.createTournamentNotification(tournamentId, tournament.getName());
-				}
-			}
-		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
@@ -300,5 +228,22 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 			// TODO: handle exception
 			return null;
 		}
+	}
+
+	@Override
+	public ResponseMessage getAllTournamentSchedule() {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<TournamentSchedule> tournamentSchedules = tournamentScheduleRepository.findAll();
+			if (!tournamentSchedules.isEmpty()) {
+				responseMessage.setData(tournamentSchedules);
+				responseMessage.setMessage("Lấy tất cả lịch của giải đấu thành công");
+			} else {
+				responseMessage.setMessage("Giải đấu chưa có lịch nào");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 }

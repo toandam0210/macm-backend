@@ -26,7 +26,7 @@ public class User {
 	private String name;
 
 	@Column
-	private boolean gender;
+	private Boolean gender;
 
 	@Column
 	private LocalDate dateOfBirth;
@@ -41,7 +41,7 @@ public class User {
 	private String phone;
 
 	@Column
-	private boolean isActive;
+	private Boolean isActive;
 
 	@Column
 	private String currentAddress;
@@ -63,7 +63,7 @@ public class User {
 	private LocalDateTime updatedOn;
 
 	@Column
-	private int generation;
+	private Integer generation;
 
 	public int getId() {
 		return id;
@@ -89,11 +89,11 @@ public class User {
 		this.name = name;
 	}
 
-	public boolean isGender() {
+	public Boolean isGender() {
 		return gender;
 	}
 
-	public void setGender(boolean gender) {
+	public void setGender(Boolean gender) {
 		this.gender = gender;
 	}
 
@@ -121,11 +121,11 @@ public class User {
 		this.phone = phone;
 	}
 
-	public boolean isActive() {
+	public Boolean isActive() {
 		return isActive;
 	}
 
-	public void setActive(boolean isActive) {
+	public void setActive(Boolean isActive) {
 		this.isActive = isActive;
 	}
 
@@ -185,11 +185,11 @@ public class User {
 		this.currentAddress = currentAddress;
 	}
 
-	public int getGeneration() {
+	public Integer getGeneration() {
 		return generation;
 	}
 
-	public void setGeneration(int generation) {
+	public void setGeneration(Integer generation) {
 		this.generation = generation;
 	}
 

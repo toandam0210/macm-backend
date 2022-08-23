@@ -13,12 +13,14 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ScheduleDto;
+import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventSchedule;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
@@ -55,6 +57,9 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 
 	@Autowired
 	NotificationService notificationService;
+
+	@Autowired
+	AttendanceStatusRepository attendanceStatusRepository;
 
 	@Override
 	public ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate,
@@ -116,96 +121,6 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 	}
 
 	@Override
-	public ResponseMessage createEventSchedule(int eventId, List<ScheduleDto> listPreview, Boolean isOverwritten) {
-		// TODO Auto-generated method stub
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<EventSchedule> listEventSchedule = new ArrayList<EventSchedule>();
-			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
-			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
-			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
-			Boolean isInterrupted = false;
-			String title = "";
-			Optional<Event> eventOp = eventRepository.findById(eventId);
-			if (eventOp.isPresent()) {
-				Event event = eventOp.get();
-				for (ScheduleDto scheduleDto : listPreview) {
-					if (!scheduleDto.getExisted()) {
-						EventSchedule eventSchedule = new EventSchedule();
-						eventSchedule.setEvent(eventRepository.findById(eventId).get());
-						eventSchedule.setDate(scheduleDto.getDate());
-						eventSchedule.setStartTime(scheduleDto.getStartTime());
-						eventSchedule.setFinishTime(scheduleDto.getFinishTime());
-						eventSchedule.setCreatedBy("LinhLHN");
-						eventSchedule.setCreatedOn(LocalDateTime.now());
-						eventSchedule.setUpdatedBy("LinhLHN");
-						eventSchedule.setUpdatedOn(LocalDateTime.now());
-						listEventSchedule.add(eventSchedule);
-						CommonSchedule commonSession = new CommonSchedule();
-						commonSession.setTitle(eventSchedule.getEvent().getName());
-						commonSession.setDate(scheduleDto.getDate());
-						commonSession.setStartTime(scheduleDto.getStartTime());
-						commonSession.setFinishTime(scheduleDto.getFinishTime());
-						commonSession.setCreatedOn(LocalDateTime.now());
-						commonSession.setUpdatedOn(LocalDateTime.now());
-						commonSession.setType(1);
-						listCommon.add(commonSession);
-					} else {
-						if (isOverwritten && scheduleDto.getTitle().toString().equals("Trùng với Lịch tập")) {
-							EventSchedule eventSchedule = new EventSchedule();
-							eventSchedule.setEvent(eventRepository.findById(eventId).get());
-							eventSchedule.setDate(scheduleDto.getDate());
-							eventSchedule.setStartTime(scheduleDto.getStartTime());
-							eventSchedule.setFinishTime(scheduleDto.getFinishTime());
-							eventSchedule.setCreatedBy("LinhLHN");
-							eventSchedule.setCreatedOn(LocalDateTime.now());
-							eventSchedule.setUpdatedBy("LinhLHN");
-							eventSchedule.setUpdatedOn(LocalDateTime.now());
-							listEventSchedule.add(eventSchedule);
-							CommonSchedule commonSession = new CommonSchedule();
-							commonSession.setTitle(eventSchedule.getEvent().getName());
-							commonSession.setDate(scheduleDto.getDate());
-							commonSession.setStartTime(scheduleDto.getStartTime());
-							commonSession.setFinishTime(scheduleDto.getFinishTime());
-							commonSession.setCreatedOn(LocalDateTime.now());
-							commonSession.setUpdatedOn(LocalDateTime.now());
-							commonSession.setType(1);
-							listCommon.add(commonSession);
-							CommonSchedule getCommonSession = commonScheduleService
-									.getCommonSessionByDate(scheduleDto.getDate());
-							listCommonOverwritten.add(getCommonSession);
-							TrainingSchedule getTrainingSession = trainingScheduleService
-									.getTrainingScheduleByDate(scheduleDto.getDate());
-							listTrainingOverwritten.add(getTrainingSession);
-						} else {
-							isInterrupted = true;
-							title = scheduleDto.getTitle();
-							break;
-						}
-					}
-				}
-				if (isInterrupted) {
-					responseMessage.setMessage(Constant.MSG_093 + title);
-				} else {
-					eventScheduleRepository.saveAll(listEventSchedule);
-					commonScheduleRepository.deleteAll(listCommonOverwritten);
-					trainingScheduleRepository.deleteAll(listTrainingOverwritten);
-					commonScheduleRepository.saveAll(listCommon);
-					responseMessage.setData(listEventSchedule);
-					responseMessage.setMessage(Constant.MSG_066);
-					notificationService.createEventNotification(eventId, event.getName());
-				}
-			} else {
-				responseMessage.setMessage("Không tìm thấy sự kiện");
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
 	public ResponseMessage getListEventScheduleByEvent(int eventId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -240,7 +155,8 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 			if (getEventSessionOp.isPresent()) {
 				EventSchedule getEventSession = getEventSessionOp.get();
 				responseMessage.setData(Arrays.asList(getEventSession));
-				responseMessage.setMessage("Ngày " + date + " thuộc lịch trình của sự kiện " + getEventSession.getEvent().getName());
+				responseMessage.setMessage(
+						"Ngày " + date + " thuộc lịch trình của sự kiện " + getEventSession.getEvent().getName());
 			} else {
 				responseMessage.setMessage(Constant.MSG_071);
 			}
@@ -249,23 +165,6 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
-	}
-
-	@Override
-	public EventSchedule getEventScheduleByDate(LocalDate date) {
-		// TODO Auto-generated method stub
-		try {
-			Optional<EventSchedule> getEventSessionOp = eventScheduleRepository.findByDate(date);
-			if (getEventSessionOp.isPresent()) {
-				EventSchedule getEventSession = getEventSessionOp.get();
-				return getEventSession;
-			} else {
-				return null;
-			}
-		} catch (Exception e) {
-			// TODO: handle exception
-			return null;
-		}
 	}
 
 	@Override
@@ -342,6 +241,7 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 			List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
 			List<CommonSchedule> listCommonOverwritten = new ArrayList<CommonSchedule>();
 			List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
+			List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
 			Boolean isInterrupted = false;
 			String title = "";
 			for (ScheduleDto scheduleDto : listPreview) {
@@ -392,6 +292,11 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 						TrainingSchedule getTrainingSession = trainingScheduleService
 								.getTrainingScheduleByDate(scheduleDto.getDate());
 						listTrainingOverwritten.add(getTrainingSession);
+						List<AttendanceStatus> listAttendanceStatus = attendanceStatusRepository
+								.findByTrainingScheduleIdOrderByIdAsc(getTrainingSession.getId());
+						for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
+							listAttendanceStatusOverwritten.add(attendanceStatus);
+						}
 					} else {
 						isInterrupted = true;
 						title = scheduleDto.getTitle();
@@ -414,6 +319,7 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 					}
 					eventScheduleRepository.saveAll(listEventSchedule);
 					commonScheduleRepository.deleteAll(listCommonOverwritten);
+					attendanceStatusRepository.deleteAll(listAttendanceStatusOverwritten);
 					trainingScheduleRepository.deleteAll(listTrainingOverwritten);
 					commonScheduleRepository.saveAll(listCommon);
 					responseMessage.setData(listEventSchedule);

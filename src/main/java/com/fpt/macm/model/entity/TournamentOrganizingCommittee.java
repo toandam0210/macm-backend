@@ -32,9 +32,6 @@ public class TournamentOrganizingCommittee {
 	private RoleEvent roleEvent;
 
 	@Column
-	private String registerStatus;
-
-	@Column
 	private boolean paymentStatus;
 
 	@Column
@@ -79,14 +76,6 @@ public class TournamentOrganizingCommittee {
 
 	public void setRoleEvent(RoleEvent roleEvent) {
 		this.roleEvent = roleEvent;
-	}
-
-	public String getRegisterStatus() {
-		return registerStatus;
-	}
-
-	public void setRegisterStatus(String registerStatus) {
-		this.registerStatus = registerStatus;
 	}
 
 	public String getCreatedBy() {

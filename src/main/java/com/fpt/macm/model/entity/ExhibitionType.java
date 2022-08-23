@@ -44,6 +44,9 @@ public class ExhibitionType {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
+	@Column
+	private Integer status;
 
 	public int getId() {
 		return id;
@@ -117,4 +120,12 @@ public class ExhibitionType {
 		this.exhibitionTeams = exhibitionTeams;
 	}
 
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+	
 }

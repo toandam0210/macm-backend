@@ -22,22 +22,23 @@ public class MembershipController {
 	MembershipService membershipService;
 
 	@GetMapping("/treasure/membership/{membershipInfoId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getListMembershipStatus(
 			@PathVariable(name = "membershipInfoId") int membershipInfoId) {
 		return new ResponseEntity<ResponseMessage>(
 				membershipService.getListMemberPayMembershipBySemester(membershipInfoId), HttpStatus.OK);
 	}
 
-	@PutMapping("/treasure/membership/update/{id}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> updateMembershipStatus(@PathVariable(name = "id") int id) {
-		return new ResponseEntity<ResponseMessage>(membershipService.updateStatusPaymenMembershipById(id),
+	@PutMapping("/treasure/membership/update/{id}/{studentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> updateMembershipStatus(@PathVariable(name = "id") int id,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(membershipService.updateStatusPaymenMembershipById(studentId, id),
 				HttpStatus.OK);
 	}
 
 	@PutMapping("/treasure/membership/membershipinfo/{semester}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateMembershipInfo(@RequestParam double amount,
 			@PathVariable(name = "semester") String semester) {
 		return new ResponseEntity<ResponseMessage>(membershipService.updateMembershipBySemester(amount, semester),
@@ -45,18 +46,19 @@ public class MembershipController {
 	}
 
 	@GetMapping("/treasure/membership/membershipinfo/{semester}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateMembershipInfo(@PathVariable(name = "semester") String semester) {
 		return new ResponseEntity<ResponseMessage>(membershipService.getMembershipInfoBySemester(semester),
 				HttpStatus.OK);
 	}
 
 	@GetMapping("/treasure/membership/getreportmembershippaymentstatus/{membershipInfoId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getReportMembershipPaymentStatus(
 			@PathVariable(name = "membershipInfoId") int membershipInfoId, @RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize, @RequestParam(defaultValue = "id") String sortBy) {
 		return new ResponseEntity<ResponseMessage>(
-				membershipService.getReportMembershipPaymentStatus(membershipInfoId, pageNo, pageSize, sortBy), HttpStatus.OK);
+				membershipService.getReportMembershipPaymentStatus(membershipInfoId, pageNo, pageSize, sortBy),
+				HttpStatus.OK);
 	}
 }

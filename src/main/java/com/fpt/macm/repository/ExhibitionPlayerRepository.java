@@ -16,7 +16,9 @@ public interface ExhibitionPlayerRepository extends JpaRepository<ExhibitionPlay
 			+ "where player_id = ?1 and exhibition_type_id = ?2", nativeQuery = true)
 	Optional<ExhibitionPlayer> findByTournamentPlayerAndType(int tournamentPlayerId, int exhibitionTypeId);
 	
-	@Query(value = "select * from exhibition_player where player_id = ?1", nativeQuery = true)
+	@Query(value = "select * from exhibition_player where player_id = ?1 and exhibition_team_id isnull = false", nativeQuery = true)
 	List<ExhibitionPlayer> findAllByPlayerId(int playerId);
 	
+	@Query(value = "select * from exhibition_player where player_id = ?1 and exhibition_team_id isnull = true", nativeQuery = true)
+	List<ExhibitionPlayer> findAllByPlayerIdAndExhibitionNull(int playerId);
 }

@@ -17,20 +17,20 @@ import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.utils.Utils;
 
 @Service
-public class CommonScheduleServiceImpl implements CommonScheduleService{
+public class CommonScheduleServiceImpl implements CommonScheduleService {
 
 	@Autowired
 	CommonScheduleRepository commonScheduleRepository;
-	
+
 	@Autowired
 	SemesterRepository semesterRepository;
-	
+
 	@Override
 	public CommonSchedule getCommonSessionByDate(LocalDate date) {
 		// TODO Auto-generated method stub
 		try {
 			Optional<CommonSchedule> getSessionOp = commonScheduleRepository.findByDate(date);
-			if(getSessionOp.isPresent()) {
+			if (getSessionOp.isPresent()) {
 				return getSessionOp.get();
 			}
 		} catch (Exception e) {
@@ -43,14 +43,9 @@ public class CommonScheduleServiceImpl implements CommonScheduleService{
 	public ResponseMessage getCommonSchedule() {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<CommonSchedule> getAllCommonSchedule = commonScheduleRepository.listAll();
-			responseMessage.setData(getAllCommonSchedule);
-			responseMessage.setMessage(Constant.MSG_105);
-		} catch (Exception e) {
-			// TODO: handle exception
-			responseMessage.setMessage(e.getMessage());
-		}
+		List<CommonSchedule> getAllCommonSchedule = commonScheduleRepository.listAll();
+		responseMessage.setData(getAllCommonSchedule);
+		responseMessage.setMessage(Constant.MSG_105);
 		return responseMessage;
 	}
 
@@ -61,11 +56,10 @@ public class CommonScheduleServiceImpl implements CommonScheduleService{
 		try {
 			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
 			Optional<CommonSchedule> getSessionOp = commonScheduleRepository.findByDate(getDate);
-			if(getSessionOp != null) {
+			if (getSessionOp != null) {
 				responseMessage.setData(Arrays.asList(getSessionOp.get()));
 				responseMessage.setMessage(Constant.MSG_103);
-			}
-			else {
+			} else {
 				responseMessage.setMessage(Constant.MSG_104);
 			}
 		} catch (Exception e) {
@@ -81,7 +75,8 @@ public class CommonScheduleServiceImpl implements CommonScheduleService{
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Semester getSemester = semesterRepository.findById(semesterId).get();
-			List<CommonSchedule> getCommonScheduleBySemester = commonScheduleRepository.listCommonScheduleByTime(getSemester.getStartDate(), getSemester.getEndDate());
+			List<CommonSchedule> getCommonScheduleBySemester = commonScheduleRepository
+					.listCommonScheduleByTime(getSemester.getStartDate(), getSemester.getEndDate());
 			responseMessage.setData(getCommonScheduleBySemester);
 			responseMessage.setMessage(Constant.MSG_130 + getSemester.getName());
 		} catch (Exception e) {
@@ -90,4 +85,6 @@ public class CommonScheduleServiceImpl implements CommonScheduleService{
 		}
 		return responseMessage;
 	}
+
+
 }

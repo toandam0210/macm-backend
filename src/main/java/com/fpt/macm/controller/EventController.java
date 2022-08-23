@@ -1,6 +1,7 @@
 package com.fpt.macm.controller;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.macm.model.dto.EventCreateDto;
+import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.EventService;
@@ -26,10 +29,12 @@ public class EventController {
 	@Autowired
 	EventService eventService;
 
-	@PostMapping("/headculture/createevent")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> createEvent(@RequestBody Event event) {
-		return new ResponseEntity<ResponseMessage>(eventService.createEvent(event), HttpStatus.OK);
+	@PostMapping("/headculture/createevent/{studentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> createEvent(@PathVariable(name = "studentId") String studentId,
+			@RequestBody EventCreateDto eventCreateDto, @RequestParam boolean isOverwritten) {
+		return new ResponseEntity<ResponseMessage>(eventService.createEvent(studentId, eventCreateDto, isOverwritten),
+				HttpStatus.OK);
 	}
 
 	@GetMapping("/geteventsbyname")
@@ -41,16 +46,17 @@ public class EventController {
 	}
 
 	@PutMapping("/headculture/updatebeforeevent/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateBeforeEvent(@PathVariable(name = "eventId") int id,
 			@RequestBody Event event) {
 		return new ResponseEntity<ResponseMessage>(eventService.updateBeforeEvent(id, event), HttpStatus.OK);
 	}
 
-	@PutMapping("/headculture/deleteevent/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> deleteEvent(@PathVariable(name = "eventId") int id) {
-		return new ResponseEntity<ResponseMessage>(eventService.deleteEvent(id), HttpStatus.OK);
+	@PutMapping("/headculture/deleteevent/{eventId}/{studentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> deleteEvent(@PathVariable(name = "eventId") int id,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(eventService.deleteEvent(studentId, id), HttpStatus.OK);
 	}
 
 	@GetMapping("/geteventsbydate")
@@ -61,12 +67,6 @@ public class EventController {
 				eventService.getEventsByDate(startDate, finishDate, pageNo, pageSize), HttpStatus.OK);
 	}
 
-	@GetMapping("/headculture/getstartdate/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> getStartDateOfEvent(@PathVariable(name = "eventId") int eventId) {
-		return new ResponseEntity<ResponseMessage>(eventService.getStartDateOfEvent(eventId), HttpStatus.OK);
-	}
-
 	@GetMapping("/geteventsbysemester")
 	ResponseEntity<ResponseMessage> getEventBySemester(@RequestParam(defaultValue = "") String semester,
 			@RequestParam(defaultValue = "0") int month, @RequestParam(defaultValue = "0") int pageNo,
@@ -75,13 +75,14 @@ public class EventController {
 				HttpStatus.OK);
 	}
 
-	@PutMapping("/headculture/updateafterevent/{eventId}")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
-	ResponseEntity<ResponseMessage> updateAfterEvent(@PathVariable(name = "eventId") int id, @RequestParam double money,
+	@PutMapping("/headculture/updateafterevent/{eventId}/{studentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> updateAfterEvent(@PathVariable(name = "eventId") int id,
+			@PathVariable(name = "studentId") String studentId, @RequestParam double money,
 			@RequestParam(defaultValue = "true") boolean isIncurred,
 			@RequestParam(defaultValue = "true") boolean isUseClubFund) {
-		return new ResponseEntity<ResponseMessage>(eventService.updateAfterEvent(id, money, isIncurred, isUseClubFund),
-				HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(
+				eventService.updateAfterEvent(studentId, id, money, isIncurred, isUseClubFund), HttpStatus.OK);
 	}
 
 	@GetMapping("/geteventbyid/{eventId}")
@@ -108,21 +109,26 @@ public class EventController {
 	@GetMapping("/getallupcomingevent")
 	ResponseEntity<ResponseMessage> getAllUpcomingEvent(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize) {
-		return new ResponseEntity<ResponseMessage>(
-				eventService.getAllUpcomingEvent(pageNo, pageSize), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(eventService.getAllUpcomingEvent(pageNo, pageSize), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/getallongoingevent")
 	ResponseEntity<ResponseMessage> getAllOngoingEvent(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize) {
-		return new ResponseEntity<ResponseMessage>(
-				eventService.getAllOngoingEvent(pageNo, pageSize), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(eventService.getAllOngoingEvent(pageNo, pageSize), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/getallclosedevent")
 	ResponseEntity<ResponseMessage> getAllClosedEvent(@RequestParam(defaultValue = "0") int pageNo,
 			@RequestParam(defaultValue = "10") int pageSize) {
-		return new ResponseEntity<ResponseMessage>(
-				eventService.getAllClosedEvent(pageNo, pageSize), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(eventService.getAllClosedEvent(pageNo, pageSize), HttpStatus.OK);
 	}
+
+	@PutMapping("/headculture/editroleevent/{eventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> editRoleEvent(@PathVariable(name = "eventId") int eventId,
+			@RequestBody List<RoleEventDto> rolesEventDto) {
+		return new ResponseEntity<ResponseMessage>(eventService.editRoleEvent(eventId, rolesEventDto), HttpStatus.OK);
+	}
+
 }

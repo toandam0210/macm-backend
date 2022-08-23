@@ -32,7 +32,7 @@ public class RoleController {
 		return new ResponseEntity<ResponseMessage>(roleService.getAllRole(), HttpStatus.OK);
 	}
 	@GetMapping("/viceheadclub/getroles")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasure')")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> getRolesForViceHeadClub(){
 		return new ResponseEntity<ResponseMessage>(roleService.getRoleForViceHeadClub(), HttpStatus.OK);
 	}

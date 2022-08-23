@@ -21,7 +21,7 @@ public class ExhibitionTeam {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
 	@JoinColumn(name = "exhibition_team_id")
 	private Set<ExhibitionPlayer> exhibitionPlayers;
 

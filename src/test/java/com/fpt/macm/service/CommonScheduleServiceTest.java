@@ -69,8 +69,15 @@ public class CommonScheduleServiceTest {
 	}
 	
 	@Test
-	public void testGetCommonSessionByDateCaseEmpty() {
+	public void testGetCommonSessionByDateCaseNull() {
 		when(commonScheduleRepository.findByDate(any())).thenReturn(null);
+		ResponseMessage responseMessage = commonScheduleService.getCommonScheduleByDate("28/07/2022");
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+	
+	@Test
+	public void testGetCommonSessionByDateCaseEmpty() {
+		when(commonScheduleRepository.findByDate(any())).thenReturn(Optional.empty());
 		ResponseMessage responseMessage = commonScheduleService.getCommonScheduleByDate("28/07/2022");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
@@ -104,7 +111,14 @@ public class CommonScheduleServiceTest {
 	}
 	
 	@Test
-	public void testGetCommonSessionByDateCaseNull() {
+	public void testGetCommonSessionByDate1CaseEmpty() {
+		when(commonScheduleRepository.findByDate(any())).thenReturn(Optional.empty());
+		CommonSchedule response = commonScheduleService.getCommonSessionByDate(LocalDate.now());
+		assertNull(response);
+	}
+	
+	@Test
+	public void testGetCommonSessionByDate1CaseNull() {
 		when(commonScheduleRepository.findByDate(any())).thenReturn(null);
 		CommonSchedule response = commonScheduleService.getCommonSessionByDate(LocalDate.now());
 		assertNull(response);

@@ -18,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.entity.CommonSchedule;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.ExhibitionType;
@@ -35,7 +34,7 @@ public class TournamentScheduleServiceTest {
 
 	@InjectMocks
 	TournamentScheduleService tournamentScheduleService = new TournamentScheduleServiceImpl();
-	
+
 	@Mock
 	TournamentScheduleRepository tournamentScheduleRepository;
 
@@ -47,19 +46,18 @@ public class TournamentScheduleServiceTest {
 
 	@Mock
 	CommonScheduleService commonScheduleService;
-	
+
 	@Mock
 	CommonScheduleRepository commonScheduleRepository;
 
 	@Mock
 	NotificationService notificationService;
-	
+
 	private Tournament tournament() {
 		Tournament tournament = new Tournament();
 		tournament.setId(1);
 		tournament.setName("Giải đấu FNC Summer2022");
 		tournament.setDescription("Giải đấu cho thành viên FNC Summer2022");
-		tournament.setMaxQuantityComitee(10);
 		tournament.setFeeOrganizingCommiteePay(100000);
 		tournament.setSemester("Summer2022");
 		Set<CompetitiveType> competitiveTypes = new HashSet<CompetitiveType>();
@@ -78,9 +76,10 @@ public class TournamentScheduleServiceTest {
 		tournament.setExhibitionTypes(exhibitionTypes);
 		tournament.setTotalAmount(500000);
 		tournament.setFeePlayerPay(20000);
+		tournament.setStatus(true);
 		return tournament;
 	}
-	
+
 	private TournamentSchedule tournamentSchedule() {
 		TournamentSchedule tournamentSchedule = new TournamentSchedule();
 		tournamentSchedule.setId(1);
@@ -90,7 +89,7 @@ public class TournamentScheduleServiceTest {
 		tournamentSchedule.setTournament(tournament());
 		return tournamentSchedule;
 	}
-	
+
 	private Semester semester() {
 		Semester semester = new Semester();
 		semester.setId(1);
@@ -99,7 +98,7 @@ public class TournamentScheduleServiceTest {
 		semester.setEndDate(LocalDate.of(2022, 9, 1));
 		return semester;
 	}
-	
+
 	private CommonSchedule commonSchedule() {
 		CommonSchedule commonSchedule = new CommonSchedule();
 		commonSchedule.setId(1);
@@ -110,262 +109,240 @@ public class TournamentScheduleServiceTest {
 		commonSchedule.setType(1);
 		return commonSchedule;
 	}
-	
-	private ScheduleDto scheduleDto() {
-		ScheduleDto scheduleDto = new ScheduleDto();
-		scheduleDto.setDate(LocalDate.now().plusMonths(1));
-		scheduleDto.setStartTime(LocalTime.of(18, 0));
-		scheduleDto.setFinishTime(LocalTime.of(20, 0));
-		scheduleDto.setExisted(false);
-		scheduleDto.setTitle("Giải đấu FNC Summer2022 update");
-		return scheduleDto;
-	}
-	
+
 	@Test
 	public void createPreviewTournamentScheduleCaseStartDateAfterEndDate() {
-		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "30/10/2022", "29/10/2022", "08:00", "16:00");
+		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "30/10/2022",
+				"29/10/2022", "08:00", "16:00");
 		assertEquals(response.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createPreviewTournamentScheduleCaseStartTimeAfterFinishTime() {
-		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/10/2022", "30/10/2022", "16:00", "08:00");
+		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/10/2022",
+				"30/10/2022", "16:00", "08:00");
 		assertEquals(response.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createPreviewTournamentScheduleCaseStartDateInPast() {
-		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/01/2022", "30/01/2022", "08:00", "16:00");
+		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/01/2022",
+				"30/01/2022", "08:00", "16:00");
 		assertEquals(response.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createPreviewTournamentScheduleCaseNotInSemester() {
 		ResponseMessage semesterResponse = new ResponseMessage();
 		semesterResponse.setData(Arrays.asList(semester()));
 		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
-		
-		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/10/2022", "30/10/2022", "08:00", "16:00");
+
+		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/10/2022",
+				"30/10/2022", "08:00", "16:00");
 		assertEquals(response.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createPreviewTournamentScheduleCaseNotExisted() {
 		ResponseMessage semesterResponse = new ResponseMessage();
 		semesterResponse.setData(Arrays.asList(semester()));
 		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(null);
-		
-		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/08/2022", "30/08/2022", "08:00", "16:00");
+
+		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/08/2022",
+				"30/08/2022", "08:00", "16:00");
 		assertEquals(response.getData().size(), 2);
 	}
-	
+
 	@Test
 	public void createPreviewTournamentScheduleCaseExisted() {
 		ResponseMessage semesterResponse = new ResponseMessage();
 		semesterResponse.setData(Arrays.asList(semester()));
 		when(semesterService.getCurrentSemester()).thenReturn(semesterResponse);
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
-		
-		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/08/2022", "30/08/2022", "08:00", "16:00");
+
+		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/08/2022",
+				"30/08/2022", "08:00", "16:00");
 		assertEquals(response.getData().size(), 2);
 	}
-	
+
 	@Test
 	public void createPreviewTournamentScheduleCaseException() {
 		when(semesterService.getCurrentSemester()).thenReturn(null);
-		
-		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/08/2022", "30/08/2022", "08:00", "16:00");
+
+		ResponseMessage response = tournamentScheduleService.createPreviewTournamentSchedule("FNC", "29/08/2022",
+				"30/08/2022", "08:00", "16:00");
 		assertEquals(response.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void getListTournamentScheduleByTournamentCaseSuccess() {
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.getListTournamentScheduleByTournament(1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void getListTournamentScheduleByTournamentCaseException() {
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.getListTournamentScheduleByTournament(1);
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
-	@Test
-	public void createTournamentScheduleCaseNotExisted() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		
-		ResponseMessage responseMessage = tournamentScheduleService.createTournamentSchedule(1, Arrays.asList(scheduleDto()), false);
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void createTournamentScheduleCaseExistedAndNotOverwrite() {
-		ScheduleDto scheduleDto = scheduleDto();
-		scheduleDto.setExisted(true);
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		
-		ResponseMessage responseMessage = tournamentScheduleService.createTournamentSchedule(1, Arrays.asList(scheduleDto), false);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void createTournamentScheduleCaseExistedAndOverwriteAndNotTrainingSchedule() {
-		ScheduleDto scheduleDto = scheduleDto();
-		scheduleDto.setExisted(true);
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		
-		ResponseMessage responseMessage = tournamentScheduleService.createTournamentSchedule(1, Arrays.asList(scheduleDto), true);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void createTournamentScheduleCaseExistedAndOverwriteTrainingSchedule() {
-		ScheduleDto scheduleDto = scheduleDto();
-		scheduleDto.setExisted(true);
-		scheduleDto.setTitle("Trùng với Lịch tập");
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		
-		ResponseMessage responseMessage = tournamentScheduleService.createTournamentSchedule(1, Arrays.asList(scheduleDto), true);
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void createTournamentScheduleCaseException() {
-		when(tournamentRepository.findById(anyInt())).thenReturn(null);
-		
-		ResponseMessage responseMessage = tournamentScheduleService.createTournamentSchedule(1, Arrays.asList(scheduleDto()), true);
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
+
 	@Test
 	public void createTournamentSessionCaseStartTimeAfterFinishTime() {
 		TournamentSchedule tournamentSchedule = tournamentSchedule();
 		tournamentSchedule.setStartTime(LocalTime.of(16, 0));
 		tournamentSchedule.setFinishTime(LocalTime.of(8, 0));
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.createTournamentSession(1, tournamentSchedule);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createTournamentSessionCaseDateInPast() {
 		TournamentSchedule tournamentSchedule = tournamentSchedule();
 		tournamentSchedule.setDate(LocalDate.now().minusMonths(1));
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.createTournamentSession(1, tournamentSchedule);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createTournamentSessionCaseCommonScheduleNotNull() {
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.createTournamentSession(1, tournamentSchedule());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void createTournamentSessionCaseCommonScheduleNull() {
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(null);
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.createTournamentSession(1, tournamentSchedule());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void createTournamentSessionCaseException() {
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(null);
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.createTournamentSession(1, tournamentSchedule());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void updateTournamentSessionCaseScheduleInPast() {
 		TournamentSchedule tournamentSchedule = tournamentSchedule();
 		tournamentSchedule.setDate(LocalDate.now().minusMonths(1));
-		
+
 		when(tournamentScheduleRepository.findById(anyInt())).thenReturn(Optional.of(tournamentSchedule));
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.updateTournamentSession(1, tournamentSchedule);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void updateTournamentSessionCaseSuccess() {
 		when(tournamentScheduleRepository.findById(anyInt())).thenReturn(Optional.of(tournamentSchedule()));
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.updateTournamentSession(1, tournamentSchedule());
 		assertEquals(responseMessage.getData().size(), 1);
 	}
-	
+
 	@Test
 	public void updateTournamentSessionCaseException() {
 		when(tournamentScheduleRepository.findById(anyInt())).thenReturn(null);
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.updateTournamentSession(1, tournamentSchedule());
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void deleteTournamentSessionCaseScheduleInPast() {
 		TournamentSchedule tournamentSchedule = tournamentSchedule();
 		tournamentSchedule.setDate(LocalDate.now().minusMonths(1));
-		
+
 		when(tournamentScheduleRepository.findById(anyInt())).thenReturn(Optional.of(tournamentSchedule));
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.deleteTournamentSession(1);
 		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
+
 	@Test
 	public void deleteTournamentSessionCaseSuccess() {
 		when(tournamentScheduleRepository.findById(anyInt())).thenReturn(Optional.of(tournamentSchedule()));
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
-		
+
 		ResponseMessage responseMessage = tournamentScheduleService.deleteTournamentSession(1);
+		assertEquals(responseMessage.getData().size(), 1);
+	}
+
+	@Test
+	public void deleteTournamentSessionCaseException() {
+		when(tournamentScheduleRepository.findById(anyInt())).thenReturn(null);
+
+		ResponseMessage responseMessage = tournamentScheduleService.deleteTournamentSession(1);
+		assertEquals(responseMessage.getData().size(), 0);
+	}
+
+	@Test
+	public void getTournamentSessionByDateCaseSuccess() {
+		when(tournamentScheduleRepository.findByDate(any())).thenReturn(Optional.of(tournamentSchedule()));
+
+		TournamentSchedule tournamentSchedule = tournamentScheduleService
+				.getTournamentSessionByDate(LocalDate.now().plusMonths(1));
+		assertEquals(tournamentSchedule.getId(), tournamentSchedule().getId());
+	}
+
+	@Test
+	public void getTournamentSessionByDateCaseTournamentScheduleEmpty() {
+		when(tournamentScheduleRepository.findByDate(any())).thenReturn(Optional.empty());
+
+		TournamentSchedule tournamentSchedule = tournamentScheduleService
+				.getTournamentSessionByDate(LocalDate.now().plusMonths(1));
+		assertEquals(tournamentSchedule, null);
+	}
+
+	@Test
+	public void getTournamentSessionByDateCaseException() {
+		when(tournamentScheduleRepository.findByDate(any())).thenReturn(null);
+
+		TournamentSchedule tournamentSchedule = tournamentScheduleService
+				.getTournamentSessionByDate(LocalDate.now().plusMonths(1));
+		assertEquals(tournamentSchedule, null);
+	}
+
+	@Test
+	public void getAllTournamentScheduleCaseSuccess() {
+		when(tournamentScheduleRepository.findAll()).thenReturn(Arrays.asList(tournamentSchedule()));
+
+		ResponseMessage responseMessage = tournamentScheduleService.getAllTournamentSchedule();
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
 	@Test
-	public void deleteTournamentSessionCaseException() {
-		when(tournamentScheduleRepository.findById(anyInt())).thenReturn(null);
-		
-		ResponseMessage responseMessage = tournamentScheduleService.deleteTournamentSession(1);
+	public void getAllTournamentScheduleCaseEmpty() {
+		when(tournamentScheduleRepository.findAll()).thenReturn(Arrays.asList());
+
+		ResponseMessage responseMessage = tournamentScheduleService.getAllTournamentSchedule();
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
 	@Test
-	public void getTournamentSessionByDateCaseSuccess() {
-		when(tournamentScheduleRepository.findByDate(any())).thenReturn(Optional.of(tournamentSchedule()));
-		
-		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now().plusMonths(1));
-		assertEquals(tournamentSchedule.getId(), tournamentSchedule().getId());
+	public void getAllTournamentScheduleCaseException() {
+		when(tournamentScheduleRepository.findAll()).thenReturn(null);
+
+		ResponseMessage responseMessage = tournamentScheduleService.getAllTournamentSchedule();
+		assertEquals(responseMessage.getData().size(), 0);
 	}
-	
-	@Test
-	public void getTournamentSessionByDateCaseTournamentScheduleEmpty() {
-		when(tournamentScheduleRepository.findByDate(any())).thenReturn(Optional.empty());
-		
-		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now().plusMonths(1));
-		assertEquals(tournamentSchedule, null);
-	}
-	
-	@Test
-	public void getTournamentSessionByDateCaseException() {
-		when(tournamentScheduleRepository.findByDate(any())).thenReturn(null);
-		
-		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now().plusMonths(1));
-		assertEquals(tournamentSchedule, null);
-	}
+
 }
