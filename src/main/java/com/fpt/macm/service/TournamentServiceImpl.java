@@ -1383,6 +1383,60 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	@Override
+	public ResponseMessage acceptRequestToJoinTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
+					.findById(tournamentOrganizingCommitteeId);
+			if (tournamentOrganizingCommitteeOp.isPresent()) {
+				TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+				tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+				tournamentOrganizingCommittee.setUpdatedBy("toandv");
+				tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
+				tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
+
+				responseMessage.setData(
+						Arrays.asList(convertToTournamentOrganizingCommitteeDto(tournamentOrganizingCommittee)));
+				responseMessage.setMessage("Chấp nhận yêu cầu tham gia BTC giải đấu của "
+						+ tournamentOrganizingCommittee.getUser().getName() + " - "
+						+ tournamentOrganizingCommittee.getUser().getStudentId() + " thành công");
+			} else {
+				responseMessage.setMessage("Sai id truyền vào rồi");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+	
+	@Override
+	public ResponseMessage declineRequestToJoinTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
+					.findById(tournamentOrganizingCommitteeId);
+			if (tournamentOrganizingCommitteeOp.isPresent()) {
+				TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+				tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
+				tournamentOrganizingCommittee.setUpdatedBy("toandv");
+				tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
+				tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
+
+				responseMessage.setData(
+						Arrays.asList(convertToTournamentOrganizingCommitteeDto(tournamentOrganizingCommittee)));
+				responseMessage.setMessage("Từ chối yêu cầu tham gia BTC giải đấu của "
+						+ tournamentOrganizingCommittee.getUser().getName() + " - "
+						+ tournamentOrganizingCommittee.getUser().getStudentId() + " thành công");
+			} else {
+				responseMessage.setMessage("Sai id truyền vào rồi");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
 	public ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight,
 			int competitiveTypeId) {
 		ResponseMessage responseMessage = new ResponseMessage();
