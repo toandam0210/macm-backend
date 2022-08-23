@@ -6,6 +6,7 @@ public class UserEventDto {
 	private RoleEventDto roleEventDto;
 	private int eventId;
 	private String eventName;
+	private String registerStatus;
 
 	public String getUserName() {
 		return userName;
@@ -45,6 +46,14 @@ public class UserEventDto {
 
 	public void setEventName(String eventName) {
 		this.eventName = eventName;
+	}
+
+	public String getRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(String registerStatus) {
+		this.registerStatus = registerStatus;
 	}
 
 }
