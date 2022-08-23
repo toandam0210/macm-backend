@@ -450,6 +450,8 @@ public class TournamentServiceImpl implements TournamentService {
 					Set<ExhibitionTypeDto> exhibitionTypeDtos = tournamentDto.getExhibitionTypesDto();
 					Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
 					Set<CompetitiveType> competitiveTypesNew = new HashSet<CompetitiveType>();
+					Set<CompetitiveType> competitiveTypesRemove = new HashSet<CompetitiveType>();
+					Set<ExhibitionType> exhibitionTypesRemove = new HashSet<ExhibitionType>();
 
 					for (CompetitiveType competitiveType : competitiveTypes) {
 						boolean isExist = false;
@@ -475,9 +477,10 @@ public class TournamentServiceImpl implements TournamentService {
 								}
 							}
 							
-							competitiveTypes.remove(competitiveType);
+							competitiveTypesRemove.add(competitiveType);
 						}
 					}
+					competitiveTypes.removeAll(competitiveTypesRemove);
 					for (CompetitiveTypeDto competitiveTypeDto : competitiveTypeDtos) {
 						boolean isExist = false;
 						for (CompetitiveType competitiveType : competitiveTypes) {
@@ -509,9 +512,10 @@ public class TournamentServiceImpl implements TournamentService {
 							}
 						}
 						if (isExist == false) {
-							exhibitionTypes.remove(exhibitionType);
+							exhibitionTypesRemove.add(exhibitionType);
 						}
 					}
+					exhibitionTypes.removeAll(exhibitionTypesRemove);
 					for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
 						boolean isExist = false;
 						for (ExhibitionType exhibitionType : exhibitionTypes) {

@@ -461,10 +461,6 @@ public class UserServiceImpl implements UserService {
 						memberSemester.setSemester(semester);
 						memberSemesterRepository.save(memberSemester);
 					}
-				} else {
-					if (memberSemesterOp.isPresent()) {
-						memberSemesterRepository.delete(memberSemesterOp.get());
-					}
 				}
 				List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
 				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
@@ -855,11 +851,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email,
-			String gender, Integer generation, Integer roleId, String isActive, String dateFrom, String dateTo) {
+			String gender, Integer generation, Integer roleId, String isActive, Integer month) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<UserDto> userDtoResponse = userDtos;
 			for (int i = 0; i < userDtos.size(); i++) {
+				int monthInDob = userDtos.get(i).getDateOfBirth().getMonthValue();
 				if (!name.equals("") && name != null
 						&& !userDtos.get(i).getName().toLowerCase().contains(name.toLowerCase())) {
 					userDtoResponse.remove(userDtos.get(i));
@@ -900,14 +897,7 @@ public class UserServiceImpl implements UserService {
 					i--;
 					continue;
 				}
-				if (!dateFrom.equals("") && dateFrom != null
-						&& userDtos.get(i).getDateOfBirth().isBefore(LocalDate.parse(dateFrom))) {
-					userDtoResponse.remove(userDtos.get(i));
-					i--;
-					continue;
-				}
-				if (!dateTo.equals("") && dateTo != null
-						&& userDtos.get(i).getDateOfBirth().isAfter(LocalDate.parse(dateTo))) {
+				if (month != null && monthInDob != month) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
