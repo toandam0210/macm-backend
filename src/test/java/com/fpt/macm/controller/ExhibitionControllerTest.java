@@ -242,20 +242,20 @@ public class ExhibitionControllerTest {
 		.andExpect(jsonPath("$.data.size()").value("1"));
 	}
 	
-	@Test
-	public void getExhibitionResultSuccess() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(exhibitionResult()));
-		
-		when(exhibitionService.getListExhibitionResult(anyInt(), anyString())).thenReturn(responseMessage);
-		
-		this.mockMvc.perform(get("/api/exhibition/getlistexhibitionresult")
-				.param("exhibitionTypeId", "1")
-				.param("date", "29/08/2022"))
-		.andExpect(status().isOk())
-		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
+//	@Test
+//	public void getExhibitionResultSuccess() throws Exception {
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		responseMessage.setData(Arrays.asList(exhibitionResult()));
+//		
+//		when(exhibitionService.getListExhibitionResult(anyInt(), anyString())).thenReturn(responseMessage);
+//		
+//		this.mockMvc.perform(get("/api/exhibition/getlistexhibitionresult")
+//				.param("exhibitionTypeId", "1")
+//				.param("date", "29/08/2022"))
+//		.andExpect(status().isOk())
+//		.andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(jsonPath("$.data.size()").value("1"));
+//	}
 	
 	@Test
 	public void updateExhibitionResultSuccess() throws Exception {

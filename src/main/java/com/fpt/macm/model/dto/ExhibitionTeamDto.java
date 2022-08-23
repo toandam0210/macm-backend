@@ -1,5 +1,6 @@
 package com.fpt.macm.model.dto;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 public class ExhibitionTeamDto implements Comparable<ExhibitionTeamDto> {
@@ -11,6 +12,8 @@ public class ExhibitionTeamDto implements Comparable<ExhibitionTeamDto> {
 	private String exhibitionTypeName;
 	private Double score;
 	private Integer rank;
+	private LocalDateTime time;
+	private String areaName;
 
 	public int getId() {
 		return id;
@@ -66,6 +69,22 @@ public class ExhibitionTeamDto implements Comparable<ExhibitionTeamDto> {
 
 	public void setRank(Integer rank) {
 		this.rank = rank;
+	}
+
+	public LocalDateTime getTime() {
+		return time;
+	}
+
+	public void setTime(LocalDateTime time) {
+		this.time = time;
+	}
+
+	public String getAreaName() {
+		return areaName;
+	}
+
+	public void setAreaName(String areaName) {
+		this.areaName = areaName;
 	}
 
 	@Override

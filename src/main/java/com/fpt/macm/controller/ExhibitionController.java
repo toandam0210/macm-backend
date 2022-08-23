@@ -47,11 +47,10 @@ public class ExhibitionController {
 				HttpStatus.OK);
 	}
 
-	@GetMapping("/getlistexhibitionresult")
-	ResponseEntity<ResponseMessage> getExhibitionResult(@RequestParam(defaultValue = "0") int exhibitionTypeId,
-			@RequestParam(defaultValue = "") String date) {
+	@GetMapping("/getlistexhibitionresult/{exhibitionTypeId}")
+	ResponseEntity<ResponseMessage> getExhibitionResult(@PathVariable(name = "exhibitionTypeId") int exhibitionTypeId) {
 		return new ResponseEntity<ResponseMessage>(
-				exhibitionService.getListExhibitionResult(exhibitionTypeId, date), HttpStatus.OK);
+				exhibitionService.getListExhibitionResult(exhibitionTypeId), HttpStatus.OK);
 	}
 
 	@PutMapping("/headclub/updateexhibitionresult/{exhibitionTeamId}")

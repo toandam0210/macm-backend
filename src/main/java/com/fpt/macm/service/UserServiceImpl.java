@@ -461,6 +461,12 @@ public class UserServiceImpl implements UserService {
 						memberSemester.setSemester(semester);
 						memberSemesterRepository.save(memberSemester);
 					}
+				}else {
+					if (memberSemesterOp.isPresent()) {
+						MemberSemester memberSemester = memberSemesterOp.get();
+						memberSemester.setStatus(false);
+						memberSemesterRepository.save(memberSemester);
+					}
 				}
 				List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
 				List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
