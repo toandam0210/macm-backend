@@ -109,7 +109,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 	public ResponseMessage getAllMemberCancelJoinEvent(int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId, false);
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId, Constant.REQUEST_STATUS_DECLINED);
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			if (!membersEvent.isEmpty()) {
 				for (MemberEvent memberEvent : membersEvent) {

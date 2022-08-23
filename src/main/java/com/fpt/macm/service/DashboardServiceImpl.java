@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ActivityReportDto;
 import com.fpt.macm.model.dto.AttendanceReportDto;
 import com.fpt.macm.model.dto.EventDashboardDto;
@@ -370,7 +371,7 @@ public class DashboardServiceImpl implements DashboardService {
 				if (event.isStatus()) {
 					totalEvent++;
 					List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(event.getId(),
-							true);
+							Constant.REQUEST_STATUS_APPROVED);
 					totalJoinEvent += membersEvent.size();
 				}
 			}
