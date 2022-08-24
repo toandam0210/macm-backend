@@ -8,7 +8,7 @@ public class MemberEventDto implements Comparable<MemberEventDto> {
 	private String userMail;
 	private String userStudentId;
 	private String registerStatus;
-	private RoleEventDto roleEventDto;
+	private EventRoleDto eventRoleDto;
 	private String roleInClub;
 	private double paymentValue;
 	private double amountPerRegisterEstimate;
@@ -54,12 +54,12 @@ public class MemberEventDto implements Comparable<MemberEventDto> {
 		this.registerStatus = registerStatus;
 	}
 
-	public RoleEventDto getRoleEventDto() {
-		return roleEventDto;
+	public EventRoleDto getEventRoleDto() {
+		return eventRoleDto;
 	}
 
-	public void setRoleEventDto(RoleEventDto roleEventDto) {
-		this.roleEventDto = roleEventDto;
+	public void setEventRoleDto(EventRoleDto eventRoleDto) {
+		this.eventRoleDto = eventRoleDto;
 	}
 
 	public String getRoleInClub() {

@@ -76,11 +76,11 @@ public class MemberEventController {
 		return new ResponseEntity<ResponseMessage>(memberEventService.getAllRoleByEventId(eventId), HttpStatus.OK);
 	}
 
-	@GetMapping("/headculture/getallsuggestionrole")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> getAllSuggestionRole() {
-		return new ResponseEntity<ResponseMessage>(memberEventService.getAllSuggestionRole(), HttpStatus.OK);
-	}
+//	@GetMapping("/headculture/getallsuggestionrole")
+//	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+//	ResponseEntity<ResponseMessage> getAllSuggestionRole() {
+//		return new ResponseEntity<ResponseMessage>(memberEventService.getAllSuggestionRole(), HttpStatus.OK);
+//	}
 
 	@GetMapping("/getallorganizingcommitteerolebyeventid/{eventId}")
 	ResponseEntity<ResponseMessage> getAllOrganizingCommitteeRoleByEventId(
