@@ -19,8 +19,6 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fpt.macm.model.dto.MemberEventDto;
-import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.dto.UserDto;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.User;
@@ -33,9 +31,7 @@ public class ExcelHelper {
 	
 	static String[] HEADERsForErrors = { "MSSV", "Tên", "Ngày sinh", "SĐT", "Email", "Giới tính", "Trạng thái hoạt động",
 			"Vai trò", "Địa chỉ", "Generation", "Lỗi"};
-	
-	static String[] HEADERsForOrganizingCommittee = { "Tên", "Email", "Mã sinh viên", "Vai trò trong sự kiện"};
-	
+
 	static String SHEET = "Users";
 	
 	public static boolean hasExcelFormat(MultipartFile file) {
@@ -218,55 +214,7 @@ public class ExcelHelper {
 			throw new RuntimeException("fail to import data to Excel file: " + e.getMessage());
 		}
 	}
-	
-	public static ByteArrayInputStream organizingCommittesToExcel(List<TournamentOrganizingCommitteeDto> users) {
-		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
-			Sheet sheet = workbook.createSheet(SHEET);
-			Row headerRow = sheet.createRow(0);
-			for (int col = 0; col < HEADERsForOrganizingCommittee.length; col++) {
-				Cell cell = headerRow.createCell(col);
-				cell.setCellValue(HEADERsForOrganizingCommittee[col]);
-			}
-			int rowIdx = 1;
-			for (TournamentOrganizingCommitteeDto user : users) {
-				Row row = sheet.createRow(rowIdx++);
 
-				row.createCell(0).setCellValue(user.getUserName());
-				row.createCell(1).setCellValue(user.get());
-				row.createCell(2).setCellValue(user.getUserStudentId().toString());
-				row.createCell(3).setCellValue(user.getTournamentRoleDto().getName());
-			}
-			workbook.write(out);
-			return new ByteArrayInputStream(out.toByteArray());
-		} catch (Exception e) {
-			throw new RuntimeException("fail to import data to Excel file: " + e.getMessage());
-		}
-	}
-	
-	public static ByteArrayInputStream organizingCommittesEventToExcel(List<MemberEventDto> users) {
-		try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream out = new ByteArrayOutputStream();) {
-			Sheet sheet = workbook.createSheet(SHEET);
-			Row headerRow = sheet.createRow(0);
-			for (int col = 0; col < HEADERsForOrganizingCommittee.length; col++) {
-				Cell cell = headerRow.createCell(col);
-				cell.setCellValue(HEADERsForOrganizingCommittee[col]);
-			}
-			int rowIdx = 1;
-			for (MemberEventDto user : users) {
-				Row row = sheet.createRow(rowIdx++);
-
-				row.createCell(0).setCellValue(user.getUserName());
-				row.createCell(1).setCellValue(user.getUserMail());
-				row.createCell(2).setCellValue(user.getUserStudentId().toString());
-				row.createCell(3).setCellValue(user.getEventRoleDto().getName());
-			}
-			workbook.write(out);
-			return new ByteArrayInputStream(out.toByteArray());
-		} catch (Exception e) {
-			throw new RuntimeException("fail to import data to Excel file: " + e.getMessage());
-		}
-	}
-	
 	 public static boolean isValid(String dateStr) {
 	        try {
 	            LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
