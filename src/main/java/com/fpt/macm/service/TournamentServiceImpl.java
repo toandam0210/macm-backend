@@ -2601,4 +2601,21 @@ public class TournamentServiceImpl implements TournamentService {
 		}
 		return responseMessage;
 	}
+
+	@Override
+	public ResponseMessage getAllSuggestRole() {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<RoleTournament> roleTournaments = roleTournamentRepository.findByIsActiveOrderByIdAsc(true);
+			if (!roleTournaments.isEmpty()) {
+				responseMessage.setData(roleTournaments);
+				responseMessage.setMessage("Lấy gợi ý vai trò giải đấu thành công");
+			} else {
+				responseMessage.setMessage("Chưa có vai trò gợi ý nào");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
 }
