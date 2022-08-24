@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -1167,6 +1168,34 @@ public class UserServiceImpl implements UserService {
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllGen() {
+		// TODO Auto-generated method stub
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<User> listUser = (List<User>) userRepository.findAll();
+			List<Integer> listGen = new ArrayList<Integer>();
+			for (User user : listUser) {
+				if(!listGen.contains(user.getGeneration())) {
+					listGen.add(user.getGeneration());
+				}
+			}
+			Collections.sort(listGen, new Comparator<Integer>() {
+				@Override
+				public int compare(Integer o1, Integer o2) {
+					// TODO Auto-generated method stub
+					return o1 - o2;
+				}
+				
+			});
+			responseMessage.setData(listGen);
+			responseMessage.setMessage("Danh sách gen");
+		} catch (Exception e) {
+			// TODO: handle exception
 		}
 		return responseMessage;
 	}
