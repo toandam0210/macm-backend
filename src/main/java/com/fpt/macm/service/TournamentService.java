@@ -97,5 +97,7 @@ public interface TournamentService {
 	ResponseMessage getAllSuggestType();
 	
 	ResponseMessage editRoleTournament(int tournamentId, List<RoleTournamentDto> rolesTournamentDto);
+	
+	ResponseMessage getAllSuggestRole();
 
 }
