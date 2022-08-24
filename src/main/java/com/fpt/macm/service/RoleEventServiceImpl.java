@@ -33,26 +33,30 @@ public class RoleEventServiceImpl implements RoleEventService {
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
 	public ResponseMessage addNewRoleEvent(String newName) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<RoleEvent> rolesEvent = roleEventRepository.findAll();
-			for (RoleEvent roleEvent : rolesEvent) {
-				if (roleEvent.getName().toLowerCase().equals(newName.toLowerCase().trim())) {
-					responseMessage.setMessage("Đã có vai trò này");
-					return responseMessage;
+			if (!newName.trim().equals("")) {
+				List<RoleEvent> rolesEvent = roleEventRepository.findAll();
+				for (RoleEvent roleEvent : rolesEvent) {
+					if (roleEvent.getName().toLowerCase().equals(newName.toLowerCase().trim())) {
+						responseMessage.setMessage("Đã có vai trò này");
+						return responseMessage;
+					}
 				}
-			}
 
-			RoleEvent roleEvent = new RoleEvent();
-			roleEvent.setName(newName);
-			roleEvent.setActive(true);
-			roleEventRepository.save(roleEvent);
-			
-			responseMessage.setData(Arrays.asList(roleEvent));
-			responseMessage.setMessage("Thêm vai trò mặc định cho sự kiện thành công");
+				RoleEvent roleEvent = new RoleEvent();
+				roleEvent.setName(newName);
+				roleEvent.setActive(true);
+				roleEventRepository.save(roleEvent);
+
+				responseMessage.setData(Arrays.asList(roleEvent));
+				responseMessage.setMessage("Thêm vai trò mặc định cho sự kiện thành công");
+			} else {
+				responseMessage.setMessage("Không được để trống tên vai trò");
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
@@ -63,21 +67,25 @@ public class RoleEventServiceImpl implements RoleEventService {
 	public ResponseMessage updateRoleEventName(int roleEventId, String newName) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<RoleEvent> rolesEvent = roleEventRepository.findAll();
-			for (RoleEvent roleEvent : rolesEvent) {
-				if (roleEvent.getName().toLowerCase().equals(newName.toLowerCase().trim())) {
-					responseMessage.setMessage("Đã có vai trò này");
-					return responseMessage;
+			if (!newName.trim().equals("")) {
+				List<RoleEvent> rolesEvent = roleEventRepository.findAll();
+				for (RoleEvent roleEvent : rolesEvent) {
+					if (roleEvent.getName().toLowerCase().equals(newName.toLowerCase().trim())) {
+						responseMessage.setMessage("Đã có vai trò này");
+						return responseMessage;
+					}
 				}
-			}
 
-			Optional<RoleEvent> roleEventOp = roleEventRepository.findById(roleEventId);
-			if (roleEventOp.isPresent()) {
-				RoleEvent roleEvent = roleEventOp.get();
-				roleEvent.setName(newName);
-				roleEventRepository.save(roleEvent);
+				Optional<RoleEvent> roleEventOp = roleEventRepository.findById(roleEventId);
+				if (roleEventOp.isPresent()) {
+					RoleEvent roleEvent = roleEventOp.get();
+					roleEvent.setName(newName);
+					roleEventRepository.save(roleEvent);
+				} else {
+					responseMessage.setMessage("Không có vai trò này");
+				}
 			} else {
-				responseMessage.setMessage("Không có vai trò này");
+				responseMessage.setMessage("Không được để trống tên vai trò");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
@@ -94,7 +102,7 @@ public class RoleEventServiceImpl implements RoleEventService {
 				RoleEvent roleEvent = roleEventOp.get();
 				roleEvent.setActive(!roleEvent.isActive());
 				roleEventRepository.save(roleEvent);
-				
+
 				responseMessage.setData(Arrays.asList(roleEvent));
 				responseMessage.setMessage("Cập nhật trạng thái của vai trò mặc định trong sự kiện thành công");
 			} else {
