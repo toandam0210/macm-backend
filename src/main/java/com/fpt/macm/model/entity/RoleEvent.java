@@ -14,7 +14,7 @@ public class RoleEvent {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@Column
 	private String name;
 
@@ -33,6 +33,5 @@ public class RoleEvent {
 	public void setName(String name) {
 		this.name = name;
 	}
-	
-	
+
 }

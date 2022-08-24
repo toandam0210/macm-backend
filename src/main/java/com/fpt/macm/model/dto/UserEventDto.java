@@ -3,9 +3,10 @@ package com.fpt.macm.model.dto;
 public class UserEventDto {
 	private String userName;
 	private String userStudentId;
-	private RoleEventDto roleEventDto;
+	private EventRoleDto eventRoleDto;
 	private int eventId;
 	private String eventName;
+	private String registerStatus;
 
 	public String getUserName() {
 		return userName;
@@ -23,12 +24,12 @@ public class UserEventDto {
 		this.userStudentId = userStudentId;
 	}
 
-	public RoleEventDto getRoleEventDto() {
-		return roleEventDto;
+	public EventRoleDto getEventRoleDto() {
+		return eventRoleDto;
 	}
 
-	public void setRoleEventDto(RoleEventDto roleEventDto) {
-		this.roleEventDto = roleEventDto;
+	public void setEventRoleDto(EventRoleDto eventRoleDto) {
+		this.eventRoleDto = eventRoleDto;
 	}
 
 	public int getEventId() {
@@ -45,6 +46,14 @@ public class UserEventDto {
 
 	public void setEventName(String eventName) {
 		this.eventName = eventName;
+	}
+
+	public String getRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(String registerStatus) {
+		this.registerStatus = registerStatus;
 	}
 
 }

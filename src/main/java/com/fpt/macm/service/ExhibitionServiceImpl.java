@@ -13,6 +13,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ExhibitionPlayerDto;
 import com.fpt.macm.model.dto.ExhibitionResultByTypeDto;
 import com.fpt.macm.model.dto.ExhibitionTeamDto;
@@ -21,6 +22,7 @@ import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.Tournament;
+import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
@@ -28,6 +30,7 @@ import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
+import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -55,6 +58,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
 	@Autowired
 	ExhibitionResultRepository exhibitionResultRepository;
+	
+	@Autowired
+	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
 
 	@Override
 	public ResponseMessage getAllExhibitionType(int tournamentId) {
@@ -98,6 +104,17 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 						userJoined.add(getUser);
 					}
 				}
+				
+				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+						.findByTournamentId(getTournament.getId());
+				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							|| tournamentOrganizingCommittee.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+						userJoined.add(tournamentOrganizingCommittee.getUser());
+					}
+				}
+				
 				List<User> userNotJoined = new ArrayList<User>();
 				for (User user : listActive) {
 					if (!userJoined.contains(user)) {
@@ -412,46 +429,51 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 				ExhibitionResultByTypeDto exhibitionResultByTypeDto = new ExhibitionResultByTypeDto();
 				ExhibitionType getType = getTypeOp.get();
 				exhibitionResultByTypeDto.setExhibitionType(getType);
-				// responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
-				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
-				List<ExhibitionTeamDto> listResult = new ArrayList<ExhibitionTeamDto>();
-				for (ExhibitionTeam exhibitionTeam : getTeams) {
-					Optional<ExhibitionResult> exhibitionResultOp = exhibitionResultRepository
-							.findByTeam(exhibitionTeam.getId());
-					if (exhibitionResultOp.isPresent()) {
-						ExhibitionResult exhibitionResult = exhibitionResultOp.get();
-						if (exhibitionResult.getScore() == null) {
-							responseMessage.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa có điểm");
-							return responseMessage;
-						} else {
-							ExhibitionTeamDto exhibitionTeamDto = new ExhibitionTeamDto();
-							exhibitionTeamDto.setTeamName(exhibitionTeam.getTeamName());
-							exhibitionTeamDto.setScore(exhibitionResult.getScore());
-							listResult.add(exhibitionTeamDto);
-						}
-					} else {
-						responseMessage
-								.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa được xếp lịch thi đấu");
-						return responseMessage;
-					}
-				}
-				Collections.sort(listResult);
-				List<Double> listScore = new ArrayList<Double>();
-				for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
-					if (!listScore.contains(exhibitionTeamDto.getScore())) {
-						listScore.add(exhibitionTeamDto.getScore());
-					}
-				}
-				for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
-					for (int i = 0; i < listScore.size(); i++) {
-						if (exhibitionTeamDto.getScore().equals(listScore.get(i))) {
-							exhibitionTeamDto.setRank(i + 1);
-						}
-					}
-				}
-				exhibitionResultByTypeDto.setListResult(listResult);
 				responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
-				responseMessage.setMessage("Kết quả thi đấu của nội dung " + getType.getName());
+				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
+				if(getTeams.size() < 3) {
+					responseMessage.setMessage("Thể thức này không đủ số đội tham gia");
+				}
+				else {
+					List<ExhibitionTeamDto> listResult = new ArrayList<ExhibitionTeamDto>();
+					for (ExhibitionTeam exhibitionTeam : getTeams) {
+						Optional<ExhibitionResult> exhibitionResultOp = exhibitionResultRepository
+								.findByTeam(exhibitionTeam.getId());
+						if (exhibitionResultOp.isPresent()) {
+							ExhibitionResult exhibitionResult = exhibitionResultOp.get();
+							if (exhibitionResult.getScore() == null) {
+								responseMessage.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa có điểm");
+								return responseMessage;
+							} else {
+								ExhibitionTeamDto exhibitionTeamDto = new ExhibitionTeamDto();
+								exhibitionTeamDto.setTeamName(exhibitionTeam.getTeamName());
+								exhibitionTeamDto.setScore(exhibitionResult.getScore());
+								listResult.add(exhibitionTeamDto);
+							}
+						} else {
+							responseMessage
+									.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa được xếp lịch thi đấu");
+							return responseMessage;
+						}
+					}
+					Collections.sort(listResult);
+					List<Double> listScore = new ArrayList<Double>();
+					for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
+						if (!listScore.contains(exhibitionTeamDto.getScore())) {
+							listScore.add(exhibitionTeamDto.getScore());
+						}
+					}
+					for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
+						for (int i = 0; i < listScore.size(); i++) {
+							if (exhibitionTeamDto.getScore().equals(listScore.get(i))) {
+								exhibitionTeamDto.setRank(i + 1);
+							}
+						}
+					}
+					exhibitionResultByTypeDto.setListResult(listResult);
+					responseMessage.setMessage("Kết quả thi đấu của nội dung " + getType.getName());
+				}
+				responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

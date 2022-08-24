@@ -1,11 +1,11 @@
 package com.fpt.macm.model.dto;
 
-public class UserEventSemesterDto implements Comparable<UserEventSemesterDto>{
+public class UserEventSemesterDto implements Comparable<UserEventSemesterDto> {
 
 	private String userName;
 	private String studentId;
-	private boolean isJoin;
 	private EventDto eventDto;
+	private String registerStatus;
 
 	public String getUserName() {
 		return userName;
@@ -23,20 +23,20 @@ public class UserEventSemesterDto implements Comparable<UserEventSemesterDto>{
 		this.studentId = studentId;
 	}
 
-	public boolean isJoin() {
-		return isJoin;
-	}
-
-	public void setJoin(boolean isJoin) {
-		this.isJoin = isJoin;
-	}
-
 	public EventDto getEventDto() {
 		return eventDto;
 	}
 
 	public void setEventDto(EventDto eventDto) {
 		this.eventDto = eventDto;
+	}
+
+	public String getRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(String registerStatus) {
+		this.registerStatus = registerStatus;
 	}
 
 	@Override

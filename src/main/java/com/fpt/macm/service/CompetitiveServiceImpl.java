@@ -12,6 +12,7 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.CompetitiveMatchByTypeDto;
 import com.fpt.macm.model.dto.CompetitiveMatchDto;
 import com.fpt.macm.model.dto.CompetitivePlayerByTypeDto;
@@ -128,7 +129,11 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
 						.findByTournamentId(getTournament.getId());
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					userJoined.add(tournamentOrganizingCommittee.getUser());
+					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							|| tournamentOrganizingCommittee.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+						userJoined.add(tournamentOrganizingCommittee.getUser());
+					}
 				}
 
 				List<User> userNotJoined = new ArrayList<User>();
@@ -464,7 +469,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
 							newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
 							newCompetitivePlayer.setWeight(0);
-							newCompetitivePlayer.setIsEligible(true);
+							newCompetitivePlayer.setIsEligible(false);
 							newCompetitivePlayer.setCompetitiveType(getType);
 							newCompetitivePlayer.setCreatedBy("LinhLHN");
 							newCompetitivePlayer.setCreatedOn(LocalDateTime.now());
@@ -474,7 +479,6 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							listUsers.add(user.getName() + " - " + user.getStudentId());
 						}
 					}
-					autoSpawnMatchs(competitiveTypeId);
 					getType.setCanDelete(false);
 					competitiveTypeRepository.save(getType);
 					responseMessage.setData(listUsers);
@@ -690,34 +694,39 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				User getUser = new User();
 				User[] listResult = new User[3];
 				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
-				CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(listMatchs.get(1).getId())
-						.get();
-				if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
-					responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
-				} else {
-					getUser = userRepository.findByStudentId(getResult.getFirstPoint() > getResult.getSecondPoint()
-							? listMatchs.get(0).getFirstStudentId()
-							: listMatchs.get(0).getSecondStudentId()).get();
-					listResult[2] = getUser;
-					getResult = competitiveResultRepository.findByMatchId(listMatchs.get(0).getId()).get();
+				if(listMatchs.size() == 0) {
+					responseMessage.setMessage("Thể thức này chưa tạo trận đấu");
+				}
+				else {
+					CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(listMatchs.get(0).getId())
+							.get();
 					if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
-						responseMessage.setMessage("Trận chung kết chưa diễn ra");
+						responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
 					} else {
-						if (getResult.getFirstPoint() > getResult.getSecondPoint()) {
-							getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
-							listResult[0] = getUser;
-							getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
-							listResult[1] = getUser;
+						getUser = userRepository.findByStudentId(getResult.getFirstPoint() > getResult.getSecondPoint()
+								? listMatchs.get(0).getFirstStudentId()
+								: listMatchs.get(0).getSecondStudentId()).get();
+						listResult[2] = getUser;
+						getResult = competitiveResultRepository.findByMatchId(listMatchs.get(1).getId()).get();
+						if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
+							responseMessage.setMessage("Trận chung kết chưa diễn ra");
 						} else {
-							getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
-							listResult[1] = getUser;
-							getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
-							listResult[0] = getUser;
+							if (getResult.getFirstPoint() > getResult.getSecondPoint()) {
+								getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
+								listResult[0] = getUser;
+								getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
+								listResult[1] = getUser;
+							} else {
+								getUser = userRepository.findByStudentId(listMatchs.get(1).getFirstStudentId()).get();
+								listResult[1] = getUser;
+								getUser = userRepository.findByStudentId(listMatchs.get(1).getSecondStudentId()).get();
+								listResult[0] = getUser;
+							}
+							competitiveResultByTypeDto.setListResult(listResult);
+							responseMessage
+									.setMessage("Kết quả thi đấu ở thể thức " + (getType.isGender() ? "Nam: " : "Nữ: ")
+											+ getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
 						}
-						competitiveResultByTypeDto.setListResult(listResult);
-						responseMessage
-								.setMessage("Kết quả thi đấu ở thể thức " + (getType.isGender() ? "Nam: " : "Nữ: ")
-										+ getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
 					}
 				}
 				responseMessage.setData(Arrays.asList(competitiveResultByTypeDto));

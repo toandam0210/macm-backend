@@ -28,11 +28,14 @@ public class TournamentOrganizingCommittee {
 	private User user;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "role_in_tournament")
-	private RoleEvent roleEvent;
+	@JoinColumn(name = "tournament_role_id")
+	private TournamentRole tournamentRole;
 
 	@Column
 	private boolean paymentStatus;
+
+	@Column
+	private String registerStatus;
 
 	@Column
 	private String createdBy;
@@ -70,12 +73,12 @@ public class TournamentOrganizingCommittee {
 		this.user = user;
 	}
 
-	public RoleEvent getRoleEvent() {
-		return roleEvent;
+	public TournamentRole getTournamentRole() {
+		return tournamentRole;
 	}
 
-	public void setRoleEvent(RoleEvent roleEvent) {
-		this.roleEvent = roleEvent;
+	public void setTournamentRole(TournamentRole tournamentRole) {
+		this.tournamentRole = tournamentRole;
 	}
 
 	public String getCreatedBy() {
@@ -116,6 +119,14 @@ public class TournamentOrganizingCommittee {
 
 	public void setPaymentStatus(boolean paymentStatus) {
 		this.paymentStatus = paymentStatus;
+	}
+
+	public String getRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(String registerStatus) {
+		this.registerStatus = registerStatus;
 	}
 
 }

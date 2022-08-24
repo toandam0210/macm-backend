@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.MemberEventDto;
-import com.fpt.macm.model.dto.MemberNotJoinEventDto;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.MemberEventService;
 
@@ -77,12 +76,6 @@ public class MemberEventController {
 		return new ResponseEntity<ResponseMessage>(memberEventService.getAllRoleByEventId(eventId), HttpStatus.OK);
 	}
 
-	@GetMapping("/headculture/getallsuggestionrole")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> getAllSuggestionRole() {
-		return new ResponseEntity<ResponseMessage>(memberEventService.getAllSuggestionRole(), HttpStatus.OK);
-	}
-
 	@GetMapping("/getallorganizingcommitteerolebyeventid/{eventId}")
 	ResponseEntity<ResponseMessage> getAllOrganizingCommitteeRoleByEventId(
 			@PathVariable(name = "eventId") int eventId) {
@@ -92,16 +85,15 @@ public class MemberEventController {
 
 	@GetMapping("/headculture/getlistmembernotjoin/{eventId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> getListMemberNotJoinEvent(@PathVariable(name = "eventId") int eventId,
-			@RequestParam(defaultValue = "0") int pageNo, @RequestParam(defaultValue = "10") int pageSize) {
-		return new ResponseEntity<ResponseMessage>(
-				memberEventService.getListMemberNotJoinEvent(eventId, pageNo, pageSize), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> getListMemberNotJoinEvent(@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.getListMemberNotJoinEvent(eventId),
+				HttpStatus.OK);
 	}
 
 	@PostMapping("/headculture/addlistmemberjoin/{eventId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> addListMemberJoinEvent(@PathVariable(name = "eventId") int eventId,
-			@RequestBody List<MemberNotJoinEventDto> listToJoin) {
+			@RequestBody List<MemberEventDto> listToJoin) {
 		return new ResponseEntity<ResponseMessage>(memberEventService.addListMemberJoinEvent(eventId, listToJoin),
 				HttpStatus.OK);
 	}
@@ -120,11 +112,24 @@ public class MemberEventController {
 				memberEventService.registerToJoinOrganizingCommittee(eventId, studentId, roleEventId), HttpStatus.OK);
 	}
 
-	@PutMapping("/canceltojoinevent/{eventId}/{studentId}")
-	ResponseEntity<ResponseMessage> cancelToJoinEvent(@PathVariable(name = "eventId") int eventId,
-			@PathVariable(name = "studentId") String studentId) {
-		return new ResponseEntity<ResponseMessage>(memberEventService.cancelToJoinEvent(eventId, studentId),
+	@PutMapping("/acceptrequesttojoinevent/{memberEventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> acceptRequestToJoinEvent(@PathVariable(name = "memberEventId") int memberEventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.acceptRequestToJoinEvent(memberEventId),
 				HttpStatus.OK);
+	}
+
+	@PutMapping("/declinerequesttojoinevent/{memberEventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> declineRequestToJoinEvent(@PathVariable(name = "memberEventId") int memberEventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.declineRequestToJoinEvent(memberEventId),
+				HttpStatus.OK);
+	}
+
+	@PutMapping("/deletememberevent/{memberEventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> deleteMemberEvent(@PathVariable(name = "memberEventId") int memberEventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.deleteMemberEvent(memberEventId), HttpStatus.OK);
 	}
 
 	@GetMapping("/getalleventbystudentid/{studentId}")

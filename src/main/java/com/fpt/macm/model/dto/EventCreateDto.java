@@ -8,7 +8,7 @@ import com.fpt.macm.model.entity.Event;
 public class EventCreateDto {
 
 	private Event event;
-	private List<RoleEventDto> rolesEventDto = new ArrayList<RoleEventDto>();
+	private List<EventRoleDto> eventRolesDto = new ArrayList<EventRoleDto>();
 	private List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
 
 	public Event getEvent() {
@@ -19,12 +19,12 @@ public class EventCreateDto {
 		this.event = event;
 	}
 
-	public List<RoleEventDto> getRolesEventDto() {
-		return rolesEventDto;
+	public List<EventRoleDto> getEventRolesDto() {
+		return eventRolesDto;
 	}
 
-	public void setRolesEventDto(List<RoleEventDto> rolesEventDto) {
-		this.rolesEventDto = rolesEventDto;
+	public void setEventRolesDto(List<EventRoleDto> eventRolesDto) {
+		this.eventRolesDto = eventRolesDto;
 	}
 
 	public List<ScheduleDto> getListPreview() {

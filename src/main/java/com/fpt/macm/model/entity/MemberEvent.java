@@ -27,15 +27,15 @@ public class MemberEvent {
 	private User user;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "role_in_event")
-	private RoleEvent roleEvent;
+	@JoinColumn(name = "event_role_id")
+	private EventRole eventRole;
 
 	@Column
-	private boolean registerStatus;
+	private String registerStatus;
 
 	@Column
 	private double paymentValue;
-	
+
 	@Column
 	private boolean isPaidBeforeClosing;
 
@@ -75,26 +75,26 @@ public class MemberEvent {
 		this.user = user;
 	}
 
-	public RoleEvent getRoleEvent() {
-		return roleEvent;
+	public EventRole getEventRole() {
+		return eventRole;
 	}
 
-	public void setRoleEvent(RoleEvent roleEvent) {
-		this.roleEvent = roleEvent;
+	public void setEventRole(EventRole eventRole) {
+		this.eventRole = eventRole;
 	}
 
-	public boolean isRegisterStatus() {
+	public String getRegisterStatus() {
 		return registerStatus;
 	}
 
-	public void setRegisterStatus(boolean registerStatus) {
+	public void setRegisterStatus(String registerStatus) {
 		this.registerStatus = registerStatus;
 	}
 
 	public String getCreatedBy() {
 		return createdBy;
 	}
-	
+
 	public void setCreatedBy(String createdBy) {
 		this.createdBy = createdBy;
 	}

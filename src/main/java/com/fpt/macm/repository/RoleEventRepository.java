@@ -15,4 +15,6 @@ public interface RoleEventRepository extends JpaRepository<RoleEvent, Integer>{
 //	@Query(value = "SELECT * FROM role_event where id != 1", nativeQuery = true)
 //	List<RoleEvent> findAllOrganizingCommitteeRole();
 	
+//	List<RoleEvent> findByIsActiveOrderByIdAsc(boolean isActive);
+	
 }

@@ -31,6 +31,9 @@ public class Area {
 
 	@Column
 	private LocalDateTime updatedOn;
+	
+	@Column
+	private Boolean isActive;
 
 	public int getId() {
 		return id;
@@ -78,6 +81,14 @@ public class Area {
 
 	public void setUpdatedOn(LocalDateTime updatedOn) {
 		this.updatedOn = updatedOn;
+	}
+
+	public Boolean getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(Boolean isActive) {
+		this.isActive = isActive;
 	}
 	
 	

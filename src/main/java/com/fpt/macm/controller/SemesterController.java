@@ -4,10 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.SemesterService;
 
@@ -30,5 +34,10 @@ public class SemesterController {
 	@GetMapping("/getlistmonths")
 	ResponseEntity<ResponseMessage> getListMonthsBySemesters(@RequestParam(defaultValue = "") String semester) {
 		return new ResponseEntity<ResponseMessage>(semesterService.getListMonthsBySemester(semester), HttpStatus.OK);
+	}
+	
+	@PutMapping("/headclub/updatesemester/{semesterId}")
+	ResponseEntity<ResponseMessage> updateSemester(@PathVariable (name = "semesterId") int smesterId, @RequestBody Semester semester) {
+		return new ResponseEntity<ResponseMessage>(semesterService.updateSemester(smesterId, semester), HttpStatus.OK);
 	}
 }

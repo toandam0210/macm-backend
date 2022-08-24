@@ -7,15 +7,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.EventPaymentStatusReportDto;
+import com.fpt.macm.model.dto.EventRoleDto;
 import com.fpt.macm.model.dto.MemberEventDto;
-import com.fpt.macm.model.dto.MemberNotJoinEventDto;
-import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.dto.UserEventDto;
 import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.ClubFund;
@@ -23,7 +23,7 @@ import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventPaymentStatusReport;
 import com.fpt.macm.model.entity.EventRole;
 import com.fpt.macm.model.entity.MemberEvent;
-import com.fpt.macm.model.entity.RoleEvent;
+import com.fpt.macm.model.entity.Notification;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AttendanceEventRepository;
@@ -32,6 +32,7 @@ import com.fpt.macm.repository.EventPaymentStatusReportRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventRoleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
+import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.RoleEventRepository;
 import com.fpt.macm.repository.UserRepository;
 import com.fpt.macm.utils.Utils;
@@ -66,6 +67,12 @@ public class MemberEventServiceImpl implements MemberEventService {
 	@Autowired
 	ClubFundService clubFundService;
 
+	@Autowired
+	NotificationRepository notificationRepository;
+
+	@Autowired
+	NotificationService notificationService;
+
 	@Override
 	public ResponseMessage updateListMemberEventRole(List<MemberEventDto> membersEventDto) {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -74,11 +81,13 @@ public class MemberEventServiceImpl implements MemberEventService {
 			for (MemberEventDto memberEventDto : membersEventDto) {
 				Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventDto.getId());
 				MemberEvent memberEvent = memberEventOp.get();
-				if (memberEventDto.getRoleEventDto().getId() != memberEvent.getRoleEvent().getId()) {
-					RoleEvent roleEvent = new RoleEvent();
-					roleEvent.setId(memberEventDto.getRoleEventDto().getId());
-					roleEvent.setName(memberEventDto.getRoleEventDto().getName());
-					memberEvent.setRoleEvent(roleEvent);
+				if (memberEventDto.getEventRoleDto().getId() != memberEvent.getEventRole().getId()) {
+					EventRole eventRole = new EventRole();
+					eventRole.setId(memberEventDto.getEventRoleDto().getId());
+					eventRole.setName(memberEventDto.getEventRoleDto().getName());
+					eventRole.setQuantity(memberEventDto.getEventRoleDto().getMaxQuantity());
+					eventRole.setEvent(memberEvent.getEvent());
+					memberEvent.setEventRole(eventRole);
 					memberEvent.setUpdatedBy("toandv");
 					memberEvent.setUpdatedOn(LocalDateTime.now());
 					listUpdatedRoleEvent.add(memberEvent);
@@ -101,7 +110,8 @@ public class MemberEventServiceImpl implements MemberEventService {
 	public ResponseMessage getAllMemberCancelJoinEvent(int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId, false);
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId,
+					Constant.REQUEST_STATUS_DECLINED);
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			if (!membersEvent.isEmpty()) {
 				for (MemberEvent memberEvent : membersEvent) {
@@ -110,11 +120,11 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEventDto.setUserName(memberEvent.getUser().getName());
 					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-					memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
-					RoleEventDto roleEventDto = new RoleEventDto();
-					roleEventDto.setId(memberEvent.getRoleEvent().getId());
-					roleEventDto.setName(memberEvent.getRoleEvent().getName());
-					memberEventDto.setRoleEventDto(roleEventDto);
+					memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
+					EventRoleDto eventRoleDto = new EventRoleDto();
+					eventRoleDto.setId(memberEvent.getEventRole().getId());
+					eventRoleDto.setName(memberEvent.getEventRole().getName());
+					memberEventDto.setEventRoleDto(eventRoleDto);
 					memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 					memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
 					memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
@@ -268,7 +278,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 			case 0:
 				// filter all
 				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.isRegisterStatus()) {
+					if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
 						membersEventFilter.add(memberEvent);
 					}
 				}
@@ -276,7 +286,8 @@ public class MemberEventServiceImpl implements MemberEventService {
 			case 1:
 				// filter thành viên tham gia
 				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.isRegisterStatus() && memberEvent.getRoleEvent().getId() == 1) {
+					if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							&& memberEvent.getEventRole().getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
 						membersEventFilter.add(memberEvent);
 					}
 				}
@@ -284,14 +295,15 @@ public class MemberEventServiceImpl implements MemberEventService {
 			case 2:
 				// filter thành viên ban tổ chức
 				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.isRegisterStatus() && memberEvent.getRoleEvent().getId() != 1) {
+					if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							&& !memberEvent.getEventRole().getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
 						membersEventFilter.add(memberEvent);
 					}
 				}
 				break;
 			default:
 				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.isRegisterStatus()) {
+					if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
 						membersEventFilter.add(memberEvent);
 					}
 				}
@@ -306,11 +318,11 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEventDto.setUserName(memberEvent.getUser().getName());
 					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-					memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
-					RoleEventDto roleEventDto = new RoleEventDto();
-					roleEventDto.setId(memberEvent.getRoleEvent().getId());
-					roleEventDto.setName(memberEvent.getRoleEvent().getName());
-					memberEventDto.setRoleEventDto(roleEventDto);
+					memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
+					EventRoleDto eventRoleDto = new EventRoleDto();
+					eventRoleDto.setId(memberEvent.getEventRole().getId());
+					eventRoleDto.setName(memberEvent.getEventRole().getName());
+					memberEventDto.setEventRoleDto(eventRoleDto);
 					memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 					memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
 					memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
@@ -334,11 +346,11 @@ public class MemberEventServiceImpl implements MemberEventService {
 		try {
 			List<EventRole> eventRoles = eventRoleRepository.findByEventId(eventId);
 			if (!eventRoles.isEmpty()) {
-				List<RoleEventDto> rolesEventDto = new ArrayList<RoleEventDto>();
+				List<EventRoleDto> rolesEventDto = new ArrayList<EventRoleDto>();
 				for (EventRole eventRole : eventRoles) {
-					RoleEventDto roleEventDto = new RoleEventDto();
-					roleEventDto.setId(eventRole.getRoleEvent().getId());
-					roleEventDto.setName(eventRole.getRoleEvent().getName());
+					EventRoleDto roleEventDto = new EventRoleDto();
+					roleEventDto.setId(eventRole.getId());
+					roleEventDto.setName(eventRole.getName());
 					rolesEventDto.add(roleEventDto);
 				}
 				responseMessage.setData(rolesEventDto);
@@ -353,36 +365,18 @@ public class MemberEventServiceImpl implements MemberEventService {
 	}
 
 	@Override
-	public ResponseMessage getAllSuggestionRole() {
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<RoleEvent> rolesEvent = roleEventRepository.findAll(Sort.by("id").ascending());
-			if (!rolesEvent.isEmpty()) {
-				rolesEvent.remove(0);
-				responseMessage.setData(rolesEvent);
-				responseMessage.setMessage("Lấy tất cả vai trò gợi ý thành công");
-			} else {
-				responseMessage.setMessage("Không có vai trò gợi ý nào");
-			}
-		} catch (Exception e) {
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
 	public ResponseMessage getAllOrganizingCommitteeRoleByEventId(int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<EventRole> eventRoles = eventRoleRepository.findByEventId(eventId);
 			if (!eventRoles.isEmpty()) {
-				List<RoleEventDto> rolesEventDto = new ArrayList<RoleEventDto>();
+				List<EventRoleDto> rolesEventDto = new ArrayList<EventRoleDto>();
 				for (EventRole eventRole : eventRoles) {
-					if (eventRole.getRoleEvent().getId() != 1) {
-						RoleEventDto roleEventDto = new RoleEventDto();
-						roleEventDto.setId(eventRole.getRoleEvent().getId());
-						roleEventDto.setName(eventRole.getRoleEvent().getName());
-						roleEventDto.setAvailableQuantity(getAvailableQuantity(eventId, eventRole));
+					if (!eventRole.getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
+						EventRoleDto roleEventDto = new EventRoleDto();
+						roleEventDto.setId(eventRole.getId());
+						roleEventDto.setName(eventRole.getName());
+						roleEventDto.setAvailableQuantity(getAvailableQuantity(eventRole));
 						roleEventDto.setMaxQuantity(eventRole.getQuantity());
 						rolesEventDto.add(roleEventDto);
 					}
@@ -398,14 +392,23 @@ public class MemberEventServiceImpl implements MemberEventService {
 		return responseMessage;
 	}
 
-	private int getAvailableQuantity(int eventId, EventRole eventRole) {
-		List<MemberEvent> organizingCommittees = memberEventRepository.findOrganizingCommitteeByEventId(eventId,
-				eventRole.getRoleEvent().getId());
+	private int getAvailableQuantity(EventRole eventRole) {
+		List<MemberEvent> organizingCommittees = memberEventRepository
+				.findByEventIdOrderByIdAsc(eventRole.getEvent().getId());
 		if (!organizingCommittees.isEmpty()) {
-			if (eventRole.getQuantity() - organizingCommittees.size() < 0) {
+			int count = 0;
+			for (MemberEvent memberEvent : organizingCommittees) {
+				if (!memberEvent.getEventRole().getName().equals(Constant.ROLE_EVENT_MEMBER_VN)
+						&& (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+								|| memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING))) {
+					count++;
+				}
+			}
+
+			if (eventRole.getQuantity() - count < 0) {
 				return 0;
 			} else {
-				return eventRole.getQuantity() - organizingCommittees.size();
+				return eventRole.getQuantity() - count;
 			}
 		} else {
 			return eventRole.getQuantity();
@@ -420,17 +423,19 @@ public class MemberEventServiceImpl implements MemberEventService {
 			if (!membersEvent.isEmpty()) {
 				List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.isRegisterStatus() && memberEvent.getUser().isActive()) {
+					if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							&& memberEvent.getUser().isActive()) {
 						MemberEventDto memberEventDto = new MemberEventDto();
 						memberEventDto.setId(memberEvent.getId());
 						memberEventDto.setUserName(memberEvent.getUser().getName());
 						memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 						memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-						memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
-						RoleEventDto roleEventDto = new RoleEventDto();
-						roleEventDto.setId(memberEvent.getRoleEvent().getId());
-						roleEventDto.setName(memberEvent.getRoleEvent().getName());
-						memberEventDto.setRoleEventDto(roleEventDto);
+						memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
+						EventRoleDto eventRoleDto = new EventRoleDto();
+						eventRoleDto.setId(memberEvent.getEventRole().getId());
+						eventRoleDto.setName(memberEvent.getEventRole().getName());
+						eventRoleDto.setMaxQuantity(memberEvent.getEventRole().getQuantity());
+						memberEventDto.setEventRoleDto(eventRoleDto);
 						memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 						memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
 						memberEventDto
@@ -451,78 +456,76 @@ public class MemberEventServiceImpl implements MemberEventService {
 	}
 
 	@Override
-	public ResponseMessage getListMemberNotJoinEvent(int eventId, int pageNo, int pageSize) {
-		// TODO Auto-generated method stub
+	public ResponseMessage getListMemberNotJoinEvent(int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<User> listUser = (List<User>) userRepository.findAll();
-			List<MemberNotJoinEventDto> listNotJoin = new ArrayList<MemberNotJoinEventDto>();
+			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			for (User user : listUser) {
-				Optional<MemberEvent> getMemberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventId,
+				Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventId,
 						user.getId());
-				if (getMemberEventOp.isPresent()) {
-					MemberEvent getMemberEvent = getMemberEventOp.get();
-					if (getMemberEvent.isRegisterStatus()) {
-						continue;
-					} else {
-						MemberNotJoinEventDto memberNotJoinEventDto = new MemberNotJoinEventDto();
-						memberNotJoinEventDto.setUserId(user.getId());
-						memberNotJoinEventDto.setUserName(user.getName());
-						memberNotJoinEventDto.setUserMail(user.getEmail());
-						memberNotJoinEventDto.setUserStudentId(user.getStudentId());
-						memberNotJoinEventDto.setRegisteredStatus(true);
-						memberNotJoinEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(user.getRole()));
-						listNotJoin.add(memberNotJoinEventDto);
+				if (memberEventOp.isPresent()) {
+					MemberEvent memberEvent = memberEventOp.get();
+					if (!memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							&& !memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+						MemberEventDto memberEventDto = new MemberEventDto();
+						memberEventDto.setUserId(user.getId());
+						memberEventDto.setUserName(user.getName());
+						memberEventDto.setUserMail(user.getEmail());
+						memberEventDto.setUserStudentId(user.getStudentId());
+						memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(user.getRole()));
+						memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
+						membersEventDto.add(memberEventDto);
 					}
 				} else {
-					MemberNotJoinEventDto memberNotJoinEventDto = new MemberNotJoinEventDto();
+					MemberEventDto memberNotJoinEventDto = new MemberEventDto();
 					memberNotJoinEventDto.setUserId(user.getId());
 					memberNotJoinEventDto.setUserName(user.getName());
 					memberNotJoinEventDto.setUserMail(user.getEmail());
 					memberNotJoinEventDto.setUserStudentId(user.getStudentId());
-					memberNotJoinEventDto.setRegisteredStatus(false);
 					memberNotJoinEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(user.getRole()));
-					listNotJoin.add(memberNotJoinEventDto);
+					membersEventDto.add(memberNotJoinEventDto);
 				}
 			}
-			List<MemberNotJoinEventDto> listNotJoinPageable = pageableMemberNotJoinEvent(listNotJoin, pageNo, pageSize);
-			responseMessage.setData(listNotJoinPageable);
-			responseMessage.setMessage("Danh sách chưa tham gia sự kiện" + listNotJoinPageable.size());
+
+			responseMessage.setData(membersEventDto);
+			responseMessage.setMessage("Lấy danh sách thành viên chưa đăng ký tham gia sự kiện thành công");
+			responseMessage.setTotalResult(membersEventDto.size());
 		} catch (Exception e) {
-			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
 	}
 
 	@Override
-	public ResponseMessage addListMemberJoinEvent(int eventId, List<MemberNotJoinEventDto> listToJoin) {
-		// TODO Auto-generated method stub
+	public ResponseMessage addListMemberJoinEvent(int eventId, List<MemberEventDto> listToJoin) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Event event = eventRepository.findById(eventId).get();
 			List<MemberEvent> listJoinEvent = new ArrayList<MemberEvent>();
 			List<AttendanceEvent> attendancesEvent = new ArrayList<AttendanceEvent>();
-			for (MemberNotJoinEventDto memberNotJoinEventDto : listToJoin) {
-				User user = userRepository.findById(memberNotJoinEventDto.getUserId()).get();
+			for (MemberEventDto memberEventDto : listToJoin) {
+				User user = userRepository.findById(memberEventDto.getUserId()).get();
 				MemberEvent memberEvent = new MemberEvent();
-				if (memberNotJoinEventDto.isRegisteredStatus()) {
+				if (memberEventDto.getRegisterStatus().equals(Constant.REQUEST_STATUS_DECLINED)) {
 					memberEvent = memberEventRepository
-							.findMemberEventByEventAndUser(eventId, memberNotJoinEventDto.getUserId()).get();
-					memberEvent.setUpdatedBy("LinhLHN");
+							.findMemberEventByEventAndUser(eventId, memberEventDto.getUserId()).get();
+					memberEvent.setUpdatedBy("toandv");
 					memberEvent.setUpdatedOn(LocalDateTime.now());
 				} else {
 					memberEvent.setEvent(event);
 					memberEvent.setUser(user);
 					memberEvent.setPaymentValue(0);
 					memberEvent.setPaidBeforeClosing(false);
-					memberEvent.setCreatedBy("LinhLHN");
+					memberEvent.setCreatedBy("toandv");
 					memberEvent.setCreatedOn(LocalDateTime.now());
 				}
-				memberEvent.setRegisterStatus(true);
-				Optional<RoleEvent> roleEventOp = roleEventRepository.findById(1);
-				RoleEvent roleEvent = roleEventOp.get();
-				memberEvent.setRoleEvent(roleEvent);
+				memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+				Optional<EventRole> eventRoleOp = eventRoleRepository
+						.findByNameAndEventId(Constant.ROLE_EVENT_MEMBER_VN, event.getId());
+				;
+				EventRole eventRole = eventRoleOp.get();
+				memberEvent.setEventRole(eventRole);
 				listJoinEvent.add(memberEvent);
 
 				AttendanceEvent attendanceEvent = new AttendanceEvent();
@@ -545,11 +548,11 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEventDto.setUserName(memberEvent.getUser().getName());
 					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
-					memberEventDto.setRegisterStatus(memberEvent.isRegisterStatus());
-					RoleEventDto roleEventDto = new RoleEventDto();
-					roleEventDto.setId(memberEvent.getRoleEvent().getId());
-					roleEventDto.setName(memberEvent.getRoleEvent().getName());
-					memberEventDto.setRoleEventDto(roleEventDto);
+					memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
+					EventRoleDto eventRoleDto = new EventRoleDto();
+					eventRoleDto.setId(memberEvent.getEventRole().getId());
+					eventRoleDto.setName(memberEvent.getEventRole().getName());
+					memberEventDto.setEventRoleDto(eventRoleDto);
 					memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 					memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
 					memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
@@ -557,27 +560,16 @@ public class MemberEventServiceImpl implements MemberEventService {
 					membersEventDto.add(memberEventDto);
 				}
 				responseMessage.setData(membersEventDto);
-				responseMessage.setMessage("Thêm thành viên thành công");
+				responseMessage.setMessage("Thêm thành viên vào sự kiện thành công");
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
 	}
 
-	public List<MemberNotJoinEventDto> pageableMemberNotJoinEvent(List<MemberNotJoinEventDto> currentList, int pageNo,
-			int pageSize) {
-		List<MemberNotJoinEventDto> result = new ArrayList<MemberNotJoinEventDto>();
-		for (int i = pageNo * pageSize; i < (pageNo + 1) * pageSize && i < currentList.size(); i++) {
-			result.add(currentList.get(i));
-		}
-		return result;
-	}
-
 	@Override
 	public ResponseMessage registerToJoinEvent(int eventId, String studentId) {
-		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Event event = eventRepository.findById(eventId).get();
@@ -590,46 +582,43 @@ public class MemberEventServiceImpl implements MemberEventService {
 						user.getId());
 				if (memberEventOp.isPresent()) {
 					memberEvent = memberEventOp.get();
-					if (memberEvent.isRegisterStatus()) {
+					if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							|| memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
 						responseMessage.setMessage("Bạn đã đăng ký tham gia sự kiện này rồi");
 						return responseMessage;
+					} else if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_DECLINED)) {
+						responseMessage.setMessage("Bạn đã bị từ chối tham gia sự kiện này");
+						return responseMessage;
 					} else {
-						memberEvent.setRegisterStatus(true);
+						memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_PENDING);
 						memberEvent.setUpdatedOn(LocalDateTime.now());
 						memberEvent.setUpdatedBy(user.getName() + " - " + user.getStudentId());
 					}
 				} else {
 					memberEvent.setEvent(event);
 					memberEvent.setUser(user);
-					memberEvent.setRegisterStatus(true);
+					memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_PENDING);
 					memberEvent.setPaymentValue(0);
 					memberEvent.setPaidBeforeClosing(false);
-					Optional<RoleEvent> roleEventOp = roleEventRepository.findById(1);
-					RoleEvent roleEvent = roleEventOp.get();
-					memberEvent.setRoleEvent(roleEvent);
+					Optional<EventRole> eventRoleOp = eventRoleRepository
+							.findByNameAndEventId(Constant.ROLE_EVENT_MEMBER_VN, event.getId());
+					EventRole eventRole = eventRoleOp.get();
+					memberEvent.setEventRole(eventRole);
 					memberEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
 					memberEvent.setCreatedOn(LocalDateTime.now());
 				}
 
 				memberEventRepository.save(memberEvent);
 
-				AttendanceEvent attendanceEvent = new AttendanceEvent();
-				attendanceEvent.setEvent(event);
-				attendanceEvent.setStatus(2);
-				attendanceEvent.setUser(user);
-				attendanceEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
-				attendanceEvent.setCreatedOn(LocalDateTime.now());
-				attendanceEventRepository.save(attendanceEvent);
-
 				UserEventDto userEventDto = new UserEventDto();
 				userEventDto.setEventId(memberEvent.getEvent().getId());
 				userEventDto.setEventName(memberEvent.getEvent().getName());
 				userEventDto.setUserName(user.getName());
 				userEventDto.setUserStudentId(user.getStudentId());
-				RoleEventDto roleEventDto = new RoleEventDto();
-				roleEventDto.setId(memberEvent.getRoleEvent().getId());
-				roleEventDto.setName(memberEvent.getRoleEvent().getName());
-				userEventDto.setRoleEventDto(roleEventDto);
+				EventRoleDto eventRoleDto = new EventRoleDto();
+				eventRoleDto.setId(memberEvent.getEventRole().getId());
+				eventRoleDto.setName(memberEvent.getEventRole().getName());
+				userEventDto.setEventRoleDto(eventRoleDto);
 
 				responseMessage.setData(Arrays.asList(userEventDto));
 				responseMessage.setMessage("Đăng ký tham gia sự kiện thành công");
@@ -637,7 +626,6 @@ public class MemberEventServiceImpl implements MemberEventService {
 				responseMessage.setMessage(Constant.MSG_131);
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
@@ -649,11 +637,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 		try {
 			Event event = eventRepository.findById(eventId).get();
 			if (LocalDateTime.now().isBefore(event.getRegistrationOrganizingCommitteeDeadline())) {
-				RoleEvent roleEvent = roleEventRepository.findById(roleEventId).get();
-				EventRole eventRole = eventRoleRepository.findByRoleEventIdAndEventId(roleEvent.getId(), event.getId())
-						.get();
-				if (roleEvent.getId() != 1) {
-					if (getAvailableQuantity(event.getId(), eventRole) > 0) {
+				EventRole eventRole = eventRoleRepository.findById(roleEventId).get();
+				if (!eventRole.getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
+					if (getAvailableQuantity(eventRole) > 0) {
 						User user = userRepository.findByStudentId(studentId).get();
 
 						MemberEvent memberEvent = new MemberEvent();
@@ -662,8 +648,12 @@ public class MemberEventServiceImpl implements MemberEventService {
 								.findMemberEventByEventAndUser(event.getId(), user.getId());
 						if (memberEventOp.isPresent()) {
 							memberEvent = memberEventOp.get();
-							if (memberEvent.isRegisterStatus()) {
+							if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+									|| memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
 								responseMessage.setMessage("Bạn đã đăng ký tham gia sự kiện này rồi");
+								return responseMessage;
+							} else if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_DECLINED)) {
+								responseMessage.setMessage("Bạn đã bị từ chối tham gia sự kiện này");
 								return responseMessage;
 							} else {
 								memberEvent.setUpdatedBy(user.getName() + " - " + user.getStudentId());
@@ -678,27 +668,19 @@ public class MemberEventServiceImpl implements MemberEventService {
 							memberEvent.setCreatedOn(LocalDateTime.now());
 						}
 
-						memberEvent.setRegisterStatus(true);
-						memberEvent.setRoleEvent(roleEvent);
+						memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_PENDING);
+						memberEvent.setEventRole(eventRole);
 						memberEventRepository.save(memberEvent);
-
-						AttendanceEvent attendanceEvent = new AttendanceEvent();
-						attendanceEvent.setEvent(event);
-						attendanceEvent.setStatus(2);
-						attendanceEvent.setUser(user);
-						attendanceEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
-						attendanceEvent.setCreatedOn(LocalDateTime.now());
-						attendanceEventRepository.save(attendanceEvent);
 
 						UserEventDto userEventDto = new UserEventDto();
 						userEventDto.setEventId(memberEvent.getEvent().getId());
 						userEventDto.setEventName(memberEvent.getEvent().getName());
 						userEventDto.setUserName(user.getName());
 						userEventDto.setUserStudentId(user.getStudentId());
-						RoleEventDto roleEventDto = new RoleEventDto();
-						roleEventDto.setId(memberEvent.getRoleEvent().getId());
-						roleEventDto.setName(memberEvent.getRoleEvent().getName());
-						userEventDto.setRoleEventDto(roleEventDto);
+						EventRoleDto eventRoleDto = new EventRoleDto();
+						eventRoleDto.setId(memberEvent.getEventRole().getId());
+						eventRoleDto.setName(memberEvent.getEventRole().getName());
+						userEventDto.setEventRoleDto(eventRoleDto);
 
 						responseMessage.setData(Arrays.asList(userEventDto));
 						responseMessage.setMessage("Đăng ký tham gia ban tổ chức sự kiện thành công");
@@ -718,37 +700,142 @@ public class MemberEventServiceImpl implements MemberEventService {
 	}
 
 	@Override
-	public ResponseMessage cancelToJoinEvent(int eventId, String studentId) {
+	public ResponseMessage acceptRequestToJoinEvent(int memberEventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Event event = eventRepository.findById(eventId).get();
-			if (LocalDateTime.now().isBefore(event.getRegistrationMemberDeadline())) {
-				User user = userRepository.findByStudentId(studentId).get();
-				Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventId,
-						user.getId());
-				if (memberEventOp.isPresent()) {
-					MemberEvent memberEvent = memberEventOp.get();
-					if (memberEvent.getRoleEvent().getId() != 1) {
-						responseMessage.setMessage("Thành viên ban tổ chức không thể hủy tham gia");
-					} else {
-						memberEvent.setRegisterStatus(false);
-						memberEvent.setUpdatedBy(user.getName() + " - " + user.getStudentId());
-						memberEvent.setUpdatedOn(LocalDateTime.now());
-						memberEventRepository.save(memberEvent);
+			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
+			if (memberEventOp.isPresent()) {
+				MemberEvent memberEvent = memberEventOp.get();
+				memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+				memberEvent.setUpdatedBy("toandv");
+				memberEvent.setUpdatedOn(LocalDateTime.now());
+				memberEventRepository.save(memberEvent);
 
-						Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
-								.findByEventIdAndUserId(event.getId(), user.getId());
-						if (attendanceEventOp.isPresent()) {
-							AttendanceEvent attendanceEvent = attendanceEventOp.get();
-							attendanceEventRepository.delete(attendanceEvent);
-						}
+				AttendanceEvent attendanceEvent = new AttendanceEvent();
+				attendanceEvent.setEvent(memberEvent.getEvent());
+				attendanceEvent.setStatus(2);
+				attendanceEvent.setUser(memberEvent.getUser());
+				attendanceEvent.setCreatedBy("toandv");
+				attendanceEvent.setCreatedOn(LocalDateTime.now());
+				attendanceEventRepository.save(attendanceEvent);
 
-						responseMessage.setData(Arrays.asList(memberEvent));
-						responseMessage.setMessage("Hủy đăng ký tham gia sự kiện thành công");
+				Notification notification = new Notification();
+				notification.setMessage("Yêu cầu đăng ký tham gia sự kiện " + memberEvent.getEvent().getName()
+						+ " của bạn đã được chấp nhận");
+				notification.setCreatedOn(LocalDateTime.now());
+				notification.setNotificationType(1);
+				notification.setNotificationTypeId(memberEvent.getEvent().getId());
+				notificationRepository.save(notification);
+
+				Iterable<Notification> notificationIterable = notificationRepository
+						.findAll(Sort.by("id").descending());
+				List<Notification> notifications = IterableUtils.toList(notificationIterable);
+				Notification newNotification = notifications.get(0);
+
+				notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
+
+				responseMessage.setData(Arrays.asList(memberEvent));
+				responseMessage.setMessage("Từ chối đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
+						+ " - " + memberEvent.getUser().getStudentId());
+			} else {
+				responseMessage.setMessage("Sai memberEventId rồi");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage declineRequestToJoinEvent(int memberEventId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
+			if (memberEventOp.isPresent()) {
+				MemberEvent memberEvent = memberEventOp.get();
+				memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
+				memberEvent.setUpdatedBy("toandv");
+				memberEvent.setUpdatedOn(LocalDateTime.now());
+				memberEventRepository.save(memberEvent);
+
+				Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
+						.findByEventIdAndUserId(memberEvent.getEvent().getId(), memberEvent.getUser().getId());
+				if (attendanceEventOp.isPresent()) {
+					AttendanceEvent attendanceEvent = attendanceEventOp.get();
+					attendanceEventRepository.delete(attendanceEvent);
+				}
+
+				Notification notification = new Notification();
+				notification.setMessage("Yêu cầu đăng ký tham gia sự kiện " + memberEvent.getEvent().getName()
+						+ " của bạn đã bị từ chối");
+				notification.setCreatedOn(LocalDateTime.now());
+				notification.setNotificationType(1);
+				notification.setNotificationTypeId(memberEvent.getEvent().getId());
+				notificationRepository.save(notification);
+
+				Iterable<Notification> notificationIterable = notificationRepository
+						.findAll(Sort.by("id").descending());
+				List<Notification> notifications = IterableUtils.toList(notificationIterable);
+				Notification newNotification = notifications.get(0);
+
+				notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
+
+				responseMessage.setData(Arrays.asList(memberEvent));
+				responseMessage.setMessage("Từ chối đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
+						+ " - " + memberEvent.getUser().getStudentId());
+			} else {
+				responseMessage.setMessage("Sai memberEventId rồi");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage deleteMemberEvent(int memberEventId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
+			if (memberEventOp.isPresent()) {
+				MemberEvent memberEvent = memberEventOp.get();
+				if (memberEvent.getPaymentValue() == 0) {
+					memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
+					memberEvent.setUpdatedBy("toandv");
+					memberEvent.setUpdatedOn(LocalDateTime.now());
+					memberEventRepository.save(memberEvent);
+
+					Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
+							.findByEventIdAndUserId(memberEvent.getEvent().getId(), memberEvent.getUser().getId());
+					if (attendanceEventOp.isPresent()) {
+						AttendanceEvent attendanceEvent = attendanceEventOp.get();
+						attendanceEventRepository.delete(attendanceEvent);
 					}
+
+					Notification notification = new Notification();
+					notification.setMessage("Bạn đã bị xóa khỏi sự kiện " + memberEvent.getEvent().getName());
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(1);
+					notification.setNotificationTypeId(memberEvent.getEvent().getId());
+					notificationRepository.save(notification);
+
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
+
+					notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
+
+					responseMessage.setData(Arrays.asList(memberEvent));
+					responseMessage.setMessage("Xóa " + memberEvent.getUser().getName() + " - "
+							+ memberEvent.getUser().getStudentId() + " khỏi sự kiện thành công");
+				} else {
+					responseMessage.setMessage(
+							"Thành viên này đã đóng phí tham gia. Vui lòng cập nhật lại trạng thái đóng tiền của "
+									+ memberEvent.getUser().getName() + " - " + memberEvent.getUser().getStudentId());
 				}
 			} else {
-				responseMessage.setMessage("Đã hết hạn hủy đăng ký");
+				responseMessage.setMessage("Sai memberEventId rồi");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
@@ -758,7 +845,6 @@ public class MemberEventServiceImpl implements MemberEventService {
 
 	@Override
 	public ResponseMessage getAllEventByStudentId(String studentId) {
-		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			User user = userRepository.findByStudentId(studentId).get();
@@ -766,18 +852,17 @@ public class MemberEventServiceImpl implements MemberEventService {
 			if (!membersEvent.isEmpty()) {
 				List<UserEventDto> userEventsDto = new ArrayList<UserEventDto>();
 				for (MemberEvent memberEvent : membersEvent) {
-					if (memberEvent.isRegisterStatus()) {
-						UserEventDto userEventDto = new UserEventDto();
-						userEventDto.setEventId(memberEvent.getEvent().getId());
-						userEventDto.setEventName(memberEvent.getEvent().getName());
-						userEventDto.setUserName(user.getName());
-						userEventDto.setUserStudentId(user.getStudentId());
-						RoleEventDto roleEventDto = new RoleEventDto();
-						roleEventDto.setId(memberEvent.getRoleEvent().getId());
-						roleEventDto.setName(memberEvent.getRoleEvent().getName());
-						userEventDto.setRoleEventDto(roleEventDto);
-						userEventsDto.add(userEventDto);
-					}
+					UserEventDto userEventDto = new UserEventDto();
+					userEventDto.setEventId(memberEvent.getEvent().getId());
+					userEventDto.setEventName(memberEvent.getEvent().getName());
+					userEventDto.setUserName(user.getName());
+					userEventDto.setUserStudentId(user.getStudentId());
+					EventRoleDto eventRoleDto = new EventRoleDto();
+					eventRoleDto.setId(memberEvent.getEventRole().getId());
+					eventRoleDto.setName(memberEvent.getEventRole().getName());
+					userEventDto.setEventRoleDto(eventRoleDto);
+					userEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
+					userEventsDto.add(userEventDto);
 				}
 				responseMessage.setData(userEventsDto);
 				responseMessage.setMessage("Lấy danh sách sự kiện đã tham gia của " + user.getName() + " - "

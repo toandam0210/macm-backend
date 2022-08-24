@@ -1,12 +1,13 @@
 package com.fpt.macm.model.dto;
 
-public class TournamentOrganizingCommitteeDto implements Comparable<TournamentOrganizingCommitteeDto>{
+public class TournamentOrganizingCommitteeDto implements Comparable<TournamentOrganizingCommitteeDto> {
 
 	private int id;
 	private String userName;
 	private String userStudentId;
-	private RoleEventDto roleTournamentDto;
+	private TournamentRoleDto tournamentRoleDto;
 	private boolean paymentStatus;
+	private String registerStatus;
 
 	public int getId() {
 		return id;
@@ -32,12 +33,12 @@ public class TournamentOrganizingCommitteeDto implements Comparable<TournamentOr
 		this.userStudentId = userStudentId;
 	}
 
-	public RoleEventDto getRoleTournamentDto() {
-		return roleTournamentDto;
+	public TournamentRoleDto getTournamentRoleDto() {
+		return tournamentRoleDto;
 	}
 
-	public void setRoleTournamentDto(RoleEventDto roleTournamentDto) {
-		this.roleTournamentDto = roleTournamentDto;
+	public void setTournamentRoleDto(TournamentRoleDto tournamentRoleDto) {
+		this.tournamentRoleDto = tournamentRoleDto;
 	}
 
 	public boolean isPaymentStatus() {
@@ -46,6 +47,14 @@ public class TournamentOrganizingCommitteeDto implements Comparable<TournamentOr
 
 	public void setPaymentStatus(boolean paymentStatus) {
 		this.paymentStatus = paymentStatus;
+	}
+
+	public String getRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(String registerStatus) {
+		this.registerStatus = registerStatus;
 	}
 
 	@Override

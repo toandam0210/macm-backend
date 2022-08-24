@@ -1,13 +1,14 @@
 package com.fpt.macm.model.dto;
 
-public class MemberEventDto implements Comparable<MemberEventDto>{
+public class MemberEventDto implements Comparable<MemberEventDto> {
 
 	private int id;
+	private int userId;
 	private String userName;
 	private String userMail;
 	private String userStudentId;
-	private boolean registerStatus;
-	private RoleEventDto roleEventDto;
+	private String registerStatus;
+	private EventRoleDto eventRoleDto;
 	private String roleInClub;
 	private double paymentValue;
 	private double amountPerRegisterEstimate;
@@ -45,20 +46,20 @@ public class MemberEventDto implements Comparable<MemberEventDto>{
 		this.userStudentId = userStudentId;
 	}
 
-	public boolean isRegisterStatus() {
+	public String getRegisterStatus() {
 		return registerStatus;
 	}
 
-	public void setRegisterStatus(boolean registerStatus) {
+	public void setRegisterStatus(String registerStatus) {
 		this.registerStatus = registerStatus;
 	}
 
-	public RoleEventDto getRoleEventDto() {
-		return roleEventDto;
+	public EventRoleDto getEventRoleDto() {
+		return eventRoleDto;
 	}
 
-	public void setRoleEventDto(RoleEventDto roleEventDto) {
-		this.roleEventDto = roleEventDto;
+	public void setEventRoleDto(EventRoleDto eventRoleDto) {
+		this.eventRoleDto = eventRoleDto;
 	}
 
 	public String getRoleInClub() {
@@ -91,6 +92,14 @@ public class MemberEventDto implements Comparable<MemberEventDto>{
 
 	public void setAmountPerRegisterActual(double amountPerRegisterActual) {
 		this.amountPerRegisterActual = amountPerRegisterActual;
+	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
 	}
 
 	@Override
