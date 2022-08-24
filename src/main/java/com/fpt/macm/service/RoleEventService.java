@@ -10,5 +10,5 @@ public interface RoleEventService {
 
 	ResponseMessage updateRoleEventName(int roleEventId, String newName);
 	
-	ResponseMessage updateStatusRoleEvent(int roleEventId);
+	ResponseMessage deleteRoleEvent(int roleEventId);
 }

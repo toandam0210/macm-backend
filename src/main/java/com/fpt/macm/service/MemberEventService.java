@@ -13,7 +13,6 @@ public interface MemberEventService {
 	ResponseMessage getReportPaymentStatusByEventId(int eventId);
 	ResponseMessage getAllMemberJoinEventByRoleEventId(int eventId, int filterIndex);
 	ResponseMessage getAllRoleByEventId(int eventId);
-	ResponseMessage getAllSuggestionRole();
 	ResponseMessage getAllOrganizingCommitteeRoleByEventId(int eventId);
 	ResponseMessage getListMemberEventToUpdateRole(int eventId);
 	ResponseMessage getListMemberNotJoinEvent(int eventId);

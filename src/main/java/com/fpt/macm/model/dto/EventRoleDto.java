@@ -1,6 +1,6 @@
 package com.fpt.macm.model.dto;
 
-public class RoleEventDto {
+public class EventRoleDto {
 
 	private int id;
 	private String name;

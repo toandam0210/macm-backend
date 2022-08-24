@@ -360,7 +360,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 
 				attendanceStatistics.put("totalAbsent", String.valueOf(totalAbsent));
 				attendanceStatistics.put("totalSession", String.valueOf(trainingSchedules.size()));
-				attendanceStatistics.put("percentAbsent", String.valueOf(percentAbsent) + "%");
+				attendanceStatistics.put("percentAbsent", String.valueOf(percentAbsent));
 
 				listAttendanceStatistics.add(attendanceStatistics);
 			}

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.model.entity.RoleEvent;
@@ -21,7 +22,7 @@ public class RoleEventServiceImpl implements RoleEventService {
 	public ResponseMessage getAllRoleEvent() {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<RoleEvent> rolesEvent = roleEventRepository.findByIsActiveOrderByIdAsc(true);
+			List<RoleEvent> rolesEvent = roleEventRepository.findAll(Sort.by("id").descending());
 			if (!rolesEvent.isEmpty()) {
 				responseMessage.setData(rolesEvent);
 				responseMessage.setMessage("Lấy tất cả vai trò mặc định trong sự kiện thành công");
@@ -49,7 +50,6 @@ public class RoleEventServiceImpl implements RoleEventService {
 
 				RoleEvent roleEvent = new RoleEvent();
 				roleEvent.setName(newName);
-				roleEvent.setActive(true);
 				roleEventRepository.save(roleEvent);
 
 				responseMessage.setData(Arrays.asList(roleEvent));
@@ -81,6 +81,9 @@ public class RoleEventServiceImpl implements RoleEventService {
 					RoleEvent roleEvent = roleEventOp.get();
 					roleEvent.setName(newName);
 					roleEventRepository.save(roleEvent);
+					
+					responseMessage.setData(Arrays.asList(roleEvent));
+					responseMessage.setMessage("Cập nhật tên vai trò thành công");
 				} else {
 					responseMessage.setMessage("Không có vai trò này");
 				}
@@ -94,17 +97,20 @@ public class RoleEventServiceImpl implements RoleEventService {
 	}
 
 	@Override
-	public ResponseMessage updateStatusRoleEvent(int roleEventId) {
+	public ResponseMessage deleteRoleEvent(int roleEventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<RoleEvent> roleEventOp = roleEventRepository.findById(roleEventId);
 			if (roleEventOp.isPresent()) {
 				RoleEvent roleEvent = roleEventOp.get();
-				roleEvent.setActive(!roleEvent.isActive());
-				roleEventRepository.save(roleEvent);
+				if (roleEvent.getId() != 1) {
+					roleEventRepository.delete(roleEvent);
 
-				responseMessage.setData(Arrays.asList(roleEvent));
-				responseMessage.setMessage("Cập nhật trạng thái của vai trò mặc định trong sự kiện thành công");
+					responseMessage.setData(Arrays.asList(roleEvent));
+					responseMessage.setMessage("Cập nhật trạng thái của vai trò mặc định trong sự kiện thành công");
+				} else {
+					responseMessage.setMessage("Không thể xóa vai trò mặc định");
+				}
 			} else {
 				responseMessage.setMessage("Không có vai trò này");
 			}

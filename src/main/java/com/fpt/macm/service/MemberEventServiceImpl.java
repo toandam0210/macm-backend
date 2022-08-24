@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.EventPaymentStatusReportDto;
+import com.fpt.macm.model.dto.EventRoleDto;
 import com.fpt.macm.model.dto.MemberEventDto;
-import com.fpt.macm.model.dto.RoleEventDto;
 import com.fpt.macm.model.dto.UserEventDto;
 import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.ClubFund;
@@ -24,7 +24,6 @@ import com.fpt.macm.model.entity.EventPaymentStatusReport;
 import com.fpt.macm.model.entity.EventRole;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.Notification;
-import com.fpt.macm.model.entity.RoleEvent;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AttendanceEventRepository;
@@ -82,11 +81,13 @@ public class MemberEventServiceImpl implements MemberEventService {
 			for (MemberEventDto memberEventDto : membersEventDto) {
 				Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventDto.getId());
 				MemberEvent memberEvent = memberEventOp.get();
-				if (memberEventDto.getRoleEventDto().getId() != memberEvent.getRoleEvent().getId()) {
-					RoleEvent roleEvent = new RoleEvent();
-					roleEvent.setId(memberEventDto.getRoleEventDto().getId());
-					roleEvent.setName(memberEventDto.getRoleEventDto().getName());
-					memberEvent.setRoleEvent(roleEvent);
+				if (memberEventDto.getEventRoleDto().getId() != memberEvent.getEventRole().getId()) {
+					EventRole eventRole = new EventRole();
+					eventRole.setId(memberEventDto.getEventRoleDto().getId());
+					eventRole.setName(memberEventDto.getEventRoleDto().getName());
+					eventRole.setQuantity(memberEventDto.getEventRoleDto().getMaxQuantity());
+					eventRole.setEvent(memberEvent.getEvent());
+					memberEvent.setEventRole(eventRole);
 					memberEvent.setUpdatedBy("toandv");
 					memberEvent.setUpdatedOn(LocalDateTime.now());
 					listUpdatedRoleEvent.add(memberEvent);
@@ -120,10 +121,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
 					memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
-					RoleEventDto roleEventDto = new RoleEventDto();
-					roleEventDto.setId(memberEvent.getRoleEvent().getId());
-					roleEventDto.setName(memberEvent.getRoleEvent().getName());
-					memberEventDto.setRoleEventDto(roleEventDto);
+					EventRoleDto eventRoleDto = new EventRoleDto();
+					eventRoleDto.setId(memberEvent.getEventRole().getId());
+					eventRoleDto.setName(memberEvent.getEventRole().getName());
+					memberEventDto.setEventRoleDto(eventRoleDto);
 					memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 					memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
 					memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
@@ -286,7 +287,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				// filter thành viên tham gia
 				for (MemberEvent memberEvent : membersEvent) {
 					if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
-							&& memberEvent.getRoleEvent().getId() == 1) {
+							&& memberEvent.getEventRole().getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
 						membersEventFilter.add(memberEvent);
 					}
 				}
@@ -295,7 +296,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				// filter thành viên ban tổ chức
 				for (MemberEvent memberEvent : membersEvent) {
 					if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
-							&& memberEvent.getRoleEvent().getId() != 1) {
+							&& !memberEvent.getEventRole().getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
 						membersEventFilter.add(memberEvent);
 					}
 				}
@@ -318,10 +319,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
 					memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
-					RoleEventDto roleEventDto = new RoleEventDto();
-					roleEventDto.setId(memberEvent.getRoleEvent().getId());
-					roleEventDto.setName(memberEvent.getRoleEvent().getName());
-					memberEventDto.setRoleEventDto(roleEventDto);
+					EventRoleDto eventRoleDto = new EventRoleDto();
+					eventRoleDto.setId(memberEvent.getEventRole().getId());
+					eventRoleDto.setName(memberEvent.getEventRole().getName());
+					memberEventDto.setEventRoleDto(eventRoleDto);
 					memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 					memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
 					memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
@@ -345,11 +346,11 @@ public class MemberEventServiceImpl implements MemberEventService {
 		try {
 			List<EventRole> eventRoles = eventRoleRepository.findByEventId(eventId);
 			if (!eventRoles.isEmpty()) {
-				List<RoleEventDto> rolesEventDto = new ArrayList<RoleEventDto>();
+				List<EventRoleDto> rolesEventDto = new ArrayList<EventRoleDto>();
 				for (EventRole eventRole : eventRoles) {
-					RoleEventDto roleEventDto = new RoleEventDto();
-					roleEventDto.setId(eventRole.getRoleEvent().getId());
-					roleEventDto.setName(eventRole.getRoleEvent().getName());
+					EventRoleDto roleEventDto = new EventRoleDto();
+					roleEventDto.setId(eventRole.getId());
+					roleEventDto.setName(eventRole.getName());
 					rolesEventDto.add(roleEventDto);
 				}
 				responseMessage.setData(rolesEventDto);
@@ -364,36 +365,18 @@ public class MemberEventServiceImpl implements MemberEventService {
 	}
 
 	@Override
-	public ResponseMessage getAllSuggestionRole() {
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<RoleEvent> rolesEvent = roleEventRepository.findByIsActiveOrderByIdAsc(true);
-			if (!rolesEvent.isEmpty()) {
-				rolesEvent.remove(0);
-				responseMessage.setData(rolesEvent);
-				responseMessage.setMessage("Lấy tất cả vai trò gợi ý thành công");
-			} else {
-				responseMessage.setMessage("Không có vai trò gợi ý nào");
-			}
-		} catch (Exception e) {
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
-
-	@Override
 	public ResponseMessage getAllOrganizingCommitteeRoleByEventId(int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<EventRole> eventRoles = eventRoleRepository.findByEventId(eventId);
 			if (!eventRoles.isEmpty()) {
-				List<RoleEventDto> rolesEventDto = new ArrayList<RoleEventDto>();
+				List<EventRoleDto> rolesEventDto = new ArrayList<EventRoleDto>();
 				for (EventRole eventRole : eventRoles) {
-					if (eventRole.getRoleEvent().getId() != 1) {
-						RoleEventDto roleEventDto = new RoleEventDto();
-						roleEventDto.setId(eventRole.getRoleEvent().getId());
-						roleEventDto.setName(eventRole.getRoleEvent().getName());
-						roleEventDto.setAvailableQuantity(getAvailableQuantity(eventId, eventRole));
+					if (!eventRole.getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
+						EventRoleDto roleEventDto = new EventRoleDto();
+						roleEventDto.setId(eventRole.getId());
+						roleEventDto.setName(eventRole.getName());
+						roleEventDto.setAvailableQuantity(getAvailableQuantity(eventRole));
 						roleEventDto.setMaxQuantity(eventRole.getQuantity());
 						rolesEventDto.add(roleEventDto);
 					}
@@ -409,14 +392,15 @@ public class MemberEventServiceImpl implements MemberEventService {
 		return responseMessage;
 	}
 
-	private int getAvailableQuantity(int eventId, EventRole eventRole) {
-		List<MemberEvent> organizingCommittees = memberEventRepository.findOrganizingCommitteeByEventId(eventId,
-				eventRole.getRoleEvent().getId());
+	private int getAvailableQuantity(EventRole eventRole) {
+		List<MemberEvent> organizingCommittees = memberEventRepository
+				.findByEventIdOrderByIdAsc(eventRole.getEvent().getId());
 		if (!organizingCommittees.isEmpty()) {
 			int count = 0;
 			for (MemberEvent memberEvent : organizingCommittees) {
-				if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
-						|| memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+				if (!memberEvent.getEventRole().getName().equals(Constant.ROLE_EVENT_MEMBER_VN)
+						&& (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+								|| memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING))) {
 					count++;
 				}
 			}
@@ -447,10 +431,11 @@ public class MemberEventServiceImpl implements MemberEventService {
 						memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 						memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
 						memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
-						RoleEventDto roleEventDto = new RoleEventDto();
-						roleEventDto.setId(memberEvent.getRoleEvent().getId());
-						roleEventDto.setName(memberEvent.getRoleEvent().getName());
-						memberEventDto.setRoleEventDto(roleEventDto);
+						EventRoleDto eventRoleDto = new EventRoleDto();
+						eventRoleDto.setId(memberEvent.getEventRole().getId());
+						eventRoleDto.setName(memberEvent.getEventRole().getName());
+						eventRoleDto.setMaxQuantity(memberEvent.getEventRole().getQuantity());
+						memberEventDto.setEventRoleDto(eventRoleDto);
 						memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 						memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
 						memberEventDto
@@ -489,6 +474,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 						memberEventDto.setUserMail(user.getEmail());
 						memberEventDto.setUserStudentId(user.getStudentId());
 						memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(user.getRole()));
+						memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
 						membersEventDto.add(memberEventDto);
 					}
 				} else {
@@ -535,9 +521,11 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEvent.setCreatedOn(LocalDateTime.now());
 				}
 				memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
-				Optional<RoleEvent> roleEventOp = roleEventRepository.findById(1);
-				RoleEvent roleEvent = roleEventOp.get();
-				memberEvent.setRoleEvent(roleEvent);
+				Optional<EventRole> eventRoleOp = eventRoleRepository
+						.findByNameAndEventId(Constant.ROLE_EVENT_MEMBER_VN, event.getId());
+				;
+				EventRole eventRole = eventRoleOp.get();
+				memberEvent.setEventRole(eventRole);
 				listJoinEvent.add(memberEvent);
 
 				AttendanceEvent attendanceEvent = new AttendanceEvent();
@@ -561,10 +549,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEventDto.setUserMail(memberEvent.getUser().getEmail());
 					memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
 					memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
-					RoleEventDto roleEventDto = new RoleEventDto();
-					roleEventDto.setId(memberEvent.getRoleEvent().getId());
-					roleEventDto.setName(memberEvent.getRoleEvent().getName());
-					memberEventDto.setRoleEventDto(roleEventDto);
+					EventRoleDto eventRoleDto = new EventRoleDto();
+					eventRoleDto.setId(memberEvent.getEventRole().getId());
+					eventRoleDto.setName(memberEvent.getEventRole().getName());
+					memberEventDto.setEventRoleDto(eventRoleDto);
 					memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 					memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
 					memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
@@ -612,9 +600,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_PENDING);
 					memberEvent.setPaymentValue(0);
 					memberEvent.setPaidBeforeClosing(false);
-					Optional<RoleEvent> roleEventOp = roleEventRepository.findById(1);
-					RoleEvent roleEvent = roleEventOp.get();
-					memberEvent.setRoleEvent(roleEvent);
+					Optional<EventRole> eventRoleOp = eventRoleRepository
+							.findByNameAndEventId(Constant.ROLE_EVENT_MEMBER_VN, event.getId());
+					EventRole eventRole = eventRoleOp.get();
+					memberEvent.setEventRole(eventRole);
 					memberEvent.setCreatedBy(user.getName() + " - " + user.getStudentId());
 					memberEvent.setCreatedOn(LocalDateTime.now());
 				}
@@ -626,10 +615,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 				userEventDto.setEventName(memberEvent.getEvent().getName());
 				userEventDto.setUserName(user.getName());
 				userEventDto.setUserStudentId(user.getStudentId());
-				RoleEventDto roleEventDto = new RoleEventDto();
-				roleEventDto.setId(memberEvent.getRoleEvent().getId());
-				roleEventDto.setName(memberEvent.getRoleEvent().getName());
-				userEventDto.setRoleEventDto(roleEventDto);
+				EventRoleDto eventRoleDto = new EventRoleDto();
+				eventRoleDto.setId(memberEvent.getEventRole().getId());
+				eventRoleDto.setName(memberEvent.getEventRole().getName());
+				userEventDto.setEventRoleDto(eventRoleDto);
 
 				responseMessage.setData(Arrays.asList(userEventDto));
 				responseMessage.setMessage("Đăng ký tham gia sự kiện thành công");
@@ -648,11 +637,9 @@ public class MemberEventServiceImpl implements MemberEventService {
 		try {
 			Event event = eventRepository.findById(eventId).get();
 			if (LocalDateTime.now().isBefore(event.getRegistrationOrganizingCommitteeDeadline())) {
-				RoleEvent roleEvent = roleEventRepository.findById(roleEventId).get();
-				EventRole eventRole = eventRoleRepository.findByRoleEventIdAndEventId(roleEvent.getId(), event.getId())
-						.get();
-				if (roleEvent.getId() != 1) {
-					if (getAvailableQuantity(event.getId(), eventRole) > 0) {
+				EventRole eventRole = eventRoleRepository.findById(roleEventId).get();
+				if (!eventRole.getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
+					if (getAvailableQuantity(eventRole) > 0) {
 						User user = userRepository.findByStudentId(studentId).get();
 
 						MemberEvent memberEvent = new MemberEvent();
@@ -682,7 +669,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 						}
 
 						memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_PENDING);
-						memberEvent.setRoleEvent(roleEvent);
+						memberEvent.setEventRole(eventRole);
 						memberEventRepository.save(memberEvent);
 
 						UserEventDto userEventDto = new UserEventDto();
@@ -690,10 +677,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 						userEventDto.setEventName(memberEvent.getEvent().getName());
 						userEventDto.setUserName(user.getName());
 						userEventDto.setUserStudentId(user.getStudentId());
-						RoleEventDto roleEventDto = new RoleEventDto();
-						roleEventDto.setId(memberEvent.getRoleEvent().getId());
-						roleEventDto.setName(memberEvent.getRoleEvent().getName());
-						userEventDto.setRoleEventDto(roleEventDto);
+						EventRoleDto eventRoleDto = new EventRoleDto();
+						eventRoleDto.setId(memberEvent.getEventRole().getId());
+						eventRoleDto.setName(memberEvent.getEventRole().getName());
+						userEventDto.setEventRoleDto(eventRoleDto);
 
 						responseMessage.setData(Arrays.asList(userEventDto));
 						responseMessage.setMessage("Đăng ký tham gia ban tổ chức sự kiện thành công");
@@ -870,10 +857,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 					userEventDto.setEventName(memberEvent.getEvent().getName());
 					userEventDto.setUserName(user.getName());
 					userEventDto.setUserStudentId(user.getStudentId());
-					RoleEventDto roleEventDto = new RoleEventDto();
-					roleEventDto.setId(memberEvent.getRoleEvent().getId());
-					roleEventDto.setName(memberEvent.getRoleEvent().getName());
-					userEventDto.setRoleEventDto(roleEventDto);
+					EventRoleDto eventRoleDto = new EventRoleDto();
+					eventRoleDto.setId(memberEvent.getEventRole().getId());
+					eventRoleDto.setName(memberEvent.getEventRole().getName());
+					userEventDto.setEventRoleDto(eventRoleDto);
 					userEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
 					userEventsDto.add(userEventDto);
 				}

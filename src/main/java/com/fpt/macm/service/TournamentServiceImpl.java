@@ -2508,8 +2508,8 @@ public class TournamentServiceImpl implements TournamentService {
 			List<TournamentRole> tournamentRoles = tournamentRoleRepository.findByTournamentId(tournamentId);
 			for (TournamentRole tournamentRole : tournamentRoles) {
 				boolean isExist = false;
-				for (TournamentRoleDto roleTournamentDto : tournamentRolesDto) {
-					if (roleTournamentDto.getName().equals(tournamentRole.getName())) {
+				for (TournamentRoleDto tournamentRoleDto : tournamentRolesDto) {
+					if (tournamentRoleDto.getName().equals(tournamentRole.getName())) {
 						isExist = true;
 						break;
 					}
@@ -2519,17 +2519,17 @@ public class TournamentServiceImpl implements TournamentService {
 				}
 			}
 
-			for (TournamentRoleDto roleTournamentDto : tournamentRolesDto) {
+			for (TournamentRoleDto tournamentRoleDto : tournamentRolesDto) {
 				Optional<TournamentRole> tournamentRoleOp = tournamentRoleRepository
-						.findByNameAndTournamentId(roleTournamentDto.getName(), tournament.getId());
+						.findByNameAndTournamentId(tournamentRoleDto.getName(), tournament.getId());
 				if (tournamentRoleOp.isPresent()) {
 					TournamentRole tournamentRole = tournamentRoleOp.get();
-					tournamentRole.setQuantity(roleTournamentDto.getMaxQuantity());
+					tournamentRole.setQuantity(tournamentRoleDto.getMaxQuantity());
 					tournamentRoleRepository.save(tournamentRole);
 				} else {
 					TournamentRole tournamentRole = new TournamentRole();
-					tournamentRole.setName(roleTournamentDto.getName());
-					tournamentRole.setQuantity(roleTournamentDto.getMaxQuantity());
+					tournamentRole.setName(tournamentRoleDto.getName());
+					tournamentRole.setQuantity(tournamentRoleDto.getMaxQuantity());
 					tournamentRole.setTournament(tournament);
 					tournamentRoleRepository.save(tournamentRole);
 				}
