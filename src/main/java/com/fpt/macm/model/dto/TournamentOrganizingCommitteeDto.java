@@ -5,6 +5,7 @@ public class TournamentOrganizingCommitteeDto implements Comparable<TournamentOr
 	private int id;
 	private String userName;
 	private String userStudentId;
+	private String userEmail;
 	private TournamentRoleDto tournamentRoleDto;
 	private boolean paymentStatus;
 	private String registerStatus;
@@ -55,6 +56,14 @@ public class TournamentOrganizingCommitteeDto implements Comparable<TournamentOr
 
 	public void setRegisterStatus(String registerStatus) {
 		this.registerStatus = registerStatus;
+	}
+
+	public String getUserEmail() {
+		return userEmail;
+	}
+
+	public void setUserEmail(String userEmail) {
+		this.userEmail = userEmail;
 	}
 
 	@Override

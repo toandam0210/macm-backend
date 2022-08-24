@@ -22,6 +22,7 @@ import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.CompetitiveTypeRegistration;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
@@ -31,6 +32,7 @@ import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
+import com.fpt.macm.repository.CompetitiveTypeRegistrationRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
@@ -67,6 +69,9 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 
 	@Autowired
 	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
+
+	@Autowired
+	CompetitiveTypeRegistrationRepository competitiveTypeRegistrationRepository;
 
 	@Override
 	public ResponseMessage getAllCompetitiveType(int tournamentId) {
@@ -111,23 +116,35 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 			Optional<CompetitiveType> getTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
 			if (getTypeOp.isPresent()) {
 				CompetitiveType getType = getTypeOp.get();
-				Tournament getTournament = tournamentRepository
+				Tournament tournament = tournamentRepository
 						.findById(competitiveTypeRepository.findTournamentOfType(competitiveTypeId)).get();
 				List<User> userJoined = new ArrayList<User>();
 				List<User> listActive = userRepository.findAllActiveUser();
 				List<TournamentPlayer> listPlayers = tournamentPlayerRepository
-						.getPlayerByTournamentId(getTournament.getId());
+						.getPlayerByTournamentId(tournament.getId());
 				for (TournamentPlayer tournamentPlayer : listPlayers) {
-					Optional<CompetitivePlayer> getCompetitivePlayerOp = competitivePlayerRepository
-							.findByTournamentPlayerId(tournamentPlayer.getId());
-					if (getCompetitivePlayerOp.isPresent()) {
-						User getUser = tournamentPlayer.getUser();
-						userJoined.add(getUser);
+//					Optional<CompetitivePlayer> getCompetitivePlayerOp = competitivePlayerRepository
+//							.findByTournamentPlayerId(tournamentPlayer.getId());
+//					if (getCompetitivePlayerOp.isPresent()) {
+//						User getUser = tournamentPlayer.getUser();
+//						userJoined.add(getUser);
+//					}
+
+					Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+							.findByCompetitiveTypeIdAndTournamentPlayerId(competitiveTypeId, tournamentPlayer.getId());
+					if (competitiveTypeRegistrationOp.isPresent()) {
+						CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp.get();
+						if (competitiveTypeRegistration.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)
+								|| competitiveTypeRegistration.getRegisterStatus()
+										.equals(Constant.REQUEST_STATUS_APPROVED)) {
+							User user = tournamentPlayer.getUser();
+							userJoined.add(user);
+						}
 					}
 				}
 
 				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-						.findByTournamentId(getTournament.getId());
+						.findByTournamentId(tournament.getId());
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
 					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
 							|| tournamentOrganizingCommittee.getRegisterStatus()
@@ -435,22 +452,22 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<CompetitiveType> getCompetitiveTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
-			if (getCompetitiveTypeOp.isPresent()) {
-				CompetitiveType getType = getCompetitiveTypeOp.get();
+			Optional<CompetitiveType> competitiveTypeOp = competitiveTypeRepository.findById(competitiveTypeId);
+			if (competitiveTypeOp.isPresent()) {
+				CompetitiveType competitiveType = competitiveTypeOp.get();
 				Tournament tournament = tournamentRepository
-						.findById(competitiveTypeRepository.findTournamentOfType(getType.getId())).get();
+						.findById(competitiveTypeRepository.findTournamentOfType(competitiveType.getId())).get();
 				if (tournament.getStage() == 0) {
 					int tournamentId = competitiveTypeRepository.findTournamentOfType(competitiveTypeId);
-					Tournament getTounament = tournamentRepository.findById(tournamentId).get();
+					Tournament tounament = tournamentRepository.findById(tournamentId).get();
 					List<String> listUsers = new ArrayList<String>();
 					for (User user : users) {
-						if (user.isGender() == getType.isGender()) {
-							TournamentPlayer getTournamentPlayer = new TournamentPlayer();
+						if (user.isGender() == competitiveType.isGender()) {
+							TournamentPlayer tournamentPlayer = new TournamentPlayer();
 							Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
 									.getPlayerByUserIdAndTournamentId(user.getId(), tournamentId);
 							if (!tournamentPlayerOp.isPresent()) {
-								Set<TournamentPlayer> players = getTounament.getTournamentPlayers();
+								Set<TournamentPlayer> players = tounament.getTournamentPlayers();
 								TournamentPlayer newTournamentPlayer = new TournamentPlayer();
 								newTournamentPlayer.setUser(userRepository.findById(user.getId()).get());
 								newTournamentPlayer.setPaymentStatus(false);
@@ -459,18 +476,41 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 								newTournamentPlayer.setUpdatedBy("LinhLHN");
 								newTournamentPlayer.setUpdatedOn(LocalDateTime.now());
 								players.add(newTournamentPlayer);
-								getTounament.setTournamentPlayers(players);
-								tournamentRepository.save(getTounament);
-								getTournamentPlayer = tournamentPlayerRepository
+								tounament.setTournamentPlayers(players);
+								tournamentRepository.save(tounament);
+								tournamentPlayer = tournamentPlayerRepository
 										.findPlayerByUserIdAndTournamentId(user.getId(), tournamentId).get();
+
+								CompetitiveTypeRegistration competitiveTypeRegistration = new CompetitiveTypeRegistration();
+								competitiveTypeRegistration.setCompetitiveType(competitiveType);
+								competitiveTypeRegistration.setTournamentPlayer(tournamentPlayer);
+								competitiveTypeRegistration.setWeight(0);
+								competitiveTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+								competitiveTypeRegistrationRepository.save(competitiveTypeRegistration);
+
 							} else {
-								getTournamentPlayer = tournamentPlayerOp.get();
+								tournamentPlayer = tournamentPlayerOp.get();
+
+								CompetitiveTypeRegistration competitiveTypeRegistration = new CompetitiveTypeRegistration();
+
+								Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+										.findByCompetitiveTypeIdAndTournamentPlayerId(competitiveTypeId,
+												tournamentPlayer.getId());
+								if (competitiveTypeRegistrationOp.isPresent()) {
+									competitiveTypeRegistration = competitiveTypeRegistrationOp.get();
+								}
+
+								competitiveTypeRegistration.setCompetitiveType(competitiveType);
+								competitiveTypeRegistration.setTournamentPlayer(tournamentPlayer);
+								competitiveTypeRegistration.setWeight(0);
+								competitiveTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+								competitiveTypeRegistrationRepository.save(competitiveTypeRegistration);
 							}
 							CompetitivePlayer newCompetitivePlayer = new CompetitivePlayer();
-							newCompetitivePlayer.setTournamentPlayer(getTournamentPlayer);
+							newCompetitivePlayer.setTournamentPlayer(tournamentPlayer);
 							newCompetitivePlayer.setWeight(0);
 							newCompetitivePlayer.setIsEligible(false);
-							newCompetitivePlayer.setCompetitiveType(getType);
+							newCompetitivePlayer.setCompetitiveType(competitiveType);
 							newCompetitivePlayer.setCreatedBy("LinhLHN");
 							newCompetitivePlayer.setCreatedOn(LocalDateTime.now());
 							newCompetitivePlayer.setUpdatedBy("LinhLHN");
@@ -479,12 +519,12 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							listUsers.add(user.getName() + " - " + user.getStudentId());
 						}
 					}
-					getType.setCanDelete(false);
-					competitiveTypeRepository.save(getType);
+					competitiveType.setCanDelete(false);
+					competitiveTypeRepository.save(competitiveType);
 					responseMessage.setData(listUsers);
-					responseMessage.setMessage(
-							"Danh sách đăng ký tham gia thi đấu thể thức " + (getType.isGender() ? "Nam: " : "Nữ: ")
-									+ getType.getWeightMin() + " kg - " + getType.getWeightMax() + " kg");
+					responseMessage.setMessage("Danh sách đăng ký tham gia thi đấu thể thức "
+							+ (competitiveType.isGender() ? "Nam: " : "Nữ: ") + competitiveType.getWeightMin()
+							+ " kg - " + competitiveType.getWeightMax() + " kg");
 				} else {
 					responseMessage.setMessage("Đã quá thời gian để đăng ký thi đấu");
 				}
@@ -549,20 +589,28 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository
 						.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
 				CompetitivePlayer getCompetitivePlayer = competitivePlayerOp.get();
-				CompetitiveType getType = getCompetitivePlayer.getCompetitiveType();
+				CompetitiveType competitiveType = getCompetitivePlayer.getCompetitiveType();
 				Tournament tournament = tournamentRepository
-						.findById(competitiveTypeRepository.findTournamentOfType(getType.getId())).get();
+						.findById(competitiveTypeRepository.findTournamentOfType(competitiveType.getId())).get();
 				if (tournament.getStage() < 2) {
+					// Xóa đơn đăng ký của member
+					Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+							.findByCompetitiveTypeIdAndTournamentPlayerId(competitiveType.getId(),
+									getCompetitivePlayer.getTournamentPlayer().getId());
+					if (competitiveTypeRegistrationOp.isPresent()) {
+						competitiveTypeRegistrationRepository.delete(competitiveTypeRegistrationOp.get());
+					}
+					
 					competitivePlayerRepository.delete(getCompetitivePlayer);
 					List<CompetitivePlayer> competitivePlayers = competitivePlayerRepository
-							.findByCompetitiveTypeId(getType.getId());
+							.findByCompetitiveTypeId(competitiveType.getId());
 					if (competitivePlayers.size() == 0) {
-						getType.setCanDelete(true);
-						competitiveTypeRepository.save(getType);
+						competitiveType.setCanDelete(true);
+						competitiveTypeRepository.save(competitiveType);
 					}
 					responseMessage.setMessage("Xóa tuyển thủ thành công");
 					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
-					autoSpawnMatchs(getType.getId());
+					autoSpawnMatchs(competitiveType.getId());
 					if (exhibitionPlayers.size() == 0) {
 						TournamentPlayer tournamentPlayer = tournamentPlayerRepository
 								.findById(getCompetitivePlayer.getTournamentPlayer().getId()).get();
@@ -577,10 +625,10 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 						responseMessage.setMessage("Xóa tuyển thủ thành công");
 						responseMessage.setData(Arrays.asList(getCompetitivePlayer));
 						List<CompetitivePlayer> competitivePlayers = competitivePlayerRepository
-								.findByCompetitiveTypeId(getType.getId());
+								.findByCompetitiveTypeId(competitiveType.getId());
 						if (competitivePlayers.size() == 0) {
-							getType.setCanDelete(true);
-							competitiveTypeRepository.save(getType);
+							competitiveType.setCanDelete(true);
+							competitiveTypeRepository.save(competitiveType);
 						}
 					}
 				}
@@ -694,12 +742,11 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				User getUser = new User();
 				User[] listResult = new User[3];
 				List<CompetitiveMatch> listMatchs = competitiveMatchRepository.listMatchsByTypeDesc(competitiveTypeId);
-				if(listMatchs.size() == 0) {
+				if (listMatchs.size() == 0) {
 					responseMessage.setMessage("Thể thức này chưa tạo trận đấu");
-				}
-				else {
-					CompetitiveResult getResult = competitiveResultRepository.findResultByMatchId(listMatchs.get(0).getId())
-							.get();
+				} else {
+					CompetitiveResult getResult = competitiveResultRepository
+							.findResultByMatchId(listMatchs.get(0).getId()).get();
 					if (getResult.getFirstPoint() == null || getResult.getSecondPoint() == null) {
 						responseMessage.setMessage("Trận tranh hạng ba chưa diễn ra");
 					} else {
