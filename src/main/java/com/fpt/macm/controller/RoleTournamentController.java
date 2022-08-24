@@ -17,7 +17,7 @@ import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.RoleTournamentService;
 
 @RestController
-@RequestMapping("/api/roletournament")
+@RequestMapping("/api/tournament")
 public class RoleTournamentController {
 
 	@Autowired
@@ -43,9 +43,9 @@ public class RoleTournamentController {
 				HttpStatus.OK);
 	}
 
-	@DeleteMapping("/updatestatusroletournament/{roleTournamentId}")
+	@DeleteMapping("/deleteroletournament/{roleTournamentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> updateStatusRoleTournament(@PathVariable(name = "roleTournamentId") int roleTournamentId) {
+	ResponseEntity<ResponseMessage> deleteRoleTournament(@PathVariable(name = "roleTournamentId") int roleTournamentId) {
 		return new ResponseEntity<ResponseMessage>(roleTournamentService.deleteRoleTournament(roleTournamentId), HttpStatus.OK);
 	}
 	
