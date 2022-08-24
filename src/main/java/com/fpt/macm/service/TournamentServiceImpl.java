@@ -42,6 +42,7 @@ import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.CompetitiveTypeRegistration;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
@@ -64,6 +65,7 @@ import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
+import com.fpt.macm.repository.CompetitiveTypeRegistrationRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
@@ -178,6 +180,9 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	TrainingScheduleService trainingScheduleService;
+
+	@Autowired
+	CompetitiveTypeRegistrationRepository competitiveTypeRegistrationRepository;
 
 	@Override
 	public ResponseMessage createTournament(String studentId, TournamentCreateDto tournamentCreateDto,
@@ -986,8 +991,27 @@ public class TournamentServiceImpl implements TournamentService {
 				Tournament tournament = tournamentOp.get();
 				if (tournament.getFeePlayerPay() > 0) {
 					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
-					List<TournamentPlayerDto> tournamentPlayersDto = new ArrayList<TournamentPlayerDto>();
+					List<TournamentPlayer> tournamentPlayersHaveToPaid = new ArrayList<TournamentPlayer>();
 					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+						Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+						for (CompetitiveType competitiveType : competitiveTypes) {
+							Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+									.findByCompetitiveTypeIdAndTournamentPlayerId(competitiveType.getId(),
+											tournament.getId());
+							if (competitiveTypeRegistrationOp.isPresent()) {
+								CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp
+										.get();
+								if (competitiveTypeRegistration.getRegisterStatus()
+										.equals(Constant.REQUEST_STATUS_APPROVED)) {
+									tournamentPlayersHaveToPaid.add(tournamentPlayer);
+								}
+							}
+						}
+
+					}
+
+					List<TournamentPlayerDto> tournamentPlayersDto = new ArrayList<TournamentPlayerDto>();
+					for (TournamentPlayer tournamentPlayer : tournamentPlayersHaveToPaid) {
 						TournamentPlayerDto tournamentPlayerDto = convertTournamentPlayer(tournamentPlayer);
 						tournamentPlayersDto.add(tournamentPlayerDto);
 					}
@@ -1407,13 +1431,59 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	@Override
+	public ResponseMessage getAllRequestToJoinTournamentCompetitiveType(int tournamentId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			if (tournamentOp.isPresent()) {
+				Tournament tournament = tournamentOp.get();
+
+				List<CompetitiveTypeRegistration> competitiveTypeRegistrations = new ArrayList<CompetitiveTypeRegistration>();
+
+				Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+				for (CompetitiveType competitiveType : competitiveTypes) {
+					List<CompetitiveTypeRegistration> listCompetitiveTypeRegistration = competitiveTypeRegistrationRepository
+							.findByCompetitiveTypeId(competitiveType.getId());
+					if (!listCompetitiveTypeRegistration.isEmpty()) {
+						for (CompetitiveTypeRegistration competitiveTypeRegistration : listCompetitiveTypeRegistration) {
+							if (competitiveTypeRegistration.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+								competitiveTypeRegistrations.add(competitiveTypeRegistration);
+							}
+						}
+					}
+				}
+
+				if (!competitiveTypeRegistrations.isEmpty()) {
+					Collections.sort(competitiveTypeRegistrations, new Comparator<CompetitiveTypeRegistration>() {
+						@Override
+						public int compare(CompetitiveTypeRegistration o1, CompetitiveTypeRegistration o2) {
+							return o1.getId() - o2.getId();
+						}
+					});
+					responseMessage.setData(competitiveTypeRegistrations);
+					responseMessage.setMessage("Lấy danh sách đăng ký tham gia đối kháng thành công");
+				} else {
+					responseMessage.setMessage("Chưa có thành viên nào đăng ký");
+				}
+			} else {
+				responseMessage.setMessage("Không có giải đấu này");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
 	public ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight,
 			int competitiveTypeId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
 
-			if (LocalDateTime.now().isBefore(tournament.getRegistrationPlayerDeadline())) {
+			if (LocalDateTime.now().isBefore(tournament.getRegistrationPlayerDeadline())
+					&& tournament.getStage() == 0) {
 				User user = userRepository.findByStudentId(studentId).get();
 
 				Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
@@ -1448,32 +1518,47 @@ public class TournamentServiceImpl implements TournamentService {
 				Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
 						.getPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
 
-				if (!tournamentPlayerOp.isPresent()) {
+				if (tournamentPlayerOp.isPresent()) {
+					Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+					for (CompetitiveType currentCompetitiveType : competitiveTypes) {
+						Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+								.findByCompetitiveTypeIdAndTournamentPlayerId(currentCompetitiveType.getId(),
+										tournament.getId());
+						if (competitiveTypeRegistrationOp.isPresent()) {
+							CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp
+									.get();
+							if (competitiveTypeRegistration.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+									|| competitiveTypeRegistration.getRegisterStatus()
+											.equals(Constant.REQUEST_STATUS_PENDING)) {
+								responseMessage.setMessage("Bạn đã đăng ký tham gia nội dung thi đấu đối kháng rồi");
+								return responseMessage;
+							}
+						}
+					}
+				} else {
 					createTournamentPlayer(tournament, user);
 					tournamentPlayerOp = tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(user.getId(),
 							tournament.getId());
 				}
 
 				TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
-				Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository
-						.findByTournamentPlayerId(tournamentPlayer.getId());
-				if (!competitivePlayerOp.isPresent()) {
-					CompetitivePlayer competitivePlayer = new CompetitivePlayer();
-					competitivePlayer.setTournamentPlayer(tournamentPlayer);
-					competitivePlayer.setWeight(weight);
-					competitivePlayer.setCompetitiveType(competitiveType);
-					competitivePlayer.setIsEligible(true);
-					competitivePlayer.setCreatedBy(user.getName() + " - " + user.getStudentId());
-					competitivePlayer.setCreatedOn(LocalDateTime.now());
-					competitivePlayerRepository.save(competitivePlayer);
-					competitiveType.setCanDelete(false);
-					competitiveTypeRepository.save(competitiveType);
-					responseMessage.setData(Arrays.asList(competitivePlayer));
-					responseMessage.setMessage("Đăng ký thành công");
-					competitiveService.autoSpawnMatchs(competitiveTypeId);
-				} else {
-					responseMessage.setMessage("Bạn đã đăng ký vào giải này rồi");
+
+				CompetitiveTypeRegistration competitiveTypeRegistration = new CompetitiveTypeRegistration();
+
+				Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+						.findByCompetitiveTypeIdAndTournamentPlayerId(competitiveTypeId, tournamentPlayer.getId());
+				if (competitiveTypeRegistrationOp.isPresent()) {
+					competitiveTypeRegistration = competitiveTypeRegistrationOp.get();
 				}
+
+				competitiveTypeRegistration.setCompetitiveType(competitiveType);
+				competitiveTypeRegistration.setTournamentPlayer(tournamentPlayer);
+				competitiveTypeRegistration.setWeight(weight);
+				competitiveTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_PENDING);
+				competitiveTypeRegistrationRepository.save(competitiveTypeRegistration);
+
+				responseMessage.setData(Arrays.asList(competitiveTypeRegistration));
+				responseMessage.setMessage("Đăng ký thành công");
 			} else {
 				responseMessage.setMessage(Constant.MSG_131);
 			}
@@ -1495,6 +1580,66 @@ public class TournamentServiceImpl implements TournamentService {
 		tournamentRepository.save(tournament);
 	}
 
+	@Override
+	public ResponseMessage acceptRequestToJoinTournamentCompetitiveType(int competitiveTypeRegistrationId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+					.findById(competitiveTypeRegistrationId);
+			if (competitiveTypeRegistrationOp.isPresent()) {
+				CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp.get();
+				competitiveTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+				competitiveTypeRegistrationRepository.save(competitiveTypeRegistration);
+
+				CompetitivePlayer competitivePlayer = new CompetitivePlayer();
+				competitivePlayer.setCompetitiveType(competitiveTypeRegistration.getCompetitiveType());
+				competitivePlayer.setTournamentPlayer(competitiveTypeRegistration.getTournamentPlayer());
+				competitivePlayer.setWeight(competitiveTypeRegistration.getWeight());
+				competitivePlayer.setIsEligible(true);
+				competitivePlayer.setCreatedBy("toandv");
+				competitivePlayer.setCreatedOn(LocalDateTime.now());
+				competitivePlayerRepository.save(competitivePlayer);
+
+				CompetitiveType competitiveType = competitiveTypeRegistration.getCompetitiveType();
+				competitiveType.setCanDelete(false);
+				competitiveTypeRepository.save(competitiveType);
+
+				competitiveService.autoSpawnMatchs(competitiveType.getId());
+
+				responseMessage.setData(Arrays.asList(competitivePlayer));
+				responseMessage.setMessage("Chấp nhận đăng ký tham gia thành công");
+			} else {
+				responseMessage.setMessage("Không có yêu cầu đăng ký này");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage declineRequestToJoinTournamentCompetitiveType(int competitiveTypeRegistrationId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+					.findById(competitiveTypeRegistrationId);
+			if (competitiveTypeRegistrationOp.isPresent()) {
+				CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp.get();
+				competitiveTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
+				competitiveTypeRegistrationRepository.save(competitiveTypeRegistration);
+
+				responseMessage.setData(Arrays.asList(competitiveTypeRegistration));
+				responseMessage.setMessage("Từ chối đăng ký tham gia thành công");
+			} else {
+				responseMessage.setMessage("Không có yêu cầu đăng ký này");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
 	public ResponseMessage registerToJoinTournamentExhibitionType(int tournamentId, String studentId,
 			int exhibitionTypeId, String teamName, List<ActiveUserDto> activeUsersDto) {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -2541,5 +2686,5 @@ public class TournamentServiceImpl implements TournamentService {
 		}
 		return responseMessage;
 	}
-	
+
 }

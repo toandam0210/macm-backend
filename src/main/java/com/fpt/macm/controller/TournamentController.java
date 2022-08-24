@@ -203,6 +203,32 @@ public class TournamentController {
 				tournamentId, studentId, weight, competitiveTypeId), HttpStatus.OK);
 	}
 
+	@PutMapping("/acceptrequesttojointournamentcompetitivetype/{competitiveTypeRegistrationId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> acceptRequestToJoinTournamentCompetitiveType(
+			@PathVariable(name = "competitiveTypeRegistrationId") int competitiveTypeRegistrationId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.acceptRequestToJoinTournamentCompetitiveType(competitiveTypeRegistrationId),
+				HttpStatus.OK);
+	}
+
+	@PutMapping("/declinerequesttojointournamentcompetitivetype/{competitiveTypeRegistrationId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> declineRequestToJoinTournamentCompetitiveType(
+			@PathVariable(name = "competitiveTypeRegistrationId") int competitiveTypeRegistrationId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.declineRequestToJoinTournamentCompetitiveType(competitiveTypeRegistrationId),
+				HttpStatus.OK);
+	}
+
+	@GetMapping("/getallrequesttojointournamentcompetitivetype/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> getAllRequestToJoinTournamentCompetitiveType(
+			@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllRequestToJoinTournamentCompetitiveType(tournamentId), HttpStatus.OK);
+	}
+
 	@PostMapping("/registertojointournamentexhibitiontype/{tournamentId}/{studentId}")
 	ResponseEntity<ResponseMessage> registerToJoinTournamentExhibitionType(
 			@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId,

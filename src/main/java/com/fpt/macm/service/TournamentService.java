@@ -58,10 +58,16 @@ public interface TournamentService {
 	ResponseMessage acceptRequestToJoinTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId);
 	
 	ResponseMessage declineRequestToJoinTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId);
-
+	
 	ResponseMessage registerToJoinTournamentCompetitiveType(int tournamentId, String studentId, double weight,
 			int competitiveTypeId);
+	
+	ResponseMessage acceptRequestToJoinTournamentCompetitiveType(int competitiveTypeRegistrationId);
 
+	ResponseMessage declineRequestToJoinTournamentCompetitiveType(int competitiveTypeRegistrationId);
+	
+	ResponseMessage getAllRequestToJoinTournamentCompetitiveType(int tournamentId);
+	
 	ResponseMessage registerToJoinTournamentExhibitionType(int tournamentId, String studentId, int exhibitionTypeId,
 			String teamName, List<ActiveUserDto> activeUsersDto);
 
