@@ -904,7 +904,7 @@ public class UserServiceImpl implements UserService {
 					i--;
 					continue;
 				}
-				if (months.size() > 0 && !months.contains(monthInDob)) {
+				if (months != null && !months.contains(monthInDob)) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
