@@ -3443,13 +3443,13 @@ public class TournamentServiceTest {
 		assertEquals(responseMessage.getData().size(), 1);
 }
 	
-	@Test
-	public void testGetAllSuggestType() {
-		when(competitiveTypeSampleRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(competitiveTypeSample()));
-		when(exhibitionTypeSampleRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(exhibitionTypeSample()));
-		ResponseMessage responseMessage = tournamentService.getAllSuggestType();
-		assertEquals(responseMessage.getData().size(), 1);
-	}
+//	@Test
+//	public void testGetAllSuggestType() {
+//		when(competitiveTypeSampleRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(competitiveTypeSample()));
+//		when(exhibitionTypeSampleRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(exhibitionTypeSample()));
+//		ResponseMessage responseMessage = tournamentService.getAllSuggestType();
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
 	
 	@Test
 	public void editRoleEventCaseDelete() {
