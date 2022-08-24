@@ -119,7 +119,7 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public ResponseMessage attendanceReport(String semesterName) {
+	public ResponseMessage attendanceReport(String semesterName, int month) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<Semester> semesterOp = semesterRepository.findByName(semesterName);
@@ -133,6 +133,7 @@ public class DashboardServiceImpl implements DashboardService {
 						.listTrainingScheduleByTime(semester.getStartDate(), LocalDate.now());
 				double totalAttendInSemester = 0;
 				for (TrainingSchedule trainingSchedule : trainingSchedulesBySemester) {
+					if(month == 0 || trainingSchedule.getDate().getMonthValue() == month) {
 					int totalUserJoinTrainingSession = 0;
 					int totalUserAttentInTrainingSession = 0;
 					int totalUserAbsentInTrainingSession = 0;
@@ -154,6 +155,7 @@ public class DashboardServiceImpl implements DashboardService {
 					attendanceReportDto.setTotalAbsentInTrainingSession(totalUserAbsentInTrainingSession);
 					attendanceReportDto.setTotalUserJoin(totalUserJoinTrainingSession);
 					attendanceReportDtos.add(attendanceReportDto);
+					}
 				}
 				List<AttendanceReportDto> listRemove = new ArrayList<AttendanceReportDto>();
 				for (AttendanceReportDto attendanceReportDto : attendanceReportDtos) {
