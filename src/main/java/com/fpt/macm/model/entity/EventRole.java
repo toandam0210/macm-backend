@@ -18,12 +18,11 @@ public class EventRole {
 	private int id;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "role_event_id")
-	private RoleEvent roleEvent;
-
-	@ManyToOne(optional = false)
 	@JoinColumn(name = "event_id")
 	private Event event;
+
+	@Column
+	private String name;
 
 	@Column
 	private int quantity;
@@ -36,12 +35,12 @@ public class EventRole {
 		this.id = id;
 	}
 
-	public RoleEvent getRoleEvent() {
-		return roleEvent;
+	public String getName() {
+		return name;
 	}
 
-	public void setRoleEvent(RoleEvent roleEvent) {
-		this.roleEvent = roleEvent;
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public Event getEvent() {

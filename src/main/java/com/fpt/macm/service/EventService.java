@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fpt.macm.model.dto.EventCreateDto;
-import com.fpt.macm.model.dto.RoleEventDto;
+import com.fpt.macm.model.dto.EventRoleDto;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.response.ResponseMessage;
 
@@ -24,5 +24,5 @@ public interface EventService {
 	ResponseMessage getAllUpcomingEvent(int pageNo, int pageSize);
 	ResponseMessage getAllOngoingEvent(int pageNo, int pageSize);
 	ResponseMessage getAllClosedEvent(int pageNo, int pageSize);
-	ResponseMessage editRoleEvent(int eventId, List<RoleEventDto> rolesEventDto);
+	ResponseMessage editRoleEvent(int eventId, List<EventRoleDto> rolesEventDto);
 }

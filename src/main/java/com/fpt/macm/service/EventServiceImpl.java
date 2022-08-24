@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.EventCreateDto;
 import com.fpt.macm.model.dto.EventDto;
-import com.fpt.macm.model.dto.RoleEventDto;
+import com.fpt.macm.model.dto.EventRoleDto;
 import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.dto.UserEventSemesterDto;
 import com.fpt.macm.model.entity.AttendanceStatus;
@@ -100,7 +100,7 @@ public class EventServiceImpl implements EventService {
 
 			Event event = eventCreateDto.getEvent();
 			List<ScheduleDto> listPreview = eventCreateDto.getListPreview();
-			List<RoleEventDto> rolesEventDto = eventCreateDto.getRolesEventDto();
+			List<EventRoleDto> eventRolesDto = eventCreateDto.getEventRolesDto();
 
 			if (event == null || listPreview == null || listPreview.isEmpty()) {
 				responseMessage.setMessage("Không đc null");
@@ -136,37 +136,19 @@ public class EventServiceImpl implements EventService {
 				notificationService.createEventCreateNotification(newEvent.getId(), newEvent.getName());
 
 				// Tạo role ban tổ chức cho event vs số lượng của từng role
-				for (RoleEventDto roleEventDto : rolesEventDto) {
-					Optional<RoleEvent> roleEventOp = roleEventRepository.findByName(roleEventDto.getName());
-					if (roleEventOp.isPresent()) {
-						RoleEvent roleEvent = roleEventOp.get();
-
-						EventRole eventRole = new EventRole();
-						eventRole.setEvent(newEvent);
-						eventRole.setQuantity(roleEventDto.getMaxQuantity());
-						eventRole.setRoleEvent(roleEvent);
-						eventRoleRepository.save(eventRole);
-					} else {
-						RoleEvent roleEvent = new RoleEvent();
-						roleEvent.setName(roleEventDto.getName());
-						roleEventRepository.save(roleEvent);
-
-						List<RoleEvent> roleEvents = roleEventRepository.findAll(Sort.by("id").descending());
-						RoleEvent newRoleEvent = roleEvents.get(0);
-
-						EventRole eventRole = new EventRole();
-						eventRole.setEvent(newEvent);
-						eventRole.setQuantity(roleEventDto.getMaxQuantity());
-						eventRole.setRoleEvent(newRoleEvent);
-						eventRoleRepository.save(eventRole);
-					}
+				for (EventRoleDto eventRoleDto : eventRolesDto) {
+					EventRole eventRole = new EventRole();
+					eventRole.setName(eventRoleDto.getName());
+					eventRole.setQuantity(eventRoleDto.getMaxQuantity());
+					eventRole.setEvent(newEvent);
+					eventRoleRepository.save(eventRole);
 				}
 				// Role mặc định của thành viên tham gia
 				RoleEvent roleEvent = roleEventRepository.findById(1).get();
 				EventRole eventRole = new EventRole();
 				eventRole.setEvent(newEvent);
 				eventRole.setQuantity(0);
-				eventRole.setRoleEvent(roleEvent);
+				eventRole.setName(roleEvent.getName());
 				eventRoleRepository.save(eventRole);
 
 				for (ScheduleDto scheduleDto : listPreview) {
@@ -576,7 +558,8 @@ public class EventServiceImpl implements EventService {
 				Optional<Event> eventOp = eventRepository.findById(eventId);
 				Event getEvent = eventOp.get();
 				if (isIncurred) {
-					int countMemberEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId, Constant.REQUEST_STATUS_APPROVED).size();
+					int countMemberEvent = memberEventRepository
+							.findByEventIdAndRegisterStatus(eventId, Constant.REQUEST_STATUS_APPROVED).size();
 					double totalProceedsActual = countMemberEvent * getEvent.getAmountPerRegisterEstimated();
 					double totalAmountActual = totalProceedsActual + money + getEvent.getAmountFromClub();
 					getEvent.setTotalAmountActual(totalAmountActual);
@@ -587,7 +570,8 @@ public class EventServiceImpl implements EventService {
 						clubFundService.withdrawFromClubFund(user.getStudentId(), money,
 								("Phát sinh từ sự kiện " + getEvent.getName()));
 					} else {
-						double amountPerRegisterActual = Math.round((totalProceedsActual + money)/(countMemberEvent*1000))*1000;
+						double amountPerRegisterActual = Math
+								.round((totalProceedsActual + money) / (countMemberEvent * 1000)) * 1000;
 						getEvent.setAmountPerRegisterActual(amountPerRegisterActual);
 					}
 				} else {
@@ -716,7 +700,8 @@ public class EventServiceImpl implements EventService {
 			if (!memberEvents.isEmpty()) {
 				List<EventDto> eventsDto = new ArrayList<EventDto>();
 				for (MemberEvent memberEvent : memberEvents) {
-					if (memberEvent.getEvent().isStatus() && memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
+					if (memberEvent.getEvent().isStatus()
+							&& memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
 						Event event = memberEvent.getEvent();
 						eventsDto.add(convertToEventDto(event));
 					}
@@ -871,7 +856,7 @@ public class EventServiceImpl implements EventService {
 	}
 
 	@Override
-	public ResponseMessage editRoleEvent(int eventId, List<RoleEventDto> rolesEventDto) {
+	public ResponseMessage editRoleEvent(int eventId, List<EventRoleDto> eventRolesDto) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Event event = eventRepository.findById(eventId).get();
@@ -879,8 +864,8 @@ public class EventServiceImpl implements EventService {
 			List<EventRole> eventRoles = eventRoleRepository.findByEventId(eventId);
 			for (EventRole eventRole : eventRoles) {
 				boolean isExist = false;
-				for (RoleEventDto roleEventDto : rolesEventDto) {
-					if (roleEventDto.getName().equals(eventRole.getRoleEvent().getName())) {
+				for (EventRoleDto eventRoleDto : eventRolesDto) {
+					if (eventRoleDto.getName().equals(eventRole.getName())) {
 						isExist = true;
 						break;
 					}
@@ -890,37 +875,22 @@ public class EventServiceImpl implements EventService {
 				}
 			}
 
-			for (RoleEventDto roleEventDto : rolesEventDto) {
-				Optional<EventRole> eventRoleOp = eventRoleRepository.findByRoleEventIdAndEventId(roleEventDto.getId(),
+			for (EventRoleDto roleEventDto : eventRolesDto) {
+				Optional<EventRole> eventRoleOp = eventRoleRepository.findByNameAndEventId(roleEventDto.getName(),
 						eventId);
 				if (eventRoleOp.isPresent()) {
 					EventRole eventRole = eventRoleOp.get();
 					eventRole.setQuantity(roleEventDto.getMaxQuantity());
 					eventRoleRepository.save(eventRole);
 				} else {
-					Optional<RoleEvent> roleEventOp = roleEventRepository.findByName(roleEventDto.getName());
-					if (roleEventOp.isPresent()) {
-						RoleEvent roleEvent = roleEventOp.get();
-						EventRole eventRole = new EventRole();
-						eventRole.setEvent(event);
-						eventRole.setQuantity(roleEventDto.getMaxQuantity());
-						eventRole.setRoleEvent(roleEvent);
-						eventRoleRepository.save(eventRole);
-					} else {
-						RoleEvent roleEvent = new RoleEvent();
-						roleEvent.setName(roleEventDto.getName());
-						roleEventRepository.save(roleEvent);
-
-						RoleEvent newRoleEvent = roleEventRepository.findAll(Sort.by("id").descending()).get(0);
-						EventRole eventRole = new EventRole();
-						eventRole.setEvent(event);
-						eventRole.setRoleEvent(newRoleEvent);
-						eventRole.setQuantity(roleEventDto.getMaxQuantity());
-						eventRoleRepository.save(eventRole);
-					}
+					EventRole eventRole = new EventRole();
+					eventRole.setEvent(event);
+					eventRole.setName(roleEventDto.getName());
+					eventRole.setQuantity(roleEventDto.getMaxQuantity());
+					eventRoleRepository.save(eventRole);
 				}
 			}
-			responseMessage.setData(rolesEventDto);
+			responseMessage.setData(eventRolesDto);
 			responseMessage.setMessage("Chỉnh sửa vai trò BTC trong sự kiện thành công");
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
