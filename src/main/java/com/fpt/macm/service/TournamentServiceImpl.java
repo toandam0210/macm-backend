@@ -361,13 +361,17 @@ public class TournamentServiceImpl implements TournamentService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-					.findByTournamentIdAndRegisterStatus(tournamentId, Constant.REQUEST_STATUS_APPROVED);
+					.findByTournamentId(tournamentId);
 			if (!tournamentOrganizingCommittees.isEmpty()) {
 				List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertToTournamentOrganizingCommitteeDto(
-							tournamentOrganizingCommittee);
-					tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
+					if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							|| tournamentOrganizingCommittee.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+						TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = convertToTournamentOrganizingCommitteeDto(
+								tournamentOrganizingCommittee);
+						tournamentOrganizingCommitteesDto.add(tournamentOrganizingCommitteeDto);
+					}
 				}
 				Collections.sort(tournamentOrganizingCommitteesDto);
 				responseMessage.setData(tournamentOrganizingCommitteesDto);
@@ -1408,7 +1412,7 @@ public class TournamentServiceImpl implements TournamentService {
 		}
 		return responseMessage;
 	}
-	
+
 	@Override
 	public ResponseMessage declineRequestToJoinTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId) {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -1424,9 +1428,9 @@ public class TournamentServiceImpl implements TournamentService {
 
 				responseMessage.setData(
 						Arrays.asList(convertToTournamentOrganizingCommitteeDto(tournamentOrganizingCommittee)));
-				responseMessage.setMessage("Từ chối yêu cầu tham gia BTC giải đấu của "
-						+ tournamentOrganizingCommittee.getUser().getName() + " - "
-						+ tournamentOrganizingCommittee.getUser().getStudentId() + " thành công");
+				responseMessage.setMessage(
+						"Từ chối yêu cầu tham gia BTC giải đấu của " + tournamentOrganizingCommittee.getUser().getName()
+								+ " - " + tournamentOrganizingCommittee.getUser().getStudentId() + " thành công");
 			} else {
 				responseMessage.setMessage("Sai id truyền vào rồi");
 			}
@@ -1706,18 +1710,26 @@ public class TournamentServiceImpl implements TournamentService {
 			User user = userRepository.findByStudentId(studentId).get();
 			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
 					.findByTournamentIdAndUserId(tournament.getId(), user.getId());
-			if (tournamentOrganizingCommitteeOp.isPresent() && tournamentOrganizingCommitteeOp.get().getRegisterStatus()
+			if (tournamentOrganizingCommitteeOp.isPresent()) {
+				if (tournamentOrganizingCommitteeOp.get().getRegisterStatus()
 					.equals(Constant.REQUEST_STATUS_APPROVED)) {
-				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-						.findByTournamentId(tournamentId);
-				List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
-				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					tournamentOrganizingCommitteesDto
-							.add(convertToTournamentOrganizingCommitteeDto(tournamentOrganizingCommittee));
+					List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+							.findByTournamentId(tournamentId);
+					List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
+					for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+						tournamentOrganizingCommitteesDto
+								.add(convertToTournamentOrganizingCommitteeDto(tournamentOrganizingCommittee));
+					}
+					Collections.sort(tournamentOrganizingCommitteesDto);
+					responseMessage.setData(tournamentOrganizingCommitteesDto);
+					responseMessage.setMessage("Lấy danh sách ban tổ chức giải đấu cho người dùng thành công");
+				} else if (tournamentOrganizingCommitteeOp.get().getRegisterStatus()
+					.equals(Constant.REQUEST_STATUS_PENDING)) {
+					responseMessage.setMessage("Yêu cầu đăng ký tham gia vào BTC giải đấu của bạn đang chờ duyệt");
+				} else {
+					responseMessage.setMessage("Yêu cầu đăng ký tham gia vào BTC giải đấu của bạn đã bị từ chối");
 				}
-				Collections.sort(tournamentOrganizingCommitteesDto);
-				responseMessage.setData(tournamentOrganizingCommitteesDto);
-				responseMessage.setMessage("Lấy danh sách ban tổ chức giải đấu cho người dùng thành công");
+				
 			} else {
 				responseMessage.setMessage("Bạn chưa tham gia ban tổ chức giải đấu");
 			}
@@ -1961,7 +1973,7 @@ public class TournamentServiceImpl implements TournamentService {
 				if (getTournament.getStage() <= 1) {
 					List<CompetitiveMatch> listCompetitiveMatchs = new ArrayList<CompetitiveMatch>();
 					Set<CompetitiveType> listCompetitiveTypes = getTournament.getCompetitiveTypes();
-					List<Area> listArea = areaRepository.findAll();
+					List<Area> listArea = areaRepository.listActiveArea();
 					for (CompetitiveType competitiveType : listCompetitiveTypes) {
 						competitiveType.setStatus(2);
 						List<CompetitiveMatch> listMatchByType = competitiveMatchRepository

@@ -1,5 +1,7 @@
 package com.fpt.macm.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +33,11 @@ public class AreaController {
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> addNewArea (@RequestBody Area area) {
 		return new ResponseEntity<ResponseMessage>(areaService.addNewArea(area), HttpStatus.OK);
+	}
+	
+	@PostMapping("/headclub/updatelistarea")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
+	ResponseEntity<ResponseMessage> updateListArea (@RequestBody List<Area> listArea) {
+		return new ResponseEntity<ResponseMessage>(areaService.updateListArea(listArea), HttpStatus.OK);
 	}
 }

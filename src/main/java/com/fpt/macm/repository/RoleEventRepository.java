@@ -1,5 +1,6 @@
 package com.fpt.macm.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -14,5 +15,7 @@ public interface RoleEventRepository extends JpaRepository<RoleEvent, Integer>{
 
 //	@Query(value = "SELECT * FROM role_event where id != 1", nativeQuery = true)
 //	List<RoleEvent> findAllOrganizingCommitteeRole();
+	
+	List<RoleEvent> findByIsActiveOrderByIdAsc(boolean isActive);
 	
 }
