@@ -148,7 +148,7 @@ public class UserController {
 	@PostMapping("/viceheadclub/member/search")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> searchByMutipleField(@RequestBody List<UserDto> userDtos,@RequestParam(required = false,defaultValue = "") String name,@RequestParam(required = false,defaultValue = "") String studentId,@RequestParam(required = false,defaultValue = "") String email,@RequestParam(required = false,defaultValue = "") String gender,
-			@RequestParam(required = false) Integer generation,@RequestParam(required = false) Integer roleId,@RequestParam(required = false,defaultValue = "") String isActive, List<Integer> months) {
+			@RequestParam(required = false) Integer generation,@RequestParam(required = false) Integer roleId,@RequestParam(required = false,defaultValue = "") String isActive, @RequestParam(required = false) List<Integer> months) {
 		return new ResponseEntity<ResponseMessage>(userService.searchByMultipleField(userDtos, name, studentId, email, gender, generation, roleId, isActive, months), HttpStatus.OK);
 	}
 	
