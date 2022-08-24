@@ -25,10 +25,10 @@ public class ExhibitionTeamRegistration {
 	private Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration;
 
 	@Column
-	private String teamName;
+	private Integer teamId;
 
 	@Column
-	private String registerStatus;
+	private String teamName;
 
 	public int getId() {
 		return id;
@@ -54,12 +54,12 @@ public class ExhibitionTeamRegistration {
 		this.teamName = teamName;
 	}
 
-	public String getRegisterStatus() {
-		return registerStatus;
+	public Integer getTeamId() {
+		return teamId;
 	}
 
-	public void setRegisterStatus(String registerStatus) {
-		this.registerStatus = registerStatus;
+	public void setTeamId(Integer teamId) {
+		this.teamId = teamId;
 	}
 
 }

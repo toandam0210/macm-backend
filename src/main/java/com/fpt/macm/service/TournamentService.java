@@ -70,6 +70,12 @@ public interface TournamentService {
 	
 	ResponseMessage registerToJoinTournamentExhibitionType(int tournamentId, String studentId, int exhibitionTypeId,
 			String teamName, List<ActiveUserDto> activeUsersDto);
+	
+	ResponseMessage acceptRequestToJoinTournamentExhibitionType(int exhibitionTypeRegistrationId);
+	
+	ResponseMessage declineRequestToJoinTournamentExhibitionType(int exhibitionTypeRegistrationId);
+	
+	ResponseMessage getAllRequestToJoinTournamentExhibitionType(int tournamentId);
 
 	ResponseMessage getAllUserCompetitivePlayer(int tournamentId, String studentId);
 

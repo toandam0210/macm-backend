@@ -18,9 +18,12 @@ import com.fpt.macm.model.dto.ExhibitionPlayerDto;
 import com.fpt.macm.model.dto.ExhibitionResultByTypeDto;
 import com.fpt.macm.model.dto.ExhibitionTeamDto;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
+import com.fpt.macm.model.entity.ExhibitionPlayerRegistration;
 import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
+import com.fpt.macm.model.entity.ExhibitionTeamRegistration;
 import com.fpt.macm.model.entity.ExhibitionType;
+import com.fpt.macm.model.entity.ExhibitionTypeRegistration;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
@@ -29,6 +32,7 @@ import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
+import com.fpt.macm.repository.ExhibitionTypeRegistrationRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
@@ -61,6 +65,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	
 	@Autowired
 	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
+	
+	@Autowired
+	ExhibitionTypeRegistrationRepository exhibitionTypeRegistrationRepository;
 
 	@Override
 	public ResponseMessage getAllExhibitionType(int tournamentId) {
@@ -96,7 +103,35 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 				List<User> listActive = userRepository.findAllActiveUser();
 				List<TournamentPlayer> listPlayers = tournamentPlayerRepository
 						.getPlayerByTournamentId(getTournament.getId());
+				List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
+						.findByExhibitionTypeId(exhibitionTypeId);
 				for (TournamentPlayer tournamentPlayer : listPlayers) {
+					boolean isContinue = false;
+					for (ExhibitionTypeRegistration exhibitionTypeRegistration : exhibitionTypeRegistrations) {
+						if (exhibitionTypeRegistration.getRegisterStatus()
+								.equals(Constant.REQUEST_STATUS_PENDING)) {
+							ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
+									.getExhibitionTeamRegistration();
+							Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration = exhibitionTeamRegistration
+									.getExhibitionPlayersRegistration();
+							for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistration) {
+								if (tournamentPlayer.getId() == exhibitionPlayerRegistration.getTournamentPlayer()
+										.getId()) {
+									User getUser = tournamentPlayer.getUser();
+									userJoined.add(getUser);
+									isContinue = true;
+									break;
+								}
+							}
+						}
+						if (isContinue) {
+							break;
+						}
+					}
+					if (isContinue) {
+						continue;
+					}
+					
 					Optional<ExhibitionPlayer> getExhibitionPlayerOp = exhibitionPlayerRepository
 							.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionTypeId);
 					if (getExhibitionPlayerOp.isPresent()) {
@@ -104,6 +139,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 						userJoined.add(getUser);
 					}
 				}
+				
+				
+				
 				
 				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
 						.findByTournamentId(getTournament.getId());
@@ -158,6 +196,28 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 									exhibitionTypeRepository.findTournamentOfType(exhibitionTypeId));
 					if (getTournamentPlayerOp.isPresent()) {
 						TournamentPlayer getTournamentPlayer = getTournamentPlayerOp.get();
+						
+						List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
+								.findByExhibitionTypeId(exhibitionTypeId);
+						for (ExhibitionTypeRegistration exhibitionTypeRegistration : exhibitionTypeRegistrations) {
+							if (exhibitionTypeRegistration.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+								ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
+										.getExhibitionTeamRegistration();
+								Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration = exhibitionTeamRegistration
+										.getExhibitionPlayersRegistration();
+								for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistration) {
+									if (getTournamentPlayer.getId() == exhibitionPlayerRegistration.getTournamentPlayer()
+											.getId()) {
+										responseMessage.setMessage("Thành viên " + getTournamentPlayer.getUser().getName()
+												+ " - " + getTournamentPlayer.getUser().getStudentId()
+												+ " đã đăng ký nội dung này");
+										return responseMessage;
+									}
+								}
+							}
+						}
+						
 						Optional<ExhibitionPlayer> getExhibitionPlayerOp = exhibitionPlayerRepository
 								.findByTournamentPlayerAndType(getTournamentPlayer.getId(), getType.getId());
 						if (getExhibitionPlayerOp.isPresent()) {

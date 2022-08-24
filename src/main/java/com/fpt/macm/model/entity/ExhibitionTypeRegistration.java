@@ -1,15 +1,14 @@
 package com.fpt.macm.model.entity;
 
-import java.util.Set;
-
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -24,9 +23,12 @@ public class ExhibitionTypeRegistration {
 	@JoinColumn(name = "exhibition_type_id")
 	private ExhibitionType exhibitionType;
 
-	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = false)
-	@JoinColumn(name = "exhibition_type_registration_id")
-	private Set<ExhibitionTeamRegistration> exhibitionTeamsRegistration;
+	@OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "exhibition_team_registration_id", referencedColumnName = "id")
+	private ExhibitionTeamRegistration exhibitionTeamRegistration;
+
+	@Column
+	private String registerStatus;
 
 	public int getId() {
 		return id;
@@ -44,12 +46,20 @@ public class ExhibitionTypeRegistration {
 		this.exhibitionType = exhibitionType;
 	}
 
-	public Set<ExhibitionTeamRegistration> getExhibitionTeamsRegistration() {
-		return exhibitionTeamsRegistration;
+	public ExhibitionTeamRegistration getExhibitionTeamRegistration() {
+		return exhibitionTeamRegistration;
 	}
 
-	public void setExhibitionTeamsRegistration(Set<ExhibitionTeamRegistration> exhibitionTeamsRegistration) {
-		this.exhibitionTeamsRegistration = exhibitionTeamsRegistration;
+	public void setExhibitionTeamRegistration(ExhibitionTeamRegistration exhibitionTeamRegistration) {
+		this.exhibitionTeamRegistration = exhibitionTeamRegistration;
+	}
+
+	public String getRegisterStatus() {
+		return registerStatus;
+	}
+
+	public void setRegisterStatus(String registerStatus) {
+		this.registerStatus = registerStatus;
 	}
 
 }
