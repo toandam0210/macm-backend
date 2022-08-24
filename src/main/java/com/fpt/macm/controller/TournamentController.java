@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.ActiveUserDto;
-import com.fpt.macm.model.dto.RoleEventDto;
+import com.fpt.macm.model.dto.TournamentRoleDto;
 import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
@@ -186,7 +185,7 @@ public class TournamentController {
 				tournamentService.acceptRequestToJoinTournamentOrganizingCommittee(tournamentOrganizingCommitteeId),
 				HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/declinerequesttojointournamentorganizingcommittee/{tournamentOrganizingCommitteeId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> declineRequestToJoinTournamentOrganizingCommittee(
@@ -257,7 +256,7 @@ public class TournamentController {
 				HttpStatus.OK);
 	}
 
-	@DeleteMapping("/headclub/deletetournamentorganizingcommittee/{tournamentOrganizingCommitteeId}")
+	@PutMapping("/headclub/deletetournamentorganizingcommittee/{tournamentOrganizingCommitteeId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> deleteTournamentOrganizingCommittee(
 			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId) {
@@ -301,17 +300,12 @@ public class TournamentController {
 				HttpStatus.OK);
 	}
 
-	@GetMapping("headclub/getallsuggesttype")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
-	ResponseEntity<ResponseMessage> getAllSuggestType() {
-		return new ResponseEntity<ResponseMessage>(tournamentService.getAllSuggestType(), HttpStatus.OK);
-	}
-
-	@PutMapping("headclub/editroletournament/{tournamentId}")
+	@PutMapping("/headclub/editroletournament/{tournamentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> editRoleTournament(@PathVariable(name = "tournamentId") int tournamentId,
-			@RequestBody List<RoleEventDto> rolesEventDto) {
-		return new ResponseEntity<ResponseMessage>(tournamentService.editRoleTournament(tournamentId, rolesEventDto),
-				HttpStatus.OK);
+			@RequestBody List<TournamentRoleDto> rolesTournamentDto) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.editRoleTournament(tournamentId, rolesTournamentDto), HttpStatus.OK);
 	}
+
 }

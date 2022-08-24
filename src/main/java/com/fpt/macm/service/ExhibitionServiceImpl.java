@@ -429,46 +429,51 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 				ExhibitionResultByTypeDto exhibitionResultByTypeDto = new ExhibitionResultByTypeDto();
 				ExhibitionType getType = getTypeOp.get();
 				exhibitionResultByTypeDto.setExhibitionType(getType);
-				// responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
-				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
-				List<ExhibitionTeamDto> listResult = new ArrayList<ExhibitionTeamDto>();
-				for (ExhibitionTeam exhibitionTeam : getTeams) {
-					Optional<ExhibitionResult> exhibitionResultOp = exhibitionResultRepository
-							.findByTeam(exhibitionTeam.getId());
-					if (exhibitionResultOp.isPresent()) {
-						ExhibitionResult exhibitionResult = exhibitionResultOp.get();
-						if (exhibitionResult.getScore() == null) {
-							responseMessage.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa có điểm");
-							return responseMessage;
-						} else {
-							ExhibitionTeamDto exhibitionTeamDto = new ExhibitionTeamDto();
-							exhibitionTeamDto.setTeamName(exhibitionTeam.getTeamName());
-							exhibitionTeamDto.setScore(exhibitionResult.getScore());
-							listResult.add(exhibitionTeamDto);
-						}
-					} else {
-						responseMessage
-								.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa được xếp lịch thi đấu");
-						return responseMessage;
-					}
-				}
-				Collections.sort(listResult);
-				List<Double> listScore = new ArrayList<Double>();
-				for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
-					if (!listScore.contains(exhibitionTeamDto.getScore())) {
-						listScore.add(exhibitionTeamDto.getScore());
-					}
-				}
-				for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
-					for (int i = 0; i < listScore.size(); i++) {
-						if (exhibitionTeamDto.getScore().equals(listScore.get(i))) {
-							exhibitionTeamDto.setRank(i + 1);
-						}
-					}
-				}
-				exhibitionResultByTypeDto.setListResult(listResult);
 				responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
-				responseMessage.setMessage("Kết quả thi đấu của nội dung " + getType.getName());
+				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
+				if(getTeams.size() < 3) {
+					responseMessage.setMessage("Thể thức này không đủ số đội tham gia");
+				}
+				else {
+					List<ExhibitionTeamDto> listResult = new ArrayList<ExhibitionTeamDto>();
+					for (ExhibitionTeam exhibitionTeam : getTeams) {
+						Optional<ExhibitionResult> exhibitionResultOp = exhibitionResultRepository
+								.findByTeam(exhibitionTeam.getId());
+						if (exhibitionResultOp.isPresent()) {
+							ExhibitionResult exhibitionResult = exhibitionResultOp.get();
+							if (exhibitionResult.getScore() == null) {
+								responseMessage.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa có điểm");
+								return responseMessage;
+							} else {
+								ExhibitionTeamDto exhibitionTeamDto = new ExhibitionTeamDto();
+								exhibitionTeamDto.setTeamName(exhibitionTeam.getTeamName());
+								exhibitionTeamDto.setScore(exhibitionResult.getScore());
+								listResult.add(exhibitionTeamDto);
+							}
+						} else {
+							responseMessage
+									.setMessage("Đội " + exhibitionTeam.getTeamName() + " chưa được xếp lịch thi đấu");
+							return responseMessage;
+						}
+					}
+					Collections.sort(listResult);
+					List<Double> listScore = new ArrayList<Double>();
+					for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
+						if (!listScore.contains(exhibitionTeamDto.getScore())) {
+							listScore.add(exhibitionTeamDto.getScore());
+						}
+					}
+					for (ExhibitionTeamDto exhibitionTeamDto : listResult) {
+						for (int i = 0; i < listScore.size(); i++) {
+							if (exhibitionTeamDto.getScore().equals(listScore.get(i))) {
+								exhibitionTeamDto.setRank(i + 1);
+							}
+						}
+					}
+					exhibitionResultByTypeDto.setListResult(listResult);
+					responseMessage.setMessage("Kết quả thi đấu của nội dung " + getType.getName());
+				}
+				responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
