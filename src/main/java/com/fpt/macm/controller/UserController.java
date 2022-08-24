@@ -167,4 +167,8 @@ public class UserController {
 		return new ResponseEntity<ResponseMessage>(userService.getAllUserAttendanceStatus(studentId), HttpStatus.OK);
 	}
 	
+	@GetMapping("/getallgen")
+	ResponseEntity<ResponseMessage> getAllGen() {
+		return new ResponseEntity<ResponseMessage>(userService.getAllGen(), HttpStatus.OK);
+	}
 }
