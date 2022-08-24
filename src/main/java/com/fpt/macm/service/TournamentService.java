@@ -94,8 +94,6 @@ public interface TournamentService {
 
 	ResponseMessage updateTimeAndAreaExhibition(int teamId, ExhibitionResult newResult);
 
-	ResponseMessage getAllSuggestType();
-	
 	ResponseMessage editRoleTournament(int tournamentId, List<RoleTournamentDto> rolesTournamentDto);
 	
 	ResponseMessage getAllSuggestRole();

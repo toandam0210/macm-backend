@@ -32,7 +32,6 @@ import com.fpt.macm.model.dto.TournamentOrganizingCommitteePaymentStatusReportDt
 import com.fpt.macm.model.dto.TournamentPlayerDto;
 import com.fpt.macm.model.dto.TournamentPlayerPaymentStatusReportDto;
 import com.fpt.macm.model.dto.TournamentResultDto;
-import com.fpt.macm.model.dto.TournamentSampleTypeDto;
 import com.fpt.macm.model.dto.UserTournamentDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.Area;
@@ -43,12 +42,10 @@ import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
-import com.fpt.macm.model.entity.CompetitiveTypeSample;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
-import com.fpt.macm.model.entity.ExhibitionTypeSample;
 import com.fpt.macm.model.entity.RoleTournament;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
@@ -69,12 +66,10 @@ import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
-import com.fpt.macm.repository.CompetitiveTypeSampleRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
-import com.fpt.macm.repository.ExhibitionTypeSampleRepository;
 import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.RoleTournamentRepository;
 import com.fpt.macm.repository.SemesterRepository;
@@ -160,12 +155,6 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	AreaRepository areaRepository;
-
-	@Autowired
-	CompetitiveTypeSampleRepository competitiveTypeSampleRepository;
-
-	@Autowired
-	ExhibitionTypeSampleRepository exhibitionTypeSampleRepository;
 
 	@Autowired
 	ExhibitionResultRepository exhibitionResultRepository;
@@ -2530,23 +2519,6 @@ public class TournamentServiceImpl implements TournamentService {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
 		}
-		return responseMessage;
-	}
-
-	@Override
-	public ResponseMessage getAllSuggestType() {
-		ResponseMessage responseMessage = new ResponseMessage();
-		List<CompetitiveTypeSample> competitiveTypeSamples = competitiveTypeSampleRepository
-				.findAll(Sort.by("id").ascending());
-		List<ExhibitionTypeSample> exhibitionTypeSamples = exhibitionTypeSampleRepository
-				.findAll(Sort.by("id").ascending());
-
-		TournamentSampleTypeDto tournamentSampleTypeDto = new TournamentSampleTypeDto();
-		tournamentSampleTypeDto.setCompetitiveTypeSamples(competitiveTypeSamples);
-		tournamentSampleTypeDto.setExhibitionTypeSamples(exhibitionTypeSamples);
-
-		responseMessage.setData(Arrays.asList(tournamentSampleTypeDto));
-		responseMessage.setMessage("Lấy danh sách các thể thức thi đấu thành công");
 		return responseMessage;
 	}
 

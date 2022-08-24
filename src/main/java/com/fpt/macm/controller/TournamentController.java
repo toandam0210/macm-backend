@@ -300,12 +300,6 @@ public class TournamentController {
 				HttpStatus.OK);
 	}
 
-	@GetMapping("/headclub/getallsuggesttype")
-	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
-	ResponseEntity<ResponseMessage> getAllSuggestType() {
-		return new ResponseEntity<ResponseMessage>(tournamentService.getAllSuggestType(), HttpStatus.OK);
-	}
-
 	@PutMapping("/headclub/editroletournament/{tournamentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> editRoleTournament(@PathVariable(name = "tournamentId") int tournamentId,
