@@ -56,7 +56,7 @@ public class CommonScheduleServiceImpl implements CommonScheduleService {
 		try {
 			LocalDate getDate = Utils.ConvertStringToLocalDate(date);
 			Optional<CommonSchedule> getSessionOp = commonScheduleRepository.findByDate(getDate);
-			if (getSessionOp != null) {
+			if (getSessionOp.isPresent()) {
 				responseMessage.setData(Arrays.asList(getSessionOp.get()));
 				responseMessage.setMessage(Constant.MSG_103);
 			} else {
