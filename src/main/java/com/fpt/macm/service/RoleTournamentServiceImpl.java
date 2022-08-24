@@ -81,6 +81,9 @@ public class RoleTournamentServiceImpl implements RoleTournamentService{
 					RoleTournament roleTournament = roleTournamentOp.get();
 					roleTournament.setName(newName);
 					roleTournamentRepository.save(roleTournament);
+					
+					responseMessage.setData(Arrays.asList(rolesTournament));
+					responseMessage.setMessage("Cập nhật tên vai trò thành công");
 				} else {
 					responseMessage.setMessage("Không có vai trò này");
 				}
