@@ -1355,8 +1355,52 @@ public class TournamentServiceImpl implements TournamentService {
 				Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
 						.getPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
 				if (tournamentPlayerOp.isPresent()) {
-					responseMessage.setMessage("Bạn đã đăng ký tham gia giải đấu rồi");
-					return responseMessage;
+					TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
+					
+					Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+					for (CompetitiveType currentCompetitiveType : competitiveTypes) {
+						Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+								.findByCompetitiveTypeIdAndTournamentPlayerId(currentCompetitiveType.getId(),
+										tournament.getId());
+						if (competitiveTypeRegistrationOp.isPresent()) {
+							CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp
+									.get();
+							if (competitiveTypeRegistration.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+									|| competitiveTypeRegistration.getRegisterStatus()
+											.equals(Constant.REQUEST_STATUS_PENDING)) {
+								responseMessage.setMessage("Bạn đã đăng ký tham gia nội dung thi đấu đối kháng rồi");
+								return responseMessage;
+							}
+						}
+					}
+					Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+					for (ExhibitionType exhibitionType : exhibitionTypes) {
+						List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
+								.findByExhibitionTypeId(exhibitionType.getId());
+						for (ExhibitionTypeRegistration exhibitionTypeRegistration : exhibitionTypeRegistrations) {
+							if (exhibitionTypeRegistration.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+								ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
+										.getExhibitionTeamRegistration();
+								Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration = exhibitionTeamRegistration
+										.getExhibitionPlayersRegistration();
+								for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistration) {
+									if (tournamentPlayer.getId() == exhibitionPlayerRegistration.getTournamentPlayer()
+											.getId()) {
+										responseMessage.setMessage("Bạn đã đăng ký thi đấu nội dung biểu diễn rồi");
+										return responseMessage;
+									}
+								}
+							}
+						}
+						
+						Optional<ExhibitionPlayer> exhibitionPlayerOp = exhibitionPlayerRepository
+								.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
+						if (exhibitionPlayerOp.isPresent()) {
+							responseMessage.setMessage("Bạn đã đăng ký thi đấu nội dung biểu diễn rồi");
+							return responseMessage;
+						}
+					}
 				}
 
 				if (getAvailableQuantity(tournamentRole) > 0) {
@@ -2102,10 +2146,55 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	private boolean isJoinTournament(int userId, int tournamentId) {
+		
+		Tournament tournament = tournamentRepository.findById(tournamentId).get();
+		
 		Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
 				.findPlayerByUserIdAndTournamentId(userId, tournamentId);
 		if (tournamentPlayerOp.isPresent()) {
-			return true;
+			TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
+			
+			Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+			for (CompetitiveType currentCompetitiveType : competitiveTypes) {
+				Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+						.findByCompetitiveTypeIdAndTournamentPlayerId(currentCompetitiveType.getId(),
+								tournament.getId());
+				if (competitiveTypeRegistrationOp.isPresent()) {
+					CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp
+							.get();
+					if (competitiveTypeRegistration.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+							|| competitiveTypeRegistration.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+						return true;
+					}
+				}
+			}
+			Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+			for (ExhibitionType exhibitionType : exhibitionTypes) {
+				List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
+						.findByExhibitionTypeId(exhibitionType.getId());
+				for (ExhibitionTypeRegistration exhibitionTypeRegistration : exhibitionTypeRegistrations) {
+					if (exhibitionTypeRegistration.getRegisterStatus()
+							.equals(Constant.REQUEST_STATUS_PENDING)) {
+						ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
+								.getExhibitionTeamRegistration();
+						Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration = exhibitionTeamRegistration
+								.getExhibitionPlayersRegistration();
+						for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistration) {
+							if (tournamentPlayer.getId() == exhibitionPlayerRegistration.getTournamentPlayer()
+									.getId()) {
+								return true;
+							}
+						}
+					}
+				}
+				
+				Optional<ExhibitionPlayer> exhibitionPlayerOp = exhibitionPlayerRepository
+						.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
+				if (exhibitionPlayerOp.isPresent()) {
+					return true;
+				}
+			}
 		}
 
 		Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
