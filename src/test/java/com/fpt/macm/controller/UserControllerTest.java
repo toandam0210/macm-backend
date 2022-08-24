@@ -325,7 +325,7 @@ public class UserControllerTest {
 	public void testSearchSuccess() throws Exception{
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(usersDto());
-		when(userService.searchByMultipleField(anyList(),anyString(),anyString(),anyString(),anyString(),anyInt(),anyInt(),anyString(),anyInt())).thenReturn(responseMessage);
+		when(userService.searchByMultipleField(anyList(),anyString(),anyString(),anyString(),anyString(),anyInt(),anyInt(),anyString(),any())).thenReturn(responseMessage);
 		this.mockMvc.perform(post("/api/admin/hr/viceheadclub/member/search").param("name", "toan").content(asJsonString(usersDto()))
 				.contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
 	}
