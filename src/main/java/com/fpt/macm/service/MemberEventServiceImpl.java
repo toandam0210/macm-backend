@@ -367,7 +367,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 	public ResponseMessage getAllSuggestionRole() {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<RoleEvent> rolesEvent = roleEventRepository.findAll(Sort.by("id").ascending());
+			List<RoleEvent> rolesEvent = roleEventRepository.findByIsActiveOrderByIdAsc(true);
 			if (!rolesEvent.isEmpty()) {
 				rolesEvent.remove(0);
 				responseMessage.setData(rolesEvent);

@@ -18,8 +18,8 @@ public class TournamentRole {
 	private int id;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "role_event_id")
-	private RoleEvent roleEvent;
+	@JoinColumn(name = "role_tournament_id")
+	private RoleTournament roleTournament;
 
 	@ManyToOne(optional = false)
 	@JoinColumn(name = "tournament_id")
@@ -36,12 +36,12 @@ public class TournamentRole {
 		this.id = id;
 	}
 
-	public RoleEvent getRoleEvent() {
-		return roleEvent;
+	public RoleTournament getRoleTournament() {
+		return roleTournament;
 	}
 
-	public void setRoleEvent(RoleEvent roleEvent) {
-		this.roleEvent = roleEvent;
+	public void setRoleTournament(RoleTournament roleTournament) {
+		this.roleTournament = roleTournament;
 	}
 
 	public Tournament getTournament() {

@@ -429,7 +429,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 				ExhibitionResultByTypeDto exhibitionResultByTypeDto = new ExhibitionResultByTypeDto();
 				ExhibitionType getType = getTypeOp.get();
 				exhibitionResultByTypeDto.setExhibitionType(getType);
-				// responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
+				responseMessage.setData(Arrays.asList(exhibitionResultByTypeDto));
 				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
 				if(getTeams.size() < 3) {
 					responseMessage.setMessage("Thể thức này không đủ số đội tham gia");
