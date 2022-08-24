@@ -31,4 +31,5 @@ public interface UserService {
 	ResponseMessage generateQrCode(InforInQrCode inforInQrCode);
 	ResponseMessage getAllActiveMemberAndCollaborator();
 	ResponseMessage getAllUserAttendanceStatus(String studentId);
+	ResponseMessage getAllGen();
 }
