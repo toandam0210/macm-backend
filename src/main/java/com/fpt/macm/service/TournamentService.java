@@ -4,10 +4,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fpt.macm.model.dto.ActiveUserDto;
-import com.fpt.macm.model.dto.RoleTournamentDto;
 import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
+import com.fpt.macm.model.dto.TournamentRoleDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.ExhibitionResult;
@@ -94,8 +94,6 @@ public interface TournamentService {
 
 	ResponseMessage updateTimeAndAreaExhibition(int teamId, ExhibitionResult newResult);
 
-	ResponseMessage editRoleTournament(int tournamentId, List<RoleTournamentDto> rolesTournamentDto);
+	ResponseMessage editRoleTournament(int tournamentId, List<TournamentRoleDto> rolesTournamentDto);
 	
-	ResponseMessage getAllSuggestRole();
-
 }

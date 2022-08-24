@@ -31,10 +31,10 @@ import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.Role;
-import com.fpt.macm.model.entity.RoleTournament;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
+import com.fpt.macm.model.entity.TournamentRole;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
@@ -241,18 +241,18 @@ public class CompetitiveServiceTest {
 		return playerMatchDto;
 	}
 	
-	private RoleTournament roleTournament() {
-		RoleTournament roleTournament = new RoleTournament();
-		roleTournament.setId(2);
-		roleTournament.setName("Ban van hoa");
-		return roleTournament;
+	private TournamentRole tournamentRole() {
+		TournamentRole tournamentRole = new TournamentRole();
+		tournamentRole.setId(2);
+		tournamentRole.setName("Ban van hoa");
+		return tournamentRole;
 	}
 	
 	private TournamentOrganizingCommittee tournamentOrganizingCommittee() {
 		TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
 		tournamentOrganizingCommittee.setId(1);
 		tournamentOrganizingCommittee.setPaymentStatus(true);
-		tournamentOrganizingCommittee.setRoleTournament(roleTournament());
+		tournamentOrganizingCommittee.setTournamentRole(tournamentRole());
 		tournamentOrganizingCommittee.setTournament(tournament());
 		tournamentOrganizingCommittee.setUser(createUser());
 		return tournamentOrganizingCommittee;

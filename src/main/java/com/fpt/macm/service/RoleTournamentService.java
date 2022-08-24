@@ -10,5 +10,5 @@ public interface RoleTournamentService {
 
 	ResponseMessage updateRoleTournamentName(int roleTournamentId, String newName);
 
-	ResponseMessage updateStatusRoleTournament(int roleTournamentId);
+	ResponseMessage deleteRoleTournament(int roleTournamentId);
 }

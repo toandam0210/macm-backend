@@ -28,7 +28,7 @@ import com.fpt.macm.model.dto.CompetitiveResultByTypeDto;
 import com.fpt.macm.model.dto.CompetitiveTypeDto;
 import com.fpt.macm.model.dto.ExhibitionResultByTypeDto;
 import com.fpt.macm.model.dto.ExhibitionTypeDto;
-import com.fpt.macm.model.dto.RoleTournamentDto;
+import com.fpt.macm.model.dto.TournamentRoleDto;
 import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
@@ -320,24 +320,17 @@ public class TournamentServiceTest {
 		TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
 		tournamentOrganizingCommittee.setId(1);
 		tournamentOrganizingCommittee.setPaymentStatus(true);
-		tournamentOrganizingCommittee.setRoleTournament(roleTournament());
+		tournamentOrganizingCommittee.setTournamentRole(tournamentRole());
 		tournamentOrganizingCommittee.setTournament(tournament());
 		tournamentOrganizingCommittee.setUser(user());
 		return tournamentOrganizingCommittee;
-	}
-
-	private RoleTournament roleTournament() {
-		RoleTournament roleTournament = new RoleTournament();
-		roleTournament.setId(2);
-		roleTournament.setName("Ban van hoa");
-		return roleTournament;
 	}
 
 	private TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto() {
 		TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = new TournamentOrganizingCommitteeDto();
 		tournamentOrganizingCommitteeDto.setId(1);
 		tournamentOrganizingCommitteeDto.setPaymentStatus(true);
-		tournamentOrganizingCommitteeDto.setRoleTournamentDto(roleTournamentDto());
+		tournamentOrganizingCommitteeDto.setTournamentRoleDto(tournamentRoleDto());
 		tournamentOrganizingCommitteeDto.setUserName("toan");
 		tournamentOrganizingCommitteeDto.setUserStudentId("HE140855");
 		return tournamentOrganizingCommitteeDto;
@@ -508,19 +501,19 @@ public class TournamentServiceTest {
 		return scheduleDto;
 	}
 
-	private RoleTournamentDto roleTournamentDto() {
-		RoleTournamentDto roleTournamentDto = new RoleTournamentDto();
-		roleTournamentDto.setId(roleTournament().getId());
-		roleTournamentDto.setName(roleTournament().getName());
-		roleTournamentDto.setMaxQuantity(tournamentRole().getQuantity());
-		roleTournamentDto.setAvailableQuantity(10);
-		return roleTournamentDto;
+	private TournamentRoleDto tournamentRoleDto() {
+		TournamentRoleDto tournamentRoleDto = new TournamentRoleDto();
+		tournamentRoleDto.setId(tournamentRole().getId());
+		tournamentRoleDto.setName(tournamentRole().getName());
+		tournamentRoleDto.setMaxQuantity(tournamentRole().getQuantity());
+		tournamentRoleDto.setAvailableQuantity(10);
+		return tournamentRoleDto;
 	}
 
 	private TournamentRole tournamentRole() {
 		TournamentRole tournamentRole = new TournamentRole();
 		tournamentRole.setId(1);
-		tournamentRole.setRoleTournament(roleTournament());
+		tournamentRole.setName("Ban van hoa");
 		tournamentRole.setQuantity(10);
 		tournamentRole.setTournament(tournament());
 		return tournamentRole;
@@ -530,7 +523,7 @@ public class TournamentServiceTest {
 		TournamentCreateDto tournamentCreateDto = new TournamentCreateDto();
 		tournamentCreateDto.setTournament(tournament());
 		tournamentCreateDto.setListPreview(Arrays.asList(scheduleDto()));
-		tournamentCreateDto.setRolesTournamentDto(Arrays.asList(roleTournamentDto()));
+		tournamentCreateDto.setTournamentRolesDto(Arrays.asList(tournamentRoleDto()));
 		return tournamentCreateDto;
 	}
 
@@ -628,7 +621,7 @@ public class TournamentServiceTest {
 		responseMessage.setData(Arrays.asList(semester()));
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		when(tournamentRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(tournament()));
-		when(roleTournamentRepository.findByName(anyString())).thenReturn(Optional.of(roleTournament()));
+//		when(roleTournamentRepository.findByName(anyString())).thenReturn(Optional.of(tournamentRole()));
 		when(commonScheduleService.getCommonSessionByDate(any())).thenReturn(commonSchedule());
 		when(trainingScheduleService.getTrainingScheduleByDate(any())).thenReturn(trainingSchedule());
 		when(attendanceStatusRepository.findByTrainingScheduleIdOrderByIdAsc(anyInt()))
@@ -647,7 +640,7 @@ public class TournamentServiceTest {
 		when(semesterService.getCurrentSemester()).thenReturn(responseMessage);
 		when(tournamentRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(tournament()));
 		when(roleTournamentRepository.findByName(anyString())).thenReturn(Optional.empty());
-		when(roleTournamentRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(roleTournament()));
+//		when(roleTournamentRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(tournamentRole()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 
 		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto(),
@@ -688,7 +681,7 @@ public class TournamentServiceTest {
 	@Test
 	public void testCreateTournamentCaseRolesEventDtoNull() {
 		TournamentCreateDto tournamentCreateDto = tournamentCreateDto();
-		tournamentCreateDto.setRolesTournamentDto(null);
+//		tournamentCreateDto.setRolesTournamentDto(null);
 
 		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto,
 				false);
@@ -698,7 +691,7 @@ public class TournamentServiceTest {
 	@Test
 	public void testCreateTournamentCaseRolesEventDtoEmpty() {
 		TournamentCreateDto tournamentCreateDto = tournamentCreateDto();
-		tournamentCreateDto.setRolesTournamentDto(new ArrayList<RoleTournamentDto>());
+//		tournamentCreateDto.setRolesTournamentDto(new ArrayList<TournamentRoleDto>());
 
 		ResponseMessage response = tournamentService.createTournament(user().getStudentId(), tournamentCreateDto,
 				false);
@@ -766,7 +759,7 @@ public class TournamentServiceTest {
 	@Test
 	public void testUpdateTournamentOrganizingCommitteeRole() {
 		TournamentOrganizingCommitteeDto tournamentOrganizingCommitteeDto = tournamentOrganizingCommitteeDto();
-		tournamentOrganizingCommitteeDto.getRoleTournamentDto().setId(10);
+//		tournamentOrganizingCommitteeDto.getRoleTournamentDto().setId(10);
 
 		when(tournamentOrganizingCommitteeRepository.findById(anyInt()))
 				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
@@ -1161,8 +1154,8 @@ public class TournamentServiceTest {
 		tournamentRole.setQuantity(0);
 
 		when(tournamentRoleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentRole));
-		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndRoleInTournament(anyInt(), anyInt()))
-				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
+//		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndRoleInTournament(anyInt(), anyInt()))
+//				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
 
 		ResponseMessage response = tournamentService.getAllOrganizingCommitteeRoleByTournamentId(tournament().getId());
 		assertEquals(response.getData().size(), 1);
@@ -1174,8 +1167,8 @@ public class TournamentServiceTest {
 		tournamentRole.setQuantity(10);
 
 		when(tournamentRoleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentRole));
-		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndRoleInTournament(anyInt(), anyInt()))
-				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
+//		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndRoleInTournament(anyInt(), anyInt()))
+//				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
 
 		ResponseMessage response = tournamentService.getAllOrganizingCommitteeRoleByTournamentId(tournament().getId());
 		assertEquals(response.getData().size(), 1);
@@ -1184,7 +1177,7 @@ public class TournamentServiceTest {
 	@Test
 	public void getAllOrganizingCommitteeRoleByTournamentIdCaseRoleIdEq1() {
 		TournamentRole tournamentRole = tournamentRole();
-		tournamentRole.getRoleTournament().setId(1);
+//		tournamentRole.getRoleTournament().setId(1);
 
 		when(tournamentRoleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentRole));
 
@@ -1433,9 +1426,9 @@ public class TournamentServiceTest {
 	public void registerToJoinTournamentOrganizingComitteeCaseSuccess() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(roleTournament()));
-		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt()))
-				.thenReturn(Optional.of(tournamentRole()));
+//		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournamentRole()));
+//		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt()))
+//				.thenReturn(Optional.of(tournamentRole()));
 		ResponseMessage response = tournamentService.registerToJoinTournamentOrganizingComittee(1,
 				user().getStudentId(), 1);
 		assertEquals(response.getData().size(), 1);
@@ -1445,9 +1438,9 @@ public class TournamentServiceTest {
 	public void registerToJoinTournamentOrganizingComitteeCaseAlreadyJoinOrganizing() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(roleTournament()));
-		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt()))
-				.thenReturn(Optional.of(tournamentRole()));
+//		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournamentRole()));
+//		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt()))
+//				.thenReturn(Optional.of(tournamentRole()));
 		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(anyInt(), anyInt()))
 				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
 
@@ -1460,9 +1453,9 @@ public class TournamentServiceTest {
 	public void registerToJoinTournamentOrganizingComitteeCasePlayer() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(roleTournament()));
-		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt()))
-				.thenReturn(Optional.of(tournamentRole()));
+//		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournamentRole()));
+//		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt()))
+//				.thenReturn(Optional.of(tournamentRole()));
 		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
 				.thenReturn(Optional.of(tournamentPlayer()));
 
@@ -1485,14 +1478,14 @@ public class TournamentServiceTest {
 
 	@Test
 	public void registerToJoinTournamentOrganizingComitteeCaseRoleMember() {
-		RoleTournament roleTournament = roleTournament();
-		roleTournament.setId(1);
+//		RoleTournament roleTournament = tournamentRole();
+//		roleTournament.setId(1);
 
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(roleTournament));
-		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt()))
-				.thenReturn(Optional.of(tournamentRole()));
+//		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(roleTournament));
+//		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt()))
+//				.thenReturn(Optional.of(tournamentRole()));
 
 		ResponseMessage response = tournamentService.registerToJoinTournamentOrganizingComittee(1,
 				user().getStudentId(), 1);
@@ -1506,11 +1499,11 @@ public class TournamentServiceTest {
 
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
-		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(roleTournament()));
-		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt()))
-				.thenReturn(Optional.of(tournamentRole));
-		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndRoleInTournament(anyInt(), anyInt()))
-				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
+//		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournamentRole()));
+//		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt()))
+//				.thenReturn(Optional.of(tournamentRole));
+//		when(tournamentOrganizingCommitteeRepository.findByTournamentIdAndRoleInTournament(anyInt(), anyInt()))
+//				.thenReturn(Arrays.asList(tournamentOrganizingCommittee()));
 
 		ResponseMessage response = tournamentService.registerToJoinTournamentOrganizingComittee(1,
 				user().getStudentId(), 1);
@@ -2063,7 +2056,7 @@ public class TournamentServiceTest {
 	public void testAddListTournamentOrganizingCommittee() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(roleTournament()));
+//		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournamentRole()));
 		ResponseMessage response = tournamentService.addListTournamentOrganizingCommittee("HE140855",
 				Arrays.asList(userTournamentOrganizingCommitteeDto()), 1);
 		assertEquals(response.getData().size(), 0);
@@ -2073,7 +2066,7 @@ public class TournamentServiceTest {
 	public void testAddListTournamentOrganizingCommittee2() {
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(roleTournament()));
+//		when(roleTournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournamentRole()));
 		ResponseMessage response = tournamentService.addListTournamentOrganizingCommittee("HE140855",
 				Arrays.asList(userTournamentOrganizingCommitteeDto()), 1);
 		assertEquals(response.getData().size(), 0);
@@ -3464,9 +3457,9 @@ public class TournamentServiceTest {
 	public void editRoleEventCaseUpdateQuantity() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(tournamentRoleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentRole()));
-		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.of(tournamentRole()));
+//		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.of(tournamentRole()));
 		
-		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(roleTournamentDto()));
+		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(tournamentRoleDto()));
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -3474,10 +3467,10 @@ public class TournamentServiceTest {
 	public void editRoleEventCaseCreateEventRole() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(tournamentRoleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentRole()));
-		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.empty());
-		when(roleTournamentRepository.findByName(anyString())).thenReturn(Optional.of(roleTournament()));
+//		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.empty());
+//		when(roleTournamentRepository.findByName(anyString())).thenReturn(Optional.of(tournamentRole()));
 		
-		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(roleTournamentDto()));
+		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(tournamentRoleDto()));
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -3485,11 +3478,11 @@ public class TournamentServiceTest {
 	public void editRoleEventCaseCreateRoleEvent() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
 		when(tournamentRoleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentRole()));
-		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.empty());
-		when(roleTournamentRepository.findByName(anyString())).thenReturn(Optional.empty());
-		when(roleTournamentRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(roleTournament()));
-		
-		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(roleTournamentDto()));
+//		when(tournamentRoleRepository.findByRoleTournamentIdAndTournamentId(anyInt(), anyInt())).thenReturn(Optional.empty());
+//		when(roleTournamentRepository.findByName(anyString())).thenReturn(Optional.empty());
+//		when(roleTournamentRepository.findAll(any(Sort.class))).thenReturn(Arrays.asList(tournamentRole()));
+//		
+		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(tournamentRoleDto()));
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
@@ -3497,7 +3490,7 @@ public class TournamentServiceTest {
 	public void editRoleEventCaseException() {
 		when(tournamentRepository.findById(anyInt())).thenReturn(null);
 		
-		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(roleTournamentDto()));
+		ResponseMessage responseMessage = tournamentService.editRoleTournament(tournament().getId(), Arrays.asList(tournamentRoleDto()));
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	

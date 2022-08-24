@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.model.entity.RoleTournament;
@@ -21,7 +22,7 @@ public class RoleTournamentServiceImpl implements RoleTournamentService{
 	public ResponseMessage getAllRoleTournament() {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<RoleTournament> rolesTournament = roleTournamentRepository.findByIsActiveOrderByIdAsc(true);
+			List<RoleTournament> rolesTournament = roleTournamentRepository.findAll(Sort.by("id").descending());
 			if (!rolesTournament.isEmpty()) {
 				responseMessage.setData(rolesTournament);
 				responseMessage.setMessage("Lấy tất cả vai trò mặc định trong giải đấu thành công");
@@ -49,7 +50,6 @@ public class RoleTournamentServiceImpl implements RoleTournamentService{
 
 				RoleTournament roleTournament = new RoleTournament();
 				roleTournament.setName(newName);
-				roleTournament.setActive(true);
 				roleTournamentRepository.save(roleTournament);
 
 				responseMessage.setData(Arrays.asList(roleTournament));
@@ -94,17 +94,16 @@ public class RoleTournamentServiceImpl implements RoleTournamentService{
 	}
 
 	@Override
-	public ResponseMessage updateStatusRoleTournament(int roleTournamentId) {
+	public ResponseMessage deleteRoleTournament(int roleTournamentId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<RoleTournament> roleTournamenttOp = roleTournamentRepository.findById(roleTournamentId);
 			if (roleTournamenttOp.isPresent()) {
 				RoleTournament roleTournament = roleTournamenttOp.get();
-				roleTournament.setActive(!roleTournament.isActive());
-				roleTournamentRepository.save(roleTournament);
+				roleTournamentRepository.delete(roleTournament);
 
 				responseMessage.setData(Arrays.asList(roleTournament));
-				responseMessage.setMessage("Cập nhật trạng thái của vai trò mặc định trong sự kiện thành công");
+				responseMessage.setMessage("Xóa vai trò mặc định trong giải đấu thành công");
 			} else {
 				responseMessage.setMessage("Không có vai trò này");
 			}

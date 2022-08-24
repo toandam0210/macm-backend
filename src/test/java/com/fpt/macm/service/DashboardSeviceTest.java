@@ -34,11 +34,11 @@ import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.RoleEvent;
-import com.fpt.macm.model.entity.RoleTournament;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
+import com.fpt.macm.model.entity.TournamentRole;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.entity.UserStatusReport;
@@ -210,11 +210,11 @@ public class DashboardSeviceTest {
 		return memberEvent;
 	}
 
-	private RoleTournament roleTournament() {
-		RoleTournament roleTounament = new RoleTournament();
-		roleTounament.setId(1);
-		roleTounament.setName("ROLE_Member");
-		return roleTounament;
+	private TournamentRole tournamentRole() {
+		TournamentRole tournamentRole = new TournamentRole();
+		tournamentRole.setId(1);
+		tournamentRole.setName("ROLE_Member");
+		return tournamentRole;
 	}
 	
 	private RoleEvent roleEvent() {
@@ -326,7 +326,7 @@ public class DashboardSeviceTest {
 		TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
 		tournamentOrganizingCommittee.setId(1);
 		tournamentOrganizingCommittee.setPaymentStatus(true);
-		tournamentOrganizingCommittee.setRoleTournament(roleTournament());
+		tournamentOrganizingCommittee.setTournamentRole(tournamentRole());
 		tournamentOrganizingCommittee.setTournament(tournament());
 		tournamentOrganizingCommittee.setUser(user());
 		return tournamentOrganizingCommittee;

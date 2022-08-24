@@ -23,7 +23,6 @@ import com.fpt.macm.model.dto.CompetitiveTypeDto;
 import com.fpt.macm.model.dto.ExhibitionPlayerDto;
 import com.fpt.macm.model.dto.ExhibitionTeamDto;
 import com.fpt.macm.model.dto.ExhibitionTypeDto;
-import com.fpt.macm.model.dto.RoleTournamentDto;
 import com.fpt.macm.model.dto.ScheduleDto;
 import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
@@ -32,6 +31,7 @@ import com.fpt.macm.model.dto.TournamentOrganizingCommitteePaymentStatusReportDt
 import com.fpt.macm.model.dto.TournamentPlayerDto;
 import com.fpt.macm.model.dto.TournamentPlayerPaymentStatusReportDto;
 import com.fpt.macm.model.dto.TournamentResultDto;
+import com.fpt.macm.model.dto.TournamentRoleDto;
 import com.fpt.macm.model.dto.UserTournamentDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.Area;
@@ -46,7 +46,6 @@ import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
-import com.fpt.macm.model.entity.RoleTournament;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
@@ -186,7 +185,7 @@ public class TournamentServiceImpl implements TournamentService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Tournament tournament = tournamentCreateDto.getTournament();
-			List<RoleTournamentDto> rolesTournamentDto = tournamentCreateDto.getRolesTournamentDto();
+			List<TournamentRoleDto> tournamentRolesDto = tournamentCreateDto.getTournamentRolesDto();
 			List<ScheduleDto> listPreview = tournamentCreateDto.getListPreview();
 
 			if (tournament == null || listPreview == null || listPreview.isEmpty()) {
@@ -241,32 +240,12 @@ public class TournamentServiceImpl implements TournamentService {
 				notificationService.createTournamentCreateNotification(newTournament.getId(), newTournament.getName());
 
 				// Tạo role ban tổ chức cho giải đấu vs số lượng của từng role
-				for (RoleTournamentDto roleTournamentDto : rolesTournamentDto) {
-					Optional<RoleTournament> roleTournamentOp = roleTournamentRepository
-							.findByName(roleTournamentDto.getName());
-					if (roleTournamentOp.isPresent()) {
-						RoleTournament roleTournament = roleTournamentOp.get();
-
-						TournamentRole tournamentRole = new TournamentRole();
-						tournamentRole.setTournament(newTournament);
-						tournamentRole.setQuantity(roleTournamentDto.getMaxQuantity());
-						tournamentRole.setRoleTournament(roleTournament);
-						tournamentRoleRepository.save(tournamentRole);
-					} else {
-						RoleTournament roleTournament = new RoleTournament();
-						roleTournament.setName(roleTournamentDto.getName());
-						roleTournamentRepository.save(roleTournament);
-
-						List<RoleTournament> roleTournaments = roleTournamentRepository
-								.findAll(Sort.by("id").descending());
-						RoleTournament newRoleTournament = roleTournaments.get(0);
-
-						TournamentRole tournamentRole = new TournamentRole();
-						tournamentRole.setTournament(newTournament);
-						tournamentRole.setQuantity(roleTournamentDto.getMaxQuantity());
-						tournamentRole.setRoleTournament(newRoleTournament);
-						tournamentRoleRepository.save(tournamentRole);
-					}
+				for (TournamentRoleDto tournamentRoleDto : tournamentRolesDto) {
+					TournamentRole tournamentRole = new TournamentRole();
+					tournamentRole.setName(tournamentRoleDto.getName());
+					tournamentRole.setQuantity(tournamentRoleDto.getMaxQuantity());
+					tournamentRole.setTournament(newTournament);
+					tournamentRoleRepository.save(tournamentRole);
 				}
 
 				for (ScheduleDto scheduleDto : listPreview) {
@@ -387,12 +366,15 @@ public class TournamentServiceImpl implements TournamentService {
 				Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
 						.findById(tournamentOrganizingCommitteeDto.getId());
 				TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
-				if (tournamentOrganizingCommittee.getRoleTournament().getId() != tournamentOrganizingCommitteeDto
-						.getRoleTournamentDto().getId()) {
-					RoleTournament roleTournament = new RoleTournament();
-					roleTournament.setId(tournamentOrganizingCommitteeDto.getRoleTournamentDto().getId());
-					roleTournament.setName(tournamentOrganizingCommitteeDto.getRoleTournamentDto().getName());
-					tournamentOrganizingCommittee.setRoleTournament(roleTournament);
+				if (tournamentOrganizingCommittee.getTournamentRole().getId() != tournamentOrganizingCommitteeDto
+						.getTournamentRoleDto().getId()) {
+					TournamentRole tournamentRole = new TournamentRole();
+					tournamentRole.setId(tournamentOrganizingCommitteeDto.getTournamentRoleDto().getId());
+					tournamentRole.setName(tournamentOrganizingCommitteeDto.getTournamentRoleDto().getName());
+					tournamentRole
+							.setQuantity(tournamentOrganizingCommitteeDto.getTournamentRoleDto().getMaxQuantity());
+					tournamentRole.setTournament(tournamentOrganizingCommittee.getTournament());
+					tournamentOrganizingCommittee.setTournamentRole(tournamentRole);
 					tournamentOrganizingCommittee.setUpdatedBy("toandv");
 					tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
 					tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
@@ -422,10 +404,11 @@ public class TournamentServiceImpl implements TournamentService {
 		tournamentOrganizingCommitteeDto.setPaymentStatus(tournamentOrganizingCommittee.isPaymentStatus());
 		tournamentOrganizingCommitteeDto.setRegisterStatus(tournamentOrganizingCommittee.getRegisterStatus());
 
-		RoleTournamentDto roleTournamentDto = new RoleTournamentDto();
-		roleTournamentDto.setId(tournamentOrganizingCommittee.getRoleTournament().getId());
-		roleTournamentDto.setName(tournamentOrganizingCommittee.getRoleTournament().getName());
-		tournamentOrganizingCommitteeDto.setRoleTournamentDto(roleTournamentDto);
+		TournamentRoleDto tournamentRoleDto = new TournamentRoleDto();
+		tournamentRoleDto.setId(tournamentOrganizingCommittee.getTournamentRole().getId());
+		tournamentRoleDto.setName(tournamentOrganizingCommittee.getTournamentRole().getName());
+		tournamentRoleDto.setMaxQuantity(tournamentOrganizingCommittee.getTournamentRole().getQuantity());
+		tournamentOrganizingCommitteeDto.setTournamentRoleDto(tournamentRoleDto);
 		return tournamentOrganizingCommitteeDto;
 	}
 
@@ -929,18 +912,16 @@ public class TournamentServiceImpl implements TournamentService {
 		try {
 			List<TournamentRole> tournamentRoles = tournamentRoleRepository.findByTournamentId(tournamentId);
 			if (!tournamentRoles.isEmpty()) {
-				List<RoleTournamentDto> rolesTournamentDto = new ArrayList<RoleTournamentDto>();
+				List<TournamentRoleDto> tournamentRolesDto = new ArrayList<TournamentRoleDto>();
 				for (TournamentRole tournamentRole : tournamentRoles) {
-					if (tournamentRole.getRoleTournament().getId() != 1) {
-						RoleTournamentDto roleTournamentDto = new RoleTournamentDto();
-						roleTournamentDto.setId(tournamentRole.getRoleTournament().getId());
-						roleTournamentDto.setName(tournamentRole.getRoleTournament().getName());
-						roleTournamentDto.setAvailableQuantity(getAvailableQuantity(tournamentId, tournamentRole));
-						roleTournamentDto.setMaxQuantity(tournamentRole.getQuantity());
-						rolesTournamentDto.add(roleTournamentDto);
-					}
+					TournamentRoleDto tournamentRoleDto = new TournamentRoleDto();
+					tournamentRoleDto.setId(tournamentRole.getId());
+					tournamentRoleDto.setName(tournamentRole.getName());
+					tournamentRoleDto.setAvailableQuantity(getAvailableQuantity(tournamentRole));
+					tournamentRoleDto.setMaxQuantity(tournamentRole.getQuantity());
+					tournamentRolesDto.add(tournamentRoleDto);
 				}
-				responseMessage.setData(rolesTournamentDto);
+				responseMessage.setData(tournamentRolesDto);
 				responseMessage.setMessage(Constant.MSG_116);
 			} else {
 				responseMessage.setMessage("Giải đấu này chưa có vai trò ban tổ chức nào");
@@ -951,9 +932,9 @@ public class TournamentServiceImpl implements TournamentService {
 		return responseMessage;
 	}
 
-	private int getAvailableQuantity(int tournamentId, TournamentRole tournamentRole) {
+	private int getAvailableQuantity(TournamentRole tournamentRole) {
 		List<TournamentOrganizingCommittee> organizingCommittees = tournamentOrganizingCommitteeRepository
-				.findByTournamentIdAndRoleInTournament(tournamentId, tournamentRole.getRoleTournament().getId());
+				.findByTournamentRoleId(tournamentRole.getId());
 		if (!organizingCommittees.isEmpty()) {
 			int count = 0;
 			for (TournamentOrganizingCommittee tournamentOrganizingCommittee : organizingCommittees) {
@@ -1322,9 +1303,7 @@ public class TournamentServiceImpl implements TournamentService {
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
 			if (LocalDateTime.now().isBefore(tournament.getRegistrationOrganizingCommitteeDeadline())) {
 				User user = userRepository.findByStudentId(studentId).get();
-				RoleTournament roleTournament = roleTournamentRepository.findById(roleId).get();
-				TournamentRole tournamentRole = tournamentRoleRepository
-						.findByRoleTournamentIdAndTournamentId(roleTournament.getId(), tournament.getId()).get();
+				TournamentRole tournamentRole = tournamentRoleRepository.findById(roleId).get();
 
 				Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
 						.findByTournamentIdAndUserId(tournament.getId(), user.getId());
@@ -1348,24 +1327,20 @@ public class TournamentServiceImpl implements TournamentService {
 					return responseMessage;
 				}
 
-				if (roleTournament.getId() != 1) {
-					if (getAvailableQuantity(tournament.getId(), tournamentRole) > 0) {
-						TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
-						tournamentOrganizingCommittee.setTournament(tournament);
-						tournamentOrganizingCommittee.setUser(user);
-						tournamentOrganizingCommittee.setRoleTournament(roleTournament);
-						tournamentOrganizingCommittee.setPaymentStatus(false);
-						tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_PENDING);
-						tournamentOrganizingCommittee.setCreatedBy(user.getName() + " - " + user.getStudentId());
-						tournamentOrganizingCommittee.setCreatedOn(LocalDateTime.now());
-						tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
-						responseMessage.setData(Arrays.asList(tournamentOrganizingCommittee));
-						responseMessage.setMessage("Đăng ký thành công");
-					} else {
-						responseMessage.setMessage("Đã đủ số lượng ban tổ chức");
-					}
+				if (getAvailableQuantity(tournamentRole) > 0) {
+					TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
+					tournamentOrganizingCommittee.setTournament(tournament);
+					tournamentOrganizingCommittee.setUser(user);
+					tournamentOrganizingCommittee.setTournamentRole(tournamentRole);
+					tournamentOrganizingCommittee.setPaymentStatus(false);
+					tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_PENDING);
+					tournamentOrganizingCommittee.setCreatedBy(user.getName() + " - " + user.getStudentId());
+					tournamentOrganizingCommittee.setCreatedOn(LocalDateTime.now());
+					tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
+					responseMessage.setData(Arrays.asList(tournamentOrganizingCommittee));
+					responseMessage.setMessage("Đăng ký thành công");
 				} else {
-					responseMessage.setMessage("Vai trò không hợp lệ");
+					responseMessage.setMessage("Đã đủ số lượng ban tổ chức");
 				}
 			} else {
 				responseMessage.setMessage(Constant.MSG_131);
@@ -1834,8 +1809,8 @@ public class TournamentServiceImpl implements TournamentService {
 				if (!isJoinTournament(userToJoin.getUser().getId(), tournamentId)) {
 					TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
 					tournamentOrganizingCommittee.setUser(userToJoin.getUser());
-					RoleTournament roleTournament = roleTournamentRepository.findById(userToJoin.getRoleId()).get();
-					tournamentOrganizingCommittee.setRoleTournament(roleTournament);
+					TournamentRole tournamentRole = tournamentRoleRepository.findById(userToJoin.getRoleId()).get();
+					tournamentOrganizingCommittee.setTournamentRole(tournamentRole);
 					tournamentOrganizingCommittee.setTournament(tournament);
 					tournamentOrganizingCommittee.setPaymentStatus(false);
 					tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
@@ -2016,9 +1991,9 @@ public class TournamentServiceImpl implements TournamentService {
 							}
 						}
 						Area getArea = listArea.get(0);
-						
+
 						for (int i = 0; i < listTournamentSchedules.size(); i++) {
-							if(listCompetitiveMatchs.size() > 0) {
+							if (listCompetitiveMatchs.size() > 0) {
 								if (continueSpawnCompetitive) {
 									LocalDate date = listTournamentSchedules.get(i).getDate();
 									LocalTime startTime = listTournamentSchedules.get(i).getStartTime();
@@ -2035,8 +2010,10 @@ public class TournamentServiceImpl implements TournamentService {
 														newResult = getResultOp.get();
 													}
 													newResult.setMatch(listCompetitiveMatchs.get(index));
-													if (index > 0 && oldResult.getMatch().getRound() < newResult.getMatch()
-															.getRound() && oldResult.getTime().equals(timeMatch)) {
+													if (index > 0
+															&& oldResult.getMatch().getRound() < newResult.getMatch()
+																	.getRound()
+															&& oldResult.getTime().equals(timeMatch)) {
 														startTime = startTime.plusMinutes(10);
 														timeMatch = LocalDateTime.of(date, startTime);
 													}
@@ -2055,8 +2032,8 @@ public class TournamentServiceImpl implements TournamentService {
 														if (startTime.plusMinutes(10).compareTo(finishTime) <= 0) {
 															doneSpawnCompetitiveTime = startTime.plusMinutes(10);
 														} else {
-															doneSpawnCompetitiveDate = listTournamentSchedules.get(i + 1)
-																	.getDate();
+															doneSpawnCompetitiveDate = listTournamentSchedules
+																	.get(i + 1).getDate();
 														}
 													}
 												} else {
@@ -2069,11 +2046,10 @@ public class TournamentServiceImpl implements TournamentService {
 										}
 									}
 								}
-							}
-							else {
+							} else {
 								continueSpawnCompetitive = false;
 							}
-							if(listTypeNeedHeld.size() > 0) {
+							if (listTypeNeedHeld.size() > 0) {
 								if (!continueSpawnCompetitive) {
 									index = 0;
 									LocalDate getDate = listTournamentSchedules.get(i).getDate();
@@ -2088,11 +2064,12 @@ public class TournamentServiceImpl implements TournamentService {
 										continue;
 									}
 									while (true) {
-										int countMatchCanHeld = ((listTournamentSchedules.get(i).getFinishTime().getHour()
-												- startTime.getHour()) * 60
+										int countMatchCanHeld = ((listTournamentSchedules.get(i).getFinishTime()
+												.getHour() - startTime.getHour()) * 60
 												+ listTournamentSchedules.get(i).getFinishTime().getMinute()
 												- startTime.getMinute()) / 5;
-										if (listTypeNeedHeld.get(index).getExhibitionTeams().size() > countMatchCanHeld) {
+										if (listTypeNeedHeld.get(index).getExhibitionTeams()
+												.size() > countMatchCanHeld) {
 											break;
 										}
 										ExhibitionType getType = listTypeNeedHeld.get(index);
@@ -2523,7 +2500,7 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	@Override
-	public ResponseMessage editRoleTournament(int tournamentId, List<RoleTournamentDto> rolesTournamentDto) {
+	public ResponseMessage editRoleTournament(int tournamentId, List<TournamentRoleDto> tournamentRolesDto) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
@@ -2531,8 +2508,8 @@ public class TournamentServiceImpl implements TournamentService {
 			List<TournamentRole> tournamentRoles = tournamentRoleRepository.findByTournamentId(tournamentId);
 			for (TournamentRole tournamentRole : tournamentRoles) {
 				boolean isExist = false;
-				for (RoleTournamentDto roleTournamentDto : rolesTournamentDto) {
-					if (roleTournamentDto.getName().equals(tournamentRole.getRoleTournament().getName())) {
+				for (TournamentRoleDto roleTournamentDto : tournamentRolesDto) {
+					if (roleTournamentDto.getName().equals(tournamentRole.getName())) {
 						isExist = true;
 						break;
 					}
@@ -2542,60 +2519,27 @@ public class TournamentServiceImpl implements TournamentService {
 				}
 			}
 
-			for (RoleTournamentDto roleTournamentDto : rolesTournamentDto) {
+			for (TournamentRoleDto roleTournamentDto : tournamentRolesDto) {
 				Optional<TournamentRole> tournamentRoleOp = tournamentRoleRepository
-						.findByRoleTournamentIdAndTournamentId(roleTournamentDto.getId(), tournamentId);
+						.findByNameAndTournamentId(roleTournamentDto.getName(), tournament.getId());
 				if (tournamentRoleOp.isPresent()) {
 					TournamentRole tournamentRole = tournamentRoleOp.get();
 					tournamentRole.setQuantity(roleTournamentDto.getMaxQuantity());
 					tournamentRoleRepository.save(tournamentRole);
 				} else {
-					Optional<RoleTournament> roleTournamentOp = roleTournamentRepository
-							.findByName(roleTournamentDto.getName());
-					if (roleTournamentOp.isPresent()) {
-						RoleTournament roleTournament = roleTournamentOp.get();
-						TournamentRole tournamentRole = new TournamentRole();
-						tournamentRole.setTournament(tournament);
-						tournamentRole.setQuantity(roleTournamentDto.getMaxQuantity());
-						tournamentRole.setRoleTournament(roleTournament);
-						tournamentRoleRepository.save(tournamentRole);
-					} else {
-						RoleTournament roleTournament = new RoleTournament();
-						roleTournament.setName(roleTournamentDto.getName());
-						roleTournamentRepository.save(roleTournament);
-
-						RoleTournament newRoleTournament = roleTournamentRepository.findAll(Sort.by("id").descending())
-								.get(0);
-						TournamentRole tournamentRole = new TournamentRole();
-						tournamentRole.setTournament(tournament);
-						tournamentRole.setRoleTournament(newRoleTournament);
-						tournamentRole.setQuantity(roleTournamentDto.getMaxQuantity());
-						tournamentRoleRepository.save(tournamentRole);
-					}
+					TournamentRole tournamentRole = new TournamentRole();
+					tournamentRole.setName(roleTournamentDto.getName());
+					tournamentRole.setQuantity(roleTournamentDto.getMaxQuantity());
+					tournamentRole.setTournament(tournament);
+					tournamentRoleRepository.save(tournamentRole);
 				}
 			}
-			responseMessage.setData(rolesTournamentDto);
+			responseMessage.setData(tournamentRolesDto);
 			responseMessage.setMessage("Chỉnh sửa vai trò BTC trong giải đấu thành công");
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
 	}
-
-	@Override
-	public ResponseMessage getAllSuggestRole() {
-		ResponseMessage responseMessage = new ResponseMessage();
-		try {
-			List<RoleTournament> roleTournaments = roleTournamentRepository.findByIsActiveOrderByIdAsc(true);
-			if (!roleTournaments.isEmpty()) {
-				responseMessage.setData(roleTournaments);
-				responseMessage.setMessage("Lấy gợi ý vai trò giải đấu thành công");
-			} else {
-				responseMessage.setMessage("Chưa có vai trò gợi ý nào");
-			}
-		} catch (Exception e) {
-			responseMessage.setMessage(e.getMessage());
-		}
-		return responseMessage;
-	}
+	
 }

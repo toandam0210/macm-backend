@@ -18,12 +18,11 @@ public class TournamentRole {
 	private int id;
 
 	@ManyToOne(optional = false)
-	@JoinColumn(name = "role_tournament_id")
-	private RoleTournament roleTournament;
-
-	@ManyToOne(optional = false)
 	@JoinColumn(name = "tournament_id")
 	private Tournament tournament;
+
+	@Column
+	private String name;
 
 	@Column
 	private int quantity;
@@ -36,20 +35,20 @@ public class TournamentRole {
 		this.id = id;
 	}
 
-	public RoleTournament getRoleTournament() {
-		return roleTournament;
-	}
-
-	public void setRoleTournament(RoleTournament roleTournament) {
-		this.roleTournament = roleTournament;
-	}
-
 	public Tournament getTournament() {
 		return tournament;
 	}
 
 	public void setTournament(Tournament tournament) {
 		this.tournament = tournament;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 	public int getQuantity() {
