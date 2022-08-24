@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fpt.macm.model.dto.ActiveUserDto;
-import com.fpt.macm.model.dto.RoleEventDto;
+import com.fpt.macm.model.dto.RoleTournamentDto;
 import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
@@ -96,6 +96,6 @@ public interface TournamentService {
 
 	ResponseMessage getAllSuggestType();
 	
-	ResponseMessage editRoleTournament(int tournamentId, List<RoleEventDto> rolesEventDto);
+	ResponseMessage editRoleTournament(int tournamentId, List<RoleTournamentDto> rolesTournamentDto);
 
 }

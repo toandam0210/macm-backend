@@ -31,7 +31,7 @@ import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.Role;
-import com.fpt.macm.model.entity.RoleEvent;
+import com.fpt.macm.model.entity.RoleTournament;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
@@ -241,18 +241,18 @@ public class CompetitiveServiceTest {
 		return playerMatchDto;
 	}
 	
-	private RoleEvent roleEvent() {
-		RoleEvent roleEvent = new RoleEvent();
-		roleEvent.setId(2);
-		roleEvent.setName("Ban van hoa");
-		return roleEvent;
+	private RoleTournament roleTournament() {
+		RoleTournament roleTournament = new RoleTournament();
+		roleTournament.setId(2);
+		roleTournament.setName("Ban van hoa");
+		return roleTournament;
 	}
 	
 	private TournamentOrganizingCommittee tournamentOrganizingCommittee() {
 		TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
 		tournamentOrganizingCommittee.setId(1);
 		tournamentOrganizingCommittee.setPaymentStatus(true);
-		tournamentOrganizingCommittee.setRoleEvent(roleEvent());
+		tournamentOrganizingCommittee.setRoleTournament(roleTournament());
 		tournamentOrganizingCommittee.setTournament(tournament());
 		tournamentOrganizingCommittee.setUser(createUser());
 		return tournamentOrganizingCommittee;
