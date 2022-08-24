@@ -4,7 +4,7 @@ import com.fpt.macm.model.response.ResponseMessage;
 
 public interface DashboardService {
 	ResponseMessage getCollaboratorReport();
-	ResponseMessage attendanceReport(String semester);
+	ResponseMessage attendanceReport(String semester, int month);
 	ResponseMessage eventReport();
 	ResponseMessage statusMemberReport();
 	ResponseMessage feeReport(String semester);

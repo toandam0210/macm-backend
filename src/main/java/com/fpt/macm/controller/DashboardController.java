@@ -22,8 +22,8 @@ public class DashboardController {
 
 	@GetMapping("/attendance")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> attendanceReportBySemester(@RequestParam String semester) {
-		return new ResponseEntity<ResponseMessage>(dashboardService.attendanceReport(semester), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> attendanceReportBySemester(@RequestParam String semester, @RequestParam(defaultValue = "0") int month) {
+		return new ResponseEntity<ResponseMessage>(dashboardService.attendanceReport(semester, month), HttpStatus.OK);
 	}
 	
 	@GetMapping("/collaborator")
