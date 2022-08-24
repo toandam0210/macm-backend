@@ -47,7 +47,9 @@ import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionPlayerRegistration;
 import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
+import com.fpt.macm.model.entity.ExhibitionTeamRegistration;
 import com.fpt.macm.model.entity.ExhibitionType;
+import com.fpt.macm.model.entity.ExhibitionTypeRegistration;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
@@ -1464,7 +1466,7 @@ public class TournamentServiceImpl implements TournamentService {
 					Collections.sort(competitiveTypeRegistrations, new Comparator<CompetitiveTypeRegistration>() {
 						@Override
 						public int compare(CompetitiveTypeRegistration o1, CompetitiveTypeRegistration o2) {
-							return o1.getId() - o2.getId();
+							return o2.getId() - o1.getId();
 						}
 					});
 					responseMessage.setData(competitiveTypeRegistrations);
@@ -1652,7 +1654,7 @@ public class TournamentServiceImpl implements TournamentService {
 		try {
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
 			if (LocalDateTime.now().isBefore(tournament.getRegistrationPlayerDeadline())) {
-				User user = userRepository.findByStudentId(studentId).get();
+//				User user = userRepository.findByStudentId(studentId).get();
 				ExhibitionType exhibitionType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
 
 				int countMale = 0;
@@ -1667,6 +1669,28 @@ public class TournamentServiceImpl implements TournamentService {
 							.getPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
 					if (tournamentPlayerOp.isPresent()) {
 						TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
+
+						List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
+								.findByExhibitionTypeId(exhibitionTypeId);
+						for (ExhibitionTypeRegistration exhibitionTypeRegistration : exhibitionTypeRegistrations) {
+							if (exhibitionTypeRegistration.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+								ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
+										.getExhibitionTeamRegistration();
+								Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration = exhibitionTeamRegistration
+										.getExhibitionPlayersRegistration();
+								for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistration) {
+									if (tournamentPlayer.getId() == exhibitionPlayerRegistration.getTournamentPlayer()
+											.getId()) {
+										responseMessage.setMessage("Thành viên " + tournamentPlayer.getUser().getName()
+												+ " - " + tournamentPlayer.getUser().getStudentId()
+												+ " đã đăng ký nội dung này");
+										return responseMessage;
+									}
+								}
+							}
+						}
+
 						Optional<ExhibitionPlayer> exhibitionPlayerOp = exhibitionPlayerRepository
 								.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
 						if (exhibitionPlayerOp.isPresent()) {
@@ -1687,19 +1711,7 @@ public class TournamentServiceImpl implements TournamentService {
 					return responseMessage;
 				}
 
-//				Set<ExhibitionPlayerRegistration> exhibitionPlayerRegistrations = new HashSet<ExhibitionPlayerRegistration>();
-//				for (User member : members) {
-//					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
-//							.findPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
-//					if (!tournamentPlayerOp.isPresent()) {
-//						createTournamentPlayer(tournament, member);
-//						tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(member.getId(),
-//								tournament.getId());
-//					}
-//					TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
-//				}
-
-				Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
+				Set<ExhibitionPlayerRegistration> exhibitionPlayerRegistrations = new HashSet<ExhibitionPlayerRegistration>();
 				for (User member : members) {
 					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
 							.findPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
@@ -1709,40 +1721,137 @@ public class TournamentServiceImpl implements TournamentService {
 								tournament.getId());
 					}
 					TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
-					ExhibitionPlayer exhibitionPlayer = new ExhibitionPlayer();
-					exhibitionPlayer.setTournamentPlayer(tournamentPlayer);
+					ExhibitionPlayerRegistration exhibitionPlayerRegistration = new ExhibitionPlayerRegistration();
+					exhibitionPlayerRegistration.setTournamentPlayer(tournamentPlayer);
 					if (member.getStudentId().equals(studentId)) {
-						exhibitionPlayer.setRoleInTeam(true);
+						exhibitionPlayerRegistration.setRoleInTeam(true);
 					} else {
-						exhibitionPlayer.setRoleInTeam(false);
+						exhibitionPlayerRegistration.setRoleInTeam(false);
 					}
-					exhibitionPlayer.setCreatedBy(user.getName() + " - " + user.getStudentId());
-					exhibitionPlayer.setCreatedOn(LocalDateTime.now());
+					exhibitionPlayerRegistrations.add(exhibitionPlayerRegistration);
+				}
+
+				ExhibitionTeamRegistration exhibitionTeamRegistration = new ExhibitionTeamRegistration();
+				exhibitionTeamRegistration.setExhibitionPlayersRegistration(exhibitionPlayerRegistrations);
+				exhibitionTeamRegistration.setTeamName(teamName);
+
+				ExhibitionTypeRegistration exhibitionTypeRegistration = new ExhibitionTypeRegistration();
+				exhibitionTypeRegistration.setExhibitionType(exhibitionType);
+				exhibitionTypeRegistration.setExhibitionTeamRegistration(exhibitionTeamRegistration);
+				exhibitionTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_PENDING);
+				exhibitionTypeRegistrationRepository.save(exhibitionTypeRegistration);
+
+				responseMessage.setData(Arrays.asList(exhibitionTypeRegistration));
+				responseMessage.setMessage("Đăng ký thành công");
+			} else {
+				responseMessage.setMessage(Constant.MSG_131);
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage acceptRequestToJoinTournamentExhibitionType(int exhibitionTypeRegistrationId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<ExhibitionTypeRegistration> exhibitionTypeRegistrationOp = exhibitionTypeRegistrationRepository
+					.findById(exhibitionTypeRegistrationId);
+			if (exhibitionTypeRegistrationOp.isPresent()) {
+				ExhibitionTypeRegistration exhibitionTypeRegistration = exhibitionTypeRegistrationOp.get();
+
+				ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
+						.getExhibitionTeamRegistration();
+				Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistrations = new HashSet<ExhibitionPlayerRegistration>();
+
+				Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
+				for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistrations) {
+					ExhibitionPlayer exhibitionPlayer = new ExhibitionPlayer();
+					exhibitionPlayer.setTournamentPlayer(exhibitionPlayerRegistration.getTournamentPlayer());
+					exhibitionPlayer.setRoleInTeam(exhibitionPlayerRegistration.isRoleInTeam());
 					exhibitionPlayers.add(exhibitionPlayer);
 				}
 
 				ExhibitionTeam exhibitionTeam = new ExhibitionTeam();
-				exhibitionTeam.setTeamName(teamName);
 				exhibitionTeam.setExhibitionPlayers(exhibitionPlayers);
-				exhibitionTeam.setCreatedBy(user.getName() + " - " + user.getStudentId());
-				exhibitionTeam.setCreatedOn(LocalDateTime.now());
-				ExhibitionTeamDto exhibitionTeamDto = convertToExhibitionTeamDto(exhibitionTeam,
-						exhibitionType.getName(), exhibitionType.getId());
+				exhibitionTeam.setTeamName(exhibitionTeamRegistration.getTeamName());
 
+				ExhibitionType exhibitionType = exhibitionTypeRegistration.getExhibitionType();
+				Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
+				exhibitionTeams.add(exhibitionTeam);
+
+				exhibitionTypeRepository.save(exhibitionType);
+
+				exhibitionTypeRegistrationRepository.delete(exhibitionTypeRegistration);
+
+				responseMessage.setData(Arrays.asList(exhibitionTypeRegistration));
+				responseMessage.setMessage("Chấp nhận đăng ký tham gia thành công");
+			} else {
+				responseMessage.setMessage("Không có yêu cầu đăng ký này");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage declineRequestToJoinTournamentExhibitionType(int exhibitionTypeRegistrationId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<ExhibitionTypeRegistration> exhibitionTypeRegistrationOp = exhibitionTypeRegistrationRepository
+					.findById(exhibitionTypeRegistrationId);
+			if (exhibitionTypeRegistrationOp.isPresent()) {
+				ExhibitionTypeRegistration exhibitionTypeRegistration = exhibitionTypeRegistrationOp.get();
+
+				exhibitionTypeRegistrationRepository.delete(exhibitionTypeRegistration);
+
+				responseMessage.setData(Arrays.asList(exhibitionTypeRegistration));
+				responseMessage.setMessage("Từ chối đăng ký tham gia thành công");
+			} else {
+				responseMessage.setMessage("Không có yêu cầu đăng ký này");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllRequestToJoinTournamentExhibitionType(int tournamentId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<Tournament> tournamentOp = tournamentRepository.findById(tournamentId);
+			if (tournamentOp.isPresent()) {
+				Tournament tournament = tournamentOp.get();
+
+				List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = new ArrayList<>();
 				Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
-				for (ExhibitionType oldExhibitionType : exhibitionTypes) {
-					if (oldExhibitionType.getId() == exhibitionType.getId()) {
-						Set<ExhibitionTeam> exhibitionTeams = oldExhibitionType.getExhibitionTeams();
-						exhibitionTeams.add(exhibitionTeam);
+				for (ExhibitionType exhibitionType : exhibitionTypes) {
+					List<ExhibitionTypeRegistration> listExhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
+							.findByExhibitionTypeId(exhibitionType.getId());
+					if (!exhibitionTypeRegistrations.isEmpty()) {
+						for (ExhibitionTypeRegistration exhibitionTypeRegistration : listExhibitionTypeRegistrations) {
+							exhibitionTypeRegistrations.add(exhibitionTypeRegistration);
+						}
 					}
 				}
-
-				tournament.setExhibitionTypes(exhibitionTypes);
-				tournamentRepository.save(tournament);
-				responseMessage.setData(Arrays.asList(exhibitionTeamDto));
-				responseMessage.setMessage("Đăng ký thành công");
+				
+				if (!exhibitionTypeRegistrations.isEmpty()) {
+					Collections.sort(exhibitionTypeRegistrations, new Comparator<ExhibitionTypeRegistration>() {
+						@Override
+						public int compare(ExhibitionTypeRegistration o1, ExhibitionTypeRegistration o2) {
+							return o2.getId() - o1.getId();
+						}
+					});
+					responseMessage.setData(exhibitionTypeRegistrations);
+					responseMessage.setMessage("Lấy danh sách các đội đăng ký tham gia thi đấu biểu diễn thành công");
+				} else {
+					responseMessage.setMessage("Chưa có đội nào đăng ký tham gia thi đấu biểu diễn");
+				}
 			} else {
-				responseMessage.setMessage(Constant.MSG_131);
+				responseMessage.setMessage("Không có giải đấu này");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
