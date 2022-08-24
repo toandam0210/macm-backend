@@ -44,6 +44,7 @@ import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.CompetitiveTypeRegistration;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
+import com.fpt.macm.model.entity.ExhibitionPlayerRegistration;
 import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionType;
@@ -70,6 +71,7 @@ import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
+import com.fpt.macm.repository.ExhibitionTypeRegistrationRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.RoleTournamentRepository;
@@ -183,6 +185,9 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	CompetitiveTypeRegistrationRepository competitiveTypeRegistrationRepository;
+
+	@Autowired
+	ExhibitionTypeRegistrationRepository exhibitionTypeRegistrationRepository;
 
 	@Override
 	public ResponseMessage createTournament(String studentId, TournamentCreateDto tournamentCreateDto,
@@ -406,6 +411,7 @@ public class TournamentServiceImpl implements TournamentService {
 		tournamentOrganizingCommitteeDto.setId(tournamentOrganizingCommittee.getId());
 		tournamentOrganizingCommitteeDto.setUserName(tournamentOrganizingCommittee.getUser().getName());
 		tournamentOrganizingCommitteeDto.setUserStudentId(tournamentOrganizingCommittee.getUser().getStudentId());
+		tournamentOrganizingCommitteeDto.setUserEmail(tournamentOrganizingCommittee.getUser().getEmail());
 		tournamentOrganizingCommitteeDto.setPaymentStatus(tournamentOrganizingCommittee.isPaymentStatus());
 		tournamentOrganizingCommitteeDto.setRegisterStatus(tournamentOrganizingCommittee.getRegisterStatus());
 
@@ -1680,6 +1686,18 @@ public class TournamentServiceImpl implements TournamentService {
 					responseMessage.setMessage("Số lượng thành viên không hợp lệ");
 					return responseMessage;
 				}
+
+//				Set<ExhibitionPlayerRegistration> exhibitionPlayerRegistrations = new HashSet<ExhibitionPlayerRegistration>();
+//				for (User member : members) {
+//					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
+//							.findPlayerByUserIdAndTournamentId(member.getId(), tournament.getId());
+//					if (!tournamentPlayerOp.isPresent()) {
+//						createTournamentPlayer(tournament, member);
+//						tournamentPlayerOp = tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(member.getId(),
+//								tournament.getId());
+//					}
+//					TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
+//				}
 
 				Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
 				for (User member : members) {
