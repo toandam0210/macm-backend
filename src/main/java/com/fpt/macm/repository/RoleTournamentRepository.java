@@ -1,6 +1,5 @@
 package com.fpt.macm.repository;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +12,6 @@ public interface RoleTournamentRepository extends JpaRepository<RoleTournament, 
 
 	Optional<RoleTournament> findByName(String name);
 	
-	List<RoleTournament> findByIsActiveOrderByIdAsc(boolean isActive);
+//	List<RoleTournament> findByIsActiveOrderByIdAsc(boolean isActive);
 	
 }

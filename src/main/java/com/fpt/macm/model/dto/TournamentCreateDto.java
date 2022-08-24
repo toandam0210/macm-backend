@@ -8,7 +8,7 @@ import com.fpt.macm.model.entity.Tournament;
 public class TournamentCreateDto {
 
 	private Tournament tournament;
-	private List<RoleTournamentDto> rolesTournamentDto = new ArrayList<RoleTournamentDto>();
+	private List<TournamentRoleDto> tournamentRolesDto = new ArrayList<TournamentRoleDto>();
 	private List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
 
 	public Tournament getTournament() {
@@ -19,12 +19,12 @@ public class TournamentCreateDto {
 		this.tournament = tournament;
 	}
 
-	public List<RoleTournamentDto> getRolesTournamentDto() {
-		return rolesTournamentDto;
+	public List<TournamentRoleDto> getTournamentRolesDto() {
+		return tournamentRolesDto;
 	}
 
-	public void setRolesTournamentDto(List<RoleTournamentDto> rolesTournamentDto) {
-		this.rolesTournamentDto = rolesTournamentDto;
+	public void setTournamentRolesDto(List<TournamentRoleDto> tournamentRolesDto) {
+		this.tournamentRolesDto = tournamentRolesDto;
 	}
 
 	public List<ScheduleDto> getListPreview() {

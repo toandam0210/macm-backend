@@ -18,9 +18,6 @@ public class RoleTournament {
 	@Column
 	private String name;
 
-	@Column
-	private boolean isActive;
-
 	public int getId() {
 		return id;
 	}
@@ -35,14 +32,6 @@ public class RoleTournament {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public boolean isActive() {
-		return isActive;
-	}
-
-	public void setActive(boolean isActive) {
-		this.isActive = isActive;
 	}
 
 }

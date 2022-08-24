@@ -13,6 +13,8 @@ public interface TournamentRoleRepository extends JpaRepository<TournamentRole, 
 
 	List<TournamentRole> findByTournamentId(int tournamentId);
 	
-	Optional<TournamentRole> findByRoleTournamentIdAndTournamentId(int roleTournamentId, int tournamentId);
+//	Optional<TournamentRole> findByRoleTournamentIdAndTournamentId(int roleTournamentId, int tournamentId);
+	
+	Optional<TournamentRole> findByNameAndTournamentId(String name, int tournamentId);
 	
 }
