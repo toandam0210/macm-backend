@@ -857,7 +857,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email,
-			String gender, Integer generation, Integer roleId, String isActive, Integer month) {
+			String gender, Integer generation, Integer roleId, String isActive, List<Integer> months) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<UserDto> userDtoResponse = userDtos;
@@ -903,7 +903,7 @@ public class UserServiceImpl implements UserService {
 					i--;
 					continue;
 				}
-				if (month != null && monthInDob != month) {
+				if (months.size() > 0 && !months.contains(monthInDob)) {
 					userDtoResponse.remove(userDtos.get(i));
 					i--;
 					continue;
