@@ -5,7 +5,7 @@ public class TournamentOrganizingCommitteeDto implements Comparable<TournamentOr
 	private int id;
 	private String userName;
 	private String userStudentId;
-	private RoleEventDto roleTournamentDto;
+	private RoleTournamentDto roleTournamentDto;
 	private boolean paymentStatus;
 	private String registerStatus;
 
@@ -33,11 +33,11 @@ public class TournamentOrganizingCommitteeDto implements Comparable<TournamentOr
 		this.userStudentId = userStudentId;
 	}
 
-	public RoleEventDto getRoleTournamentDto() {
+	public RoleTournamentDto getRoleTournamentDto() {
 		return roleTournamentDto;
 	}
 
-	public void setRoleTournamentDto(RoleEventDto roleTournamentDto) {
+	public void setRoleTournamentDto(RoleTournamentDto roleTournamentDto) {
 		this.roleTournamentDto = roleTournamentDto;
 	}
 

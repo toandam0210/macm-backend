@@ -34,6 +34,7 @@ import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.RoleEvent;
+import com.fpt.macm.model.entity.RoleTournament;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
@@ -209,6 +210,13 @@ public class DashboardSeviceTest {
 		return memberEvent;
 	}
 
+	private RoleTournament roleTournament() {
+		RoleTournament roleTounament = new RoleTournament();
+		roleTounament.setId(1);
+		roleTounament.setName("ROLE_Member");
+		return roleTounament;
+	}
+	
 	private RoleEvent roleEvent() {
 		RoleEvent roleEvent = new RoleEvent();
 		roleEvent.setId(1);
@@ -318,7 +326,7 @@ public class DashboardSeviceTest {
 		TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
 		tournamentOrganizingCommittee.setId(1);
 		tournamentOrganizingCommittee.setPaymentStatus(true);
-		tournamentOrganizingCommittee.setRoleEvent(roleEvent());
+		tournamentOrganizingCommittee.setRoleTournament(roleTournament());
 		tournamentOrganizingCommittee.setTournament(tournament());
 		tournamentOrganizingCommittee.setUser(user());
 		return tournamentOrganizingCommittee;
