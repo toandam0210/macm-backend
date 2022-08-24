@@ -81,6 +81,9 @@ public class RoleEventServiceImpl implements RoleEventService {
 					RoleEvent roleEvent = roleEventOp.get();
 					roleEvent.setName(newName);
 					roleEventRepository.save(roleEvent);
+					
+					responseMessage.setData(Arrays.asList(roleEvent));
+					responseMessage.setMessage("Cập nhật tên vai trò thành công");
 				} else {
 					responseMessage.setMessage("Không có vai trò này");
 				}

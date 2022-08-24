@@ -14,8 +14,8 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.EventPaymentStatusReportDto;
-import com.fpt.macm.model.dto.MemberEventDto;
 import com.fpt.macm.model.dto.EventRoleDto;
+import com.fpt.macm.model.dto.MemberEventDto;
 import com.fpt.macm.model.dto.UserEventDto;
 import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.ClubFund;
@@ -24,7 +24,6 @@ import com.fpt.macm.model.entity.EventPaymentStatusReport;
 import com.fpt.macm.model.entity.EventRole;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.Notification;
-import com.fpt.macm.model.entity.RoleEvent;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AttendanceEventRepository;
@@ -364,24 +363,6 @@ public class MemberEventServiceImpl implements MemberEventService {
 		}
 		return responseMessage;
 	}
-
-//	@Override
-//	public ResponseMessage getAllSuggestionRole() {
-//		ResponseMessage responseMessage = new ResponseMessage();
-//		try {
-//			List<RoleEvent> rolesEvent = roleEventRepository.findByIsActiveOrderByIdAsc(true);
-//			if (!rolesEvent.isEmpty()) {
-//				rolesEvent.remove(0);
-//				responseMessage.setData(rolesEvent);
-//				responseMessage.setMessage("Lấy tất cả vai trò gợi ý thành công");
-//			} else {
-//				responseMessage.setMessage("Không có vai trò gợi ý nào");
-//			}
-//		} catch (Exception e) {
-//			responseMessage.setMessage(e.getMessage());
-//		}
-//		return responseMessage;
-//	}
 
 	@Override
 	public ResponseMessage getAllOrganizingCommitteeRoleByEventId(int eventId) {
