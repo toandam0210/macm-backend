@@ -1710,18 +1710,26 @@ public class TournamentServiceImpl implements TournamentService {
 			User user = userRepository.findByStudentId(studentId).get();
 			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
 					.findByTournamentIdAndUserId(tournament.getId(), user.getId());
-			if (tournamentOrganizingCommitteeOp.isPresent() && tournamentOrganizingCommitteeOp.get().getRegisterStatus()
+			if (tournamentOrganizingCommitteeOp.isPresent()) {
+				if (tournamentOrganizingCommitteeOp.get().getRegisterStatus()
 					.equals(Constant.REQUEST_STATUS_APPROVED)) {
-				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
-						.findByTournamentId(tournamentId);
-				List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
-				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					tournamentOrganizingCommitteesDto
-							.add(convertToTournamentOrganizingCommitteeDto(tournamentOrganizingCommittee));
+					List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
+							.findByTournamentId(tournamentId);
+					List<TournamentOrganizingCommitteeDto> tournamentOrganizingCommitteesDto = new ArrayList<TournamentOrganizingCommitteeDto>();
+					for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
+						tournamentOrganizingCommitteesDto
+								.add(convertToTournamentOrganizingCommitteeDto(tournamentOrganizingCommittee));
+					}
+					Collections.sort(tournamentOrganizingCommitteesDto);
+					responseMessage.setData(tournamentOrganizingCommitteesDto);
+					responseMessage.setMessage("Lấy danh sách ban tổ chức giải đấu cho người dùng thành công");
+				} else if (tournamentOrganizingCommitteeOp.get().getRegisterStatus()
+					.equals(Constant.REQUEST_STATUS_PENDING)) {
+					responseMessage.setMessage("Yêu cầu đăng ký tham gia vào BTC giải đấu của bạn đang chờ duyệt");
+				} else {
+					responseMessage.setMessage("Yêu cầu đăng ký tham gia vào BTC giải đấu của bạn đã bị từ chối");
 				}
-				Collections.sort(tournamentOrganizingCommitteesDto);
-				responseMessage.setData(tournamentOrganizingCommitteesDto);
-				responseMessage.setMessage("Lấy danh sách ban tổ chức giải đấu cho người dùng thành công");
+				
 			} else {
 				responseMessage.setMessage("Bạn chưa tham gia ban tổ chức giải đấu");
 			}
