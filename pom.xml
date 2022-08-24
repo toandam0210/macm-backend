@@ -141,15 +141,13 @@
 			<artifactId>jjwt</artifactId>
 			<version>0.9.1</version>
 		</dependency>
-	</dependencies>
-
-	<!-- https://mvnrepository.com/artifact/org.springframework/spring-messaging -->
-	<dependency>
+		
+		<dependency>
 		<groupId>org.springframework</groupId>
 		<artifactId>spring-messaging</artifactId>
 		<version>5.3.22</version>
 	</dependency>
-
+	</dependencies>
 
 	<build>
 		<plugins>
