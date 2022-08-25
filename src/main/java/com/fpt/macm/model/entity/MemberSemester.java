@@ -26,7 +26,7 @@ public class MemberSemester {
 	@Column
 	private boolean status;
 	
-	@Column(nullable = true)
+	@Column(columnDefinition = "boolean default false")
 	private boolean isClicked;
 
 	public int getId() {

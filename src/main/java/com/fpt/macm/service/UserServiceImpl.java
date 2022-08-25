@@ -247,6 +247,7 @@ public class UserServiceImpl implements UserService {
 							MemberSemester memberSemester = new MemberSemester();
 							memberSemester.setSemester(semester.getName());
 							memberSemester.setStatus(user.isActive());
+							memberSemester.setClicked(true);
 							memberSemester.setUser(user);
 							memberSemesterRepository.save(memberSemester);
 						}
@@ -360,6 +361,7 @@ public class UserServiceImpl implements UserService {
 					MemberSemester memberSemester = new MemberSemester();
 					memberSemester.setUser(user);
 					memberSemester.setStatus(true);
+					memberSemester.setClicked(true);
 					Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 					memberSemester.setSemester(semester.getName());
 					memberSemesterRepository.save(memberSemester);
@@ -468,6 +470,7 @@ public class UserServiceImpl implements UserService {
 					} else {
 						MemberSemester memberSemester = new MemberSemester();
 						memberSemester.setStatus(true);
+						memberSemester.setClicked(true);
 						memberSemester.setUser(user);
 						memberSemester.setSemester(semester);
 						memberSemesterRepository.save(memberSemester);
@@ -633,6 +636,7 @@ public class UserServiceImpl implements UserService {
 						MemberSemester memberSemester = new MemberSemester();
 						memberSemester.setUser(userFromExcel);
 						memberSemester.setStatus(true);
+						memberSemester.setClicked(true);
 						Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 						memberSemester.setSemester(currentSemester.getName());
 						memberSemesterRepository.save(memberSemester);
