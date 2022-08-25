@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fpt.macm.model.entity.RoleTournament;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.service.RoleTournamentService;
 
@@ -31,15 +32,15 @@ public class RoleTournamentController {
 
 	@PostMapping("/addnewroletournament")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> addNewRoleTournament(@RequestBody String newName) {
-		return new ResponseEntity<ResponseMessage>(roleTournamentService.addNewRoleTournament(newName), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> addNewRoleTournament(@RequestBody RoleTournament roleTournament) {
+		return new ResponseEntity<ResponseMessage>(roleTournamentService.addNewRoleTournament(roleTournament), HttpStatus.OK);
 	}
 
 	@PutMapping("/updateroletournamentname/{roleTournamentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateRoleEventName(@PathVariable(name = "roleTournamentId") int roleTournamentId,
-			@RequestBody String newName) {
-		return new ResponseEntity<ResponseMessage>(roleTournamentService.updateRoleTournamentName(roleTournamentId, newName),
+			@RequestBody RoleTournament roleTournament) {
+		return new ResponseEntity<ResponseMessage>(roleTournamentService.updateRoleTournamentName(roleTournamentId, roleTournament),
 				HttpStatus.OK);
 	}
 

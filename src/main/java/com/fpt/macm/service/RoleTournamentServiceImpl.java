@@ -36,9 +36,10 @@ public class RoleTournamentServiceImpl implements RoleTournamentService{
 	}
 
 	@Override
-	public ResponseMessage addNewRoleTournament(String newName) {
+	public ResponseMessage addNewRoleTournament(RoleTournament newRoleTournament) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			String newName = newRoleTournament.getName();
 			if (!newName.trim().equals("")) {
 				List<RoleTournament> rolesTournament = roleTournamentRepository.findAll();
 				for (RoleTournament roleTournament : rolesTournament) {
@@ -64,9 +65,10 @@ public class RoleTournamentServiceImpl implements RoleTournamentService{
 	}
 
 	@Override
-	public ResponseMessage updateRoleTournamentName(int roleTournamentId, String newName) {
+	public ResponseMessage updateRoleTournamentName(int roleTournamentId, RoleTournament newRoleTournament) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			String newName = newRoleTournament.getName();
 			if (!newName.trim().equals("")) {
 				List<RoleTournament> rolesTournament = roleTournamentRepository.findAll();
 				for (RoleTournament roleTournament : rolesTournament) {
