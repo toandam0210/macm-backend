@@ -2188,14 +2188,22 @@ public class TournamentServiceImpl implements TournamentService {
 			for (UserTournamentOrganizingCommitteeDto userToJoin : users) {
 				if (!isJoinTournament(userToJoin.getUser().getId(), tournamentId)) {
 					TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
-					tournamentOrganizingCommittee.setUser(userToJoin.getUser());
+					
+					Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(tournament.getId(), user.getId());
+					if (tournamentOrganizingCommitteeOp.isPresent()) {
+						tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
+						tournamentOrganizingCommittee.setUpdatedBy(user.getName() + " - " + user.getStudentId());
+						tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
+					} else {
+						tournamentOrganizingCommittee.setUser(userToJoin.getUser());
+						tournamentOrganizingCommittee.setTournament(tournament);
+						tournamentOrganizingCommittee.setPaymentStatus(false);
+						tournamentOrganizingCommittee.setCreatedBy(user.getName() + " - " + user.getStudentId());
+						tournamentOrganizingCommittee.setCreatedOn(LocalDateTime.now());
+					}
 					TournamentRole tournamentRole = tournamentRoleRepository.findById(userToJoin.getRoleId()).get();
 					tournamentOrganizingCommittee.setTournamentRole(tournamentRole);
-					tournamentOrganizingCommittee.setTournament(tournament);
-					tournamentOrganizingCommittee.setPaymentStatus(false);
 					tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
-					tournamentOrganizingCommittee.setCreatedBy(user.getName() + " - " + user.getStudentId());
-					tournamentOrganizingCommittee.setCreatedOn(LocalDateTime.now());
 					tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
 				} else {
 					usersNotAdd.add(userToJoin);
