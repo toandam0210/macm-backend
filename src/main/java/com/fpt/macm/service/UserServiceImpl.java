@@ -1280,9 +1280,23 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public ResponseMessage getMemberSemesterWhenStartSemester(String studentId) {
-		// TODO Auto-generated method stub
-		Optional<User> user = userRepository.findByStudentId(studentId);
-		
-		return null;
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<User> userOp = userRepository.findByStudentId(studentId);
+			ResponseMessage responseSemester = semesterService.getCurrentSemester();
+			Semester semester = (Semester) responseSemester.getData().get(0);
+			if (userOp.isPresent()) {
+				Optional<MemberSemester> memberSemesterOp = memberSemesterRepository
+						.findByUserIdAndSemester(userOp.get().getId(), semester.getName());
+				if (memberSemesterOp.isPresent()) {
+					MemberSemester memberSemester = memberSemesterOp.get();
+					responseMessage.setData(Arrays.asList(memberSemester));
+					responseMessage.setMessage("Lấy thông tin thành công");
+				}
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
 	}
 }
