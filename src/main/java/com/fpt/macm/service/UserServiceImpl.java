@@ -438,6 +438,7 @@ public class UserServiceImpl implements UserService {
 			MemberSemester memberSemester = new MemberSemester();
 			memberSemester.setUser(user);
 			memberSemester.setStatus(true);
+			memberSemester.setClicked(true);
 			Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 			memberSemester.setSemester(currentSemester.getName());
 			memberSemesterRepository.save(memberSemester);
@@ -1278,7 +1279,8 @@ public class UserServiceImpl implements UserService {
 					}
 				}
 				responseMessage.setData(Arrays.asList(memberSemesterOp.get()));
-				responseMessage.setMessage("Cập nhật thành công trạng thái hoạt động của kì " + semester + ": " + user.isActive());
+				String active = user.isActive() == true ? "Hoạt động" : "Không hoạt động";
+				responseMessage.setMessage("Cập nhật thành công trạng thái hoạt động của kì " + semester + ": " + active);
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());

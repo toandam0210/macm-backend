@@ -527,7 +527,7 @@ public class TournamentServiceImpl implements TournamentService {
 						boolean isExist = false;
 						for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
 							if (exhibitionTypeDto.getName().equals(exhibitionType.getName())
-									&& exhibitionTypeDto.getNumberMale() == exhibitionTypeDto.getNumberMale()
+									&& exhibitionType.getNumberMale() == exhibitionTypeDto.getNumberMale()
 									&& exhibitionType.getNumberFemale() == exhibitionTypeDto.getNumberFemale()) {
 								isExist = true;
 								break;
@@ -2558,7 +2558,7 @@ public class TournamentServiceImpl implements TournamentService {
 				Tournament getTournament = getTournamentOp.get();
 
 				if (getTournament.getStage() <= 1) {
-					List<CompetitiveMatch> listCompetitiveMatchs = new ArrayList<CompetitiveMatch>();
+					List<CompetitiveMatch> listMatchsNeedHeld = new ArrayList<CompetitiveMatch>();
 					Set<CompetitiveType> listCompetitiveTypes = getTournament.getCompetitiveTypes();
 					List<Area> listArea = areaRepository.listActiveArea();
 					for (CompetitiveType competitiveType : listCompetitiveTypes) {
@@ -2570,10 +2570,10 @@ public class TournamentServiceImpl implements TournamentService {
 									|| competitiveMatch.getSecondStudentId() == null)) {
 								continue;
 							}
-							listCompetitiveMatchs.add(competitiveMatch);
+							listMatchsNeedHeld.add(competitiveMatch);
 						}
 					}
-					Collections.sort(listCompetitiveMatchs);
+					Collections.sort(listMatchsNeedHeld);
 
 					List<ExhibitionTeam> listExhibitionTeams = new ArrayList<ExhibitionTeam>();
 					Set<ExhibitionType> listExhibitionTypes = getTournament.getExhibitionTypes();
@@ -2589,7 +2589,7 @@ public class TournamentServiceImpl implements TournamentService {
 					List<TournamentSchedule> listTournamentSchedules = tournamentScheduleRepository
 							.findByTournamentId(tournamentId);
 
-					int timeMatchNeedHeld = listCompetitiveMatchs.size() * 10 + listExhibitionTeams.size() * 5;
+					int timeMatchNeedHeld = listMatchsNeedHeld.size() * 10 + listExhibitionTeams.size() * 5;
 					int timeMatchCanHeld = 0;
 					for (TournamentSchedule tournamentSchedule : listTournamentSchedules) {
 						LocalTime startTime = tournamentSchedule.getStartTime();
@@ -2612,137 +2612,141 @@ public class TournamentServiceImpl implements TournamentService {
 							}
 						}
 						Area getArea = listArea.get(0);
-
-						for (int i = 0; i < listTournamentSchedules.size(); i++) {
-							if (listCompetitiveMatchs.size() > 0) {
-								if (continueSpawnCompetitive) {
-									LocalDate date = listTournamentSchedules.get(i).getDate();
-									LocalTime startTime = listTournamentSchedules.get(i).getStartTime();
-									LocalTime finishTime = listTournamentSchedules.get(i).getFinishTime();
-									while (startTime.isBefore(finishTime)) {
-										if (continueSpawnCompetitive) {
-											for (Area area : listArea) {
-												LocalDateTime timeMatch = LocalDateTime.of(date, startTime);
-												if (continueSpawnCompetitive) {
-													CompetitiveResult newResult = new CompetitiveResult();
-													Optional<CompetitiveResult> getResultOp = competitiveResultRepository
-															.findByMatchId(listCompetitiveMatchs.get(index).getId());
-													if (getResultOp.isPresent()) {
-														newResult = getResultOp.get();
-													}
-													newResult.setMatch(listCompetitiveMatchs.get(index));
-													if (index > 0
-															&& oldResult.getMatch().getRound() < newResult.getMatch()
-																	.getRound()
-															&& oldResult.getTime().equals(timeMatch)) {
-														startTime = startTime.plusMinutes(10);
-														timeMatch = LocalDateTime.of(date, startTime);
-													}
-													newResult.setTime(timeMatch);
-													newResult.setArea(area);
-													newResult.setCreatedBy("LinhLHN");
-													newResult.setCreatedOn(LocalDateTime.now());
-													newResult.setUpdatedBy("LinhLHN");
-													newResult.setUpdatedOn(LocalDateTime.now());
-													competitiveResultRepository.save(newResult);
-													oldResult = newResult;
-													index++;
-													if (index == listCompetitiveMatchs.size()) {
-														continueSpawnCompetitive = false;
-														doneSpawnCompetitiveDate = date;
-														if (startTime.plusMinutes(10).compareTo(finishTime) <= 0) {
-															doneSpawnCompetitiveTime = startTime.plusMinutes(10);
-														} else {
-															doneSpawnCompetitiveDate = listTournamentSchedules
-																	.get(i + 1).getDate();
+						if(listMatchsNeedHeld.size() + listTypeNeedHeld.size() == 0) {
+							responseMessage.setMessage("Chưa có thể thức nào đủ điểu kiện tổ chức thi đấu");
+						}
+						else {
+							for (int i = 0; i < listTournamentSchedules.size(); i++) {
+								if (listMatchsNeedHeld.size() > 0) {
+									if (continueSpawnCompetitive) {
+										LocalDate date = listTournamentSchedules.get(i).getDate();
+										LocalTime startTime = listTournamentSchedules.get(i).getStartTime();
+										LocalTime finishTime = listTournamentSchedules.get(i).getFinishTime();
+										while (startTime.isBefore(finishTime)) {
+											if (continueSpawnCompetitive) {
+												for (Area area : listArea) {
+													LocalDateTime timeMatch = LocalDateTime.of(date, startTime);
+													if (continueSpawnCompetitive) {
+														CompetitiveResult newResult = new CompetitiveResult();
+														Optional<CompetitiveResult> getResultOp = competitiveResultRepository
+																.findByMatchId(listMatchsNeedHeld.get(index).getId());
+														if (getResultOp.isPresent()) {
+															newResult = getResultOp.get();
 														}
+														newResult.setMatch(listMatchsNeedHeld.get(index));
+														if (index > 0
+																&& oldResult.getMatch().getRound() < newResult.getMatch()
+																		.getRound()
+																&& oldResult.getTime().equals(timeMatch)) {
+															startTime = startTime.plusMinutes(10);
+															timeMatch = LocalDateTime.of(date, startTime);
+														}
+														newResult.setTime(timeMatch);
+														newResult.setArea(area);
+														newResult.setCreatedBy("LinhLHN");
+														newResult.setCreatedOn(LocalDateTime.now());
+														newResult.setUpdatedBy("LinhLHN");
+														newResult.setUpdatedOn(LocalDateTime.now());
+														competitiveResultRepository.save(newResult);
+														oldResult = newResult;
+														index++;
+														if (index == listMatchsNeedHeld.size()) {
+															continueSpawnCompetitive = false;
+															doneSpawnCompetitiveDate = date;
+															if (startTime.plusMinutes(10).compareTo(finishTime) <= 0) {
+																doneSpawnCompetitiveTime = startTime.plusMinutes(10);
+															} else {
+																doneSpawnCompetitiveDate = listTournamentSchedules
+																		.get(i + 1).getDate();
+															}
+														}
+													} else {
+														break;
 													}
-												} else {
-													break;
 												}
+												startTime = startTime.plusMinutes(10);
+											} else {
+												break;
 											}
-											startTime = startTime.plusMinutes(10);
-										} else {
-											break;
 										}
 									}
+								} else {
+									continueSpawnCompetitive = false;
 								}
-							} else {
-								continueSpawnCompetitive = false;
-							}
-							if (listTypeNeedHeld.size() > 0) {
-								if (!continueSpawnCompetitive) {
-									index = 0;
-									LocalDate getDate = listTournamentSchedules.get(i).getDate();
-									LocalTime startTime = listTournamentSchedules.get(i).getStartTime();
-									LocalTime finishTime = listTournamentSchedules.get(i).getFinishTime();
-									if (getDate.isEqual(doneSpawnCompetitiveDate)) {
-										while (startTime.isBefore(doneSpawnCompetitiveTime)) {
-											startTime = startTime.plusMinutes(10);
-										}
-									}
-									if (startTime.compareTo(finishTime) >= 0) {
-										continue;
-									}
-									while (true) {
-										int countMatchCanHeld = ((listTournamentSchedules.get(i).getFinishTime()
-												.getHour() - startTime.getHour()) * 60
-												+ listTournamentSchedules.get(i).getFinishTime().getMinute()
-												- startTime.getMinute()) / 5;
-										if (listTypeNeedHeld.get(index).getExhibitionTeams()
-												.size() > countMatchCanHeld) {
-											break;
-										}
-										ExhibitionType getType = listTypeNeedHeld.get(index);
-										Set<ExhibitionTeam> getTeamsByType = getType.getExhibitionTeams();
-										List<ExhibitionTeam> getTeams = new ArrayList<ExhibitionTeam>();
-										for (ExhibitionTeam exhibitionTeam : getTeamsByType) {
-											getTeams.add(exhibitionTeam);
-										}
-										for (ExhibitionTeam exhibitionTeam : getTeams) {
-											ExhibitionResult newResult = new ExhibitionResult();
-											Optional<ExhibitionResult> getResultOp = exhibitionResultRepository
-													.findByTeam(exhibitionTeam.getId());
-											if (getResultOp.isPresent()) {
-												newResult = getResultOp.get();
+								if (listTypeNeedHeld.size() > 0) {
+									if (!continueSpawnCompetitive) {
+										index = 0;
+										LocalDate getDate = listTournamentSchedules.get(i).getDate();
+										LocalTime startTime = listTournamentSchedules.get(i).getStartTime();
+										LocalTime finishTime = listTournamentSchedules.get(i).getFinishTime();
+										if (getDate.isEqual(doneSpawnCompetitiveDate)) {
+											while (startTime.isBefore(doneSpawnCompetitiveTime)) {
+												startTime = startTime.plusMinutes(10);
 											}
-											newResult.setTeam(exhibitionTeam);
-											newResult.setArea(getArea);
-											LocalDateTime getTime = LocalDateTime.of(getDate, startTime);
-											newResult.setTime(getTime);
-											newResult.setCreatedBy("LinhLHN");
-											newResult.setCreatedOn(LocalDateTime.now());
-											newResult.setUpdatedBy("LinhLHN");
-											newResult.setUpdatedOn(LocalDateTime.now());
-											exhibitionResultRepository.save(newResult);
-											startTime = startTime.plusMinutes(5);
 										}
-										index++;
-
-										if (index == listTypeNeedHeld.size()) {
-											continueSpawnExhibition = false;
-										} else {
+										if (startTime.compareTo(finishTime) >= 0) {
 											continue;
+										}
+										while (true) {
+											int countMatchCanHeld = ((listTournamentSchedules.get(i).getFinishTime()
+													.getHour() - startTime.getHour()) * 60
+													+ listTournamentSchedules.get(i).getFinishTime().getMinute()
+													- startTime.getMinute()) / 5;
+											if (listTypeNeedHeld.get(index).getExhibitionTeams()
+													.size() > countMatchCanHeld) {
+												break;
+											}
+											ExhibitionType getType = listTypeNeedHeld.get(index);
+											Set<ExhibitionTeam> getTeamsByType = getType.getExhibitionTeams();
+											List<ExhibitionTeam> getTeams = new ArrayList<ExhibitionTeam>();
+											for (ExhibitionTeam exhibitionTeam : getTeamsByType) {
+												getTeams.add(exhibitionTeam);
+											}
+											for (ExhibitionTeam exhibitionTeam : getTeams) {
+												ExhibitionResult newResult = new ExhibitionResult();
+												Optional<ExhibitionResult> getResultOp = exhibitionResultRepository
+														.findByTeam(exhibitionTeam.getId());
+												if (getResultOp.isPresent()) {
+													newResult = getResultOp.get();
+												}
+												newResult.setTeam(exhibitionTeam);
+												newResult.setArea(getArea);
+												LocalDateTime getTime = LocalDateTime.of(getDate, startTime);
+												newResult.setTime(getTime);
+												newResult.setCreatedBy("LinhLHN");
+												newResult.setCreatedOn(LocalDateTime.now());
+												newResult.setUpdatedBy("LinhLHN");
+												newResult.setUpdatedOn(LocalDateTime.now());
+												exhibitionResultRepository.save(newResult);
+												startTime = startTime.plusMinutes(5);
+											}
+											index++;
+
+											if (index == listTypeNeedHeld.size()) {
+												continueSpawnExhibition = false;
+											} else {
+												continue;
+											}
+											if (!continueSpawnExhibition) {
+												break;
+											}
 										}
 										if (!continueSpawnExhibition) {
 											break;
 										}
 									}
-									if (!continueSpawnExhibition) {
-										break;
-									}
 								}
 							}
+							responseMessage.setMessage("Phân chia lịch cho tất cả thể thức thành công");
+							for (CompetitiveType competitiveType : listCompetitiveTypes) {
+								competitiveType.setStatus(3);
+							}
+							for (ExhibitionType exhibitionType : listExhibitionTypes) {
+								exhibitionType.setStatus(3);
+							}
+							getTournament.setStage(2);
+							tournamentRepository.save(getTournament);
 						}
-						responseMessage.setMessage("Phân chia lịch cho tất cả thể thức thành công");
-						for (CompetitiveType competitiveType : listCompetitiveTypes) {
-							competitiveType.setStatus(3);
-						}
-						for (ExhibitionType exhibitionType : listExhibitionTypes) {
-							exhibitionType.setStatus(3);
-						}
-						getTournament.setStage(2);
-						tournamentRepository.save(getTournament);
 					} else {
 						responseMessage.setMessage("Không đủ thời gian xếp lịch trận đấu. Vui lòng tạo thêm "
 								+ (timeMatchNeedHeld - timeMatchCanHeld) + "phút để xếp lịch trận đấu");
