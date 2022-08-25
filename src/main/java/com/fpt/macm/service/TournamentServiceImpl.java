@@ -70,8 +70,10 @@ import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRegistrationRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
+import com.fpt.macm.repository.ExhibitionPlayerRegistrationRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
+import com.fpt.macm.repository.ExhibitionTeamRegistrationRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRegistrationRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
@@ -190,6 +192,12 @@ public class TournamentServiceImpl implements TournamentService {
 
 	@Autowired
 	ExhibitionTypeRegistrationRepository exhibitionTypeRegistrationRepository;
+
+	@Autowired
+	ExhibitionPlayerRegistrationRepository exhibitionPlayerRegistrationRepository;
+
+	@Autowired
+	ExhibitionTeamRegistrationRepository exhibitionTeamRegistrationRepository;
 
 	@Override
 	public ResponseMessage createTournament(String studentId, TournamentCreateDto tournamentCreateDto,
@@ -1001,21 +1009,37 @@ public class TournamentServiceImpl implements TournamentService {
 					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
 					List<TournamentPlayer> tournamentPlayersHaveToPaid = new ArrayList<TournamentPlayer>();
 					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
+						boolean isContinue = false;
+
 						Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 						for (CompetitiveType competitiveType : competitiveTypes) {
 							Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
 									.findByCompetitiveTypeIdAndTournamentPlayerId(competitiveType.getId(),
-											tournament.getId());
+											tournamentPlayer.getId());
 							if (competitiveTypeRegistrationOp.isPresent()) {
 								CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp
 										.get();
 								if (competitiveTypeRegistration.getRegisterStatus()
 										.equals(Constant.REQUEST_STATUS_APPROVED)) {
 									tournamentPlayersHaveToPaid.add(tournamentPlayer);
+									isContinue = true;
+									break;
 								}
 							}
 						}
+						if (isContinue) {
+							continue;
+						}
 
+						Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+						for (ExhibitionType exhibitionType : exhibitionTypes) {
+							Optional<ExhibitionPlayer> getExhibitionPlayerOp = exhibitionPlayerRepository
+									.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
+							if (getExhibitionPlayerOp.isPresent()) {
+								tournamentPlayersHaveToPaid.add(tournamentPlayer);
+							}
+
+						}
 					}
 
 					List<TournamentPlayerDto> tournamentPlayersDto = new ArrayList<TournamentPlayerDto>();
@@ -1356,12 +1380,12 @@ public class TournamentServiceImpl implements TournamentService {
 						.getPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
 				if (tournamentPlayerOp.isPresent()) {
 					TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
-					
+
 					Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 					for (CompetitiveType currentCompetitiveType : competitiveTypes) {
 						Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
 								.findByCompetitiveTypeIdAndTournamentPlayerId(currentCompetitiveType.getId(),
-										tournament.getId());
+										tournamentPlayer.getId());
 						if (competitiveTypeRegistrationOp.isPresent()) {
 							CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp
 									.get();
@@ -1393,7 +1417,7 @@ public class TournamentServiceImpl implements TournamentService {
 								}
 							}
 						}
-						
+
 						Optional<ExhibitionPlayer> exhibitionPlayerOp = exhibitionPlayerRepository
 								.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
 						if (exhibitionPlayerOp.isPresent()) {
@@ -1571,11 +1595,12 @@ public class TournamentServiceImpl implements TournamentService {
 						.getPlayerByUserIdAndTournamentId(user.getId(), tournament.getId());
 
 				if (tournamentPlayerOp.isPresent()) {
+					TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
 					Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 					for (CompetitiveType currentCompetitiveType : competitiveTypes) {
 						Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
 								.findByCompetitiveTypeIdAndTournamentPlayerId(currentCompetitiveType.getId(),
-										tournament.getId());
+										tournamentPlayer.getId());
 						if (competitiveTypeRegistrationOp.isPresent()) {
 							CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp
 									.get();
@@ -1807,10 +1832,11 @@ public class TournamentServiceImpl implements TournamentService {
 
 				ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
 						.getExhibitionTeamRegistration();
-				Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistrations = new HashSet<ExhibitionPlayerRegistration>();
-
+				Set<ExhibitionPlayerRegistration> exhibitionPlayerRegistrations = exhibitionTeamRegistration
+						.getExhibitionPlayersRegistration();
+				
 				Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
-				for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistrations) {
+				for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayerRegistrations) {
 					ExhibitionPlayer exhibitionPlayer = new ExhibitionPlayer();
 					exhibitionPlayer.setTournamentPlayer(exhibitionPlayerRegistration.getTournamentPlayer());
 					exhibitionPlayer.setRoleInTeam(exhibitionPlayerRegistration.isRoleInTeam());
@@ -1825,7 +1851,15 @@ public class TournamentServiceImpl implements TournamentService {
 				Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
 				exhibitionTeams.add(exhibitionTeam);
 
+				exhibitionType.setExhibitionTeams(exhibitionTeams);
+
 				exhibitionTypeRepository.save(exhibitionType);
+
+				for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayerRegistrations) {
+					exhibitionPlayerRegistrationRepository.delete(exhibitionPlayerRegistration);
+				}
+				exhibitionTeamRegistrationRepository.delete(exhibitionTeamRegistration);
+				exhibitionTypeRegistrationRepository.delete(exhibitionTypeRegistration);
 
 				exhibitionTypeRegistrationRepository.delete(exhibitionTypeRegistration);
 
@@ -1849,6 +1883,15 @@ public class TournamentServiceImpl implements TournamentService {
 			if (exhibitionTypeRegistrationOp.isPresent()) {
 				ExhibitionTypeRegistration exhibitionTypeRegistration = exhibitionTypeRegistrationOp.get();
 
+				ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
+						.getExhibitionTeamRegistration();
+
+				Set<ExhibitionPlayerRegistration> exhibitionPlayerRegistrations = exhibitionTeamRegistration
+						.getExhibitionPlayersRegistration();
+				for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayerRegistrations) {
+					exhibitionPlayerRegistrationRepository.delete(exhibitionPlayerRegistration);
+				}
+				exhibitionTeamRegistrationRepository.delete(exhibitionTeamRegistration);
 				exhibitionTypeRegistrationRepository.delete(exhibitionTypeRegistration);
 
 				responseMessage.setData(Arrays.asList(exhibitionTypeRegistration));
@@ -1875,13 +1918,13 @@ public class TournamentServiceImpl implements TournamentService {
 				for (ExhibitionType exhibitionType : exhibitionTypes) {
 					List<ExhibitionTypeRegistration> listExhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
 							.findByExhibitionTypeId(exhibitionType.getId());
-					if (!exhibitionTypeRegistrations.isEmpty()) {
+					if (!listExhibitionTypeRegistrations.isEmpty()) {
 						for (ExhibitionTypeRegistration exhibitionTypeRegistration : listExhibitionTypeRegistrations) {
 							exhibitionTypeRegistrations.add(exhibitionTypeRegistration);
 						}
 					}
 				}
-				
+
 				if (!exhibitionTypeRegistrations.isEmpty()) {
 					Collections.sort(exhibitionTypeRegistrations, new Comparator<ExhibitionTypeRegistration>() {
 						@Override
@@ -2146,22 +2189,21 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	private boolean isJoinTournament(int userId, int tournamentId) {
-		
+
 		Tournament tournament = tournamentRepository.findById(tournamentId).get();
-		
+
 		Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
 				.findPlayerByUserIdAndTournamentId(userId, tournamentId);
 		if (tournamentPlayerOp.isPresent()) {
 			TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
-			
+
 			Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
 			for (CompetitiveType currentCompetitiveType : competitiveTypes) {
 				Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
 						.findByCompetitiveTypeIdAndTournamentPlayerId(currentCompetitiveType.getId(),
-								tournament.getId());
+								tournamentPlayer.getId());
 				if (competitiveTypeRegistrationOp.isPresent()) {
-					CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp
-							.get();
+					CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp.get();
 					if (competitiveTypeRegistration.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
 							|| competitiveTypeRegistration.getRegisterStatus()
 									.equals(Constant.REQUEST_STATUS_PENDING)) {
@@ -2174,8 +2216,7 @@ public class TournamentServiceImpl implements TournamentService {
 				List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
 						.findByExhibitionTypeId(exhibitionType.getId());
 				for (ExhibitionTypeRegistration exhibitionTypeRegistration : exhibitionTypeRegistrations) {
-					if (exhibitionTypeRegistration.getRegisterStatus()
-							.equals(Constant.REQUEST_STATUS_PENDING)) {
+					if (exhibitionTypeRegistration.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
 						ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
 								.getExhibitionTeamRegistration();
 						Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration = exhibitionTeamRegistration
@@ -2188,7 +2229,7 @@ public class TournamentServiceImpl implements TournamentService {
 						}
 					}
 				}
-				
+
 				Optional<ExhibitionPlayer> exhibitionPlayerOp = exhibitionPlayerRepository
 						.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
 				if (exhibitionPlayerOp.isPresent()) {

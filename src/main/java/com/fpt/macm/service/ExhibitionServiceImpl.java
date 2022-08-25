@@ -175,9 +175,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<ExhibitionType> getTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
-			if (getTypeOp.isPresent()) {
-				ExhibitionType getType = getTypeOp.get();
+			Optional<ExhibitionType> exhibitionTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
+			if (exhibitionTypeOp.isPresent()) {
+				ExhibitionType exhibitionType = exhibitionTypeOp.get();
 				ExhibitionTeam newTeam = new ExhibitionTeam();
 				newTeam.setTeamName(name);
 				Set<ExhibitionPlayer> listMembers = new HashSet<>();
@@ -185,17 +185,17 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 				int countMale = 0;
 				int countFemale = 0;
 				for (String studentId : listStudentId) {
-					User getUser = userRepository.findByStudentId(studentId).get();
-					if (getUser.isGender()) {
+					User user = userRepository.findByStudentId(studentId).get();
+					if (user.isGender()) {
 						countMale++;
 					} else {
 						countFemale++;
 					}
-					Optional<TournamentPlayer> getTournamentPlayerOp = tournamentPlayerRepository
-							.getPlayerByUserIdAndTournamentId(getUser.getId(),
+					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
+							.getPlayerByUserIdAndTournamentId(user.getId(),
 									exhibitionTypeRepository.findTournamentOfType(exhibitionTypeId));
-					if (getTournamentPlayerOp.isPresent()) {
-						TournamentPlayer getTournamentPlayer = getTournamentPlayerOp.get();
+					if (tournamentPlayerOp.isPresent()) {
+						TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
 						
 						List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
 								.findByExhibitionTypeId(exhibitionTypeId);
@@ -207,10 +207,10 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 								Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration = exhibitionTeamRegistration
 										.getExhibitionPlayersRegistration();
 								for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistration) {
-									if (getTournamentPlayer.getId() == exhibitionPlayerRegistration.getTournamentPlayer()
+									if (tournamentPlayer.getId() == exhibitionPlayerRegistration.getTournamentPlayer()
 											.getId()) {
-										responseMessage.setMessage("Thành viên " + getTournamentPlayer.getUser().getName()
-												+ " - " + getTournamentPlayer.getUser().getStudentId()
+										responseMessage.setMessage("Thành viên " + tournamentPlayer.getUser().getName()
+												+ " - " + tournamentPlayer.getUser().getStudentId()
 												+ " đã đăng ký nội dung này");
 										return responseMessage;
 									}
@@ -219,18 +219,18 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 						}
 						
 						Optional<ExhibitionPlayer> getExhibitionPlayerOp = exhibitionPlayerRepository
-								.findByTournamentPlayerAndType(getTournamentPlayer.getId(), getType.getId());
+								.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
 						if (getExhibitionPlayerOp.isPresent()) {
 							isRegister = false;
-							responseMessage.setMessage("Thành viên " + getUser.getName() + " - "
-									+ getUser.getStudentId() + " đã đăng ký nội dung này");
+							responseMessage.setMessage("Thành viên " + user.getName() + " - "
+									+ user.getStudentId() + " đã đăng ký nội dung này");
 							return responseMessage;
 						} else {
 							continue;
 						}
 					}
 				}
-				if (countMale != getType.getNumberMale() || countFemale != getType.getNumberFemale()) {
+				if (countMale != exhibitionType.getNumberMale() || countFemale != exhibitionType.getNumberFemale()) {
 					responseMessage.setMessage("Số lượng thành viên không hợp lệ");
 				} else if (isRegister) {
 					for (int i = 0; i < listStudentId.size(); i++) {
@@ -274,11 +274,11 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 					newTeam.setCreatedOn(LocalDateTime.now());
 					newTeam.setUpdatedBy("LinhLHN");
 					newTeam.setUpdatedOn(LocalDateTime.now());
-					Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
+					Set<ExhibitionTeam> getTeams = exhibitionType.getExhibitionTeams();
 					getTeams.add(newTeam);
-					getType.setExhibitionTeams(getTeams);
+					exhibitionType.setExhibitionTeams(getTeams);
 					exhibitionTeamRepository.save(newTeam);
-					exhibitionTypeRepository.save(getType);
+					exhibitionTypeRepository.save(exhibitionType);
 					responseMessage.setData(Arrays.asList(newTeam));
 					responseMessage.setMessage("Đăng ký thành công");
 				}
