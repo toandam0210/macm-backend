@@ -170,6 +170,7 @@ public class TaskSchedule {
 					MemberSemester statusSemester = new MemberSemester();
 					statusSemester.setUser(collaborator);
 					statusSemester.setSemester(semester.getName());
+					statusSemester.setClicked(true);
 					statusSemester.setStatus(collaborator.isActive());
 					memberSemesterRepository.save(statusSemester);
 				} else {
