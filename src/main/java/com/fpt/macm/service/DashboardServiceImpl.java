@@ -218,12 +218,12 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public ResponseMessage statusMemberReport(String semesterName) {
+	public ResponseMessage statusMemberReport() {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<Semester> semesters = semesterRepository.findTop4Semester();
 			UserActiveReportDto userActiveReportDto = new UserActiveReportDto();
-			if (semesters.size() > 1) {
+			if (semesters.size() > 2) {
 				Semester semester = semesters.get(1);
 				int totalActive = 0;
 				int totalUser = 0;
@@ -233,9 +233,9 @@ public class DashboardServiceImpl implements DashboardService {
 						.findBySemesterOrderByIdDesc(semester.getName());
 				List<AdminSemester> adminSemesters = adminSemesterRepository.findBySemester(semester.getName());
 				List<MemberSemester> memberSemestersBefore = memberSemesterRepository
-						.findBySemesterOrderByIdDesc(semesters.get(1).getName());
+						.findBySemesterOrderByIdDesc(semesters.get(2).getName());
 				List<AdminSemester> adminSemestersBefore = adminSemesterRepository
-						.findBySemester(semesters.get(1).getName());
+						.findBySemester(semesters.get(2).getName());
 				List<User> users = userRepository.findMembersAndAdmin();
 				totalUser = users.size();
 				if (memberSemesters.size() > 0) {
