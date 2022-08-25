@@ -1278,7 +1278,7 @@ public class UserServiceImpl implements UserService {
 					}
 				}
 				responseMessage.setData(Arrays.asList(memberSemesterOp.get()));
-				responseMessage.setMessage("Cập nhật trạng thái hoạt động kì " + semester + " thành công");
+				responseMessage.setMessage("Cập nhật thành công trạng thái hoạt động của kì " + semester + ": " + user.isActive());
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
