@@ -1373,7 +1373,8 @@ public class TournamentServiceImpl implements TournamentService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
-			if (LocalDateTime.now().isBefore(tournament.getRegistrationOrganizingCommitteeDeadline())) {
+			if (LocalDateTime.now().isBefore(tournament.getRegistrationOrganizingCommitteeDeadline())
+					&& tournament.getStage() == 0) {
 				User user = userRepository.findByStudentId(studentId).get();
 				TournamentRole tournamentRole = tournamentRoleRepository.findById(roleId).get();
 
@@ -1828,7 +1829,8 @@ public class TournamentServiceImpl implements TournamentService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
-			if (LocalDateTime.now().isBefore(tournament.getRegistrationPlayerDeadline())) {
+			if (LocalDateTime.now().isBefore(tournament.getRegistrationPlayerDeadline())
+					&& tournament.getStage() == 0) {
 //				User user = userRepository.findByStudentId(studentId).get();
 				ExhibitionType exhibitionType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
 
@@ -2153,7 +2155,12 @@ public class TournamentServiceImpl implements TournamentService {
 			if (tournamentPlayerOp.isPresent()) {
 				TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
 				Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+
+				List<ExhibitionType> listExhibitionTypes = new ArrayList<ExhibitionType>();
+
 				for (ExhibitionType exhibitionType : exhibitionTypes) {
+					boolean isContinue = false;
+					
 					List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
 							.findByExhibitionTypeId(exhibitionType.getId());
 					for (ExhibitionTypeRegistration exhibitionTypeRegistration : exhibitionTypeRegistrations) {
@@ -2165,22 +2172,40 @@ public class TournamentServiceImpl implements TournamentService {
 							for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistration) {
 								if (tournamentPlayer.getId() == exhibitionPlayerRegistration.getTournamentPlayer()
 										.getId()) {
-									responseMessage.setMessage(
-											"Yêu cầu đăng ký tham gia nội dung thi đấu biểu diễn của bạn đang chờ duyệt");
-									return responseMessage;
+									listExhibitionTypes.add(exhibitionType);
+									isContinue = true;
+									break;
+//									responseMessage.setMessage(
+//											"Yêu cầu đăng ký tham gia nội dung thi đấu biểu diễn của bạn đang chờ duyệt");
+//									return responseMessage;
 								}
 							}
+							if (isContinue) {
+								break;
+							}
 						}
+					}
+					
+					if (isContinue) {
+						continue;
 					}
 
 					Optional<ExhibitionPlayer> exhibitionPlayerOp = exhibitionPlayerRepository
 							.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
 					if (exhibitionPlayerOp.isPresent()) {
-						responseMessage.setMessage(
-								"Yêu cầu đăng ký tham gia nội dung thi đấu biểu diễn của bạn đã được chấp nhận");
-						return responseMessage;
+						listExhibitionTypes.add(exhibitionType);
+//						responseMessage.setMessage(
+//								"Yêu cầu đăng ký tham gia nội dung thi đấu biểu diễn của bạn đã được chấp nhận");
+//						return responseMessage;
 					}
 
+//					responseMessage.setMessage("Bạn chưa đăng ký tham gia thi đấu biểu diễn");
+				}
+				
+				if (!listExhibitionTypes.isEmpty()) {
+					responseMessage.setData(listExhibitionTypes);
+					responseMessage.setMessage("Bạn đã đăng ký tham gia những nội dung thi đấu biểu diễn này");
+				} else {
 					responseMessage.setMessage("Bạn chưa đăng ký tham gia thi đấu biểu diễn");
 				}
 			} else {
