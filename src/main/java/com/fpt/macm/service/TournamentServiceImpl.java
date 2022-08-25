@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import org.apache.commons.collections4.IterableUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,7 @@ import com.fpt.macm.model.entity.ExhibitionTeam;
 import com.fpt.macm.model.entity.ExhibitionTeamRegistration;
 import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.ExhibitionTypeRegistration;
+import com.fpt.macm.model.entity.Notification;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
@@ -1480,6 +1482,22 @@ public class TournamentServiceImpl implements TournamentService {
 					tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
 					tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
 
+					Notification notification = new Notification();
+					notification.setMessage("Yêu cầu đăng ký tham gia BTC giải đấu "
+							+ tournamentOrganizingCommittee.getTournament().getName() + " của bạn đã được chấp nhận");
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(0);
+					notification.setNotificationTypeId(tournamentOrganizingCommittee.getTournament().getId());
+					notificationRepository.save(notification);
+
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
+
+					notificationService.sendNotificationToAnUser(tournamentOrganizingCommittee.getUser(),
+							newNotification);
+
 					responseMessage.setData(
 							Arrays.asList(convertToTournamentOrganizingCommitteeDto(tournamentOrganizingCommittee)));
 					responseMessage.setMessage("Chấp nhận yêu cầu tham gia BTC giải đấu của "
@@ -1510,6 +1528,22 @@ public class TournamentServiceImpl implements TournamentService {
 					tournamentOrganizingCommittee.setUpdatedBy("toandv");
 					tournamentOrganizingCommittee.setUpdatedOn(LocalDateTime.now());
 					tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
+
+					Notification notification = new Notification();
+					notification.setMessage("Yêu cầu đăng ký tham gia BTC giải đấu "
+							+ tournamentOrganizingCommittee.getTournament().getName() + " của bạn đã bị từ chối");
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(0);
+					notification.setNotificationTypeId(tournamentOrganizingCommittee.getTournament().getId());
+					notificationRepository.save(notification);
+
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
+
+					notificationService.sendNotificationToAnUser(tournamentOrganizingCommittee.getUser(),
+							newNotification);
 
 					responseMessage.setData(
 							Arrays.asList(convertToTournamentOrganizingCommitteeDto(tournamentOrganizingCommittee)));
@@ -1706,6 +1740,26 @@ public class TournamentServiceImpl implements TournamentService {
 
 					competitiveService.autoSpawnMatchs(competitiveType.getId());
 
+					int tournamentId = competitiveTypeRepository.findTournamentOfType(competitiveType.getId());
+					Tournament tournament = tournamentRepository.findById(tournamentId).get();
+
+					Notification notification = new Notification();
+					notification.setMessage("Yêu cầu đăng ký tham gia giải đấu " + tournament.getName()
+							+ " với hạng cân " + competitiveType.getWeightMin() + "kg - "
+							+ competitiveType.getWeightMax() + "kg của bạn đã được chấp nhận");
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(0);
+					notification.setNotificationTypeId(tournamentId);
+					notificationRepository.save(notification);
+
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
+
+					notificationService.sendNotificationToAnUser(
+							competitiveTypeRegistration.getTournamentPlayer().getUser(), newNotification);
+
 					responseMessage.setData(Arrays.asList(competitivePlayer));
 					responseMessage.setMessage("Chấp nhận đăng ký tham gia thành công");
 				} else {
@@ -1731,6 +1785,28 @@ public class TournamentServiceImpl implements TournamentService {
 				if (competitiveTypeRegistration.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
 					competitiveTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
 					competitiveTypeRegistrationRepository.save(competitiveTypeRegistration);
+
+					CompetitiveType competitiveType = competitiveTypeRegistration.getCompetitiveType();
+
+					int tournamentId = competitiveTypeRepository.findTournamentOfType(competitiveType.getId());
+					Tournament tournament = tournamentRepository.findById(tournamentId).get();
+
+					Notification notification = new Notification();
+					notification.setMessage("Yêu cầu đăng ký tham gia giải đấu " + tournament.getName()
+							+ " với hạng cân " + competitiveType.getWeightMin() + "kg - "
+							+ competitiveType.getWeightMax() + "kg của bạn đã bị từ chối");
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(0);
+					notification.setNotificationTypeId(tournamentId);
+					notificationRepository.save(notification);
+
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
+
+					notificationService.sendNotificationToAnUser(
+							competitiveTypeRegistration.getTournamentPlayer().getUser(), newNotification);
 
 					responseMessage.setData(Arrays.asList(competitiveTypeRegistration));
 					responseMessage.setMessage("Từ chối đăng ký tham gia thành công");
@@ -1893,6 +1969,28 @@ public class TournamentServiceImpl implements TournamentService {
 
 				exhibitionTypeRegistrationRepository.delete(exhibitionTypeRegistration);
 
+				int tournamentId = exhibitionTypeRepository.findTournamentOfType(exhibitionType.getId());
+				Tournament tournament = tournamentRepository.findById(tournamentId).get();
+
+				Notification notification = new Notification();
+				notification.setMessage("Yêu cầu đăng ký tham gia giải đấu " + tournament.getName() + " với nội dung "
+						+ exhibitionType.getName() + " của đội " + exhibitionTeamRegistration.getTeamName()
+						+ " đã được chấp nhận");
+				notification.setCreatedOn(LocalDateTime.now());
+				notification.setNotificationType(0);
+				notification.setNotificationTypeId(tournamentId);
+				notificationRepository.save(notification);
+
+				Iterable<Notification> notificationIterable = notificationRepository
+						.findAll(Sort.by("id").descending());
+				List<Notification> notifications = IterableUtils.toList(notificationIterable);
+				Notification newNotification = notifications.get(0);
+
+				for (ExhibitionPlayer exhibitionPlayer : exhibitionPlayers) {
+					notificationService.sendNotificationToAnUser(
+							exhibitionPlayer.getTournamentPlayer().getUser(), newNotification);
+				}
+
 				responseMessage.setData(Arrays.asList(exhibitionTypeRegistration));
 				responseMessage.setMessage("Chấp nhận đăng ký tham gia thành công");
 			} else {
@@ -1923,6 +2021,30 @@ public class TournamentServiceImpl implements TournamentService {
 				}
 				exhibitionTeamRegistrationRepository.delete(exhibitionTeamRegistration);
 				exhibitionTypeRegistrationRepository.delete(exhibitionTypeRegistration);
+				
+				ExhibitionType exhibitionType = exhibitionTypeRegistration.getExhibitionType();
+				
+				int tournamentId = exhibitionTypeRepository.findTournamentOfType(exhibitionType.getId());
+				Tournament tournament = tournamentRepository.findById(tournamentId).get();
+
+				Notification notification = new Notification();
+				notification.setMessage("Yêu cầu đăng ký tham gia giải đấu " + tournament.getName() + " với nội dung "
+						+ exhibitionType.getName() + " của đội " + exhibitionTeamRegistration.getTeamName()
+						+ " đã bị từ chối");
+				notification.setCreatedOn(LocalDateTime.now());
+				notification.setNotificationType(0);
+				notification.setNotificationTypeId(tournamentId);
+				notificationRepository.save(notification);
+
+				Iterable<Notification> notificationIterable = notificationRepository
+						.findAll(Sort.by("id").descending());
+				List<Notification> notifications = IterableUtils.toList(notificationIterable);
+				Notification newNotification = notifications.get(0);
+
+				for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayerRegistrations) {
+					notificationService.sendNotificationToAnUser(
+							exhibitionPlayerRegistration.getTournamentPlayer().getUser(), newNotification);
+				}
 
 				responseMessage.setData(Arrays.asList(exhibitionTypeRegistration));
 				responseMessage.setMessage("Từ chối đăng ký tham gia thành công");
@@ -2058,7 +2180,7 @@ public class TournamentServiceImpl implements TournamentService {
 								"Yêu cầu đăng ký tham gia nội dung thi đấu biểu diễn của bạn đã được chấp nhận");
 						return responseMessage;
 					}
-					
+
 					responseMessage.setMessage("Bạn chưa đăng ký tham gia thi đấu biểu diễn");
 				}
 			} else {
@@ -2202,8 +2324,9 @@ public class TournamentServiceImpl implements TournamentService {
 			for (UserTournamentOrganizingCommitteeDto userToJoin : users) {
 				if (!isJoinTournament(userToJoin.getUser().getId(), tournamentId)) {
 					TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
-					
-					Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(tournament.getId(), userToJoin.getUser().getId());
+
+					Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
+							.findByTournamentIdAndUserId(tournament.getId(), userToJoin.getUser().getId());
 					if (tournamentOrganizingCommitteeOp.isPresent()) {
 						tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
 						tournamentOrganizingCommittee.setUpdatedBy(user.getName() + " - " + user.getStudentId());
