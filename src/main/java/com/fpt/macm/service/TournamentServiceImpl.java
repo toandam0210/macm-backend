@@ -207,7 +207,13 @@ public class TournamentServiceImpl implements TournamentService {
 			Tournament tournament = tournamentCreateDto.getTournament();
 			List<TournamentRoleDto> tournamentRolesDto = tournamentCreateDto.getTournamentRolesDto();
 			List<ScheduleDto> listPreview = tournamentCreateDto.getListPreview();
-
+			Collections.sort(listPreview, new Comparator<ScheduleDto>() {
+				@Override
+				public int compare(ScheduleDto o1, ScheduleDto o2) {
+					// TODO Auto-generated method stub
+					return o1.getDate().compareTo(o2.getDate());
+				}
+			});
 			if (tournament == null || listPreview == null || listPreview.isEmpty()) {
 				responseMessage.setMessage("Không đc null");
 				return responseMessage;
@@ -216,7 +222,15 @@ public class TournamentServiceImpl implements TournamentService {
 			if (isAvailableToCreateTournament(listPreview, isOverwritten)) {
 				User user = userRepository.findByStudentId(studentId).get();
 
-				Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+				Semester getSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+				List<Semester> listAllSemester = semesterRepository.findAll();
+				for (Semester semester : listAllSemester) {
+					if (listPreview.get(0).getDate().compareTo(semester.getStartDate()) >= 0
+							&& listPreview.get(0).getDate().compareTo(semester.getEndDate()) <= 0) {
+						getSemester = semester;
+						break;
+					}
+				}
 
 				List<TournamentSchedule> listTournamentSchedule = new ArrayList<TournamentSchedule>();
 				List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
@@ -224,7 +238,7 @@ public class TournamentServiceImpl implements TournamentService {
 				List<TrainingSchedule> listTrainingOverwritten = new ArrayList<TrainingSchedule>();
 				List<AttendanceStatus> listAttendanceStatusOverwritten = new ArrayList<AttendanceStatus>();
 
-				tournament.setSemester(semester.getName());
+				tournament.setSemester(getSemester.getName());
 				tournament.setStatus(true);
 				tournament.setCreatedBy(user.getName() + " - " + user.getStudentId());
 				tournament.setCreatedOn(LocalDateTime.now());
