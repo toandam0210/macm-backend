@@ -18,9 +18,12 @@ import com.fpt.macm.model.dto.ExhibitionPlayerDto;
 import com.fpt.macm.model.dto.ExhibitionResultByTypeDto;
 import com.fpt.macm.model.dto.ExhibitionTeamDto;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
+import com.fpt.macm.model.entity.ExhibitionPlayerRegistration;
 import com.fpt.macm.model.entity.ExhibitionResult;
 import com.fpt.macm.model.entity.ExhibitionTeam;
+import com.fpt.macm.model.entity.ExhibitionTeamRegistration;
 import com.fpt.macm.model.entity.ExhibitionType;
+import com.fpt.macm.model.entity.ExhibitionTypeRegistration;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
@@ -29,6 +32,7 @@ import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
+import com.fpt.macm.repository.ExhibitionTypeRegistrationRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
@@ -61,6 +65,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	
 	@Autowired
 	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
+	
+	@Autowired
+	ExhibitionTypeRegistrationRepository exhibitionTypeRegistrationRepository;
 
 	@Override
 	public ResponseMessage getAllExhibitionType(int tournamentId) {
@@ -96,7 +103,35 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 				List<User> listActive = userRepository.findAllActiveUser();
 				List<TournamentPlayer> listPlayers = tournamentPlayerRepository
 						.getPlayerByTournamentId(getTournament.getId());
+				List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
+						.findByExhibitionTypeId(exhibitionTypeId);
 				for (TournamentPlayer tournamentPlayer : listPlayers) {
+					boolean isContinue = false;
+					for (ExhibitionTypeRegistration exhibitionTypeRegistration : exhibitionTypeRegistrations) {
+						if (exhibitionTypeRegistration.getRegisterStatus()
+								.equals(Constant.REQUEST_STATUS_PENDING)) {
+							ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
+									.getExhibitionTeamRegistration();
+							Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration = exhibitionTeamRegistration
+									.getExhibitionPlayersRegistration();
+							for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistration) {
+								if (tournamentPlayer.getId() == exhibitionPlayerRegistration.getTournamentPlayer()
+										.getId()) {
+									User getUser = tournamentPlayer.getUser();
+									userJoined.add(getUser);
+									isContinue = true;
+									break;
+								}
+							}
+						}
+						if (isContinue) {
+							break;
+						}
+					}
+					if (isContinue) {
+						continue;
+					}
+					
 					Optional<ExhibitionPlayer> getExhibitionPlayerOp = exhibitionPlayerRepository
 							.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionTypeId);
 					if (getExhibitionPlayerOp.isPresent()) {
@@ -104,6 +139,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 						userJoined.add(getUser);
 					}
 				}
+				
+				
+				
 				
 				List<TournamentOrganizingCommittee> tournamentOrganizingCommittees = tournamentOrganizingCommitteeRepository
 						.findByTournamentId(getTournament.getId());
@@ -137,9 +175,9 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			Optional<ExhibitionType> getTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
-			if (getTypeOp.isPresent()) {
-				ExhibitionType getType = getTypeOp.get();
+			Optional<ExhibitionType> exhibitionTypeOp = exhibitionTypeRepository.findById(exhibitionTypeId);
+			if (exhibitionTypeOp.isPresent()) {
+				ExhibitionType exhibitionType = exhibitionTypeOp.get();
 				ExhibitionTeam newTeam = new ExhibitionTeam();
 				newTeam.setTeamName(name);
 				Set<ExhibitionPlayer> listMembers = new HashSet<>();
@@ -147,30 +185,52 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 				int countMale = 0;
 				int countFemale = 0;
 				for (String studentId : listStudentId) {
-					User getUser = userRepository.findByStudentId(studentId).get();
-					if (getUser.isGender()) {
+					User user = userRepository.findByStudentId(studentId).get();
+					if (user.isGender()) {
 						countMale++;
 					} else {
 						countFemale++;
 					}
-					Optional<TournamentPlayer> getTournamentPlayerOp = tournamentPlayerRepository
-							.getPlayerByUserIdAndTournamentId(getUser.getId(),
+					Optional<TournamentPlayer> tournamentPlayerOp = tournamentPlayerRepository
+							.getPlayerByUserIdAndTournamentId(user.getId(),
 									exhibitionTypeRepository.findTournamentOfType(exhibitionTypeId));
-					if (getTournamentPlayerOp.isPresent()) {
-						TournamentPlayer getTournamentPlayer = getTournamentPlayerOp.get();
+					if (tournamentPlayerOp.isPresent()) {
+						TournamentPlayer tournamentPlayer = tournamentPlayerOp.get();
+						
+						List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
+								.findByExhibitionTypeId(exhibitionTypeId);
+						for (ExhibitionTypeRegistration exhibitionTypeRegistration : exhibitionTypeRegistrations) {
+							if (exhibitionTypeRegistration.getRegisterStatus()
+									.equals(Constant.REQUEST_STATUS_PENDING)) {
+								ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
+										.getExhibitionTeamRegistration();
+								Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration = exhibitionTeamRegistration
+										.getExhibitionPlayersRegistration();
+								for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistration) {
+									if (tournamentPlayer.getId() == exhibitionPlayerRegistration.getTournamentPlayer()
+											.getId()) {
+										responseMessage.setMessage("Thành viên " + tournamentPlayer.getUser().getName()
+												+ " - " + tournamentPlayer.getUser().getStudentId()
+												+ " đã đăng ký nội dung này");
+										return responseMessage;
+									}
+								}
+							}
+						}
+						
 						Optional<ExhibitionPlayer> getExhibitionPlayerOp = exhibitionPlayerRepository
-								.findByTournamentPlayerAndType(getTournamentPlayer.getId(), getType.getId());
+								.findByTournamentPlayerAndType(tournamentPlayer.getId(), exhibitionType.getId());
 						if (getExhibitionPlayerOp.isPresent()) {
 							isRegister = false;
-							responseMessage.setMessage("Thành viên " + getUser.getName() + " - "
-									+ getUser.getStudentId() + " đã đăng ký nội dung này");
+							responseMessage.setMessage("Thành viên " + user.getName() + " - "
+									+ user.getStudentId() + " đã đăng ký nội dung này");
 							return responseMessage;
 						} else {
 							continue;
 						}
 					}
 				}
-				if (countMale != getType.getNumberMale() || countFemale != getType.getNumberFemale()) {
+				if (countMale != exhibitionType.getNumberMale() || countFemale != exhibitionType.getNumberFemale()) {
 					responseMessage.setMessage("Số lượng thành viên không hợp lệ");
 				} else if (isRegister) {
 					for (int i = 0; i < listStudentId.size(); i++) {
@@ -214,11 +274,11 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 					newTeam.setCreatedOn(LocalDateTime.now());
 					newTeam.setUpdatedBy("LinhLHN");
 					newTeam.setUpdatedOn(LocalDateTime.now());
-					Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
+					Set<ExhibitionTeam> getTeams = exhibitionType.getExhibitionTeams();
 					getTeams.add(newTeam);
-					getType.setExhibitionTeams(getTeams);
+					exhibitionType.setExhibitionTeams(getTeams);
 					exhibitionTeamRepository.save(newTeam);
-					exhibitionTypeRepository.save(getType);
+					exhibitionTypeRepository.save(exhibitionType);
 					responseMessage.setData(Arrays.asList(newTeam));
 					responseMessage.setMessage("Đăng ký thành công");
 				}

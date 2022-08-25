@@ -333,6 +333,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				attendanceStatistics.put("id", String.valueOf(user.getId()));
 				attendanceStatistics.put("name", user.getName());
 				attendanceStatistics.put("studentId", user.getStudentId());
+				attendanceStatistics.put("email", user.getEmail());
 				attendanceStatistics.put("roleName", Utils.convertRoleFromDbToExcel(user.getRole()));
 
 				int totalAbsent = 0;
