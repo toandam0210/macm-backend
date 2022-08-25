@@ -1665,26 +1665,30 @@ public class TournamentServiceImpl implements TournamentService {
 					.findById(competitiveTypeRegistrationId);
 			if (competitiveTypeRegistrationOp.isPresent()) {
 				CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp.get();
-				competitiveTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
-				competitiveTypeRegistrationRepository.save(competitiveTypeRegistration);
+				if (competitiveTypeRegistration.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+					competitiveTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+					competitiveTypeRegistrationRepository.save(competitiveTypeRegistration);
 
-				CompetitivePlayer competitivePlayer = new CompetitivePlayer();
-				competitivePlayer.setCompetitiveType(competitiveTypeRegistration.getCompetitiveType());
-				competitivePlayer.setTournamentPlayer(competitiveTypeRegistration.getTournamentPlayer());
-				competitivePlayer.setWeight(competitiveTypeRegistration.getWeight());
-				competitivePlayer.setIsEligible(true);
-				competitivePlayer.setCreatedBy("toandv");
-				competitivePlayer.setCreatedOn(LocalDateTime.now());
-				competitivePlayerRepository.save(competitivePlayer);
+					CompetitivePlayer competitivePlayer = new CompetitivePlayer();
+					competitivePlayer.setCompetitiveType(competitiveTypeRegistration.getCompetitiveType());
+					competitivePlayer.setTournamentPlayer(competitiveTypeRegistration.getTournamentPlayer());
+					competitivePlayer.setWeight(competitiveTypeRegistration.getWeight());
+					competitivePlayer.setIsEligible(true);
+					competitivePlayer.setCreatedBy("toandv");
+					competitivePlayer.setCreatedOn(LocalDateTime.now());
+					competitivePlayerRepository.save(competitivePlayer);
 
-				CompetitiveType competitiveType = competitiveTypeRegistration.getCompetitiveType();
-				competitiveType.setCanDelete(false);
-				competitiveTypeRepository.save(competitiveType);
+					CompetitiveType competitiveType = competitiveTypeRegistration.getCompetitiveType();
+					competitiveType.setCanDelete(false);
+					competitiveTypeRepository.save(competitiveType);
 
-				competitiveService.autoSpawnMatchs(competitiveType.getId());
+					competitiveService.autoSpawnMatchs(competitiveType.getId());
 
-				responseMessage.setData(Arrays.asList(competitivePlayer));
-				responseMessage.setMessage("Chấp nhận đăng ký tham gia thành công");
+					responseMessage.setData(Arrays.asList(competitivePlayer));
+					responseMessage.setMessage("Chấp nhận đăng ký tham gia thành công");
+				} else {
+					responseMessage.setMessage("Yêu cầu đăng ký không hợp lệ");
+				}
 			} else {
 				responseMessage.setMessage("Không có yêu cầu đăng ký này");
 			}
@@ -1702,11 +1706,15 @@ public class TournamentServiceImpl implements TournamentService {
 					.findById(competitiveTypeRegistrationId);
 			if (competitiveTypeRegistrationOp.isPresent()) {
 				CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp.get();
-				competitiveTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
-				competitiveTypeRegistrationRepository.save(competitiveTypeRegistration);
+				if (competitiveTypeRegistration.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+					competitiveTypeRegistration.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
+					competitiveTypeRegistrationRepository.save(competitiveTypeRegistration);
 
-				responseMessage.setData(Arrays.asList(competitiveTypeRegistration));
-				responseMessage.setMessage("Từ chối đăng ký tham gia thành công");
+					responseMessage.setData(Arrays.asList(competitiveTypeRegistration));
+					responseMessage.setMessage("Từ chối đăng ký tham gia thành công");
+				} else {
+					responseMessage.setMessage("Yêu cầu đăng ký không hợp lệ");
+				}
 			} else {
 				responseMessage.setMessage("Không có yêu cầu đăng ký này");
 			}
@@ -1834,7 +1842,7 @@ public class TournamentServiceImpl implements TournamentService {
 						.getExhibitionTeamRegistration();
 				Set<ExhibitionPlayerRegistration> exhibitionPlayerRegistrations = exhibitionTeamRegistration
 						.getExhibitionPlayersRegistration();
-				
+
 				Set<ExhibitionPlayer> exhibitionPlayers = new HashSet<ExhibitionPlayer>();
 				for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayerRegistrations) {
 					ExhibitionPlayer exhibitionPlayer = new ExhibitionPlayer();
