@@ -43,11 +43,11 @@ public class CompetitiveController {
 				competitiveService.updateWeightForCompetitivePlayer(competitivePlayerId, weight), HttpStatus.OK);
 	}
 
-	@PutMapping("/headclub/deletecompetitiveplayer/{competitivePlayerId}")
+	@PutMapping("/headclub/deletecompetitiveplayer/{studentId}/{competitivePlayerId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
-	ResponseEntity<ResponseMessage> deleteCompetitivePlayer(
+	ResponseEntity<ResponseMessage> deleteCompetitivePlayer(@PathVariable(name = "studentId") String studentId,
 			@PathVariable(name = "competitivePlayerId") int competitivePlayerId) {
-		return new ResponseEntity<ResponseMessage>(competitiveService.deleteCompetitivePlayer(competitivePlayerId),
+		return new ResponseEntity<ResponseMessage>(competitiveService.deleteCompetitivePlayer(studentId, competitivePlayerId),
 				HttpStatus.OK);
 	}
 
