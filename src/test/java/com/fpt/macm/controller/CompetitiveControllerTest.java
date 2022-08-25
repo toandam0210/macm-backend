@@ -203,17 +203,17 @@ public class CompetitiveControllerTest {
 		.andExpect(jsonPath("$.data.size()").value("1"));
 	}
 	
-	@Test
-	public void testdDeleteCompetitivePlayer() throws Exception{
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(competitivePlayer()));
-		when(competitiveService.deleteCompetitivePlayer(anyInt()))
-		.thenReturn(responseMessage);
-		this.mockMvc
-		.perform(put("/api/competitive/headclub/deletecompetitiveplayer/{competitivePlayerId}", 1))
-		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
+//	@Test
+//	public void testdDeleteCompetitivePlayer() throws Exception{
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		responseMessage.setData(Arrays.asList(competitivePlayer()));
+//		when(competitiveService.deleteCompetitivePlayer(anyInt()))
+//		.thenReturn(responseMessage);
+//		this.mockMvc
+//		.perform(put("/api/competitive/headclub/deletecompetitiveplayer/{competitivePlayerId}", 1))
+//		.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(jsonPath("$.data.size()").value("1"));
+//	}
 	
 //	@Test
 //	public void testGetListPlayerBracket() throws Exception {
