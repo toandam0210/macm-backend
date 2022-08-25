@@ -49,6 +49,7 @@ import com.fpt.macm.repository.MembershipShipInforRepository;
 import com.fpt.macm.repository.MembershipStatusRepository;
 import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.NotificationToUserRepository;
+import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -75,7 +76,7 @@ public class NotificationServiceImpl implements NotificationService {
 	MembershipShipInforRepository membershipShipInforRepository;
 
 	@Autowired
-	SemesterService semesterService;
+	SemesterRepository semesterRepository;
 
 	@Autowired
 	MemberEventRepository memberEventRepository;
@@ -374,22 +375,24 @@ public class NotificationServiceImpl implements NotificationService {
 
 			List<String> messages = new ArrayList<String>();
 			User user = userRepository.findByStudentId(studentId).get();
-			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-			Optional<MembershipInfo> membershipInfoOp = membershipShipInforRepository
-					.findBySemester(semester.getName());
-			if (membershipInfoOp.isPresent()) {
-				MembershipInfo membershipInfo = membershipInfoOp.get();
-				Optional<MembershipStatus> membershipStatusOp = membershipStatusRepository
-						.findByMemberShipInfoIdAndUserId(membershipInfo.getId(), user.getId());
-				if (membershipStatusOp.isPresent()) {
-					MembershipStatus membershipStatus = membershipStatusOp.get();
-					if (!membershipStatus.isStatus()) {
-						String message = "Membership kỳ " + semester.getName() + ": "
-								+ nf.format(membershipInfo.getAmount()) + " VND";
-						messages.add(message);
+			List<Semester> semesters = semesterRepository.findAll();
+			for (Semester semester : semesters) {
+				Optional<MembershipInfo> membershipInfoOp = membershipShipInforRepository
+						.findBySemester(semester.getName());
+				if (membershipInfoOp.isPresent()) {
+					MembershipInfo membershipInfo = membershipInfoOp.get();
+					Optional<MembershipStatus> membershipStatusOp = membershipStatusRepository
+							.findByMemberShipInfoIdAndUserId(membershipInfo.getId(), user.getId());
+					if (membershipStatusOp.isPresent()) {
+						MembershipStatus membershipStatus = membershipStatusOp.get();
+						if (!membershipStatus.isStatus()) {
+							String message = "Membership kỳ " + semester.getName() + ": "
+									+ nf.format(membershipInfo.getAmount()) + " VND";
+							messages.add(message);
+						}
 					}
-				}
 
+				}
 			}
 
 			List<MemberEvent> membersEvent = memberEventRepository.findByUserId(user.getId());

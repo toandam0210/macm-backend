@@ -40,11 +40,11 @@ public class SemesterServiceImpl implements SemesterService {
 	}
 
 	@Override
-	public ResponseMessage getTop3Semesters() {
+	public ResponseMessage getTop4Semesters() {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<Semester> semesters = semesterRepository.findTop3Semester();
+			List<Semester> semesters = semesterRepository.findTop4Semester();
 			if(semesters.size() > 0) {
 			responseMessage.setData(semesters);
 			responseMessage.setMessage("Lấy kì thành công");

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
@@ -72,9 +73,8 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 			} else if (finishLocalDate.compareTo(LocalDate.now()) < 0) {
 				responseMessage.setMessage(Constant.MSG_039);
 			} else {
-
-				Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-				if (finishLocalDate.compareTo(currentSemester.getEndDate()) > 0) {
+				Semester lastSemester = semesterRepository.findAll(Sort.by("startDate").descending()).get(0);
+				if (finishLocalDate.compareTo(lastSemester.getEndDate()) > 0) {
 					responseMessage.setMessage(Constant.MSG_080);
 				} else {
 					List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
@@ -119,74 +119,80 @@ public class TrainingScheduleServiceImpl implements TrainingScheduleService {
 			if (trainingSchedule.getStartTime().compareTo(trainingSchedule.getFinishTime()) >= 0) {
 				responseMessage.setMessage(Constant.MSG_038);
 			} else {
-				if (trainingSchedule.getDate().compareTo(LocalDate.now()) > 0) {
-					CommonSchedule commonSchedule = commonScheduleService
-							.getCommonSessionByDate(trainingSchedule.getDate());
-					if (commonSchedule == null) {
-						trainingSchedule.setCreatedBy("LinhLHN");
-						trainingSchedule.setCreatedOn(LocalDateTime.now());
-						trainingSchedule.setUpdatedBy("LinhLHN");
-						trainingSchedule.setUpdatedOn(LocalDateTime.now());
-						trainingScheduleRepository.save(trainingSchedule);
-						responseMessage.setData(Arrays.asList(trainingSchedule));
-						responseMessage.setMessage(Constant.MSG_037);
-						CommonSchedule commonSession = new CommonSchedule();
-						commonSession.setTitle("Lịch tập");
-						commonSession.setDate(trainingSchedule.getDate());
-						commonSession.setStartTime(trainingSchedule.getStartTime());
-						commonSession.setFinishTime(trainingSchedule.getFinishTime());
-						commonSession.setCreatedOn(LocalDateTime.now());
-						commonSession.setUpdatedOn(LocalDateTime.now());
-						commonSession.setType(0);
-						commonScheduleRepository.save(commonSession);
+				Semester lastSemester = semesterRepository.findAll(Sort.by("startDate").descending()).get(0);
+				if (LocalDate.now().compareTo(lastSemester.getEndDate()) > 0) {
+					responseMessage.setMessage(Constant.MSG_080);
+				}
+				else {
+					if (trainingSchedule.getDate().compareTo(LocalDate.now()) > 0) {
+						CommonSchedule commonSchedule = commonScheduleService
+								.getCommonSessionByDate(trainingSchedule.getDate());
+						if (commonSchedule == null) {
+							trainingSchedule.setCreatedBy("LinhLHN");
+							trainingSchedule.setCreatedOn(LocalDateTime.now());
+							trainingSchedule.setUpdatedBy("LinhLHN");
+							trainingSchedule.setUpdatedOn(LocalDateTime.now());
+							trainingScheduleRepository.save(trainingSchedule);
+							responseMessage.setData(Arrays.asList(trainingSchedule));
+							responseMessage.setMessage(Constant.MSG_037);
+							CommonSchedule commonSession = new CommonSchedule();
+							commonSession.setTitle("Lịch tập");
+							commonSession.setDate(trainingSchedule.getDate());
+							commonSession.setStartTime(trainingSchedule.getStartTime());
+							commonSession.setFinishTime(trainingSchedule.getFinishTime());
+							commonSession.setCreatedOn(LocalDateTime.now());
+							commonSession.setUpdatedOn(LocalDateTime.now());
+							commonSession.setType(0);
+							commonScheduleRepository.save(commonSession);
 
-						// Thêm data điểm danh
-						List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
-						List<User> users = userRepository.findAllActiveUser();
-						if (!users.isEmpty()) {
-							Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository
-									.findByDate(trainingSchedule.getDate());
-							if (trainingScheduleOp.isPresent()) {
-								for (User user : users) {
-									AttendanceStatus attendanceStatus = new AttendanceStatus();
-									attendanceStatus.setUser(user);
-									attendanceStatus.setTrainingSchedule(trainingScheduleOp.get());
-									attendanceStatus.setCreatedOn(LocalDateTime.now());
-									attendanceStatus.setCreatedBy("toandv");
-									attendanceStatus.setStatus(2);
-									listAttendanceStatus.add(attendanceStatus);
+							// Thêm data điểm danh
+							List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
+							List<User> users = userRepository.findAllActiveUser();
+							if (!users.isEmpty()) {
+								Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository
+										.findByDate(trainingSchedule.getDate());
+								if (trainingScheduleOp.isPresent()) {
+									for (User user : users) {
+										AttendanceStatus attendanceStatus = new AttendanceStatus();
+										attendanceStatus.setUser(user);
+										attendanceStatus.setTrainingSchedule(trainingScheduleOp.get());
+										attendanceStatus.setCreatedOn(LocalDateTime.now());
+										attendanceStatus.setCreatedBy("toandv");
+										attendanceStatus.setStatus(2);
+										listAttendanceStatus.add(attendanceStatus);
+									}
 								}
 							}
-						}
 
-						if (!listAttendanceStatus.isEmpty()) {
-							attendanceStatusRepository.saveAll(listAttendanceStatus);
-						}
+							if (!listAttendanceStatus.isEmpty()) {
+								attendanceStatusRepository.saveAll(listAttendanceStatus);
+							}
 
-						// Gửi thông báo đến cho user khi tạo 1 buổi tập mới
-						notificationService.createTrainingSessionCreateNotification(trainingSchedule.getDate());
+							// Gửi thông báo đến cho user khi tạo 1 buổi tập mới
+							notificationService.createTrainingSessionCreateNotification(trainingSchedule.getDate());
+						} else {
+							switch (commonSchedule.getType()) {
+							case 0:
+								responseMessage.setMessage(
+										"Không thành công. Đã có " + commonSchedule.getTitle() + " trong ngày này.");
+								break;
+							case 1:
+								responseMessage.setMessage("Không thành công. Đã có sự kiện " + commonSchedule.getTitle()
+										+ " trong ngày này.");
+								break;
+							case 2:
+								responseMessage.setMessage("Không thành công. Đã có giải đấu " + commonSchedule.getTitle()
+										+ " trong ngày này.");
+								break;
+							default:
+								responseMessage.setMessage("Không thành công. Vui lòng thử lại.");
+								break;
+							}
+
+						}
 					} else {
-						switch (commonSchedule.getType()) {
-						case 0:
-							responseMessage.setMessage(
-									"Không thành công. Đã có " + commonSchedule.getTitle() + " trong ngày này.");
-							break;
-						case 1:
-							responseMessage.setMessage("Không thành công. Đã có sự kiện " + commonSchedule.getTitle()
-									+ " trong ngày này.");
-							break;
-						case 2:
-							responseMessage.setMessage("Không thành công. Đã có giải đấu " + commonSchedule.getTitle()
-									+ " trong ngày này.");
-							break;
-						default:
-							responseMessage.setMessage("Không thành công. Vui lòng thử lại.");
-							break;
-						}
-
+						responseMessage.setMessage(Constant.MSG_039);
 					}
-				} else {
-					responseMessage.setMessage(Constant.MSG_039);
 				}
 			}
 		} catch (Exception e) {

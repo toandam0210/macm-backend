@@ -13,10 +13,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fpt.macm.model.entity.Contact;
-import com.fpt.macm.model.entity.SocialNetwork;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ContactRepository;
-import com.fpt.macm.repository.SocialNetworkRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class ContactServiceTest {
@@ -27,9 +25,6 @@ public class ContactServiceTest {
 	@Mock
 	ContactRepository contactRepository;
 	
-	@Mock
-	SocialNetworkRepository socialNetworkRepository;
-	
 	private Contact contact() {
 		Contact contact = new Contact();
 		contact.setId(1);
@@ -38,14 +33,7 @@ public class ContactServiceTest {
 		contact.setClubPhoneNumber("0123456789");
 		return contact;
 	}
-	
-	private SocialNetwork socialNetwork() {
-		SocialNetwork socialNetwork = new SocialNetwork();
-		socialNetwork.setId(1);
-		socialNetwork.setName("Facebook");
-		socialNetwork.setUrl("fb.com/fnc");
-		return socialNetwork;
-	}
+
 	
 	@Test
 	public void getAllContactCaseSuccess() {
@@ -68,30 +56,6 @@ public class ContactServiceTest {
 		when(contactRepository.findAll()).thenReturn(null);
 		
 		ResponseMessage responseMessage = contactService.getAllContact();
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void getAllSocialNetworkCaseSuccess() {
-		when(socialNetworkRepository.findAll()).thenReturn(Arrays.asList(socialNetwork()));
-		
-		ResponseMessage responseMessage = contactService.getAllSocialNetwork();
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void getAllSocialNetworkCaseEmpty() {
-		when(socialNetworkRepository.findAll()).thenReturn(new ArrayList<SocialNetwork>());
-		
-		ResponseMessage responseMessage = contactService.getAllSocialNetwork();
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void getAllSocialNetworkCaseException() {
-		when(socialNetworkRepository.findAll()).thenReturn(null);
-		
-		ResponseMessage responseMessage = contactService.getAllSocialNetwork();
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	

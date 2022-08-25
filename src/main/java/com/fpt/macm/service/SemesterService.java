@@ -5,7 +5,7 @@ import com.fpt.macm.model.response.ResponseMessage;
 
 public interface SemesterService {
 	ResponseMessage getCurrentSemester();
-	ResponseMessage getTop3Semesters();
+	ResponseMessage getTop4Semesters();
 	ResponseMessage getListMonthsBySemester(String semester);
 	public ResponseMessage updateSemester(int semesterId, Semester semester);
 }
