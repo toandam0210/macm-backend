@@ -365,6 +365,7 @@ public class DashboardServiceImpl implements DashboardService {
 						if (!oldClubFundReports.isEmpty()) {
 							double totalIncomeOld = 0;
 							double totalSpendOld = 0;
+							double latestBalanceOld = 0;
 							for (ClubFundReport clubFundReport : oldClubFundReports) {
 								double fundChange = clubFundReport.getFundChange();
 								if (fundChange < 0) {
@@ -372,8 +373,15 @@ public class DashboardServiceImpl implements DashboardService {
 								} else {
 									totalIncomeOld += fundChange;
 								}
+								latestBalanceOld = clubFundReports.get(clubFundReports.size() - 1).getFundBalance();
 							}
 
+							if (latestBalanceOld != 0) {
+								feeDashboardToltalDto.setTotalBalancePercent((getClubFund() - latestBalanceOld) * 100 / latestBalanceOld);
+							} else {
+								feeDashboardToltalDto.setTotalBalancePercent(0);
+							}
+							
 							if (totalSpendOld != 0) {
 								feeDashboardToltalDto
 										.setTotalSpendPercent((totalSpend - totalSpendOld) * 100 / totalSpendOld);
