@@ -2613,7 +2613,7 @@ public class TournamentServiceImpl implements TournamentService {
 						}
 						Area getArea = listArea.get(0);
 						if(listMatchsNeedHeld.size() + listTypeNeedHeld.size() == 0) {
-							responseMessage.setMessage("Chưa có ai đăng ký thi đấu");
+							responseMessage.setMessage("Chưa có thể thức nào đủ điểu kiện tổ chức thi đấu");
 						}
 						else {
 							for (int i = 0; i < listTournamentSchedules.size(); i++) {
