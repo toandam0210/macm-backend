@@ -94,7 +94,7 @@ public interface TournamentService {
 
 	ResponseMessage getAllUserNotJoinTournament(int tournamentId);
 
-	ResponseMessage deleteTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId);
+	ResponseMessage deleteTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId, String studentId);
 
 	ResponseMessage getResultOfTournament(int tournamentId);
 
