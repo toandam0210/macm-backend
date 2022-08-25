@@ -527,7 +527,7 @@ public class TournamentServiceImpl implements TournamentService {
 						boolean isExist = false;
 						for (ExhibitionTypeDto exhibitionTypeDto : exhibitionTypeDtos) {
 							if (exhibitionTypeDto.getName().equals(exhibitionType.getName())
-									&& exhibitionTypeDto.getNumberMale() == exhibitionTypeDto.getNumberMale()
+									&& exhibitionType.getNumberMale() == exhibitionTypeDto.getNumberMale()
 									&& exhibitionType.getNumberFemale() == exhibitionTypeDto.getNumberFemale()) {
 								isExist = true;
 								break;
