@@ -393,7 +393,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 					if (listExhibitionByUser.size() == 0 && !getCompetitivePlayerOp.isPresent()) {
 						if (getTournamentPlayer.isPaymentStatus()) {
 							clubFundService.withdrawFromClubFund(admin.getStudentId(),
-									getTournament.getTotalAmountFromClubEstimate(),
+									getTournament.getFeePlayerPay(),
 									("Hoàn phí đăng ký tham gia giải đấu cho tuyển thủ "
 											+ getTournamentPlayer.getUser().getName()) + " - "
 											+ getTournamentPlayer.getUser().getStudentId());
