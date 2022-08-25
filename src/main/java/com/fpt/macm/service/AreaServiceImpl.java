@@ -57,40 +57,27 @@ public class AreaServiceImpl implements AreaService{
 		try {
 			List<Area> currentListArea = areaRepository.findAll();
 			List<Area> listResult = new ArrayList<Area>();
-			for (Area currentArea : currentListArea) {
-				boolean isExisted = false;
-				for (Area newArea : newListArea) {
-					if(currentArea.getName().equals(newArea.getName())) {
-						isExisted = true;
-						currentArea.setIsActive(true);
-						currentArea.setUpdatedBy("LinhLHN");
-						currentArea.setUpdatedOn(LocalDateTime.now());
-						areaRepository.save(currentArea);
-						listResult.add(currentArea);
-					}
-				}
-				if(!isExisted) {
-					currentArea.setIsActive(false);
-					currentArea.setUpdatedBy("LinhLHN");
-					currentArea.setUpdatedOn(LocalDateTime.now());
-					areaRepository.save(currentArea);
-				}
-			}
 			for (Area newArea : newListArea) {
-				boolean isExisted = false;
-				for (Area currentArea : currentListArea) {
-					if(currentArea.getName().equals(newArea.getName())) {
-						isExisted = true;
-					}
-				}
-				if(!isExisted) {
-					newArea.setIsActive(true);
+				if(newArea.getId() == null) {
 					newArea.setCreatedBy("LinhLHN");
 					newArea.setCreatedOn(LocalDateTime.now());
 					newArea.setUpdatedBy("LinhLHN");
 					newArea.setUpdatedOn(LocalDateTime.now());
 					areaRepository.save(newArea);
 					listResult.add(newArea);
+				}
+				else {
+					for (Area currentArea : currentListArea) {
+						if(currentArea.getId() == newArea.getId()) {
+							currentArea.setName(newArea.getName());
+							currentArea.setIsActive(newArea.getIsActive());
+							currentArea.setUpdatedBy("LinhLHN");
+							currentArea.setUpdatedOn(LocalDateTime.now());
+							areaRepository.save(currentArea);
+							listResult.add(currentArea);
+							break;
+						}
+					}
 				}
 			}
 			responseMessage.setData(listResult);

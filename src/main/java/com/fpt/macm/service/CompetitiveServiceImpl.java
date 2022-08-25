@@ -586,8 +586,6 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 		try {
 			Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findById(competitivePlayerId);
 			if (competitivePlayerOp.isPresent()) {
-				List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository
-						.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
 				CompetitivePlayer getCompetitivePlayer = competitivePlayerOp.get();
 				CompetitiveType competitiveType = getCompetitivePlayer.getCompetitiveType();
 				Tournament tournament = tournamentRepository
@@ -611,11 +609,6 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 					responseMessage.setMessage("Xóa tuyển thủ thành công");
 					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
 					autoSpawnMatchs(competitiveType.getId());
-					if (exhibitionPlayers.size() == 0) {
-						TournamentPlayer tournamentPlayer = tournamentPlayerRepository
-								.findById(getCompetitivePlayer.getTournamentPlayer().getId()).get();
-						tournamentPlayerRepository.delete(tournamentPlayer);
-					}
 				} else {
 					if (getCompetitivePlayer.getIsEligible()) {
 						responseMessage
@@ -630,6 +623,14 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							competitiveType.setCanDelete(true);
 							competitiveTypeRepository.save(competitiveType);
 						}
+					}
+				}
+				List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository
+						.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
+				if (exhibitionPlayers.size() == 0) {
+					TournamentPlayer tournamentPlayer = getCompetitivePlayer.getTournamentPlayer();
+					if(!tournamentPlayer.isPaymentStatus()) {
+						tournamentPlayerRepository.delete(tournamentPlayer);
 					}
 				}
 			} else {
