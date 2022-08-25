@@ -27,7 +27,6 @@ import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MemberSemester;
 import com.fpt.macm.model.entity.MembershipInfo;
-import com.fpt.macm.model.entity.MembershipStatus;
 import com.fpt.macm.model.entity.Notification;
 import com.fpt.macm.model.entity.NotificationToUser;
 import com.fpt.macm.model.entity.Role;
@@ -212,7 +211,7 @@ public class TaskSchedule {
 		logger.info("report oke");
 	}
 	
-	@Scheduled(cron = "0 0 6 * * *")
+	@Scheduled(cron = "0 0 1 * * *")
 	public void updateStatusMemberToDeactive() {
 		Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 		if(LocalDate.now().isEqual(currentSemester.getStartDate())) {
@@ -225,6 +224,7 @@ public class TaskSchedule {
 						MemberSemester memberSemester = new MemberSemester();
 						memberSemester.setSemester(currentSemester.getName());
 						memberSemester.setStatus(false);
+						memberSemester.setClicked(false);
 						memberSemester.setUser(user);
 						memberSemesterRepository.save(memberSemester);
 						logger.info("add member oke");
@@ -348,31 +348,14 @@ public class TaskSchedule {
 //		}
 //	}
 
-	@Scheduled(cron = "1 0 0 * * *")
+	@Scheduled(cron = "0 0 1 * * *")
 	public void addListMembershipStatus() {
-		if (LocalDate.now().getDayOfMonth() > 17 && LocalDate.now().getDayOfMonth() <= 24
-				&& LocalDate.now().getMonthValue() % 4 == 1
-				&& LocalDate.now().getDayOfWeek().toString().compareTo("MONDAY") == 0) {
+		Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+		if (LocalDate.now().isEqual(currentSemester.getStartDate())) {
 			MembershipInfo membershipInfo = new MembershipInfo();
-			membershipInfo.setAmount(0);
-			if (LocalDate.now().getMonthValue() == 1) {
-				membershipInfo.setSemester("Spring" + LocalDate.now().getYear());
-			}
-			if (LocalDate.now().getMonthValue() == 5) {
-				membershipInfo.setSemester("Summer" + LocalDate.now().getYear());
-			}
-			if (LocalDate.now().getMonthValue() == 9) {
-				membershipInfo.setSemester("Fall" + LocalDate.now().getYear());
-			}
+			membershipInfo.setAmount(50000);
+			membershipInfo.setSemester(currentSemester.getName());
 			membershipShipInforRepository.save(membershipInfo);
-			List<User> usersActive = userRepository.findMembersActive();
-			for (User user : usersActive) {
-				MembershipStatus membershipStatus = new MembershipStatus();
-				membershipStatus.setMembershipInfo(membershipInfo);
-				membershipStatus.setUser(user);
-				membershipStatus.setStatus(false);
-				membershipStatusRepository.save(membershipStatus);
-			}
 			logger.info("ok roi day");
 		}
 	}

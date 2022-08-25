@@ -25,6 +25,9 @@ public class MemberSemester {
 	
 	@Column
 	private boolean status;
+	
+	@Column(nullable = true)
+	private boolean isClicked;
 
 	public int getId() {
 		return id;
@@ -56,6 +59,14 @@ public class MemberSemester {
 
 	public void setStatus(boolean status) {
 		this.status = status;
+	}
+
+	public boolean isClicked() {
+		return isClicked;
+	}
+
+	public void setClicked(boolean isClicked) {
+		this.isClicked = isClicked;
 	}
 	
 	
