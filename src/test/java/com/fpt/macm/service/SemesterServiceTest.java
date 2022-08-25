@@ -58,15 +58,15 @@ public class SemesterServiceTest {
 	
 	@Test
 	public void testGetTop3Semesters() {
-		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
-		ResponseMessage responseMessage = semesterService.getTop3Semesters();
+		when(semesterRepository.findTop4Semester()).thenReturn(Arrays.asList(semester()));
+		ResponseMessage responseMessage = semesterService.getTop4Semesters();
 		assertEquals(responseMessage.getData().size(), 1);
 	}
 	
 	@Test
 	public void testGetTop3SemestersCaseException() {
-		when(semesterRepository.findTop3Semester()).thenReturn(null);
-		ResponseMessage responseMessage = semesterService.getTop3Semesters();
+		when(semesterRepository.findTop4Semester()).thenReturn(null);
+		ResponseMessage responseMessage = semesterService.getTop4Semesters();
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
@@ -91,14 +91,14 @@ public class SemesterServiceTest {
 	
 	@Test
 	public void testGetListMonthsBySemesterCaseAll() {
-		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
+		when(semesterRepository.findTop4Semester()).thenReturn(Arrays.asList(semester()));
 		ResponseMessage responseMessage = semesterService.getListMonthsBySemester("");
 		assertEquals(responseMessage.getData().size(), 4);
 	}
 	
 	@Test
 	public void testGetListMonthsBySemesterCaseException() {
-		when(semesterRepository.findTop3Semester()).thenReturn(null);
+		when(semesterRepository.findTop4Semester()).thenReturn(null);
 		ResponseMessage responseMessage = semesterService.getListMonthsBySemester("");
 		assertEquals(responseMessage.getData().size(), 0);
 	}
