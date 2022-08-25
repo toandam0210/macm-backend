@@ -25,12 +25,7 @@ public class ContactController {
 	ResponseEntity<ResponseMessage> getAllContact(){
 			return new ResponseEntity<ResponseMessage>(contactService.getAllContact(), HttpStatus.OK);
 	}
-	
-	@GetMapping("/getallsocialnetwork")
-	ResponseEntity<ResponseMessage> getAllSocialNetwork(){
-			return new ResponseEntity<ResponseMessage>(contactService.getAllSocialNetwork(), HttpStatus.OK);
-	}
-	
+
 	@PutMapping("/headcommunication/updatecontact")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> updateContact(@RequestBody Contact contact){
