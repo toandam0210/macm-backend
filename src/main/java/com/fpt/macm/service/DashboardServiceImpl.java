@@ -18,19 +18,22 @@ import com.fpt.macm.model.dto.EventDashboardDto;
 import com.fpt.macm.model.dto.FeeDashboardDto;
 import com.fpt.macm.model.dto.FeeDashboardToltalDto;
 import com.fpt.macm.model.dto.UpcomingActivityDto;
+import com.fpt.macm.model.dto.UserActiveReportDto;
+import com.fpt.macm.model.entity.AdminSemester;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.ClubFundReport;
 import com.fpt.macm.model.entity.CollaboratorReport;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.MemberEvent;
+import com.fpt.macm.model.entity.MemberSemester;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
-import com.fpt.macm.model.entity.UserStatusReport;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.ClubFundReportRepository;
 import com.fpt.macm.repository.ClubFundRepository;
@@ -38,6 +41,7 @@ import com.fpt.macm.repository.CollaboratorReportRepository;
 import com.fpt.macm.repository.EventPaymentStatusReportRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.MemberEventRepository;
+import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.MembershipPaymentStatusReportRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteePaymentStatusReportRepository;
@@ -104,6 +108,13 @@ public class DashboardServiceImpl implements DashboardService {
 
 	@Autowired
 	UserRepository userRepository;
+	
+	@Autowired
+	MemberSemesterRepository memberSemesterRepository;
+	
+	@Autowired
+	AdminSemesterRepository adminSemesterRepository;
+
 
 	@Override
 	public ResponseMessage getCollaboratorReport() {
@@ -207,16 +218,60 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public ResponseMessage statusMemberReport() {
+	public ResponseMessage statusMemberReport(String semesterName) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<UserStatusReport> userStatusReports = userStatusReportRepository.findAll();
-			if (userStatusReports.size() > 0) {
-				responseMessage.setData(userStatusReports);
-				responseMessage.setMessage("Lấy dữ liệu report thành công");
-				responseMessage.setTotalResult(userStatusReports.size());
+			List<Semester> semesters = semesterRepository.findTop3Semester();
+			UserActiveReportDto userActiveReportDto = new UserActiveReportDto();
+			if (semesters.size() > 1) {
+				Semester semester = semesters.get(semesters.size() - 1);
+				int totalActive = 0;
+				int totalUser = 0;
+				int totalActiveBefore = 0;
+				int totalUserBefore = 0;
+				List<MemberSemester> memberSemesters = memberSemesterRepository
+						.findBySemesterOrderByIdDesc(semester.getName());
+				List<AdminSemester> adminSemesters = adminSemesterRepository.findBySemester(semester.getName());
+				List<MemberSemester> memberSemestersBefore = memberSemesterRepository
+						.findBySemesterOrderByIdDesc(semesters.get(semesters.size() - 2).getName());
+				List<AdminSemester> adminSemestersBefore = adminSemesterRepository
+						.findBySemester(semesters.get(semesters.size() - 2).getName());
+				if (memberSemesters.size() > 0) {
+					totalUser++;
+					for (MemberSemester memberSemester : memberSemesters) {
+						if (memberSemester.isStatus()) {
+							totalActive++;
+						}
+					}
+				} else {
+					totalActive = 0;
+				}
+				if (adminSemesters.size() > 0) {
+					totalUser++;
+					totalActive += adminSemesters.size();
+				} else {
+					totalActive = 0;
+				}
+				if (memberSemestersBefore.size() > 0) {
+					totalUserBefore++;
+					for (MemberSemester memberSemester : memberSemestersBefore) {
+						if (memberSemester.isStatus()) {
+							totalActiveBefore++;
+						}
+					}
+				} else {
+					
+				}
+				if (adminSemestersBefore.size() > 0) {
+					totalUserBefore++;
+					totalActiveBefore += adminSemestersBefore.size();
+				} else {
+
+				}
+				double percentActive = Math.round((double)totalActive - (double)totalActiveBefore * 100D / (double)totalActiveBefore);
+				double percentUser = Math.round((double)totalUser - (double)totalUserBefore * 100D / (double)totalUserBefore);
 			} else {
-				responseMessage.setMessage("Không có dữ liệu");
+
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
