@@ -68,9 +68,9 @@ public class ExhibitionController {
 				HttpStatus.OK);
 	}
 
-	@PutMapping("/headclub/updateteam/{exhibitionTeamId}")
-	ResponseEntity<ResponseMessage> updateExhibitionTeam(@PathVariable(name = "exhibitionTeamId") int exhibitionTeamId,
+	@PutMapping("/headclub/updateteam/{studentId}/{exhibitionTeamId}")
+	ResponseEntity<ResponseMessage> updateExhibitionTeam(@PathVariable(name = "studentId") String studentId, @PathVariable(name = "exhibitionTeamId") int exhibitionTeamId,
 			@RequestBody List<User> teamUsers) {
-		return new ResponseEntity<ResponseMessage>(exhibitionService.updateTeam(exhibitionTeamId, teamUsers), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(exhibitionService.updateTeam(studentId, exhibitionTeamId, teamUsers), HttpStatus.OK);
 	}
 }
