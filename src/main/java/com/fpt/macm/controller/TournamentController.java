@@ -309,12 +309,14 @@ public class TournamentController {
 				HttpStatus.OK);
 	}
 
-	@PutMapping("/headclub/deletetournamentorganizingcommittee/{tournamentOrganizingCommitteeId}")
+	@PutMapping("/headclub/deletetournamentorganizingcommittee/{tournamentOrganizingCommitteeId}/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> deleteTournamentOrganizingCommittee(
-			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId) {
+			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId,
+			@PathVariable(name = "studentId") String studentId) {
 		return new ResponseEntity<ResponseMessage>(
-				tournamentService.deleteTournamentOrganizingCommittee(tournamentOrganizingCommitteeId), HttpStatus.OK);
+				tournamentService.deleteTournamentOrganizingCommittee(tournamentOrganizingCommitteeId, studentId),
+				HttpStatus.OK);
 	}
 
 	@GetMapping("/gettournamentresult/{tournamentId}")
