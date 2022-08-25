@@ -32,6 +32,8 @@ import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.EventSchedule;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MemberSemester;
+import com.fpt.macm.model.entity.MembershipInfo;
+import com.fpt.macm.model.entity.MembershipStatus;
 import com.fpt.macm.model.entity.Role;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.TournamentSchedule;
@@ -45,6 +47,8 @@ import com.fpt.macm.repository.CollaboratorReportRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.MemberSemesterRepository;
+import com.fpt.macm.repository.MembershipShipInforRepository;
+import com.fpt.macm.repository.MembershipStatusRepository;
 import com.fpt.macm.repository.RoleRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
@@ -96,6 +100,12 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	TournamentScheduleRepository tournamentScheduleRepository;
+	
+	@Autowired
+	MembershipStatusRepository membershipStatusRepository;
+	
+	@Autowired
+	MembershipShipInforRepository membershipShipInforRepository;
 
 	private static final int ORDER_QR_CODE_SIZE_WIDTH = 300;
 	private static final int ORDER_QR_CODE_SIZE_HEIGHT = 300;
@@ -237,6 +247,7 @@ public class UserServiceImpl implements UserService {
 							MemberSemester memberSemester = new MemberSemester();
 							memberSemester.setSemester(semester.getName());
 							memberSemester.setStatus(user.isActive());
+							memberSemester.setClicked(true);
 							memberSemester.setUser(user);
 							memberSemesterRepository.save(memberSemester);
 						}
@@ -350,6 +361,7 @@ public class UserServiceImpl implements UserService {
 					MemberSemester memberSemester = new MemberSemester();
 					memberSemester.setUser(user);
 					memberSemester.setStatus(true);
+					memberSemester.setClicked(true);
 					Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 					memberSemester.setSemester(semester.getName());
 					memberSemesterRepository.save(memberSemester);
@@ -458,6 +470,7 @@ public class UserServiceImpl implements UserService {
 					} else {
 						MemberSemester memberSemester = new MemberSemester();
 						memberSemester.setStatus(true);
+						memberSemester.setClicked(true);
 						memberSemester.setUser(user);
 						memberSemester.setSemester(semester);
 						memberSemesterRepository.save(memberSemester);
@@ -623,6 +636,7 @@ public class UserServiceImpl implements UserService {
 						MemberSemester memberSemester = new MemberSemester();
 						memberSemester.setUser(userFromExcel);
 						memberSemester.setStatus(true);
+						memberSemester.setClicked(true);
 						Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 						memberSemester.setSemester(currentSemester.getName());
 						memberSemesterRepository.save(memberSemester);
@@ -1196,6 +1210,70 @@ public class UserServiceImpl implements UserService {
 			responseMessage.setMessage("Danh sách gen");
 		} catch (Exception e) {
 			// TODO: handle exception
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage updateStatusUserSide(String semester, String studentId, int status) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			Optional<User> userOp = userRepository.findByStudentId(studentId);
+			if (userOp.isPresent()) {
+				User user = userOp.get();
+				Optional<MemberSemester> memberSemesterOp = memberSemesterRepository
+						.findByUserIdAndSemester(userOp.get().getId(), semester);
+				if(status == 1) {
+					user.setActive(true);
+					userRepository.save(user);
+				if (memberSemesterOp.isPresent()) {
+					MemberSemester memberSemester = memberSemesterOp.get();
+					memberSemester.setStatus(true);
+					memberSemester.setClicked(true);
+					memberSemesterRepository.save(memberSemester);
+					List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
+					List<TrainingSchedule> trainingSchedules = trainingScheduleRepository
+							.findAllFutureTrainingSchedule(LocalDate.now());
+					// Thêm data điểm danh khi active user
+					if (user.isActive()) {
+						for (TrainingSchedule trainingSchedule : trainingSchedules) {
+							AttendanceStatus attendanceStatus = new AttendanceStatus();
+							attendanceStatus.setUser(user);
+							attendanceStatus.setTrainingSchedule(trainingSchedule);
+							attendanceStatus.setCreatedOn(LocalDateTime.now());
+							attendanceStatus.setCreatedBy("toandv");
+							attendanceStatus.setStatus(2);
+							listAttendanceStatus.add(attendanceStatus);
+						}
+						if (!listAttendanceStatus.isEmpty()) {
+							attendanceStatusRepository.saveAll(listAttendanceStatus);
+						}
+						Optional<MembershipInfo> membershipInfo = membershipShipInforRepository
+								.findBySemester(semester);
+						if (membershipInfo.isPresent()) {
+							MembershipStatus membershipStatus = new MembershipStatus();
+							membershipStatus.setMembershipInfo(membershipInfo.get());
+							membershipStatus.setStatus(false);
+							membershipStatus.setUser(user);
+							membershipStatusRepository.save(membershipStatus);
+						}
+					}
+					}
+				}else {
+					user.setActive(false);
+					userRepository.save(user);
+					if (memberSemesterOp.isPresent()) {
+						MemberSemester memberSemester = memberSemesterOp.get();
+						memberSemester.setStatus(false);
+						memberSemester.setClicked(true);
+						memberSemesterRepository.save(memberSemester);
+					}
+				}
+				responseMessage.setData(Arrays.asList(memberSemesterOp.get()));
+				responseMessage.setMessage("Cập nhật trạng thái hoạt động kì " + semester + " thành công");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
 		}
 		return responseMessage;
 	}
