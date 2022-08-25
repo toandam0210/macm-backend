@@ -706,37 +706,41 @@ public class MemberEventServiceImpl implements MemberEventService {
 			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
 			if (memberEventOp.isPresent()) {
 				MemberEvent memberEvent = memberEventOp.get();
-				memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
-				memberEvent.setUpdatedBy("toandv");
-				memberEvent.setUpdatedOn(LocalDateTime.now());
-				memberEventRepository.save(memberEvent);
+				if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+					memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
+					memberEvent.setUpdatedBy("toandv");
+					memberEvent.setUpdatedOn(LocalDateTime.now());
+					memberEventRepository.save(memberEvent);
 
-				AttendanceEvent attendanceEvent = new AttendanceEvent();
-				attendanceEvent.setEvent(memberEvent.getEvent());
-				attendanceEvent.setStatus(2);
-				attendanceEvent.setUser(memberEvent.getUser());
-				attendanceEvent.setCreatedBy("toandv");
-				attendanceEvent.setCreatedOn(LocalDateTime.now());
-				attendanceEventRepository.save(attendanceEvent);
+					AttendanceEvent attendanceEvent = new AttendanceEvent();
+					attendanceEvent.setEvent(memberEvent.getEvent());
+					attendanceEvent.setStatus(2);
+					attendanceEvent.setUser(memberEvent.getUser());
+					attendanceEvent.setCreatedBy("toandv");
+					attendanceEvent.setCreatedOn(LocalDateTime.now());
+					attendanceEventRepository.save(attendanceEvent);
 
-				Notification notification = new Notification();
-				notification.setMessage("Yêu cầu đăng ký tham gia sự kiện " + memberEvent.getEvent().getName()
-						+ " của bạn đã được chấp nhận");
-				notification.setCreatedOn(LocalDateTime.now());
-				notification.setNotificationType(1);
-				notification.setNotificationTypeId(memberEvent.getEvent().getId());
-				notificationRepository.save(notification);
+					Notification notification = new Notification();
+					notification.setMessage("Yêu cầu đăng ký tham gia sự kiện " + memberEvent.getEvent().getName()
+							+ " của bạn đã được chấp nhận");
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(1);
+					notification.setNotificationTypeId(memberEvent.getEvent().getId());
+					notificationRepository.save(notification);
 
-				Iterable<Notification> notificationIterable = notificationRepository
-						.findAll(Sort.by("id").descending());
-				List<Notification> notifications = IterableUtils.toList(notificationIterable);
-				Notification newNotification = notifications.get(0);
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
 
-				notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
+					notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
 
-				responseMessage.setData(Arrays.asList(memberEvent));
-				responseMessage.setMessage("Từ chối đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
-						+ " - " + memberEvent.getUser().getStudentId());
+					responseMessage.setData(Arrays.asList(memberEvent));
+					responseMessage.setMessage("Từ chối đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
+							+ " - " + memberEvent.getUser().getStudentId());
+				} else {
+					responseMessage.setMessage("Yêu cầu đăng ký không hợp lệ");
+				}
 			} else {
 				responseMessage.setMessage("Sai memberEventId rồi");
 			}
@@ -753,36 +757,40 @@ public class MemberEventServiceImpl implements MemberEventService {
 			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
 			if (memberEventOp.isPresent()) {
 				MemberEvent memberEvent = memberEventOp.get();
-				memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
-				memberEvent.setUpdatedBy("toandv");
-				memberEvent.setUpdatedOn(LocalDateTime.now());
-				memberEventRepository.save(memberEvent);
+				if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)) {
+					memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
+					memberEvent.setUpdatedBy("toandv");
+					memberEvent.setUpdatedOn(LocalDateTime.now());
+					memberEventRepository.save(memberEvent);
 
-				Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
-						.findByEventIdAndUserId(memberEvent.getEvent().getId(), memberEvent.getUser().getId());
-				if (attendanceEventOp.isPresent()) {
-					AttendanceEvent attendanceEvent = attendanceEventOp.get();
-					attendanceEventRepository.delete(attendanceEvent);
+					Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
+							.findByEventIdAndUserId(memberEvent.getEvent().getId(), memberEvent.getUser().getId());
+					if (attendanceEventOp.isPresent()) {
+						AttendanceEvent attendanceEvent = attendanceEventOp.get();
+						attendanceEventRepository.delete(attendanceEvent);
+					}
+
+					Notification notification = new Notification();
+					notification.setMessage("Yêu cầu đăng ký tham gia sự kiện " + memberEvent.getEvent().getName()
+							+ " của bạn đã bị từ chối");
+					notification.setCreatedOn(LocalDateTime.now());
+					notification.setNotificationType(1);
+					notification.setNotificationTypeId(memberEvent.getEvent().getId());
+					notificationRepository.save(notification);
+
+					Iterable<Notification> notificationIterable = notificationRepository
+							.findAll(Sort.by("id").descending());
+					List<Notification> notifications = IterableUtils.toList(notificationIterable);
+					Notification newNotification = notifications.get(0);
+
+					notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
+
+					responseMessage.setData(Arrays.asList(memberEvent));
+					responseMessage.setMessage("Từ chối đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
+							+ " - " + memberEvent.getUser().getStudentId());
+				} else {
+					responseMessage.setMessage("Yêu cầu đăng ký không hợp lệ");
 				}
-
-				Notification notification = new Notification();
-				notification.setMessage("Yêu cầu đăng ký tham gia sự kiện " + memberEvent.getEvent().getName()
-						+ " của bạn đã bị từ chối");
-				notification.setCreatedOn(LocalDateTime.now());
-				notification.setNotificationType(1);
-				notification.setNotificationTypeId(memberEvent.getEvent().getId());
-				notificationRepository.save(notification);
-
-				Iterable<Notification> notificationIterable = notificationRepository
-						.findAll(Sort.by("id").descending());
-				List<Notification> notifications = IterableUtils.toList(notificationIterable);
-				Notification newNotification = notifications.get(0);
-
-				notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
-
-				responseMessage.setData(Arrays.asList(memberEvent));
-				responseMessage.setMessage("Từ chối đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
-						+ " - " + memberEvent.getUser().getStudentId());
 			} else {
 				responseMessage.setMessage("Sai memberEventId rồi");
 			}
