@@ -174,6 +174,11 @@ public class UserController {
 	
 	@PutMapping("/updatestatusbymember")
 	ResponseEntity<ResponseMessage> updateStatusByUser(@RequestParam String studentId, @RequestParam String semester, @RequestParam int status) {
-		return new ResponseEntity<ResponseMessage>(userService.updateStatusUserSide(studentId,semester,status), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(userService.updateStatusUserSide(semester,studentId,status), HttpStatus.OK);
+	}
+	
+	@GetMapping("/membersemesterinfor")
+	ResponseEntity<ResponseMessage> getMemberSemesterWhenStartSemester(@RequestParam String studentId) {
+		return new ResponseEntity<ResponseMessage>(userService.getMemberSemesterWhenStartSemester(studentId), HttpStatus.OK);
 	}
 }

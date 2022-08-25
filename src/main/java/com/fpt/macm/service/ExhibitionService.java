@@ -14,7 +14,7 @@ public interface ExhibitionService {
 	
 	ResponseMessage getTeamByType (int exhibitionTypeId);
 	
-	ResponseMessage updateTeam(int exhibitionTeamId, List<User> teamUsers);
+	ResponseMessage updateTeam(String studentId, int exhibitionTeamId, List<User> teamUsers);
 	
 	ResponseMessage getListExhibitionResult(int exhibitionTypeId);
 	

@@ -23,7 +23,6 @@ import com.fpt.macm.model.entity.CollaboratorReport;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventSchedule;
-import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MemberSemester;
 import com.fpt.macm.model.entity.MembershipInfo;
@@ -38,6 +37,7 @@ import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.entity.UserStatusReport;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.AttendanceEventRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
@@ -588,6 +588,19 @@ public class TaskSchedule {
 			tournamentRepository.save(tournament);
 		} else {
 			logger.info("Không có giải đấu");
+		}
+	}
+	
+	@Scheduled(cron = "1 0 1 * * *")
+	public void changeClicked() {
+		ResponseMessage responseMessage = semesterService.getCurrentSemester();
+		Semester semester = (Semester) responseMessage.getData().get(0);
+		if(LocalDate.now().isAfter(semester.getStartDate().plusDays(7))) {
+			List<MemberSemester> memberSemesters = memberSemesterRepository.findBySemesterOrderByIdDesc(semester.getName());
+			for (MemberSemester memberSemester : memberSemesters) {
+				memberSemester.setClicked(true);
+				memberSemesterRepository.save(memberSemester);
+			}
 		}
 	}
 }
