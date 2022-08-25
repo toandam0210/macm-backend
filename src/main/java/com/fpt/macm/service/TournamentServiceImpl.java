@@ -2203,7 +2203,7 @@ public class TournamentServiceImpl implements TournamentService {
 				if (!isJoinTournament(userToJoin.getUser().getId(), tournamentId)) {
 					TournamentOrganizingCommittee tournamentOrganizingCommittee = new TournamentOrganizingCommittee();
 					
-					Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(tournament.getId(), user.getId());
+					Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository.findByTournamentIdAndUserId(tournament.getId(), userToJoin.getUser().getId());
 					if (tournamentOrganizingCommitteeOp.isPresent()) {
 						tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
 						tournamentOrganizingCommittee.setUpdatedBy(user.getName() + " - " + user.getStudentId());
