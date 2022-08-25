@@ -4,7 +4,7 @@ public class UserActiveReportDto {
 	private int totalActive;
 	private double percentActive;
 	private int totalUser;
-	private int percentTotalUser;
+	private double percentTotalUser;
 	public int getTotalActive() {
 		return totalActive;
 	}
@@ -23,10 +23,10 @@ public class UserActiveReportDto {
 	public void setTotalUser(int totalUser) {
 		this.totalUser = totalUser;
 	}
-	public int getPercentTotalUser() {
+	public double getPercentTotalUser() {
 		return percentTotalUser;
 	}
-	public void setPercentTotalUser(int percentTotalUser) {
+	public void setPercentTotalUser(double percentTotalUser) {
 		this.percentTotalUser = percentTotalUser;
 	}
 	

@@ -10,7 +10,7 @@ import com.fpt.macm.model.entity.Semester;
 
 @Repository
 public interface SemesterRepository extends JpaRepository<Semester, Integer>{
-	@Query(value = "select * from semester order by start_date  desc limit 3", nativeQuery = true)
+	@Query(value = "select * from semester order by start_date desc limit 3", nativeQuery = true)
 	List<Semester> findTop3Semester();
 
 	Optional<Semester> findByName(String name);

@@ -224,7 +224,7 @@ public class DashboardServiceImpl implements DashboardService {
 			List<Semester> semesters = semesterRepository.findTop3Semester();
 			UserActiveReportDto userActiveReportDto = new UserActiveReportDto();
 			if (semesters.size() > 1) {
-				Semester semester = semesters.get(semesters.size() - 1);
+				Semester semester = semesters.get(0);
 				int totalActive = 0;
 				int totalUser = 0;
 				int totalActiveBefore = 0;
@@ -233,46 +233,71 @@ public class DashboardServiceImpl implements DashboardService {
 						.findBySemesterOrderByIdDesc(semester.getName());
 				List<AdminSemester> adminSemesters = adminSemesterRepository.findBySemester(semester.getName());
 				List<MemberSemester> memberSemestersBefore = memberSemesterRepository
-						.findBySemesterOrderByIdDesc(semesters.get(semesters.size() - 2).getName());
+						.findBySemesterOrderByIdDesc(semesters.get(1).getName());
 				List<AdminSemester> adminSemestersBefore = adminSemesterRepository
-						.findBySemester(semesters.get(semesters.size() - 2).getName());
+						.findBySemester(semesters.get(1).getName());
+				List<User> users = userRepository.findMembersAndAdmin();
+				totalUser = users.size();
 				if (memberSemesters.size() > 0) {
-					totalUser++;
 					for (MemberSemester memberSemester : memberSemesters) {
 						if (memberSemester.isStatus()) {
 							totalActive++;
 						}
 					}
 				} else {
+					totalUser = 0;
 					totalActive = 0;
 				}
 				if (adminSemesters.size() > 0) {
-					totalUser++;
 					totalActive += adminSemesters.size();
 				} else {
-					totalActive = 0;
+					totalActive += totalActive;
+					totalUser += totalUser;
 				}
 				if (memberSemestersBefore.size() > 0) {
-					totalUserBefore++;
+					totalUserBefore += memberSemestersBefore.size();
 					for (MemberSemester memberSemester : memberSemestersBefore) {
 						if (memberSemester.isStatus()) {
 							totalActiveBefore++;
 						}
 					}
 				} else {
-					
+					totalUserBefore = 0;
+					totalActiveBefore = 0;
 				}
 				if (adminSemestersBefore.size() > 0) {
-					totalUserBefore++;
+					totalUserBefore += adminSemestersBefore.size();
 					totalActiveBefore += adminSemestersBefore.size();
 				} else {
-
+					totalUserBefore += totalUserBefore;
+					totalActiveBefore += totalActiveBefore;
 				}
-				double percentActive = Math.round((double)totalActive - (double)totalActiveBefore * 100D / (double)totalActiveBefore);
-				double percentUser = Math.round((double)totalUser - (double)totalUserBefore * 100D / (double)totalUserBefore);
+				double percentActive = 0;
+				double percentUser = 0;
+				if (totalActiveBefore != 0) {
+					percentActive = Math.round(
+							((double) totalActive - (double) totalActiveBefore) * 100D / (double) totalActiveBefore);
+				} else {
+					percentActive = 0;
+				}
+				if (totalUserBefore != 0) {
+					percentUser = Math
+							.round(((double) totalUser - (double) totalUserBefore) * 100D / (double) totalUserBefore);
+				} else {
+					percentUser = 0;
+				}
+				userActiveReportDto.setPercentActive(percentActive);
+				userActiveReportDto.setPercentTotalUser(percentUser);
+				userActiveReportDto.setTotalActive(totalActive);
+				userActiveReportDto.setTotalUser(totalUser);
 			} else {
-
+				userActiveReportDto.setPercentActive(0);
+				userActiveReportDto.setPercentTotalUser(0);
+				userActiveReportDto.setTotalActive(0);
+				userActiveReportDto.setTotalUser(0);
 			}
+			responseMessage.setData(Arrays.asList(userActiveReportDto));
+			responseMessage.setMessage("Lấy dữ liệu report thành công");
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
