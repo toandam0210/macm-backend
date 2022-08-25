@@ -22,7 +22,7 @@ public interface CompetitiveService {
 
 	ResponseMessage updateWeightForCompetitivePlayer(int competitivePlayerId, double weight);
 
-	ResponseMessage deleteCompetitivePlayer(int competitivePlayerId);
+	ResponseMessage deleteCompetitivePlayer(String studentId, int competitivePlayerId);
 
 	ResponseMessage getListPlayer(int competitiveTypeId);
 

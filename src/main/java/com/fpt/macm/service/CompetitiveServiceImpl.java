@@ -72,6 +72,9 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 
 	@Autowired
 	CompetitiveTypeRegistrationRepository competitiveTypeRegistrationRepository;
+	
+	@Autowired
+	ClubFundService clubFundService;
 
 	@Override
 	public ResponseMessage getAllCompetitiveType(int tournamentId) {
@@ -580,14 +583,13 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 	}
 
 	@Override
-	public ResponseMessage deleteCompetitivePlayer(int competitivePlayerId) {
+	public ResponseMessage deleteCompetitivePlayer(String studentId, int competitivePlayerId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findById(competitivePlayerId);
+			User user = userRepository.findByStudentId(studentId).get();
 			if (competitivePlayerOp.isPresent()) {
-				List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository
-						.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
 				CompetitivePlayer getCompetitivePlayer = competitivePlayerOp.get();
 				CompetitiveType competitiveType = getCompetitivePlayer.getCompetitiveType();
 				Tournament tournament = tournamentRepository
@@ -611,11 +613,6 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 					responseMessage.setMessage("Xóa tuyển thủ thành công");
 					responseMessage.setData(Arrays.asList(getCompetitivePlayer));
 					autoSpawnMatchs(competitiveType.getId());
-					if (exhibitionPlayers.size() == 0) {
-						TournamentPlayer tournamentPlayer = tournamentPlayerRepository
-								.findById(getCompetitivePlayer.getTournamentPlayer().getId()).get();
-						tournamentPlayerRepository.delete(tournamentPlayer);
-					}
 				} else {
 					if (getCompetitivePlayer.getIsEligible()) {
 						responseMessage
@@ -631,6 +628,17 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 							competitiveTypeRepository.save(competitiveType);
 						}
 					}
+				}
+				List<ExhibitionPlayer> exhibitionPlayers = exhibitionPlayerRepository
+						.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
+				if (exhibitionPlayers.size() == 0) {
+					TournamentPlayer tournamentPlayer = getCompetitivePlayer.getTournamentPlayer();
+					if(tournamentPlayer.isPaymentStatus()) {
+						clubFundService.withdrawFromClubFund(user.getStudentId(),
+								tournament.getTotalAmountFromClubEstimate(),
+								("Hoàn phí đăng ký tham gia giải đấu cho tuyển thủ " + tournamentPlayer.getUser().getName()) + " - " + tournamentPlayer.getUser().getStudentId());
+					}
+					tournamentPlayerRepository.delete(tournamentPlayer);
 				}
 			} else {
 				responseMessage.setMessage("Không tồn tại tuyển thủ để xóa");
