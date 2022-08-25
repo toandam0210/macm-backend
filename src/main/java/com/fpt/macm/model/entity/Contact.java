@@ -1,6 +1,6 @@
 package com.fpt.macm.model.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,27 +15,24 @@ public class Contact {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@Column
 	private String clubName;
-	
+
 	@Column
 	private String clubMail;
-	
+
 	@Column
 	private String clubPhoneNumber;
-	
-	@Column
-	private String createdBy;
+
+	@Column(columnDefinition = "TEXT")
+	private String image;
 
 	@Column
-	private LocalDateTime createdOn;
+	private LocalDate foundingDate;
 
 	@Column
-	private String updatedBy;
-
-	@Column
-	private LocalDateTime updatedOn;
+	private String fanpageUrl;
 
 	public int getId() {
 		return id;
@@ -43,38 +40,6 @@ public class Contact {
 
 	public void setId(int id) {
 		this.id = id;
-	}
-
-	public String getCreatedBy() {
-		return createdBy;
-	}
-
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
-
-	public LocalDateTime getCreatedOn() {
-		return createdOn;
-	}
-
-	public void setCreatedOn(LocalDateTime createdOn) {
-		this.createdOn = createdOn;
-	}
-
-	public String getUpdatedBy() {
-		return updatedBy;
-	}
-
-	public void setUpdatedBy(String updatedBy) {
-		this.updatedBy = updatedBy;
-	}
-
-	public LocalDateTime getUpdatedOn() {
-		return updatedOn;
-	}
-
-	public void setUpdatedOn(LocalDateTime updatedOn) {
-		this.updatedOn = updatedOn;
 	}
 
 	public String getClubName() {
@@ -100,5 +65,29 @@ public class Contact {
 	public void setClubPhoneNumber(String clubPhoneNumber) {
 		this.clubPhoneNumber = clubPhoneNumber;
 	}
-	
+
+	public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}
+
+	public LocalDate getFoundingDate() {
+		return foundingDate;
+	}
+
+	public void setFoundingDate(LocalDate foundingDate) {
+		this.foundingDate = foundingDate;
+	}
+
+	public String getFanpageUrl() {
+		return fanpageUrl;
+	}
+
+	public void setFanpageUrl(String fanpageUrl) {
+		this.fanpageUrl = fanpageUrl;
+	}
+
 }

@@ -6,6 +6,5 @@ import com.fpt.macm.model.response.ResponseMessage;
 public interface ContactService {
 
 	ResponseMessage getAllContact();
-	ResponseMessage getAllSocialNetwork();
 	ResponseMessage updateContact(Contact contact);
 }
