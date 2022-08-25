@@ -81,7 +81,7 @@ public class AreaServiceImpl implements AreaService{
 				}
 			}
 			responseMessage.setData(listResult);
-			responseMessage.setMessage("Danh sách sân mới");
+			responseMessage.setMessage("Cập nhật sân thi đấu thành công");
 		} catch (Exception e) {
 			// TODO: handle exception
 			responseMessage.setMessage(e.getMessage());
