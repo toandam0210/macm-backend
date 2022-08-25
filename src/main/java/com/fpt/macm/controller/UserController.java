@@ -171,4 +171,9 @@ public class UserController {
 	ResponseEntity<ResponseMessage> getAllGen() {
 		return new ResponseEntity<ResponseMessage>(userService.getAllGen(), HttpStatus.OK);
 	}
+	
+	@PutMapping("/updatestatusbymember")
+	ResponseEntity<ResponseMessage> updateStatusByUser(@RequestParam String studentId, @RequestParam String semester, @RequestParam int status) {
+		return new ResponseEntity<ResponseMessage>(userService.updateStatusUserSide(studentId,semester,status), HttpStatus.OK);
+	}
 }

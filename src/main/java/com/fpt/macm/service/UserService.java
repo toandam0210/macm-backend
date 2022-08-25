@@ -32,4 +32,5 @@ public interface UserService {
 	ResponseMessage getAllActiveMemberAndCollaborator();
 	ResponseMessage getAllUserAttendanceStatus(String studentId);
 	ResponseMessage getAllGen();
+	ResponseMessage updateStatusUserSide(String semester, String studentId, int status);
 }
