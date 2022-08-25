@@ -2044,6 +2044,8 @@ public class TournamentServiceImpl implements TournamentService {
 								"Yêu cầu đăng ký tham gia nội dung thi đấu biểu diễn của bạn đã được chấp nhận");
 						return responseMessage;
 					}
+					
+					responseMessage.setMessage("Bạn chưa đăng ký tham gia thi đấu biểu diễn");
 				}
 			} else {
 				responseMessage.setMessage("Bạn chưa đăng ký tham gia thi đấu biểu diễn");
