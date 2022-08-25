@@ -101,14 +101,28 @@ public class EventServiceImpl implements EventService {
 			Event event = eventCreateDto.getEvent();
 			List<ScheduleDto> listPreview = eventCreateDto.getListPreview();
 			List<EventRoleDto> eventRolesDto = eventCreateDto.getEventRolesDto();
-
+			Collections.sort(listPreview, new Comparator<ScheduleDto>() {
+				@Override
+				public int compare(ScheduleDto o1, ScheduleDto o2) {
+					// TODO Auto-generated method stub
+					return o1.getDate().compareTo(o2.getDate());
+				}
+			});
 			if (event == null || listPreview == null || listPreview.isEmpty()) {
 				responseMessage.setMessage("Không đc null");
 				return responseMessage;
 			}
 
 			if (isAvailableToCreateEvent(listPreview, isOverwritten)) {
-				Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+				Semester getSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+				List<Semester> listAllSemester = semesterRepository.findAll();
+				for (Semester semester : listAllSemester) {
+					if (listPreview.get(0).getDate().compareTo(semester.getStartDate()) >= 0
+							&& listPreview.get(0).getDate().compareTo(semester.getEndDate()) <= 0) {
+						getSemester = semester;
+						break;
+					}
+				}
 
 				List<EventSchedule> listEventSchedule = new ArrayList<EventSchedule>();
 				List<CommonSchedule> listCommon = new ArrayList<CommonSchedule>();
@@ -121,7 +135,7 @@ public class EventServiceImpl implements EventService {
 				event.setTotalAmountActual(0);
 				event.setCreatedBy(user.getName() + " - " + user.getStudentId());
 				event.setCreatedOn(LocalDateTime.now());
-				event.setSemester(semester.getName());
+				event.setSemester(getSemester.getName());
 				event.setStatus(true);
 				eventRepository.save(event);
 
