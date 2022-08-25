@@ -367,21 +367,23 @@ public class TaskSchedule {
 				&& LocalDate.now().getDayOfWeek().toString().compareTo("MONDAY") == 0) {
 			Semester semester = new Semester();
 			if (LocalDate.now().getMonthValue() == 1) {
-				semester.setName("Spring" + LocalDate.now().getYear());
-			}
-			if (LocalDate.now().getMonthValue() == 5) {
 				semester.setName("Summer" + LocalDate.now().getYear());
 			}
-			if (LocalDate.now().getMonthValue() == 9) {
+			if (LocalDate.now().getMonthValue() == 5) {
 				semester.setName("Fall" + LocalDate.now().getYear());
 			}
-			semester.setStartDate(LocalDate.now());
-			LocalDate endDate = LocalDate.now().plusMonths(4).minusDays(LocalDate.now().getDayOfMonth());
+			if (LocalDate.now().getMonthValue() == 9) {
+				semester.setName("Spring" + (LocalDate.now().getYear() + 1));
+			}
+			Semester lastSemester = semesterRepository.findAll(Sort.by("startDate").descending()).get(0);
+			semester.setStartDate(lastSemester.getEndDate().plusDays(1));
+			LocalDate endDate = semester.getStartDate().plusMonths(4).minusDays(LocalDate.now().getDayOfMonth());
 			while (endDate.getDayOfWeek().toString().compareTo("SUNDAY") != 0) {
 				endDate = endDate.plusDays(1);
 			}
 			semester.setEndDate(endDate);
 			semesterRepository.save(semester);
+			logger.info(semester.getName());
 		}
 	}
 
@@ -551,7 +553,7 @@ public class TaskSchedule {
 	}
 
 	@Scheduled(cron = "1 0 0 * * *")
-	public void changeStatusTournamentForUpdatePlayer() {
+	public void changeStageTournamentForUpdatePlayer() {
 		
 		List<Tournament> tournaments = tournamentRepository.findAll();
 		List<Tournament> listTournaments = new ArrayList<Tournament>();
@@ -567,24 +569,7 @@ public class TaskSchedule {
 				logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
 				tournament.setStage(1);
 				Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
-				for (CompetitiveType competitiveType : listCompetitiveTypes) {
-					if (competitiveType.getStatus() == 0) {
-						competitiveType.setStatus(1);
-						logger.info("Trạng thái của " + (competitiveType.isGender() ? "Nam " : "Nữ ")
-								+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
-								+ " thay đổi từ 0 thành 1");
-					}
-				}
 				tournament.setCompetitiveTypes(listCompetitiveTypes);
-				Set<ExhibitionType> listExhibitionTypes = tournament.getExhibitionTypes();
-				for (ExhibitionType exhibitionType : listExhibitionTypes) {
-					if (exhibitionType.getStatus() == 0) {
-						exhibitionType.setStatus(1);
-						logger.info("Trạng thái của " + exhibitionType.getName() + " thay đổi từ 0 thành 1");
-					}
-				}
-				tournament.setExhibitionTypes(listExhibitionTypes);
-
 				logger.info("Dừng thay đổi trạng thái của giải đấu " + tournament.getName());
 				tournamentRepository.save(tournament);
 			}
@@ -594,32 +579,12 @@ public class TaskSchedule {
 	}
 
 	@Scheduled(cron = "1 0 0 * * *")
-	public void changeStatusTournamentForUpdateResult() {
+	public void changeStageTournamentForUpdateResult() {
 		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now());
 		if (tournamentSchedule != null) {
 			Tournament tournament = tournamentSchedule.getTournament();
 			tournament.setStage(3);
 			logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
-			Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
-			for (CompetitiveType competitiveType : listCompetitiveTypes) {
-				if (competitiveType.getStatus() == 2) {
-					competitiveType.setStatus(3);
-					logger.info("Trạng thái của " + (competitiveType.isGender() ? "Nam " : "Nữ ")
-							+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
-							+ " thay đổi từ 2 thành 3");
-				}
-			}
-			tournament.setCompetitiveTypes(listCompetitiveTypes);
-			Set<ExhibitionType> listExhibitionTypes = tournament.getExhibitionTypes();
-			for (ExhibitionType exhibitionType : listExhibitionTypes) {
-				if (exhibitionType.getStatus() == 0) {
-					exhibitionType.setStatus(1);
-					logger.info("Trạng thái của " + exhibitionType.getName() + " thay đổi từ 2 thành 3");
-				}
-			}
-			tournament.setExhibitionTypes(listExhibitionTypes);
-
-			logger.info("Dừng thay đổi trạng thái của giải đấu " + tournament.getName());
 			tournamentRepository.save(tournament);
 		} else {
 			logger.info("Không có giải đấu");
