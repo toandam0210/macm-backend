@@ -224,6 +224,7 @@ public class TaskSchedule {
 						MemberSemester memberSemester = new MemberSemester();
 						memberSemester.setSemester(currentSemester.getName());
 						memberSemester.setStatus(false);
+						memberSemester.setClicked(false);
 						memberSemester.setUser(user);
 						memberSemesterRepository.save(memberSemester);
 						logger.info("add member oke");
