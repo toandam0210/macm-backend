@@ -1373,7 +1373,8 @@ public class TournamentServiceImpl implements TournamentService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
-			if (LocalDateTime.now().isBefore(tournament.getRegistrationOrganizingCommitteeDeadline())) {
+			if (LocalDateTime.now().isBefore(tournament.getRegistrationOrganizingCommitteeDeadline())
+					&& tournament.getStage() == 0) {
 				User user = userRepository.findByStudentId(studentId).get();
 				TournamentRole tournamentRole = tournamentRoleRepository.findById(roleId).get();
 
@@ -1828,7 +1829,8 @@ public class TournamentServiceImpl implements TournamentService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Tournament tournament = tournamentRepository.findById(tournamentId).get();
-			if (LocalDateTime.now().isBefore(tournament.getRegistrationPlayerDeadline())) {
+			if (LocalDateTime.now().isBefore(tournament.getRegistrationPlayerDeadline())
+					&& tournament.getStage() == 0) {
 //				User user = userRepository.findByStudentId(studentId).get();
 				ExhibitionType exhibitionType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
 
