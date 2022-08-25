@@ -1277,4 +1277,12 @@ public class UserServiceImpl implements UserService {
 		}
 		return responseMessage;
 	}
+
+	@Override
+	public ResponseMessage getMemberSemesterWhenStartSemester(String studentId) {
+		// TODO Auto-generated method stub
+		Optional<User> user = userRepository.findByStudentId(studentId);
+		
+		return null;
+	}
 }
