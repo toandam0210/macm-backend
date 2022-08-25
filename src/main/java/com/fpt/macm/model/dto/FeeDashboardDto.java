@@ -1,7 +1,6 @@
 package com.fpt.macm.model.dto;
 
 public class FeeDashboardDto {
-
 	
 	private int month;
 	private double totalIncome;

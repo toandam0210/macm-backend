@@ -10,6 +10,7 @@ public class FeeDashboardToltalDto {
 	private double totalSpend;
 	private double totalIncomePercent;
 	private double totalSpendPercent;
+	private double totalBalancePercent;
 	List<FeeDashboardDto> feeDashboardDtos = new ArrayList<FeeDashboardDto>();
 
 	public String getSemester() {
@@ -58,6 +59,14 @@ public class FeeDashboardToltalDto {
 
 	public void setFeeDashboardDtos(List<FeeDashboardDto> feeDashboardDtos) {
 		this.feeDashboardDtos = feeDashboardDtos;
+	}
+
+	public double getTotalBalancePercent() {
+		return totalBalancePercent;
+	}
+
+	public void setTotalBalancePercent(double totalBalancePercent) {
+		this.totalBalancePercent = totalBalancePercent;
 	}
 
 }
