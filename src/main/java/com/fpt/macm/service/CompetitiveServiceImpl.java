@@ -72,6 +72,9 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 
 	@Autowired
 	CompetitiveTypeRegistrationRepository competitiveTypeRegistrationRepository;
+	
+	@Autowired
+	ClubFundService clubFundService;
 
 	@Override
 	public ResponseMessage getAllCompetitiveType(int tournamentId) {
@@ -580,11 +583,12 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 	}
 
 	@Override
-	public ResponseMessage deleteCompetitivePlayer(int competitivePlayerId) {
+	public ResponseMessage deleteCompetitivePlayer(String studentId, int competitivePlayerId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<CompetitivePlayer> competitivePlayerOp = competitivePlayerRepository.findById(competitivePlayerId);
+			User user = userRepository.findByStudentId(studentId).get();
 			if (competitivePlayerOp.isPresent()) {
 				CompetitivePlayer getCompetitivePlayer = competitivePlayerOp.get();
 				CompetitiveType competitiveType = getCompetitivePlayer.getCompetitiveType();
@@ -629,9 +633,12 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 						.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
 				if (exhibitionPlayers.size() == 0) {
 					TournamentPlayer tournamentPlayer = getCompetitivePlayer.getTournamentPlayer();
-					if(!tournamentPlayer.isPaymentStatus()) {
-						tournamentPlayerRepository.delete(tournamentPlayer);
+					if(tournamentPlayer.isPaymentStatus()) {
+						clubFundService.withdrawFromClubFund(user.getStudentId(),
+								tournament.getTotalAmountFromClubEstimate(),
+								("Hoàn phí đăng ký tham gia giải đấu cho tuyển thủ " + tournamentPlayer.getUser().getName()) + " - " + tournamentPlayer.getUser().getStudentId());
 					}
+					tournamentPlayerRepository.delete(tournamentPlayer);
 				}
 			} else {
 				responseMessage.setMessage("Không tồn tại tuyển thủ để xóa");
