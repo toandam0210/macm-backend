@@ -1169,7 +1169,7 @@ public class CompetitiveServiceTest {
 		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
-		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
+		ResponseMessage response = competitiveService.deleteCompetitivePlayer("HE140855",1);
 		assertEquals(response.getData().size(), 1);
 	}
 	
@@ -1187,7 +1187,7 @@ public class CompetitiveServiceTest {
 		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
 		when(tournamentPlayerRepository.findById(anyInt())).thenReturn(Optional.of(tournamentPlayer()));
-		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
+		ResponseMessage response = competitiveService.deleteCompetitivePlayer("HE140855",1);
 		assertEquals(response.getData().size(), 1);
 	}
 	
@@ -1203,7 +1203,7 @@ public class CompetitiveServiceTest {
 		tournament.setStage(3);
 		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament));
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
-		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
+		ResponseMessage response = competitiveService.deleteCompetitivePlayer("HE140855",1);
 		assertEquals(response.getData().size(), 0);
 	}
 	
@@ -1223,14 +1223,14 @@ public class CompetitiveServiceTest {
 		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<ExhibitionPlayer>(exhibitionPlayers());
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.of(competitivePlayer));
 		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayers);
-		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
+		ResponseMessage response = competitiveService.deleteCompetitivePlayer("HE140855",1);
 		assertEquals(response.getData().size(), 1);
 	}
 	
 	@Test
 	public void testDeleteCompetitivePlayerCaseEmpty() {
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(Optional.empty());
-		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
+		ResponseMessage response = competitiveService.deleteCompetitivePlayer("HE140855",1);
 		assertEquals(response.getData().size(), 0);
 	}
 	
@@ -1238,7 +1238,7 @@ public class CompetitiveServiceTest {
 	@Test
 	public void testDeleteCompetitivePlayerCaseException() {
 		when(competitivePlayerRepository.findById(anyInt())).thenReturn(null);
-		ResponseMessage response = competitiveService.deleteCompetitivePlayer(1);
+		ResponseMessage response = competitiveService.deleteCompetitivePlayer("HE140855",1);
 		assertEquals(response.getData().size(), 0);
 	}
 	

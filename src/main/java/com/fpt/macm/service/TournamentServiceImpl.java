@@ -1987,8 +1987,8 @@ public class TournamentServiceImpl implements TournamentService {
 				Notification newNotification = notifications.get(0);
 
 				for (ExhibitionPlayer exhibitionPlayer : exhibitionPlayers) {
-					notificationService.sendNotificationToAnUser(
-							exhibitionPlayer.getTournamentPlayer().getUser(), newNotification);
+					notificationService.sendNotificationToAnUser(exhibitionPlayer.getTournamentPlayer().getUser(),
+							newNotification);
 				}
 
 				responseMessage.setData(Arrays.asList(exhibitionTypeRegistration));
@@ -2021,9 +2021,9 @@ public class TournamentServiceImpl implements TournamentService {
 				}
 				exhibitionTeamRegistrationRepository.delete(exhibitionTeamRegistration);
 				exhibitionTypeRegistrationRepository.delete(exhibitionTypeRegistration);
-				
+
 				ExhibitionType exhibitionType = exhibitionTypeRegistration.getExhibitionType();
-				
+
 				int tournamentId = exhibitionTypeRepository.findTournamentOfType(exhibitionType.getId());
 				Tournament tournament = tournamentRepository.findById(tournamentId).get();
 
@@ -2438,20 +2438,48 @@ public class TournamentServiceImpl implements TournamentService {
 	}
 
 	@Override
-	public ResponseMessage deleteTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId) {
+	public ResponseMessage deleteTournamentOrganizingCommittee(int tournamentOrganizingCommitteeId, String studentId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			User user = userRepository.findByStudentId(studentId).get();
+
 			Optional<TournamentOrganizingCommittee> tournamentOrganizingCommitteeOp = tournamentOrganizingCommitteeRepository
 					.findById(tournamentOrganizingCommitteeId);
 			if (tournamentOrganizingCommitteeOp.isPresent()) {
 				TournamentOrganizingCommittee tournamentOrganizingCommittee = tournamentOrganizingCommitteeOp.get();
-				if (!tournamentOrganizingCommittee.isPaymentStatus()) {
-					tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
-					tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
-					responseMessage.setData(Arrays.asList(tournamentOrganizingCommittee));
-					responseMessage.setMessage("Xóa thành viên ban tổ chức thành công");
-				} else {
-					responseMessage.setMessage("Thành viên này đã đóng phí tham gia, không thể xóa");
+
+				tournamentOrganizingCommittee.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
+				tournamentOrganizingCommitteeRepository.save(tournamentOrganizingCommittee);
+				responseMessage.setData(Arrays.asList(tournamentOrganizingCommittee));
+				responseMessage.setMessage("Xóa thành viên ban tổ chức thành công");
+
+				if (tournamentOrganizingCommittee.isPaymentStatus()) {
+					List<ClubFund> clubFunds = clubFundRepository.findAll();
+					ClubFund clubFund = clubFunds.get(0);
+					double fundAmount = clubFund.getFundAmount();
+
+					double tournamentFee = tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay();
+
+					double fundBalance = fundAmount - tournamentFee;
+
+					clubFundService.withdrawFromClubFund(studentId, tournamentFee,
+							"Hoàn tiền cho " + tournamentOrganizingCommittee.getUser().getName() + " - "
+									+ tournamentOrganizingCommittee.getUser().getStudentId() + " do rời khỏi giải đấu "
+									+ tournamentOrganizingCommittee.getTournament().getName());
+
+					TournamentOrganizingCommitteePaymentStatusReport tournamentOrganizingCommitteePaymentStatusReport = new TournamentOrganizingCommitteePaymentStatusReport();
+					tournamentOrganizingCommitteePaymentStatusReport
+							.setTournament(tournamentOrganizingCommittee.getTournament());
+					tournamentOrganizingCommitteePaymentStatusReport.setUser(tournamentOrganizingCommittee.getUser());
+					tournamentOrganizingCommitteePaymentStatusReport
+							.setPaymentStatus(!tournamentOrganizingCommittee.isPaymentStatus());
+					tournamentOrganizingCommitteePaymentStatusReport.setFundChange(-tournamentFee);
+					tournamentOrganizingCommitteePaymentStatusReport.setFundBalance(fundBalance);
+					tournamentOrganizingCommitteePaymentStatusReport.setCreatedBy(
+							user.getName() + " - " + tournamentOrganizingCommittee.getUser().getStudentId());
+					tournamentOrganizingCommitteePaymentStatusReport.setCreatedOn(LocalDateTime.now());
+					tournamentOrganizingCommitteePaymentStatusReportRepository
+							.save(tournamentOrganizingCommitteePaymentStatusReport);
 				}
 			} else {
 				responseMessage.setMessage("Không có thành viên này");
