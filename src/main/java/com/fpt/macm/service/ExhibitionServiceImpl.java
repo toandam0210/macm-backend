@@ -28,8 +28,8 @@ import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.ExhibitionTypeRegistration;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
-import com.fpt.macm.model.entity.TournamentOrganizingCommitteePaymentStatusReport;
 import com.fpt.macm.model.entity.TournamentPlayer;
+import com.fpt.macm.model.entity.TournamentPlayerPaymentStatusReport;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.ClubFundRepository;
@@ -39,8 +39,8 @@ import com.fpt.macm.repository.ExhibitionResultRepository;
 import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRegistrationRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
-import com.fpt.macm.repository.TournamentOrganizingCommitteePaymentStatusReportRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
+import com.fpt.macm.repository.TournamentPlayerPaymentStatusReportRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -82,7 +82,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 	CompetitivePlayerRepository competitivePlayerRepository;
 
 	@Autowired
-	TournamentOrganizingCommitteePaymentStatusReportRepository tournamentOrganizingCommitteePaymentStatusReportRepository;
+	TournamentPlayerPaymentStatusReportRepository tournamentPlayerPaymentStatusReportRepository;
 
 	@Autowired
 	ClubFundRepository clubFundRepository;
@@ -392,8 +392,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 							.findCompetitivePlayerByTournamentPlayerId(getTournamentPlayer.getId());
 					if (listExhibitionByUser.size() == 0 && !getCompetitivePlayerOp.isPresent()) {
 						if (getTournamentPlayer.isPaymentStatus()) {
-							clubFundService.withdrawFromClubFund(admin.getStudentId(),
-									getTournament.getFeePlayerPay(),
+							clubFundService.withdrawFromClubFund(admin.getStudentId(), getTournament.getFeePlayerPay(),
 									("Hoàn phí đăng ký tham gia giải đấu cho tuyển thủ "
 											+ getTournamentPlayer.getUser().getName()) + " - "
 											+ getTournamentPlayer.getUser().getStudentId());
@@ -406,17 +405,16 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
 							double fundBalance = fundAmount - tournamentFee;
 
-							TournamentOrganizingCommitteePaymentStatusReport tournamentOrganizingCommitteePaymentStatusReport = new TournamentOrganizingCommitteePaymentStatusReport();
-							tournamentOrganizingCommitteePaymentStatusReport.setTournament(getTournament);
-							tournamentOrganizingCommitteePaymentStatusReport.setUser(getTournamentPlayer.getUser());
-							tournamentOrganizingCommitteePaymentStatusReport.setPaymentStatus(false);
-							tournamentOrganizingCommitteePaymentStatusReport.setFundChange(-tournamentFee);
-							tournamentOrganizingCommitteePaymentStatusReport.setFundBalance(fundBalance);
-							tournamentOrganizingCommitteePaymentStatusReport
+							TournamentPlayerPaymentStatusReport tournamentPlayerPaymentStatusReport = new TournamentPlayerPaymentStatusReport();
+							tournamentPlayerPaymentStatusReport.setTournament(getTournament);
+							tournamentPlayerPaymentStatusReport.setUser(getTournamentPlayer.getUser());
+							tournamentPlayerPaymentStatusReport.setPaymentStatus(false);
+							tournamentPlayerPaymentStatusReport.setFundChange(-tournamentFee);
+							tournamentPlayerPaymentStatusReport.setFundBalance(fundBalance);
+							tournamentPlayerPaymentStatusReport
 									.setCreatedBy(admin.getName() + " - " + admin.getStudentId());
-							tournamentOrganizingCommitteePaymentStatusReport.setCreatedOn(LocalDateTime.now());
-							tournamentOrganizingCommitteePaymentStatusReportRepository
-									.save(tournamentOrganizingCommitteePaymentStatusReport);
+							tournamentPlayerPaymentStatusReport.setCreatedOn(LocalDateTime.now());
+							tournamentPlayerPaymentStatusReportRepository.save(tournamentPlayerPaymentStatusReport);
 
 						}
 						tournamentPlayerRepository.deleteById(getTournamentPlayer.getId());
