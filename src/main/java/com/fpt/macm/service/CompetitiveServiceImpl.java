@@ -18,6 +18,7 @@ import com.fpt.macm.model.dto.CompetitiveMatchDto;
 import com.fpt.macm.model.dto.CompetitivePlayerByTypeDto;
 import com.fpt.macm.model.dto.CompetitiveResultByTypeDto;
 import com.fpt.macm.model.dto.PlayerMatchDto;
+import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitiveResult;
@@ -26,15 +27,18 @@ import com.fpt.macm.model.entity.CompetitiveTypeRegistration;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
+import com.fpt.macm.model.entity.TournamentOrganizingCommitteePaymentStatusReport;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
 import com.fpt.macm.repository.CompetitiveTypeRegistrationRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
+import com.fpt.macm.repository.TournamentOrganizingCommitteePaymentStatusReportRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
@@ -75,6 +79,12 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 	
 	@Autowired
 	ClubFundService clubFundService;
+	
+	@Autowired
+	TournamentOrganizingCommitteePaymentStatusReportRepository tournamentOrganizingCommitteePaymentStatusReportRepository;
+
+	@Autowired
+	ClubFundRepository clubFundRepository;
 
 	@Override
 	public ResponseMessage getAllCompetitiveType(int tournamentId) {
@@ -446,7 +456,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				}
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
+			throw e;
 		}
 	}
 
@@ -635,8 +645,30 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 					TournamentPlayer tournamentPlayer = getCompetitivePlayer.getTournamentPlayer();
 					if(tournamentPlayer.isPaymentStatus()) {
 						clubFundService.withdrawFromClubFund(user.getStudentId(),
-								tournament.getTotalAmountFromClubEstimate(),
+								tournament.getFeePlayerPay(),
 								("Hoàn phí đăng ký tham gia giải đấu cho tuyển thủ " + tournamentPlayer.getUser().getName()) + " - " + tournamentPlayer.getUser().getStudentId());
+						
+						List<ClubFund> clubFunds = clubFundRepository.findAll();
+						ClubFund clubFund = clubFunds.get(0);
+						double fundAmount = clubFund.getFundAmount();
+
+						double tournamentFee = tournament.getFeePlayerPay();
+
+						double fundBalance = fundAmount - tournamentFee;
+
+						TournamentOrganizingCommitteePaymentStatusReport tournamentOrganizingCommitteePaymentStatusReport = new TournamentOrganizingCommitteePaymentStatusReport();
+						tournamentOrganizingCommitteePaymentStatusReport
+								.setTournament(tournament);
+						tournamentOrganizingCommitteePaymentStatusReport.setUser(tournamentPlayer.getUser());
+						tournamentOrganizingCommitteePaymentStatusReport
+								.setPaymentStatus(false);
+						tournamentOrganizingCommitteePaymentStatusReport.setFundChange(-tournamentFee);
+						tournamentOrganizingCommitteePaymentStatusReport.setFundBalance(fundBalance);
+						tournamentOrganizingCommitteePaymentStatusReport.setCreatedBy(
+								user.getName() + " - " + user.getStudentId());
+						tournamentOrganizingCommitteePaymentStatusReport.setCreatedOn(LocalDateTime.now());
+						tournamentOrganizingCommitteePaymentStatusReportRepository
+								.save(tournamentOrganizingCommitteePaymentStatusReport);
 					}
 					tournamentPlayerRepository.delete(tournamentPlayer);
 				}
