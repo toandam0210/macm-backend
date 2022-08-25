@@ -2126,7 +2126,7 @@ public class TournamentServiceTest {
 				.thenReturn(Optional.of(tournamentOrganizingCommittee));
 
 		ResponseMessage response = tournamentService
-				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId(), user().getStudentId());
 		assertEquals(response.getData().size(), 1);
 	}
 
@@ -2136,7 +2136,7 @@ public class TournamentServiceTest {
 				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
 
 		ResponseMessage response = tournamentService
-				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId(), user().getStudentId());
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -2145,7 +2145,7 @@ public class TournamentServiceTest {
 		when(tournamentOrganizingCommitteeRepository.findById(anyInt())).thenReturn(Optional.empty());
 
 		ResponseMessage response = tournamentService
-				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId(), user().getStudentId());
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -2154,7 +2154,7 @@ public class TournamentServiceTest {
 		when(tournamentOrganizingCommitteeRepository.findById(anyInt())).thenReturn(null);
 
 		ResponseMessage response = tournamentService
-				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId(), user().getStudentId());
 		assertEquals(response.getData().size(), 0);
 	}
 
