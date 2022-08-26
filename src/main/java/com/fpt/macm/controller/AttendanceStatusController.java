@@ -85,17 +85,10 @@ public class AttendanceStatusController {
 		return new ResponseEntity<ResponseMessage>(attendanceStatusService.checkAttendanceStatusByStudentId(studentId), HttpStatus.OK);
 	}
 	
-    public Message sendPong(@Payload Message message) {
-		message.setMessage("pong");
-		simpMessagingTemplate.convertAndSend("/chatroom/public",message);
-		return message;
-    }
-
-    @MessageMapping("/message")
-    @SendTo("/chatroom/public")
-    public Message sendPingResponse(@Payload Message message) {
-    	message.setMessage("pong");
-		return message;
+	@Scheduled(fixedDelay = 10000L)
+	 @SendTo("/chatroom/public")
+    public void sendPong() {
+		simpMessagingTemplate.convertAndSend("/chatroom/public","Pong");
     }
 	
 	@MessageMapping("/private-message")
