@@ -16,16 +16,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
+import com.fpt.macm.model.dto.AttendanceEventDto;
 import com.fpt.macm.model.dto.AttendanceStatusDto;
 import com.fpt.macm.model.dto.TrainingScheduleDto;
 import com.fpt.macm.model.dto.UserAttendanceStatusDto;
 import com.fpt.macm.model.dto.UserAttendanceTrainingReportDto;
+import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.AttendanceStatus;
+import com.fpt.macm.model.entity.Event;
+import com.fpt.macm.model.entity.EventSchedule;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AttendanceEventRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
+import com.fpt.macm.repository.EventScheduleRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -51,6 +57,12 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 
 	@Autowired
 	SemesterService semesterService;
+
+	@Autowired
+	EventScheduleRepository eventScheduleRepository;
+	
+	@Autowired
+	AttendanceEventRepository attendanceEventRepository;
 
 	@Override
 	public ResponseMessage takeAttendanceByStudentId(String studentId, int status, int trainingScheduleId) {
@@ -368,6 +380,70 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 
 			responseMessage.setData(listAttendanceStatistics);
 			responseMessage.setMessage("Lấy thống kê điểm danh thành công");
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage checkAttendanceStatusByStudentId(String studentId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			User user = userRepository.findByStudentId(studentId).get();
+
+			Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository.findByDate(LocalDate.now());
+			if (trainingScheduleOp.isPresent()) {
+				TrainingSchedule trainingSchedule = trainingScheduleOp.get();
+				AttendanceStatus attendanceStatus = attendanceStatusRepository
+						.findByUserIdAndTrainingScheduleId(user.getId(), trainingSchedule.getId());
+				if (attendanceStatus != null) {
+					AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
+					attendanceStatusDto.setId(attendanceStatus.getId());
+					attendanceStatusDto.setName(user.getName());
+					attendanceStatusDto.setStudentId(studentId);
+					attendanceStatusDto.setStatus(attendanceStatus.getStatus());
+					attendanceStatusDto.setTrainingScheduleId(trainingSchedule.getId());
+					attendanceStatusDto.setDate(trainingSchedule.getDate());
+
+					responseMessage.setData(Arrays.asList(attendanceStatusDto));
+					responseMessage.setMessage("Lấy thông tin điểm danh hôm nay thành công");
+				} else {
+					responseMessage.setMessage("Hôm nay không có thông tin điểm danh");
+				}
+			} else {
+				Optional<EventSchedule> eventScheduleOp = eventScheduleRepository.findByDate(LocalDate.now());
+				if (eventScheduleOp.isPresent()) {
+					EventSchedule eventSchedule = eventScheduleOp.get();
+					Event event = eventSchedule.getEvent();
+					List<EventSchedule> eventSchedules = eventScheduleRepository
+							.findByEventId(event.getId());
+					if (eventSchedules.get(0).getDate().isEqual(LocalDate.now())) {
+						Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository.findByEventIdAndUserId(event.getId(), user.getId());
+						if (attendanceEventOp.isPresent()) {
+							AttendanceEvent attendanceEvent = attendanceEventOp.get();
+							
+							AttendanceEventDto attendanceEventDto = new AttendanceEventDto();
+							attendanceEventDto.setId(attendanceEvent.getId());
+							attendanceEventDto.setEventId(event.getId());
+							attendanceEventDto.setEventName(event.getName());
+							attendanceEventDto.setDate(LocalDate.now());
+							attendanceEventDto.setName(user.getName());
+							attendanceEventDto.setStudentId(user.getStudentId());
+							attendanceEventDto.setStatus(attendanceEvent.getStatus());
+							
+							responseMessage.setData(Arrays.asList(attendanceEventDto));
+							responseMessage.setMessage("Lấy thông tin điểm danh hôm nay thành công");
+						} else {
+							responseMessage.setMessage("Hôm nay không có thông tin điểm danh");
+						}
+					} else {
+						responseMessage.setMessage("Hôm nay không có thông tin điểm danh");
+					}
+				} else {
+					responseMessage.setMessage("Hôm nay không có thông tin điểm danh");
+				}
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}

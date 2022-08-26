@@ -9,4 +9,5 @@ public interface AttendanceStatusService {
 	ResponseMessage getAllAttendanceStatusByStudentIdAndSemester(String studentId, String semesterName, int month);
 	ResponseMessage getListOldTrainingScheduleToTakeAttendanceBySemester(String semesterName);
 	ResponseMessage getAttendanceTrainingStatistic(String semesterName, int roleId);
+	ResponseMessage checkAttendanceStatusByStudentId(String studentId);
 }
