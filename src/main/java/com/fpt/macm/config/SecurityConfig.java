@@ -108,7 +108,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 						"/api/exhibition/getlistexhibitiontype/**", "/api/exhibition/getlistexhibitionresult",
 						"/api/admin/hr/getbystudentid/**", "/api/admin/hr/getallactivememberandcollaborator",
 						"/api/admin/hr/updateuser/**", "/api/competitive/headclub/listmatchs/**",
-						"/api/tournament/gettournamentresult/**", "/api/admin/hr/updatestatusbymember", "/api/admin/hr/membersemesterinfor", "/ws")
+						"/api/tournament/gettournamentresult/**", "/api/admin/hr/updatestatusbymember", "/api/admin/hr/membersemesterinfor", "/ws/**")
 				.permitAll()
 //                // HeadClub
 //                .antMatchers("/api/tournament/headclub/**","/api/tournamentschedule/headclub/**","/api/area/headclub/**","/api/competitive/headclub/**","/api/exhibition/headclub/**","/api/admin/dashboard/**").hasAnyRole("HeadClub")
