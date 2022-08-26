@@ -17,6 +17,7 @@ import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.ExhibitionPlayerDto;
 import com.fpt.macm.model.dto.ExhibitionResultByTypeDto;
 import com.fpt.macm.model.dto.ExhibitionTeamDto;
+import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.ExhibitionPlayerRegistration;
@@ -28,8 +29,10 @@ import com.fpt.macm.model.entity.ExhibitionTypeRegistration;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
+import com.fpt.macm.model.entity.TournamentPlayerPaymentStatusReport;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.ExhibitionResultRepository;
@@ -37,6 +40,7 @@ import com.fpt.macm.repository.ExhibitionTeamRepository;
 import com.fpt.macm.repository.ExhibitionTypeRegistrationRepository;
 import com.fpt.macm.repository.ExhibitionTypeRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
+import com.fpt.macm.repository.TournamentPlayerPaymentStatusReportRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -76,6 +80,12 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 
 	@Autowired
 	CompetitivePlayerRepository competitivePlayerRepository;
+
+	@Autowired
+	TournamentPlayerPaymentStatusReportRepository tournamentPlayerPaymentStatusReportRepository;
+
+	@Autowired
+	ClubFundRepository clubFundRepository;
 
 	@Override
 	public ResponseMessage getAllExhibitionType(int tournamentId) {
@@ -305,7 +315,16 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 			if (getTypeOp.isPresent()) {
 				ExhibitionType getType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
 				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
-				responseMessage.setData(Arrays.asList(getTeams));
+				List<ExhibitionTeam> listResult = new ArrayList<ExhibitionTeam>(getTeams);
+				Collections.sort(listResult, new Comparator<ExhibitionTeam>() {
+
+					@Override
+					public int compare(ExhibitionTeam o1, ExhibitionTeam o2) {
+						// TODO Auto-generated method stub
+						return o1.getId() - o2.getId();
+					}
+				});
+				responseMessage.setData(listResult);
 				responseMessage.setMessage("Danh sách các đội biểu diễn nội dung " + getType.getName());
 			} else {
 				responseMessage.setMessage("Không tìm thấy thể thức");
@@ -382,13 +401,39 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 							.findCompetitivePlayerByTournamentPlayerId(getTournamentPlayer.getId());
 					if (listExhibitionByUser.size() == 0 && !getCompetitivePlayerOp.isPresent()) {
 						if (getTournamentPlayer.isPaymentStatus()) {
-							clubFundService.withdrawFromClubFund(admin.getStudentId(),
-									getTournament.getTotalAmountFromClubEstimate(),
+							clubFundService.withdrawFromClubFund(admin.getStudentId(), getTournament.getFeePlayerPay(),
 									("Hoàn phí đăng ký tham gia giải đấu cho tuyển thủ "
 											+ getTournamentPlayer.getUser().getName()) + " - "
 											+ getTournamentPlayer.getUser().getStudentId());
+
+							List<ClubFund> clubFunds = clubFundRepository.findAll();
+							ClubFund clubFund = clubFunds.get(0);
+							double fundAmount = clubFund.getFundAmount();
+
+							double tournamentFee = getTournament.getFeePlayerPay();
+
+							double fundBalance = fundAmount - tournamentFee;
+
+							TournamentPlayerPaymentStatusReport tournamentPlayerPaymentStatusReport = new TournamentPlayerPaymentStatusReport();
+							tournamentPlayerPaymentStatusReport.setTournament(getTournament);
+							tournamentPlayerPaymentStatusReport.setUser(getTournamentPlayer.getUser());
+							tournamentPlayerPaymentStatusReport.setPaymentStatus(false);
+							tournamentPlayerPaymentStatusReport.setFundChange(-tournamentFee);
+							tournamentPlayerPaymentStatusReport.setFundBalance(fundBalance);
+							tournamentPlayerPaymentStatusReport
+									.setCreatedBy(admin.getName() + " - " + admin.getStudentId());
+							tournamentPlayerPaymentStatusReport.setCreatedOn(LocalDateTime.now());
+							tournamentPlayerPaymentStatusReportRepository.save(tournamentPlayerPaymentStatusReport);
+							
+							
+
 						}
-						tournamentPlayerRepository.deleteById(getTournamentPlayer.getId());
+						Set<TournamentPlayer> tournamentPlayers = getTournament.getTournamentPlayers();
+						tournamentPlayers.remove(getTournamentPlayer);
+						
+						getTournament.setTournamentPlayers(tournamentPlayers);
+						tournamentRepository.save(getTournament);
+//						tournamentPlayerRepository.deleteById(getTournamentPlayer.getId());
 					}
 				}
 			} else {
