@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -77,6 +78,12 @@ public class AttendanceStatusController {
 		return new ResponseEntity<ResponseMessage>(
 				attendanceStatusService.getAttendanceTrainingStatistic(semesterName, roleId), HttpStatus.OK);
 	}
+	
+	 @MessageMapping("/message")
+	    @SendTo("/chatroom/public")
+	    public Message receiveMessage(@Payload Message message){
+	        return message;
+	    }
 	
 	@MessageMapping("/private-message")
     public Message recMessage(@Payload Message message){
