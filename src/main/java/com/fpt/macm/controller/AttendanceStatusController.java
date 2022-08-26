@@ -79,6 +79,11 @@ public class AttendanceStatusController {
 				attendanceStatusService.getAttendanceTrainingStatistic(semesterName, roleId), HttpStatus.OK);
 	}
 	
+	@GetMapping("/checkattendancestatusbystudentid/{studentId}")
+	ResponseEntity<ResponseMessage> checkAttendanceStatusByStudentId(@PathVariable(name = "studentId") String studentId){
+		return new ResponseEntity<ResponseMessage>(attendanceStatusService.checkAttendanceStatusByStudentId(studentId), HttpStatus.OK);
+	}
+	
 	 @MessageMapping("/message")
 	    @SendTo("/chatroom/public")
 	    public Message receiveMessage(@Payload Message message){
