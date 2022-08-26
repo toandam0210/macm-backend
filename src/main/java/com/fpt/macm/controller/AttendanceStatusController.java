@@ -85,7 +85,6 @@ public class AttendanceStatusController {
 		return new ResponseEntity<ResponseMessage>(attendanceStatusService.checkAttendanceStatusByStudentId(studentId), HttpStatus.OK);
 	}
 	
-	@Scheduled(fixedDelay = 20000L)
     public Message sendPong(@Payload Message message) {
 		message.setMessage("pong");
 		simpMessagingTemplate.convertAndSend("/chatroom/public",message);
