@@ -2204,7 +2204,7 @@ public class TournamentServiceImpl implements TournamentService {
 				
 				if (!listExhibitionTypes.isEmpty()) {
 					responseMessage.setData(listExhibitionTypes);
-					responseMessage.setMessage("Bạn đã đăng ký tham gia những nội dung thi đấu biểu diễn này");
+					responseMessage.setMessage("Bạn đã đăng ký tham gia nội dung thi đấu biểu diễn này");
 				} else {
 					responseMessage.setMessage("Bạn chưa đăng ký tham gia thi đấu biểu diễn");
 				}
