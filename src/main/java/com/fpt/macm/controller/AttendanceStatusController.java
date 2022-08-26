@@ -7,6 +7,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -84,11 +85,13 @@ public class AttendanceStatusController {
 		return new ResponseEntity<ResponseMessage>(attendanceStatusService.checkAttendanceStatusByStudentId(studentId), HttpStatus.OK);
 	}
 	
-	 @MessageMapping("/message")
-	    @SendTo("/chatroom/public")
-	    public Message receiveMessage(@Payload Message message){
-	        return message;
-	    }
+	@Scheduled(fixedDelay = 10000L)
+	@MessageMapping("/message")
+		@SendTo("/chatroom/public")
+	public Message receiveMessage(@Payload Message message) {
+		message.setMessage("Pong");
+		return message;
+	}
 	
 	@MessageMapping("/private-message")
     public Message recMessage(@Payload Message message){
