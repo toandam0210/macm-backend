@@ -75,7 +75,7 @@ public class SemesterControllerTest {
 	public void getTop3SemestersSuccessTest() throws Exception {
 		ResponseMessage responseMessage = new ResponseMessage();
 		responseMessage.setData(Arrays.asList(semester()));
-		when(semesterService.getTop3Semesters()).thenReturn(responseMessage);
+		when(semesterService.getTop4Semesters()).thenReturn(responseMessage);
 		this.mockMvc.perform(get("/api/semester/gettop3semesters")
 		.contentType(MediaType.APPLICATION_JSON))
 		.andExpect(status().isOk())

@@ -28,7 +28,7 @@ public class SemesterController {
 	
 	@GetMapping("/gettop3semesters")
 	ResponseEntity<ResponseMessage> getTop3Semesters() {
-		return new ResponseEntity<ResponseMessage>(semesterService.getTop3Semesters(), HttpStatus.OK);
+		return new ResponseEntity<ResponseMessage>(semesterService.getTop4Semesters(), HttpStatus.OK);
 	}
 	
 	@GetMapping("/getlistmonths")

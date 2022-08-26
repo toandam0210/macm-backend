@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
@@ -19,6 +20,7 @@ import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.CommonScheduleRepository;
+import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.TournamentScheduleRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
@@ -54,6 +56,9 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 	@Autowired
 	TrainingScheduleRepository trainingScheduleRepository;
 	
+	@Autowired
+	SemesterRepository semesterRepository;
+	
 	@Override
 	public ResponseMessage createPreviewTournamentSchedule(String tournamentName, String startDate, String finishDate,
 			String startTime, String finishTime) {
@@ -71,8 +76,8 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 			} else if (startLocalDate.compareTo(LocalDate.now()) <= 0) {
 				responseMessage.setMessage(Constant.MSG_065);
 			} else {
-				Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-				if (finishLocalDate.compareTo(currentSemester.getEndDate()) > 0) {
+				Semester lastSemester = semesterRepository.findAll(Sort.by("startDate").descending()).get(0);
+				if (finishLocalDate.compareTo(lastSemester.getEndDate()) > 0) {
 					responseMessage.setMessage(Constant.MSG_080);
 				} else {
 					List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
@@ -126,32 +131,38 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 			if(tournamentSchedule.getStartTime().compareTo(tournamentSchedule.getFinishTime()) >= 0) {
 				responseMessage.setMessage(Constant.MSG_038);
 			} else {
-				if(tournamentSchedule.getDate().compareTo(LocalDate.now()) > 0) {
-					if (commonScheduleService.getCommonSessionByDate(tournamentSchedule.getDate()) == null) {
-						tournamentSchedule.setTournament(tournamentRepository.findById(tournamentId).get());
-						tournamentSchedule.setCreatedBy("LinhLHN");
-						tournamentSchedule.setCreatedOn(LocalDateTime.now());
-						tournamentSchedule.setUpdatedBy("LinhLHN");
-						tournamentSchedule.setUpdatedOn(LocalDateTime.now());
-						tournamentScheduleRepository.save(tournamentSchedule);
-						responseMessage.setData(Arrays.asList(tournamentSchedule));
-						responseMessage.setMessage(Constant.MSG_106);
-						CommonSchedule commonSession = new CommonSchedule();
-						commonSession.setTitle(tournamentSchedule.getTournament().getName());
-						commonSession.setDate(tournamentSchedule.getDate());
-						commonSession.setStartTime(tournamentSchedule.getStartTime());
-						commonSession.setFinishTime(tournamentSchedule.getFinishTime());
-						commonSession.setCreatedOn(LocalDateTime.now());
-						commonSession.setUpdatedOn(LocalDateTime.now());
-						commonSession.setType(2);
-						commonScheduleRepository.save(commonSession);
-					}
-					else {
-						responseMessage.setMessage(Constant.MSG_104);
-					}
+				Semester lastSemester = semesterRepository.findAll(Sort.by("startDate").descending()).get(0);
+				if (LocalDate.now().compareTo(lastSemester.getEndDate()) > 0) {
+					responseMessage.setMessage(Constant.MSG_080);
 				}
 				else {
-					responseMessage.setMessage(Constant.MSG_105);
+					if(tournamentSchedule.getDate().compareTo(LocalDate.now()) > 0) {
+						if (commonScheduleService.getCommonSessionByDate(tournamentSchedule.getDate()) == null) {
+							tournamentSchedule.setTournament(tournamentRepository.findById(tournamentId).get());
+							tournamentSchedule.setCreatedBy("LinhLHN");
+							tournamentSchedule.setCreatedOn(LocalDateTime.now());
+							tournamentSchedule.setUpdatedBy("LinhLHN");
+							tournamentSchedule.setUpdatedOn(LocalDateTime.now());
+							tournamentScheduleRepository.save(tournamentSchedule);
+							responseMessage.setData(Arrays.asList(tournamentSchedule));
+							responseMessage.setMessage(Constant.MSG_106);
+							CommonSchedule commonSession = new CommonSchedule();
+							commonSession.setTitle(tournamentSchedule.getTournament().getName());
+							commonSession.setDate(tournamentSchedule.getDate());
+							commonSession.setStartTime(tournamentSchedule.getStartTime());
+							commonSession.setFinishTime(tournamentSchedule.getFinishTime());
+							commonSession.setCreatedOn(LocalDateTime.now());
+							commonSession.setUpdatedOn(LocalDateTime.now());
+							commonSession.setType(2);
+							commonScheduleRepository.save(commonSession);
+						}
+						else {
+							responseMessage.setMessage(Constant.MSG_104);
+						}
+					}
+					else {
+						responseMessage.setMessage(Constant.MSG_105);
+					}
 				}
 			}
 		} catch (Exception e) {

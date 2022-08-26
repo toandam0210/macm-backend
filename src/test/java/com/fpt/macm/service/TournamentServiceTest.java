@@ -1013,7 +1013,7 @@ public class TournamentServiceTest {
 
 	@Test
 	public void testGetAllTournamentBySemesterCaseSemesterNull() {
-		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
+		when(semesterRepository.findTop4Semester()).thenReturn(Arrays.asList(semester()));
 		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament()));
 		when(tournamentScheduleRepository.findByTournamentId(anyInt())).thenReturn(Arrays.asList(tournamentSchedule()));
 		ResponseMessage response = tournamentService.getAllTournamentBySemester("", 3);
@@ -1932,7 +1932,7 @@ public class TournamentServiceTest {
 	public void getAllTournamentByStudentIdCaseSemesterNull() {
 		Tournament tournament = tournament();
 		tournament.setStatus(false);
-		when(semesterRepository.findTop3Semester()).thenReturn(Arrays.asList(semester()));
+		when(semesterRepository.findTop4Semester()).thenReturn(Arrays.asList(semester()));
 		when(userRepository.findByStudentId(anyString())).thenReturn(Optional.of(user()));
 		when(tournamentRepository.findBySemester(anyString())).thenReturn(Arrays.asList(tournament));
 
@@ -2126,7 +2126,7 @@ public class TournamentServiceTest {
 				.thenReturn(Optional.of(tournamentOrganizingCommittee));
 
 		ResponseMessage response = tournamentService
-				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId(), user().getStudentId());
 		assertEquals(response.getData().size(), 1);
 	}
 
@@ -2136,7 +2136,7 @@ public class TournamentServiceTest {
 				.thenReturn(Optional.of(tournamentOrganizingCommittee()));
 
 		ResponseMessage response = tournamentService
-				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId(), user().getStudentId());
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -2145,7 +2145,7 @@ public class TournamentServiceTest {
 		when(tournamentOrganizingCommitteeRepository.findById(anyInt())).thenReturn(Optional.empty());
 
 		ResponseMessage response = tournamentService
-				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId(), user().getStudentId());
 		assertEquals(response.getData().size(), 0);
 	}
 
@@ -2154,7 +2154,7 @@ public class TournamentServiceTest {
 		when(tournamentOrganizingCommitteeRepository.findById(anyInt())).thenReturn(null);
 
 		ResponseMessage response = tournamentService
-				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId());
+				.deleteTournamentOrganizingCommittee(tournamentOrganizingCommittee().getId(), user().getStudentId());
 		assertEquals(response.getData().size(), 0);
 	}
 

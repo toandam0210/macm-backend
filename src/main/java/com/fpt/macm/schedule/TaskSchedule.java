@@ -23,11 +23,9 @@ import com.fpt.macm.model.entity.CollaboratorReport;
 import com.fpt.macm.model.entity.CompetitiveType;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.EventSchedule;
-import com.fpt.macm.model.entity.ExhibitionType;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MemberSemester;
 import com.fpt.macm.model.entity.MembershipInfo;
-import com.fpt.macm.model.entity.MembershipStatus;
 import com.fpt.macm.model.entity.Notification;
 import com.fpt.macm.model.entity.NotificationToUser;
 import com.fpt.macm.model.entity.Role;
@@ -39,6 +37,7 @@ import com.fpt.macm.model.entity.TournamentSchedule;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.entity.UserStatusReport;
+import com.fpt.macm.model.response.ResponseMessage;
 import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.AttendanceEventRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
@@ -171,6 +170,7 @@ public class TaskSchedule {
 					MemberSemester statusSemester = new MemberSemester();
 					statusSemester.setUser(collaborator);
 					statusSemester.setSemester(semester.getName());
+					statusSemester.setClicked(true);
 					statusSemester.setStatus(collaborator.isActive());
 					memberSemesterRepository.save(statusSemester);
 				} else {
@@ -212,7 +212,7 @@ public class TaskSchedule {
 		logger.info("report oke");
 	}
 	
-	@Scheduled(cron = "0 0 6 * * *")
+	@Scheduled(cron = "0 0 1 * * *")
 	public void updateStatusMemberToDeactive() {
 		Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
 		if(LocalDate.now().isEqual(currentSemester.getStartDate())) {
@@ -225,6 +225,7 @@ public class TaskSchedule {
 						MemberSemester memberSemester = new MemberSemester();
 						memberSemester.setSemester(currentSemester.getName());
 						memberSemester.setStatus(false);
+						memberSemester.setClicked(false);
 						memberSemester.setUser(user);
 						memberSemesterRepository.save(memberSemester);
 						logger.info("add member oke");
@@ -348,31 +349,14 @@ public class TaskSchedule {
 //		}
 //	}
 
-	@Scheduled(cron = "1 0 0 * * *")
+	@Scheduled(cron = "0 0 1 * * *")
 	public void addListMembershipStatus() {
-		if (LocalDate.now().getDayOfMonth() > 17 && LocalDate.now().getDayOfMonth() <= 24
-				&& LocalDate.now().getMonthValue() % 4 == 1
-				&& LocalDate.now().getDayOfWeek().toString().compareTo("MONDAY") == 0) {
+		Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
+		if (LocalDate.now().isEqual(currentSemester.getStartDate())) {
 			MembershipInfo membershipInfo = new MembershipInfo();
-			membershipInfo.setAmount(0);
-			if (LocalDate.now().getMonthValue() == 1) {
-				membershipInfo.setSemester("Spring" + LocalDate.now().getYear());
-			}
-			if (LocalDate.now().getMonthValue() == 5) {
-				membershipInfo.setSemester("Summer" + LocalDate.now().getYear());
-			}
-			if (LocalDate.now().getMonthValue() == 9) {
-				membershipInfo.setSemester("Fall" + LocalDate.now().getYear());
-			}
+			membershipInfo.setAmount(50000);
+			membershipInfo.setSemester(currentSemester.getName());
 			membershipShipInforRepository.save(membershipInfo);
-			List<User> usersActive = userRepository.findMembersActive();
-			for (User user : usersActive) {
-				MembershipStatus membershipStatus = new MembershipStatus();
-				membershipStatus.setMembershipInfo(membershipInfo);
-				membershipStatus.setUser(user);
-				membershipStatus.setStatus(false);
-				membershipStatusRepository.save(membershipStatus);
-			}
 			logger.info("ok roi day");
 		}
 	}
@@ -383,21 +367,23 @@ public class TaskSchedule {
 				&& LocalDate.now().getDayOfWeek().toString().compareTo("MONDAY") == 0) {
 			Semester semester = new Semester();
 			if (LocalDate.now().getMonthValue() == 1) {
-				semester.setName("Spring" + LocalDate.now().getYear());
-			}
-			if (LocalDate.now().getMonthValue() == 5) {
 				semester.setName("Summer" + LocalDate.now().getYear());
 			}
-			if (LocalDate.now().getMonthValue() == 9) {
+			if (LocalDate.now().getMonthValue() == 5) {
 				semester.setName("Fall" + LocalDate.now().getYear());
 			}
-			semester.setStartDate(LocalDate.now());
-			LocalDate endDate = LocalDate.now().plusMonths(4).minusDays(LocalDate.now().getDayOfMonth());
+			if (LocalDate.now().getMonthValue() == 9) {
+				semester.setName("Spring" + (LocalDate.now().getYear() + 1));
+			}
+			Semester lastSemester = semesterRepository.findAll(Sort.by("startDate").descending()).get(0);
+			semester.setStartDate(lastSemester.getEndDate().plusDays(1));
+			LocalDate endDate = semester.getStartDate().plusMonths(4).minusDays(LocalDate.now().getDayOfMonth());
 			while (endDate.getDayOfWeek().toString().compareTo("SUNDAY") != 0) {
 				endDate = endDate.plusDays(1);
 			}
 			semester.setEndDate(endDate);
 			semesterRepository.save(semester);
+			logger.info(semester.getName());
 		}
 	}
 
@@ -567,7 +553,7 @@ public class TaskSchedule {
 	}
 
 	@Scheduled(cron = "1 0 0 * * *")
-	public void changeStatusTournamentForUpdatePlayer() {
+	public void changeStageTournamentForUpdatePlayer() {
 		
 		List<Tournament> tournaments = tournamentRepository.findAll();
 		List<Tournament> listTournaments = new ArrayList<Tournament>();
@@ -583,24 +569,7 @@ public class TaskSchedule {
 				logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
 				tournament.setStage(1);
 				Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
-				for (CompetitiveType competitiveType : listCompetitiveTypes) {
-					if (competitiveType.getStatus() == 0) {
-						competitiveType.setStatus(1);
-						logger.info("Trạng thái của " + (competitiveType.isGender() ? "Nam " : "Nữ ")
-								+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
-								+ " thay đổi từ 0 thành 1");
-					}
-				}
 				tournament.setCompetitiveTypes(listCompetitiveTypes);
-				Set<ExhibitionType> listExhibitionTypes = tournament.getExhibitionTypes();
-				for (ExhibitionType exhibitionType : listExhibitionTypes) {
-					if (exhibitionType.getStatus() == 0) {
-						exhibitionType.setStatus(1);
-						logger.info("Trạng thái của " + exhibitionType.getName() + " thay đổi từ 0 thành 1");
-					}
-				}
-				tournament.setExhibitionTypes(listExhibitionTypes);
-
 				logger.info("Dừng thay đổi trạng thái của giải đấu " + tournament.getName());
 				tournamentRepository.save(tournament);
 			}
@@ -610,35 +579,28 @@ public class TaskSchedule {
 	}
 
 	@Scheduled(cron = "1 0 0 * * *")
-	public void changeStatusTournamentForUpdateResult() {
+	public void changeStageTournamentForUpdateResult() {
 		TournamentSchedule tournamentSchedule = tournamentScheduleService.getTournamentSessionByDate(LocalDate.now());
 		if (tournamentSchedule != null) {
 			Tournament tournament = tournamentSchedule.getTournament();
 			tournament.setStage(3);
 			logger.info("Thay đổi trạng thái của giải đấu " + tournament.getName());
-			Set<CompetitiveType> listCompetitiveTypes = tournament.getCompetitiveTypes();
-			for (CompetitiveType competitiveType : listCompetitiveTypes) {
-				if (competitiveType.getStatus() == 2) {
-					competitiveType.setStatus(3);
-					logger.info("Trạng thái của " + (competitiveType.isGender() ? "Nam " : "Nữ ")
-							+ competitiveType.getWeightMin() + " - " + competitiveType.getWeightMax()
-							+ " thay đổi từ 2 thành 3");
-				}
-			}
-			tournament.setCompetitiveTypes(listCompetitiveTypes);
-			Set<ExhibitionType> listExhibitionTypes = tournament.getExhibitionTypes();
-			for (ExhibitionType exhibitionType : listExhibitionTypes) {
-				if (exhibitionType.getStatus() == 0) {
-					exhibitionType.setStatus(1);
-					logger.info("Trạng thái của " + exhibitionType.getName() + " thay đổi từ 2 thành 3");
-				}
-			}
-			tournament.setExhibitionTypes(listExhibitionTypes);
-
-			logger.info("Dừng thay đổi trạng thái của giải đấu " + tournament.getName());
 			tournamentRepository.save(tournament);
 		} else {
 			logger.info("Không có giải đấu");
+		}
+	}
+	
+	@Scheduled(cron = "1 0 1 * * *")
+	public void changeClicked() {
+		ResponseMessage responseMessage = semesterService.getCurrentSemester();
+		Semester semester = (Semester) responseMessage.getData().get(0);
+		if(LocalDate.now().isAfter(semester.getStartDate().plusDays(7))) {
+			List<MemberSemester> memberSemesters = memberSemesterRepository.findBySemesterOrderByIdDesc(semester.getName());
+			for (MemberSemester memberSemester : memberSemesters) {
+				memberSemester.setClicked(true);
+				memberSemesterRepository.save(memberSemester);
+			}
 		}
 	}
 }

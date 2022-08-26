@@ -1071,14 +1071,18 @@ public class UserServiceTest {
 	@Test 
 	public void testSearchByMultipleFieldCaseDateFrom() {
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"",1);
+		List<Integer> months = new ArrayList<Integer>();
+		months.add(1);
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"",months);
 		assertEquals(response.getData().size(), 0);
 	}
 
 	@Test 
 	public void testSearchByMultipleFieldCaseDateToException() {
+		List<Integer> months = new ArrayList<Integer>();
+		months.add(1);
 		List<UserDto> userDtoResponse = usersDto();
-		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"",1);
+		ResponseMessage response = userService.searchByMultipleField(userDtoResponse,"","","","",null,null,"",months);
 		assertEquals(response.getData().size(), 0);
 	}
 	

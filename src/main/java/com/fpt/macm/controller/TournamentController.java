@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fpt.macm.model.dto.ActiveUserDto;
-import com.fpt.macm.model.dto.TournamentRoleDto;
 import com.fpt.macm.model.dto.TournamentCreateDto;
 import com.fpt.macm.model.dto.TournamentDto;
 import com.fpt.macm.model.dto.TournamentOrganizingCommitteeDto;
+import com.fpt.macm.model.dto.TournamentRoleDto;
 import com.fpt.macm.model.dto.UserTournamentOrganizingCommitteeDto;
 import com.fpt.macm.model.entity.CompetitiveResult;
 import com.fpt.macm.model.entity.ExhibitionResult;
@@ -203,6 +204,32 @@ public class TournamentController {
 				tournamentId, studentId, weight, competitiveTypeId), HttpStatus.OK);
 	}
 
+	@PutMapping("/acceptrequesttojointournamentcompetitivetype/{competitiveTypeRegistrationId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> acceptRequestToJoinTournamentCompetitiveType(
+			@PathVariable(name = "competitiveTypeRegistrationId") int competitiveTypeRegistrationId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.acceptRequestToJoinTournamentCompetitiveType(competitiveTypeRegistrationId),
+				HttpStatus.OK);
+	}
+
+	@PutMapping("/declinerequesttojointournamentcompetitivetype/{competitiveTypeRegistrationId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> declineRequestToJoinTournamentCompetitiveType(
+			@PathVariable(name = "competitiveTypeRegistrationId") int competitiveTypeRegistrationId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.declineRequestToJoinTournamentCompetitiveType(competitiveTypeRegistrationId),
+				HttpStatus.OK);
+	}
+
+	@GetMapping("/getallrequesttojointournamentcompetitivetype/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> getAllRequestToJoinTournamentCompetitiveType(
+			@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllRequestToJoinTournamentCompetitiveType(tournamentId), HttpStatus.OK);
+	}
+
 	@PostMapping("/registertojointournamentexhibitiontype/{tournamentId}/{studentId}")
 	ResponseEntity<ResponseMessage> registerToJoinTournamentExhibitionType(
 			@PathVariable(name = "tournamentId") int tournamentId, @PathVariable(name = "studentId") String studentId,
@@ -210,6 +237,32 @@ public class TournamentController {
 			@RequestBody List<ActiveUserDto> teamMember) {
 		return new ResponseEntity<ResponseMessage>(tournamentService.registerToJoinTournamentExhibitionType(
 				tournamentId, studentId, exhibitionTypeId, teamName, teamMember), HttpStatus.OK);
+	}
+
+	@PutMapping("/acceptrequesttojointournamentexhibitiontype/{exhibitionTypeRegistrationId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> acceptRequestToJoinTournamentExhibitionType(
+			@PathVariable(name = "exhibitionTypeRegistrationId") int exhibitionTypeRegistrationId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.acceptRequestToJoinTournamentExhibitionType(exhibitionTypeRegistrationId),
+				HttpStatus.OK);
+	}
+
+	@DeleteMapping("/declinerequesttojointournamentexhibitiontype/{exhibitionTypeRegistrationId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> declineRequestToJoinTournamentExhibitionType(
+			@PathVariable(name = "exhibitionTypeRegistrationId") int exhibitionTypeRegistrationId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.declineRequestToJoinTournamentExhibitionType(exhibitionTypeRegistrationId),
+				HttpStatus.OK);
+	}
+
+	@GetMapping("/getallrequesttojointournamentexhibitiontype/{tournamentId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> getAllRequestToJoinTournamentExhibitionType(
+			@PathVariable(name = "tournamentId") int tournamentId) {
+		return new ResponseEntity<ResponseMessage>(
+				tournamentService.getAllRequestToJoinTournamentExhibitionType(tournamentId), HttpStatus.OK);
 	}
 
 	@GetMapping("/getallusercompetitiveplayer/{tournamentId}/{studentId}")
@@ -256,12 +309,14 @@ public class TournamentController {
 				HttpStatus.OK);
 	}
 
-	@PutMapping("/headclub/deletetournamentorganizingcommittee/{tournamentOrganizingCommitteeId}")
+	@PutMapping("/headclub/deletetournamentorganizingcommittee/{tournamentOrganizingCommitteeId}/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_HeadTechnique','ROLE_ViceHeadTechnique')")
 	ResponseEntity<ResponseMessage> deleteTournamentOrganizingCommittee(
-			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId) {
+			@PathVariable(name = "tournamentOrganizingCommitteeId") int tournamentOrganizingCommitteeId,
+			@PathVariable(name = "studentId") String studentId) {
 		return new ResponseEntity<ResponseMessage>(
-				tournamentService.deleteTournamentOrganizingCommittee(tournamentOrganizingCommitteeId), HttpStatus.OK);
+				tournamentService.deleteTournamentOrganizingCommittee(tournamentOrganizingCommitteeId, studentId),
+				HttpStatus.OK);
 	}
 
 	@GetMapping("/gettournamentresult/{tournamentId}")

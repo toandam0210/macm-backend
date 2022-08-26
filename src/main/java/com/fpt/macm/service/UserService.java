@@ -27,8 +27,11 @@ public interface UserService {
 	ResponseMessage getAllUser();
 	ResponseMessage getMembersBySemester(String semester);
 	ResponseMessage getAdminBySemester(String semester);
-	ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email, String gender, Integer generation, Integer roleId, String isActive, Integer month);
+	ResponseMessage searchByMultipleField(List<UserDto> userDtos, String name, String studentId, String email, String gender, Integer generation, Integer roleId, String isActive, List<Integer> months);
 	ResponseMessage generateQrCode(InforInQrCode inforInQrCode);
 	ResponseMessage getAllActiveMemberAndCollaborator();
 	ResponseMessage getAllUserAttendanceStatus(String studentId);
+	ResponseMessage getAllGen();
+	ResponseMessage updateStatusUserSide(String semester, String studentId, int status);
+	ResponseMessage getMemberSemesterWhenStartSemester(String studentId);
 }

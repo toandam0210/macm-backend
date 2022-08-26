@@ -16,20 +16,24 @@ import com.fpt.macm.model.dto.ActivityReportDto;
 import com.fpt.macm.model.dto.AttendanceReportDto;
 import com.fpt.macm.model.dto.EventDashboardDto;
 import com.fpt.macm.model.dto.FeeDashboardDto;
+import com.fpt.macm.model.dto.FeeDashboardToltalDto;
 import com.fpt.macm.model.dto.UpcomingActivityDto;
+import com.fpt.macm.model.dto.UserActiveReportDto;
+import com.fpt.macm.model.entity.AdminSemester;
 import com.fpt.macm.model.entity.AttendanceStatus;
 import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.ClubFundReport;
 import com.fpt.macm.model.entity.CollaboratorReport;
 import com.fpt.macm.model.entity.Event;
 import com.fpt.macm.model.entity.MemberEvent;
+import com.fpt.macm.model.entity.MemberSemester;
 import com.fpt.macm.model.entity.Semester;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TrainingSchedule;
 import com.fpt.macm.model.entity.User;
-import com.fpt.macm.model.entity.UserStatusReport;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.AdminSemesterRepository;
 import com.fpt.macm.repository.AttendanceStatusRepository;
 import com.fpt.macm.repository.ClubFundReportRepository;
 import com.fpt.macm.repository.ClubFundRepository;
@@ -37,6 +41,7 @@ import com.fpt.macm.repository.CollaboratorReportRepository;
 import com.fpt.macm.repository.EventPaymentStatusReportRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.MemberEventRepository;
+import com.fpt.macm.repository.MemberSemesterRepository;
 import com.fpt.macm.repository.MembershipPaymentStatusReportRepository;
 import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteePaymentStatusReportRepository;
@@ -104,6 +109,13 @@ public class DashboardServiceImpl implements DashboardService {
 	@Autowired
 	UserRepository userRepository;
 	
+	@Autowired
+	MemberSemesterRepository memberSemesterRepository;
+	
+	@Autowired
+	AdminSemesterRepository adminSemesterRepository;
+
+
 	@Override
 	public ResponseMessage getCollaboratorReport() {
 		ResponseMessage responseMessage = new ResponseMessage();
@@ -119,7 +131,7 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 
 	@Override
-	public ResponseMessage attendanceReport(String semesterName) {
+	public ResponseMessage attendanceReport(String semesterName, int month) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<Semester> semesterOp = semesterRepository.findByName(semesterName);
@@ -133,27 +145,29 @@ public class DashboardServiceImpl implements DashboardService {
 						.listTrainingScheduleByTime(semester.getStartDate(), LocalDate.now());
 				double totalAttendInSemester = 0;
 				for (TrainingSchedule trainingSchedule : trainingSchedulesBySemester) {
-					int totalUserJoinTrainingSession = 0;
-					int totalUserAttentInTrainingSession = 0;
-					int totalUserAbsentInTrainingSession = 0;
-					AttendanceReportDto attendanceReportDto = new AttendanceReportDto();
-					attendanceReportDto.setDate(trainingSchedule.getDate());
-					for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
-						if (trainingSchedule.getId() == attendanceStatus.getTrainingSchedule().getId()) {
-							totalUserJoinTrainingSession++;
-							if (attendanceStatus.getStatus() == 1) {
-								totalUserAttentInTrainingSession++;
-								totalAttendInSemester++;
-							}
-							if (attendanceStatus.getStatus() == 0) {
-								totalUserAbsentInTrainingSession++;
+					if (month == 0 || trainingSchedule.getDate().getMonthValue() == month) {
+						int totalUserJoinTrainingSession = 0;
+						int totalUserAttentInTrainingSession = 0;
+						int totalUserAbsentInTrainingSession = 0;
+						AttendanceReportDto attendanceReportDto = new AttendanceReportDto();
+						attendanceReportDto.setDate(trainingSchedule.getDate());
+						for (AttendanceStatus attendanceStatus : listAttendanceStatus) {
+							if (trainingSchedule.getId() == attendanceStatus.getTrainingSchedule().getId()) {
+								totalUserJoinTrainingSession++;
+								if (attendanceStatus.getStatus() == 1) {
+									totalUserAttentInTrainingSession++;
+									totalAttendInSemester++;
+								}
+								if (attendanceStatus.getStatus() == 0) {
+									totalUserAbsentInTrainingSession++;
+								}
 							}
 						}
+						attendanceReportDto.setTotalAttendInTrainingSession(totalUserAttentInTrainingSession);
+						attendanceReportDto.setTotalAbsentInTrainingSession(totalUserAbsentInTrainingSession);
+						attendanceReportDto.setTotalUserJoin(totalUserJoinTrainingSession);
+						attendanceReportDtos.add(attendanceReportDto);
 					}
-					attendanceReportDto.setTotalAttendInTrainingSession(totalUserAttentInTrainingSession);
-					attendanceReportDto.setTotalAbsentInTrainingSession(totalUserAbsentInTrainingSession);
-					attendanceReportDto.setTotalUserJoin(totalUserJoinTrainingSession);
-					attendanceReportDtos.add(attendanceReportDto);
 				}
 				List<AttendanceReportDto> listRemove = new ArrayList<AttendanceReportDto>();
 				for (AttendanceReportDto attendanceReportDto : attendanceReportDtos) {
@@ -207,14 +221,83 @@ public class DashboardServiceImpl implements DashboardService {
 	public ResponseMessage statusMemberReport() {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<UserStatusReport> userStatusReports = userStatusReportRepository.findAll();
-			if (userStatusReports.size() > 0) {
-				responseMessage.setData(userStatusReports);
-				responseMessage.setMessage("Lấy dữ liệu report thành công");
-				responseMessage.setTotalResult(userStatusReports.size());
+			List<Semester> semesters = semesterRepository.findTop4Semester();
+			UserActiveReportDto userActiveReportDto = new UserActiveReportDto();
+			if (semesters.size() > 2) {
+				Semester semester = semesters.get(1);
+				int totalActive = 0;
+				int totalUser = 0;
+				int totalActiveBefore = 0;
+				int totalUserBefore = 0;
+				List<MemberSemester> memberSemesters = memberSemesterRepository
+						.findBySemesterOrderByIdDesc(semester.getName());
+				List<AdminSemester> adminSemesters = adminSemesterRepository.findBySemester(semester.getName());
+				List<MemberSemester> memberSemestersBefore = memberSemesterRepository
+						.findBySemesterOrderByIdDesc(semesters.get(2).getName());
+				List<AdminSemester> adminSemestersBefore = adminSemesterRepository
+						.findBySemester(semesters.get(2).getName());
+				List<User> users = userRepository.findMembersAndAdmin();
+				totalUser = users.size();
+				if (memberSemesters.size() > 0) {
+					for (MemberSemester memberSemester : memberSemesters) {
+						if (memberSemester.isStatus()) {
+							totalActive++;
+						}
+					}
+				} else {
+					totalUser = 0;
+					totalActive = 0;
+				}
+				if (adminSemesters.size() > 0) {
+					totalActive += adminSemesters.size();
+				} else {
+					totalActive += totalActive;
+					totalUser += totalUser;
+				}
+				if (memberSemestersBefore.size() > 0) {
+					totalUserBefore += memberSemestersBefore.size();
+					for (MemberSemester memberSemester : memberSemestersBefore) {
+						if (memberSemester.isStatus()) {
+							totalActiveBefore++;
+						}
+					}
+				} else {
+					totalUserBefore = 0;
+					totalActiveBefore = 0;
+				}
+				if (adminSemestersBefore.size() > 0) {
+					totalUserBefore += adminSemestersBefore.size();
+					totalActiveBefore += adminSemestersBefore.size();
+				} else {
+					totalUserBefore += totalUserBefore;
+					totalActiveBefore += totalActiveBefore;
+				}
+				double percentActive = 0;
+				double percentUser = 0;
+				if (totalActiveBefore != 0) {
+					percentActive = Math.round(
+							((double) totalActive - (double) totalActiveBefore) * 100D / (double) totalActiveBefore);
+				} else {
+					percentActive = 0;
+				}
+				if (totalUserBefore != 0) {
+					percentUser = Math
+							.round(((double) totalUser - (double) totalUserBefore) * 100D / (double) totalUserBefore);
+				} else {
+					percentUser = 0;
+				}
+				userActiveReportDto.setPercentActive(percentActive);
+				userActiveReportDto.setPercentTotalUser(percentUser);
+				userActiveReportDto.setTotalActive(totalActive);
+				userActiveReportDto.setTotalUser(totalUser);
 			} else {
-				responseMessage.setMessage("Không có dữ liệu");
+				userActiveReportDto.setPercentActive(0);
+				userActiveReportDto.setPercentTotalUser(0);
+				userActiveReportDto.setTotalActive(0);
+				userActiveReportDto.setTotalUser(0);
 			}
+			responseMessage.setData(Arrays.asList(userActiveReportDto));
+			responseMessage.setMessage("Lấy dữ liệu report thành công");
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
@@ -236,11 +319,14 @@ public class DashboardServiceImpl implements DashboardService {
 				}
 				int year = semester.getStartDate().getYear();
 
+				FeeDashboardToltalDto feeDashboardToltalDto = new FeeDashboardToltalDto();
+				feeDashboardToltalDto.setSemester(semesterName);
+
 				List<FeeDashboardDto> feeDashboardsDto = new ArrayList<FeeDashboardDto>();
 
 				for (int i = startMonth; i < endMonth; i++) {
-					int totalIncome = 0;
-					int totalSpend = 0;
+					double totalIncome = 0;
+					double totalSpend = 0;
 					double latestBalance = 0;
 
 					LocalDateTime startDate = LocalDateTime.of(year, i, 1, 0, 0, 0);
@@ -266,7 +352,6 @@ public class DashboardServiceImpl implements DashboardService {
 					}
 
 					FeeDashboardDto feeDashboardDto = new FeeDashboardDto();
-					feeDashboardDto.setSemester(semesterName);
 					feeDashboardDto.setMonth(i);
 					feeDashboardDto.setTotalIncome(totalIncome);
 					feeDashboardDto.setTotalSpend(totalSpend);
@@ -278,9 +363,69 @@ public class DashboardServiceImpl implements DashboardService {
 					}
 
 					feeDashboardsDto.add(feeDashboardDto);
+
+					if (i == LocalDate.now().getMonthValue()) {
+						feeDashboardToltalDto.setTotalIncome(totalIncome);
+						feeDashboardToltalDto.setTotalSpend(totalSpend);
+
+						int j = i;
+						if (j - 1 == 0) {
+							j = 12;
+						} else {
+							j--;
+						}
+
+						LocalDateTime startDateOld = LocalDateTime.of(year, j, 1, 0, 0, 0);
+						LocalDate startDateTempOld = startDate.toLocalDate();
+						LocalDateTime endDateOld = LocalDateTime.of(year, j,
+								startDateTemp
+										.withDayOfMonth(
+												startDateTempOld.getMonth().length(startDateTempOld.isLeapYear()))
+										.getDayOfMonth(),
+								23, 59, 59);
+
+						List<ClubFundReport> oldClubFundReports = clubFundReportRepository
+								.findAllFundChange(startDateOld, endDateOld);
+
+						if (!oldClubFundReports.isEmpty()) {
+							double totalIncomeOld = 0;
+							double totalSpendOld = 0;
+							double latestBalanceOld = 0;
+							for (ClubFundReport clubFundReport : oldClubFundReports) {
+								double fundChange = clubFundReport.getFundChange();
+								if (fundChange < 0) {
+									totalSpendOld += -fundChange;
+								} else {
+									totalIncomeOld += fundChange;
+								}
+								latestBalanceOld = clubFundReports.get(clubFundReports.size() - 1).getFundBalance();
+							}
+
+							if (latestBalanceOld != 0) {
+								feeDashboardToltalDto.setTotalBalancePercent((getClubFund() - latestBalanceOld) * 100 / latestBalanceOld);
+							} else {
+								feeDashboardToltalDto.setTotalBalancePercent(0);
+							}
+							
+							if (totalSpendOld != 0) {
+								feeDashboardToltalDto
+										.setTotalSpendPercent((totalSpend - totalSpendOld) * 100 / totalSpendOld);
+							} else {
+								feeDashboardToltalDto.setTotalSpendPercent(0);
+							}
+							if (totalIncomeOld != 0) {
+								feeDashboardToltalDto
+										.setTotalIncomePercent((totalIncome - totalIncomeOld) * 100 / totalIncomeOld);
+							} else {
+								feeDashboardToltalDto.setTotalIncomePercent(0);
+							}
+						}
+					}
 				}
 
-				responseMessage.setData(feeDashboardsDto);
+				feeDashboardToltalDto.setFeeDashboardDtos(feeDashboardsDto);
+
+				responseMessage.setData(Arrays.asList(feeDashboardToltalDto));
 				responseMessage.setMessage("Lấy dữ liệu báo cáo thu chi theo kỳ thành công");
 			}
 		} catch (Exception e) {
@@ -308,14 +453,14 @@ public class DashboardServiceImpl implements DashboardService {
 				endDateFilter = LocalDate.now().plusMonths(1);
 				break;
 			case 2:
-				Semester semester = semesterRepository.findTop3Semester().get(0);
+				Semester semester = semesterRepository.findTop4Semester().get(1);
 				endDateFilter = semester.getEndDate();
 				break;
 			default:
 				endDateFilter = LocalDate.now().plusWeeks(1);
 				break;
 			}
-			
+
 			List<Event> events = eventRepository.findAll();
 			if (!events.isEmpty()) {
 				for (Event event : events) {

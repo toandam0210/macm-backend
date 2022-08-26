@@ -491,82 +491,82 @@ public class ExhibitionServiceTest {
 		assertEquals(responseMessage.getData().size(), 0);
 	}
 	
-	@Test
-	public void testUpdateTeam() {
-		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
-		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<>(exhibitionPlayers());
-		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeam()));
-		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
-		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		when(exhibitionTypeRepository.findTournamentOfType(anyInt())).thenReturn(1);
-		when(userRepository.getByStudentId(anyString())).thenReturn(user());
-		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
-		.thenReturn(Optional.of(tournamentPlayer()));
-		when(exhibitionPlayerRepository.findByTournamentPlayerAndType(anyInt(), anyInt()))
-		.thenReturn(Optional.of(exhibitionPlayers.get(0)));
-		when(exhibitionPlayerRepository.findAllByPlayerIdAndExhibitionNull(anyInt())).thenReturn(exhibitionPlayers);
-		ResponseMessage responseMessage = exhibitionTypeService.updateTeam(1, Arrays.asList(user()));
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void testUpdateTeamCaseTournamentPlayerEmpty() {
-		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
-		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<>(exhibitionPlayers());
-		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeam()));
-		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
-		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
-		.thenReturn(Optional.empty());
-		when(exhibitionTypeRepository.findTournamentOfType(anyInt())).thenReturn(1);
-		when(userRepository.getByStudentId(anyString())).thenReturn(user());
-		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
-		.thenReturn(Optional.of(tournamentPlayer()));
-		when(exhibitionPlayerRepository.findByTournamentPlayerAndType(anyInt(), anyInt()))
-		.thenReturn(Optional.of(exhibitionPlayers.get(0)));
-		when(exhibitionPlayerRepository.findAllByPlayerIdAndExhibitionNull(anyInt())).thenReturn(exhibitionPlayers);
-		ResponseMessage responseMessage = exhibitionTypeService.updateTeam(1, Arrays.asList(user()));
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void testUpdateTeamCaseExhibitionPlayerNull() {
-		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
-		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<>(exhibitionPlayers());
-		List<ExhibitionPlayer> exhibitionPlayersNull = new ArrayList<>();
-		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeam()));
-		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
-		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
-		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
-		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
-		.thenReturn(Optional.empty());
-		when(exhibitionTypeRepository.findTournamentOfType(anyInt())).thenReturn(1);
-		when(userRepository.getByStudentId(anyString())).thenReturn(user());
-		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
-		.thenReturn(Optional.of(tournamentPlayer()));
-		when(exhibitionPlayerRepository.findByTournamentPlayerAndType(anyInt(), anyInt()))
-		.thenReturn(Optional.empty());
-		when(exhibitionPlayerRepository.findAllByPlayerIdAndExhibitionNull(anyInt())).thenReturn(exhibitionPlayers);
-		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayersNull);
-		ResponseMessage responseMessage = exhibitionTypeService.updateTeam(1, Arrays.asList(user()));
-		assertEquals(responseMessage.getData().size(), 1);
-	}
-	
-	@Test
-	public void testUpdateTeamCaseExhibitionTeamEmpty() {
-		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.empty());
-		ResponseMessage responseMessage = exhibitionTypeService.updateTeam(1, Arrays.asList(user()));
-		assertEquals(responseMessage.getData().size(), 0);
-	}
-	
-	@Test
-	public void testUpdateTeamCaseException() {
-		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(null);
-		ResponseMessage responseMessage = exhibitionTypeService.updateTeam(1, Arrays.asList(user()));
-		assertEquals(responseMessage.getData().size(), 0);
-	}
+//	@Test
+//	public void testUpdateTeam() {
+//		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
+//		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<>(exhibitionPlayers());
+//		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeam()));
+//		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
+//		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+//		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+//		when(exhibitionTypeRepository.findTournamentOfType(anyInt())).thenReturn(1);
+//		when(userRepository.getByStudentId(anyString())).thenReturn(user());
+//		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+//		.thenReturn(Optional.of(tournamentPlayer()));
+//		when(exhibitionPlayerRepository.findByTournamentPlayerAndType(anyInt(), anyInt()))
+//		.thenReturn(Optional.of(exhibitionPlayers.get(0)));
+//		when(exhibitionPlayerRepository.findAllByPlayerIdAndExhibitionNull(anyInt())).thenReturn(exhibitionPlayers);
+//		ResponseMessage responseMessage = exhibitionTypeService.updateTeam(1, Arrays.asList(user()));
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
+//	
+//	@Test
+//	public void testUpdateTeamCaseTournamentPlayerEmpty() {
+//		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
+//		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<>(exhibitionPlayers());
+//		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeam()));
+//		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
+//		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+//		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+//		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+//		.thenReturn(Optional.empty());
+//		when(exhibitionTypeRepository.findTournamentOfType(anyInt())).thenReturn(1);
+//		when(userRepository.getByStudentId(anyString())).thenReturn(user());
+//		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+//		.thenReturn(Optional.of(tournamentPlayer()));
+//		when(exhibitionPlayerRepository.findByTournamentPlayerAndType(anyInt(), anyInt()))
+//		.thenReturn(Optional.of(exhibitionPlayers.get(0)));
+//		when(exhibitionPlayerRepository.findAllByPlayerIdAndExhibitionNull(anyInt())).thenReturn(exhibitionPlayers);
+//		ResponseMessage responseMessage = exhibitionTypeService.updateTeam(1, Arrays.asList(user()));
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
+//	
+//	@Test
+//	public void testUpdateTeamCaseExhibitionPlayerNull() {
+//		List<ExhibitionType> exhibitionTypes = new ArrayList<>(exhibitionTypes());
+//		List<ExhibitionPlayer> exhibitionPlayers = new ArrayList<>(exhibitionPlayers());
+//		List<ExhibitionPlayer> exhibitionPlayersNull = new ArrayList<>();
+//		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTeam()));
+//		when(exhibitionTypeRepository.findById(anyInt())).thenReturn(Optional.of(exhibitionTypes.get(0)));
+//		when(exhibitionTeamRepository.findTypeOfExhibitionTeam(anyInt())).thenReturn(1);
+//		when(tournamentRepository.findById(anyInt())).thenReturn(Optional.of(tournament()));
+//		when(tournamentPlayerRepository.findPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+//		.thenReturn(Optional.empty());
+//		when(exhibitionTypeRepository.findTournamentOfType(anyInt())).thenReturn(1);
+//		when(userRepository.getByStudentId(anyString())).thenReturn(user());
+//		when(tournamentPlayerRepository.getPlayerByUserIdAndTournamentId(anyInt(), anyInt()))
+//		.thenReturn(Optional.of(tournamentPlayer()));
+//		when(exhibitionPlayerRepository.findByTournamentPlayerAndType(anyInt(), anyInt()))
+//		.thenReturn(Optional.empty());
+//		when(exhibitionPlayerRepository.findAllByPlayerIdAndExhibitionNull(anyInt())).thenReturn(exhibitionPlayers);
+//		when(exhibitionPlayerRepository.findAllByPlayerId(anyInt())).thenReturn(exhibitionPlayersNull);
+//		ResponseMessage responseMessage = exhibitionTypeService.updateTeam(1, Arrays.asList(user()));
+//		assertEquals(responseMessage.getData().size(), 1);
+//	}
+//	
+//	@Test
+//	public void testUpdateTeamCaseExhibitionTeamEmpty() {
+//		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(Optional.empty());
+//		ResponseMessage responseMessage = exhibitionTypeService.updateTeam(1, Arrays.asList(user()));
+//		assertEquals(responseMessage.getData().size(), 0);
+//	}
+//	
+//	@Test
+//	public void testUpdateTeamCaseException() {
+//		when(exhibitionTeamRepository.findById(anyInt())).thenReturn(null);
+//		ResponseMessage responseMessage = exhibitionTypeService.updateTeam(1, Arrays.asList(user()));
+//		assertEquals(responseMessage.getData().size(), 0);
+//	}
 	
 	@Test
 	public void testGetExhibitionResultByType() {

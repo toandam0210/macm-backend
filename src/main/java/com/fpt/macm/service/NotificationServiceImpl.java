@@ -22,7 +22,14 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.UserNotificationDto;
+import com.fpt.macm.model.entity.CompetitiveType;
+import com.fpt.macm.model.entity.CompetitiveTypeRegistration;
 import com.fpt.macm.model.entity.Event;
+import com.fpt.macm.model.entity.ExhibitionPlayer;
+import com.fpt.macm.model.entity.ExhibitionPlayerRegistration;
+import com.fpt.macm.model.entity.ExhibitionTeamRegistration;
+import com.fpt.macm.model.entity.ExhibitionType;
+import com.fpt.macm.model.entity.ExhibitionTypeRegistration;
 import com.fpt.macm.model.entity.MemberEvent;
 import com.fpt.macm.model.entity.MembershipInfo;
 import com.fpt.macm.model.entity.MembershipStatus;
@@ -34,11 +41,15 @@ import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.CompetitiveTypeRegistrationRepository;
+import com.fpt.macm.repository.ExhibitionPlayerRepository;
+import com.fpt.macm.repository.ExhibitionTypeRegistrationRepository;
 import com.fpt.macm.repository.MemberEventRepository;
 import com.fpt.macm.repository.MembershipShipInforRepository;
 import com.fpt.macm.repository.MembershipStatusRepository;
 import com.fpt.macm.repository.NotificationRepository;
 import com.fpt.macm.repository.NotificationToUserRepository;
+import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -65,13 +76,22 @@ public class NotificationServiceImpl implements NotificationService {
 	MembershipShipInforRepository membershipShipInforRepository;
 
 	@Autowired
-	SemesterService semesterService;
+	SemesterRepository semesterRepository;
 
 	@Autowired
 	MemberEventRepository memberEventRepository;
 
 	@Autowired
 	TournamentOrganizingCommitteeRepository tournamentOrganizingCommitteeRepository;
+
+	@Autowired
+	CompetitiveTypeRegistrationRepository competitiveTypeRegistrationRepository;
+
+	@Autowired
+	ExhibitionTypeRegistrationRepository exhibitionTypeRegistrationRepository;
+
+	@Autowired
+	ExhibitionPlayerRepository exhibitionPlayerRepository;
 
 	@Override
 	public ResponseMessage getAllNotificationByStudentId(String studentId, int pageNo, int pageSize, String sortBy) {
@@ -355,22 +375,24 @@ public class NotificationServiceImpl implements NotificationService {
 
 			List<String> messages = new ArrayList<String>();
 			User user = userRepository.findByStudentId(studentId).get();
-			Semester semester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-			Optional<MembershipInfo> membershipInfoOp = membershipShipInforRepository
-					.findBySemester(semester.getName());
-			if (membershipInfoOp.isPresent()) {
-				MembershipInfo membershipInfo = membershipInfoOp.get();
-				Optional<MembershipStatus> membershipStatusOp = membershipStatusRepository
-						.findByMemberShipInfoIdAndUserId(membershipInfo.getId(), user.getId());
-				if (membershipStatusOp.isPresent()) {
-					MembershipStatus membershipStatus = membershipStatusOp.get();
-					if (!membershipStatus.isStatus()) {
-						String message = "Membership kỳ " + semester.getName() + ": "
-								+ nf.format(membershipInfo.getAmount()) + " VND";
-						messages.add(message);
+			List<Semester> semesters = semesterRepository.findAll();
+			for (Semester semester : semesters) {
+				Optional<MembershipInfo> membershipInfoOp = membershipShipInforRepository
+						.findBySemester(semester.getName());
+				if (membershipInfoOp.isPresent()) {
+					MembershipInfo membershipInfo = membershipInfoOp.get();
+					Optional<MembershipStatus> membershipStatusOp = membershipStatusRepository
+							.findByMemberShipInfoIdAndUserId(membershipInfo.getId(), user.getId());
+					if (membershipStatusOp.isPresent()) {
+						MembershipStatus membershipStatus = membershipStatusOp.get();
+						if (!membershipStatus.isStatus()) {
+							String message = "Membership kỳ " + semester.getName() + ": "
+									+ nf.format(membershipInfo.getAmount()) + " VND";
+							messages.add(message);
+						}
 					}
-				}
 
+				}
 			}
 
 			List<MemberEvent> membersEvent = memberEventRepository.findByUserId(user.getId());
@@ -413,15 +435,16 @@ public class NotificationServiceImpl implements NotificationService {
 					.findByUserId(user.getId());
 			if (!tournamentOrganizingCommittees.isEmpty()) {
 				for (TournamentOrganizingCommittee tournamentOrganizingCommittee : tournamentOrganizingCommittees) {
-					if (tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay() > 0) {
-						if (tournamentOrganizingCommittee.getTournament().isStatus()) {
-							if (!tournamentOrganizingCommittee.isPaymentStatus()) {
-								String message = "Giải đấu " + tournamentOrganizingCommittee.getTournament().getName()
-										+ ": " + nf.format(tournamentOrganizingCommittee.getTournament()
-												.getFeeOrganizingCommiteePay())
-										+ " VND";
-								messages.add(message);
-							}
+					Tournament tournament = tournamentOrganizingCommittee.getTournament();
+					if (tournament.isStatus() && tournament.getFeeOrganizingCommiteePay() > 0) {
+						if (tournamentOrganizingCommittee.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
+								&& !tournamentOrganizingCommittee.isPaymentStatus()) {
+							String message = "Giải đấu " + tournamentOrganizingCommittee.getTournament().getName()
+									+ ": "
+									+ nf.format(
+											tournamentOrganizingCommittee.getTournament().getFeeOrganizingCommiteePay())
+									+ " VND";
+							messages.add(message);
 						}
 					}
 				}
@@ -434,10 +457,71 @@ public class NotificationServiceImpl implements NotificationService {
 					for (TournamentPlayer tournamentPlayer : tournamentPlayers) {
 						if (studentId.equals(tournamentPlayer.getUser().getStudentId())
 								&& !tournamentPlayer.isPaymentStatus()) {
-							String message = "Giải đấu " + tournament.getName() + ": "
-									+ nf.format(tournament.getFeePlayerPay()) + " VND";
-							messages.add(message);
-							break;
+							boolean isContinue = false;
+							Set<CompetitiveType> competitiveTypes = tournament.getCompetitiveTypes();
+							for (CompetitiveType currentCompetitiveType : competitiveTypes) {
+								Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
+										.findByCompetitiveTypeIdAndTournamentPlayerId(currentCompetitiveType.getId(),
+												tournamentPlayer.getId());
+								if (competitiveTypeRegistrationOp.isPresent()) {
+									CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp
+											.get();
+									if (competitiveTypeRegistration.getRegisterStatus()
+											.equals(Constant.REQUEST_STATUS_APPROVED)
+											|| competitiveTypeRegistration.getRegisterStatus()
+													.equals(Constant.REQUEST_STATUS_PENDING)) {
+										String message = "Giải đấu " + tournament.getName() + ": "
+												+ nf.format(tournament.getFeePlayerPay()) + " VND";
+										messages.add(message);
+										isContinue = true;
+										break;
+									}
+								}
+							}
+
+							if (isContinue) {
+								continue;
+							}
+
+							Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+							for (ExhibitionType exhibitionType : exhibitionTypes) {
+								List<ExhibitionTypeRegistration> exhibitionTypeRegistrations = exhibitionTypeRegistrationRepository
+										.findByExhibitionTypeId(exhibitionType.getId());
+								for (ExhibitionTypeRegistration exhibitionTypeRegistration : exhibitionTypeRegistrations) {
+									if (exhibitionTypeRegistration.getRegisterStatus()
+											.equals(Constant.REQUEST_STATUS_PENDING)) {
+										ExhibitionTeamRegistration exhibitionTeamRegistration = exhibitionTypeRegistration
+												.getExhibitionTeamRegistration();
+										Set<ExhibitionPlayerRegistration> exhibitionPlayersRegistration = exhibitionTeamRegistration
+												.getExhibitionPlayersRegistration();
+										for (ExhibitionPlayerRegistration exhibitionPlayerRegistration : exhibitionPlayersRegistration) {
+											if (tournamentPlayer.getId() == exhibitionPlayerRegistration
+													.getTournamentPlayer().getId()) {
+												String message = "Giải đấu " + tournament.getName() + ": "
+														+ nf.format(tournament.getFeePlayerPay()) + " VND";
+												messages.add(message);
+												isContinue = true;
+												break;
+											}
+										}
+									}
+									if (isContinue) {
+										break;
+									}
+								}
+								if (isContinue) {
+									break;
+								}
+								Optional<ExhibitionPlayer> exhibitionPlayerOp = exhibitionPlayerRepository
+										.findByTournamentPlayerAndType(tournamentPlayer.getId(),
+												exhibitionType.getId());
+								if (exhibitionPlayerOp.isPresent()) {
+									String message = "Giải đấu " + tournament.getName() + ": "
+											+ nf.format(tournament.getFeePlayerPay()) + " VND";
+									messages.add(message);
+								}
+								break;
+							}
 						}
 					}
 				}

@@ -162,6 +162,8 @@ public class MembershipServiceImpl implements MembershipService {
 				MembershipInfo membershipInfo = membershipInfoOp.get();
 				responseMessage.setData(Arrays.asList(membershipInfo));
 				responseMessage.setMessage(Constant.MSG_005);
+			}else {
+				responseMessage.setMessage("Kì " + semester + " chưa thu membership");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
