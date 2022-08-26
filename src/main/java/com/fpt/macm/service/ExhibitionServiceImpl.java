@@ -415,9 +415,16 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 									.setCreatedBy(admin.getName() + " - " + admin.getStudentId());
 							tournamentPlayerPaymentStatusReport.setCreatedOn(LocalDateTime.now());
 							tournamentPlayerPaymentStatusReportRepository.save(tournamentPlayerPaymentStatusReport);
+							
+							
 
 						}
-						tournamentPlayerRepository.deleteById(getTournamentPlayer.getId());
+						Set<TournamentPlayer> tournamentPlayers = getTournament.getTournamentPlayers();
+						tournamentPlayers.remove(getTournamentPlayer);
+						
+						getTournament.setTournamentPlayers(tournamentPlayers);
+						tournamentRepository.save(getTournament);
+//						tournamentPlayerRepository.deleteById(getTournamentPlayer.getId());
 					}
 				}
 			} else {
