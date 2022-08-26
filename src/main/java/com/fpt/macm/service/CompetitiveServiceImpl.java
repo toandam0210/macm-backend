@@ -695,6 +695,14 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				CompetitiveType getType = getTypeOp.get();
 				List<CompetitivePlayer> listPlayers = competitivePlayerRepository
 						.findByCompetitiveTypeId(competitiveTypeId);
+				Collections.sort(listPlayers, new Comparator<CompetitivePlayer>() {
+
+					@Override
+					public int compare(CompetitivePlayer o1, CompetitivePlayer o2) {
+						// TODO Auto-generated method stub
+						return o1.getId() - o2.getId();
+					}
+				});
 				CompetitivePlayerByTypeDto competitivePlayerByTypeDto = new CompetitivePlayerByTypeDto();
 				competitivePlayerByTypeDto.setName((getType.isGender() ? "Nam " : "Nữ ") + getType.getWeightMin()
 						+ " - " + getType.getWeightMax());
