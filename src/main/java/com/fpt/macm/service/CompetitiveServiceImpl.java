@@ -18,6 +18,7 @@ import com.fpt.macm.model.dto.CompetitiveMatchDto;
 import com.fpt.macm.model.dto.CompetitivePlayerByTypeDto;
 import com.fpt.macm.model.dto.CompetitiveResultByTypeDto;
 import com.fpt.macm.model.dto.PlayerMatchDto;
+import com.fpt.macm.model.entity.ClubFund;
 import com.fpt.macm.model.entity.CompetitiveMatch;
 import com.fpt.macm.model.entity.CompetitivePlayer;
 import com.fpt.macm.model.entity.CompetitiveResult;
@@ -27,8 +28,10 @@ import com.fpt.macm.model.entity.ExhibitionPlayer;
 import com.fpt.macm.model.entity.Tournament;
 import com.fpt.macm.model.entity.TournamentOrganizingCommittee;
 import com.fpt.macm.model.entity.TournamentPlayer;
+import com.fpt.macm.model.entity.TournamentPlayerPaymentStatusReport;
 import com.fpt.macm.model.entity.User;
 import com.fpt.macm.model.response.ResponseMessage;
+import com.fpt.macm.repository.ClubFundRepository;
 import com.fpt.macm.repository.CompetitiveMatchRepository;
 import com.fpt.macm.repository.CompetitivePlayerRepository;
 import com.fpt.macm.repository.CompetitiveResultRepository;
@@ -36,6 +39,7 @@ import com.fpt.macm.repository.CompetitiveTypeRegistrationRepository;
 import com.fpt.macm.repository.CompetitiveTypeRepository;
 import com.fpt.macm.repository.ExhibitionPlayerRepository;
 import com.fpt.macm.repository.TournamentOrganizingCommitteeRepository;
+import com.fpt.macm.repository.TournamentPlayerPaymentStatusReportRepository;
 import com.fpt.macm.repository.TournamentPlayerRepository;
 import com.fpt.macm.repository.TournamentRepository;
 import com.fpt.macm.repository.UserRepository;
@@ -72,9 +76,15 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 
 	@Autowired
 	CompetitiveTypeRegistrationRepository competitiveTypeRegistrationRepository;
-	
+
 	@Autowired
 	ClubFundService clubFundService;
+
+	@Autowired
+	ClubFundRepository clubFundRepository;
+	
+	@Autowired
+	TournamentPlayerPaymentStatusReportRepository tournamentPlayerPaymentStatusReportRepository;
 
 	@Override
 	public ResponseMessage getAllCompetitiveType(int tournamentId) {
@@ -446,7 +456,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				}
 			}
 		} catch (Exception e) {
-			// TODO: handle exception
+			throw e;
 		}
 	}
 
@@ -602,7 +612,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 					if (competitiveTypeRegistrationOp.isPresent()) {
 						competitiveTypeRegistrationRepository.delete(competitiveTypeRegistrationOp.get());
 					}
-					
+
 					competitivePlayerRepository.delete(getCompetitivePlayer);
 					List<CompetitivePlayer> competitivePlayers = competitivePlayerRepository
 							.findByCompetitiveTypeId(competitiveType.getId());
@@ -633,12 +643,37 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 						.findAllByPlayerId(competitivePlayerOp.get().getTournamentPlayer().getId());
 				if (exhibitionPlayers.size() == 0) {
 					TournamentPlayer tournamentPlayer = getCompetitivePlayer.getTournamentPlayer();
-					if(tournamentPlayer.isPaymentStatus()) {
-						clubFundService.withdrawFromClubFund(user.getStudentId(),
-								tournament.getTotalAmountFromClubEstimate(),
-								("Hoàn phí đăng ký tham gia giải đấu cho tuyển thủ " + tournamentPlayer.getUser().getName()) + " - " + tournamentPlayer.getUser().getStudentId());
+					if (tournamentPlayer.isPaymentStatus()) {
+						clubFundService.withdrawFromClubFund(user.getStudentId(), tournament.getFeePlayerPay(),
+								("Hoàn phí đăng ký tham gia giải đấu cho tuyển thủ "
+										+ tournamentPlayer.getUser().getName()) + " - "
+										+ tournamentPlayer.getUser().getStudentId());
+
+						List<ClubFund> clubFunds = clubFundRepository.findAll();
+						ClubFund clubFund = clubFunds.get(0);
+						double fundAmount = clubFund.getFundAmount();
+
+						double tournamentFee = tournament.getFeePlayerPay();
+
+						double fundBalance = fundAmount - tournamentFee;
+
+						TournamentPlayerPaymentStatusReport tournamentPlayerPaymentStatusReport = new TournamentPlayerPaymentStatusReport();
+						tournamentPlayerPaymentStatusReport.setTournament(tournament);
+						tournamentPlayerPaymentStatusReport.setUser(tournamentPlayer.getUser());
+						tournamentPlayerPaymentStatusReport.setPaymentStatus(false);
+						tournamentPlayerPaymentStatusReport.setFundChange(-tournamentFee);
+						tournamentPlayerPaymentStatusReport.setFundBalance(fundBalance);
+						tournamentPlayerPaymentStatusReport.setCreatedBy(user.getName() + " - " + user.getStudentId());
+						tournamentPlayerPaymentStatusReport.setCreatedOn(LocalDateTime.now());
+						tournamentPlayerPaymentStatusReportRepository.save(tournamentPlayerPaymentStatusReport);
 					}
-					tournamentPlayerRepository.delete(tournamentPlayer);
+					
+					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+					tournamentPlayers.remove(tournamentPlayer);
+					
+					tournament.setTournamentPlayers(tournamentPlayers);
+					tournamentRepository.save(tournament);
+					
 				}
 			} else {
 				responseMessage.setMessage("Không tồn tại tuyển thủ để xóa");
