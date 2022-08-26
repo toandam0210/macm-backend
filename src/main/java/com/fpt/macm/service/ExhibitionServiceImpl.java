@@ -315,7 +315,16 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 			if (getTypeOp.isPresent()) {
 				ExhibitionType getType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
 				Set<ExhibitionTeam> getTeams = getType.getExhibitionTeams();
-				responseMessage.setData(Arrays.asList(getTeams));
+				List<ExhibitionTeam> listResult = new ArrayList<ExhibitionTeam>(getTeams);
+				Collections.sort(listResult, new Comparator<ExhibitionTeam>() {
+
+					@Override
+					public int compare(ExhibitionTeam o1, ExhibitionTeam o2) {
+						// TODO Auto-generated method stub
+						return o1.getId() - o2.getId();
+					}
+				});
+				responseMessage.setData(listResult);
 				responseMessage.setMessage("Danh sách các đội biểu diễn nội dung " + getType.getName());
 			} else {
 				responseMessage.setMessage("Không tìm thấy thể thức");
