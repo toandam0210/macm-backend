@@ -101,6 +101,9 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 						responseMessage.setData(Arrays.asList(attendanceStatusDto));
 						responseMessage.setMessage(Constant.MSG_055);
 					} else {
+						AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
+						attendanceStatusDto.setStudentId(studentId);
+						attendanceStatusDto.setStatus(1);
 						responseMessage.setMessage(
 								"Không có thông tin điểm danh của " + user.getName() + " - " + user.getStudentId());
 					}
