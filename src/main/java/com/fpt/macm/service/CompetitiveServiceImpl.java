@@ -667,7 +667,13 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 						tournamentPlayerPaymentStatusReport.setCreatedOn(LocalDateTime.now());
 						tournamentPlayerPaymentStatusReportRepository.save(tournamentPlayerPaymentStatusReport);
 					}
-					tournamentPlayerRepository.delete(tournamentPlayer);
+					
+					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
+					tournamentPlayers.remove(tournamentPlayer);
+					
+					tournament.setTournamentPlayers(tournamentPlayers);
+					tournamentRepository.save(tournament);
+					
 				}
 			} else {
 				responseMessage.setMessage("Không tồn tại tuyển thủ để xóa");
