@@ -507,11 +507,17 @@ public class MemberEventServiceImpl implements MemberEventService {
 			for (MemberEventDto memberEventDto : listToJoin) {
 				User user = userRepository.findById(memberEventDto.getUserId()).get();
 				MemberEvent memberEvent = new MemberEvent();
-				if (memberEventDto.getRegisterStatus().equals(Constant.REQUEST_STATUS_DECLINED)) {
-					memberEvent = memberEventRepository
-							.findByEventIdAndUserId(eventId, memberEventDto.getUserId()).get();
-					memberEvent.setUpdatedBy("toandv");
-					memberEvent.setUpdatedOn(LocalDateTime.now());
+
+				Optional<MemberEvent> memberEventOp = memberEventRepository.findByEventIdAndUserId(event.getId(),
+						user.getId());
+				if (memberEventOp.isPresent()) {
+					memberEvent = memberEventOp.get();
+					if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_DECLINED)) {
+						memberEvent = memberEventRepository.findByEventIdAndUserId(eventId, memberEventDto.getUserId())
+								.get();
+						memberEvent.setUpdatedBy("toandv");
+						memberEvent.setUpdatedOn(LocalDateTime.now());
+					}
 				} else {
 					memberEvent.setEvent(event);
 					memberEvent.setUser(user);
@@ -520,10 +526,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEvent.setCreatedBy("toandv");
 					memberEvent.setCreatedOn(LocalDateTime.now());
 				}
+
 				memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 				Optional<EventRole> eventRoleOp = eventRoleRepository
 						.findByNameAndEventId(Constant.ROLE_EVENT_MEMBER_VN, event.getId());
-				;
 				EventRole eventRole = eventRoleOp.get();
 				memberEvent.setEventRole(eventRole);
 				listJoinEvent.add(memberEvent);
@@ -887,7 +893,8 @@ public class MemberEventServiceImpl implements MemberEventService {
 	public ResponseMessage getAllRequestToJoinEvent(int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId, Constant.REQUEST_STATUS_PENDING);
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId,
+					Constant.REQUEST_STATUS_PENDING);
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			if (!membersEvent.isEmpty()) {
 				for (MemberEvent memberEvent : membersEvent) {
@@ -904,12 +911,13 @@ public class MemberEventServiceImpl implements MemberEventService {
 						memberEventDto.setEventRoleDto(eventRoleDto);
 						memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 						memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
-						memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
+						memberEventDto
+								.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
 						memberEventDto.setAmountPerRegisterActual(memberEvent.getEvent().getAmountPerRegisterActual());
 						membersEventDto.add(memberEventDto);
 					}
 				}
-				
+
 				responseMessage.setData(membersEventDto);
 				responseMessage.setMessage("Lấy danh sách thành viên đăng ký tham gia thành công");
 			} else {
@@ -925,7 +933,8 @@ public class MemberEventServiceImpl implements MemberEventService {
 	public ResponseMessage getAllRequestToJoinOrganizingCommittee(int eventId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId, Constant.REQUEST_STATUS_PENDING);
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId,
+					Constant.REQUEST_STATUS_PENDING);
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			if (!membersEvent.isEmpty()) {
 				for (MemberEvent memberEvent : membersEvent) {
@@ -942,12 +951,13 @@ public class MemberEventServiceImpl implements MemberEventService {
 						memberEventDto.setEventRoleDto(eventRoleDto);
 						memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
 						memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
-						memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
+						memberEventDto
+								.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
 						memberEventDto.setAmountPerRegisterActual(memberEvent.getEvent().getAmountPerRegisterActual());
 						membersEventDto.add(memberEventDto);
 					}
 				}
-				
+
 				responseMessage.setData(membersEventDto);
 				responseMessage.setMessage("Lấy danh sách thành viên đăng ký tham gia BTC thành công");
 			} else {
