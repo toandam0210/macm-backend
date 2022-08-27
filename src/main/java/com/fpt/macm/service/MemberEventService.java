@@ -23,5 +23,6 @@ public interface MemberEventService {
 	ResponseMessage declineRequestToJoinEvent(int memberEventId);
 	ResponseMessage deleteMemberEvent(int memberEventId);
 	ResponseMessage getAllEventByStudentId(String studentId);
-	
+	ResponseMessage getAllRequestToJoinEvent(int eventId);
+	ResponseMessage getAllRequestToJoinOrganizingCommittee(int eventId);
 }
