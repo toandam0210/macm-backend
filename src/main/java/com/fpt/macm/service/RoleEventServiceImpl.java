@@ -36,9 +36,10 @@ public class RoleEventServiceImpl implements RoleEventService {
 	}
 
 	@Override
-	public ResponseMessage addNewRoleEvent(String newName) {
+	public ResponseMessage addNewRoleEvent(RoleEvent newRoleEvent) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			String newName = newRoleEvent.getName();
 			if (!newName.trim().equals("")) {
 				List<RoleEvent> rolesEvent = roleEventRepository.findAll();
 				for (RoleEvent roleEvent : rolesEvent) {
@@ -64,9 +65,10 @@ public class RoleEventServiceImpl implements RoleEventService {
 	}
 
 	@Override
-	public ResponseMessage updateRoleEventName(int roleEventId, String newName) {
+	public ResponseMessage updateRoleEventName(int roleEventId, RoleEvent newRoleEvent) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			String newName = newRoleEvent.getName();
 			if (!newName.trim().equals("")) {
 				List<RoleEvent> rolesEvent = roleEventRepository.findAll();
 				for (RoleEvent roleEvent : rolesEvent) {
