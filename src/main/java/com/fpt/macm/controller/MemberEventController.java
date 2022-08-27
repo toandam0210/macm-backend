@@ -136,4 +136,18 @@ public class MemberEventController {
 	ResponseEntity<ResponseMessage> getAllEventByStudentId(@PathVariable(name = "studentId") String studentId) {
 		return new ResponseEntity<ResponseMessage>(memberEventService.getAllEventByStudentId(studentId), HttpStatus.OK);
 	}
+
+	@GetMapping("/getallrequesttojoinevent/{eventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> getAllRequestToJoinEvent(@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.getAllRequestToJoinEvent(eventId), HttpStatus.OK);
+	}
+
+	@GetMapping("/getallrequesttojoinorganizingcommittee/{eventId}")
+	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
+	ResponseEntity<ResponseMessage> getAllRequestToJoinOrganizingCommittee(
+			@PathVariable(name = "eventId") int eventId) {
+		return new ResponseEntity<ResponseMessage>(memberEventService.getAllRequestToJoinOrganizingCommittee(eventId),
+				HttpStatus.OK);
+	}
 }

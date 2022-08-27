@@ -462,7 +462,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 			List<User> listUser = (List<User>) userRepository.findAll();
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			for (User user : listUser) {
-				Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventId,
+				Optional<MemberEvent> memberEventOp = memberEventRepository.findByEventIdAndUserId(eventId,
 						user.getId());
 				if (memberEventOp.isPresent()) {
 					MemberEvent memberEvent = memberEventOp.get();
@@ -509,7 +509,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				MemberEvent memberEvent = new MemberEvent();
 				if (memberEventDto.getRegisterStatus().equals(Constant.REQUEST_STATUS_DECLINED)) {
 					memberEvent = memberEventRepository
-							.findMemberEventByEventAndUser(eventId, memberEventDto.getUserId()).get();
+							.findByEventIdAndUserId(eventId, memberEventDto.getUserId()).get();
 					memberEvent.setUpdatedBy("toandv");
 					memberEvent.setUpdatedOn(LocalDateTime.now());
 				} else {
@@ -578,7 +578,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				User user = userRepository.findByStudentId(studentId).get();
 
 				MemberEvent memberEvent = new MemberEvent();
-				Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(event.getId(),
+				Optional<MemberEvent> memberEventOp = memberEventRepository.findByEventIdAndUserId(event.getId(),
 						user.getId());
 				if (memberEventOp.isPresent()) {
 					memberEvent = memberEventOp.get();
@@ -645,7 +645,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 						MemberEvent memberEvent = new MemberEvent();
 
 						Optional<MemberEvent> memberEventOp = memberEventRepository
-								.findMemberEventByEventAndUser(event.getId(), user.getId());
+								.findByEventIdAndUserId(event.getId(), user.getId());
 						if (memberEventOp.isPresent()) {
 							memberEvent = memberEventOp.get();
 							if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
@@ -877,6 +877,82 @@ public class MemberEventServiceImpl implements MemberEventService {
 						+ user.getStudentId() + " thành công");
 			}
 
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllRequestToJoinEvent(int eventId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId, Constant.REQUEST_STATUS_PENDING);
+			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
+			if (!membersEvent.isEmpty()) {
+				for (MemberEvent memberEvent : membersEvent) {
+					if (memberEvent.getEventRole().getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
+						MemberEventDto memberEventDto = new MemberEventDto();
+						memberEventDto.setId(memberEvent.getId());
+						memberEventDto.setUserName(memberEvent.getUser().getName());
+						memberEventDto.setUserMail(memberEvent.getUser().getEmail());
+						memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
+						memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
+						EventRoleDto eventRoleDto = new EventRoleDto();
+						eventRoleDto.setId(memberEvent.getEventRole().getId());
+						eventRoleDto.setName(memberEvent.getEventRole().getName());
+						memberEventDto.setEventRoleDto(eventRoleDto);
+						memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
+						memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
+						memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
+						memberEventDto.setAmountPerRegisterActual(memberEvent.getEvent().getAmountPerRegisterActual());
+						membersEventDto.add(memberEventDto);
+					}
+				}
+				
+				responseMessage.setData(membersEventDto);
+				responseMessage.setMessage("Lấy danh sách thành viên đăng ký tham gia thành công");
+			} else {
+				responseMessage.setMessage("Chưa có thành viên nào đăng ký tham gia");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllRequestToJoinOrganizingCommittee(int eventId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId, Constant.REQUEST_STATUS_PENDING);
+			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
+			if (!membersEvent.isEmpty()) {
+				for (MemberEvent memberEvent : membersEvent) {
+					if (!memberEvent.getEventRole().getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
+						MemberEventDto memberEventDto = new MemberEventDto();
+						memberEventDto.setId(memberEvent.getId());
+						memberEventDto.setUserName(memberEvent.getUser().getName());
+						memberEventDto.setUserMail(memberEvent.getUser().getEmail());
+						memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
+						memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
+						EventRoleDto eventRoleDto = new EventRoleDto();
+						eventRoleDto.setId(memberEvent.getEventRole().getId());
+						eventRoleDto.setName(memberEvent.getEventRole().getName());
+						memberEventDto.setEventRoleDto(eventRoleDto);
+						memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
+						memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
+						memberEventDto.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
+						memberEventDto.setAmountPerRegisterActual(memberEvent.getEvent().getAmountPerRegisterActual());
+						membersEventDto.add(memberEventDto);
+					}
+				}
+				
+				responseMessage.setData(membersEventDto);
+				responseMessage.setMessage("Lấy danh sách thành viên đăng ký tham gia BTC thành công");
+			} else {
+				responseMessage.setMessage("Chưa có thành viên nào đăng ký tham gia BTC");
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
