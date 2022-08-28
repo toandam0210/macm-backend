@@ -1508,7 +1508,7 @@ public class TournamentServiceImpl implements TournamentService {
 					responseMessage.setMessage("Yêu cầu đăng ký không hợp lệ");
 				}
 			} else {
-				responseMessage.setMessage("Sai id truyền vào rồi");
+				responseMessage.setMessage("Thành viên này không tồn tại");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
@@ -1555,7 +1555,7 @@ public class TournamentServiceImpl implements TournamentService {
 					responseMessage.setMessage("Yêu cầu đăng ký không hợp lệ");
 				}
 			} else {
-				responseMessage.setMessage("Sai id truyền vào rồi");
+				responseMessage.setMessage("Thành viên này không tồn tại");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
@@ -1838,8 +1838,7 @@ public class TournamentServiceImpl implements TournamentService {
 					Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
 					for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
 						if (teamName.toLowerCase().trim().equals(exhibitionTeam.getTeamName().toLowerCase().trim())) {
-							responseMessage
-									.setMessage("Tên đội " + teamName + " đã tồn tại, vui lòng chọn tên khác");
+							responseMessage.setMessage("Tên đội " + teamName + " đã tồn tại, vui lòng chọn tên khác");
 							return responseMessage;
 						}
 					}
@@ -2501,9 +2500,10 @@ public class TournamentServiceImpl implements TournamentService {
 					double fundBalance = fundAmount - tournamentFee;
 
 					clubFundService.withdrawFromClubFund(studentId, tournamentFee,
-							"Hoàn tiền cho " + tournamentOrganizingCommittee.getUser().getName() + " - "
-									+ tournamentOrganizingCommittee.getUser().getStudentId() + " do rời khỏi giải đấu "
-									+ tournamentOrganizingCommittee.getTournament().getName());
+							"Hoàn phí đăng ký tham gia BTC giải đấu "
+									+ tournamentOrganizingCommittee.getTournament().getName() + " cho thành viên "
+									+ tournamentOrganizingCommittee.getUser().getName() + " - "
+									+ tournamentOrganizingCommittee.getUser().getStudentId());
 
 					TournamentOrganizingCommitteePaymentStatusReport tournamentOrganizingCommitteePaymentStatusReport = new TournamentOrganizingCommitteePaymentStatusReport();
 					tournamentOrganizingCommitteePaymentStatusReport
@@ -2520,7 +2520,7 @@ public class TournamentServiceImpl implements TournamentService {
 							.save(tournamentOrganizingCommitteePaymentStatusReport);
 				}
 			} else {
-				responseMessage.setMessage("Không có thành viên này");
+				responseMessage.setMessage("Thành viên này không tồn tại");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
