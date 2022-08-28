@@ -363,4 +363,10 @@ public class TournamentController {
 				tournamentService.editRoleTournament(tournamentId, rolesTournamentDto), HttpStatus.OK);
 	}
 
+	@GetMapping("/getmyteam/{tournamentId}/{studentId}")
+	ResponseEntity<ResponseMessage> getMyTeam(@PathVariable(name = "tournamentId") int tournamentId,
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(tournamentService.getMyTeam(studentId, tournamentId), HttpStatus.OK);
+	}
+
 }
