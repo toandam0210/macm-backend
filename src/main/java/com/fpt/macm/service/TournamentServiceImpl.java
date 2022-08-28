@@ -595,7 +595,7 @@ public class TournamentServiceImpl implements TournamentService {
 			if (tournamentOp.isPresent()) {
 				Tournament tournament = tournamentOp.get();
 				LocalDate startDate = getStartDate(tournamentId);
-				if (startDate == null || LocalDate.now().isBefore(startDate)) {
+				if ((startDate == null || LocalDate.now().isBefore(startDate)) && tournament.getStage() < 2) {
 					User user = userRepository.findByStudentId(studentId).get();
 
 					List<TournamentSchedule> tournamentSchedules = tournamentScheduleRepository
@@ -3222,20 +3222,6 @@ public class TournamentServiceImpl implements TournamentService {
 
 					if (!exhibitionTeamsDto.isEmpty()) {
 						Collections.sort(exhibitionTeamsDto);
-
-						List<Double> listScore = new ArrayList<Double>();
-						for (ExhibitionTeamDto exhibitionTeamDto : exhibitionTeamsDto) {
-							if (!listScore.contains(exhibitionTeamDto.getScore())) {
-								listScore.add(exhibitionTeamDto.getScore());
-							}
-						}
-						for (ExhibitionTeamDto exhibitionTeamDto : exhibitionTeamsDto) {
-							for (int i = 0; i < listScore.size(); i++) {
-								if (exhibitionTeamDto.getScore().equals(listScore.get(i))) {
-									exhibitionTeamDto.setRank(i + 1);
-								}
-							}
-						}
 
 						responseMessage.setData(exhibitionTeamsDto);
 						responseMessage.setMessage("Lấy danh sách đội của bạn thành công");
