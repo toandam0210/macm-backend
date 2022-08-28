@@ -3195,6 +3195,8 @@ public class TournamentServiceImpl implements TournamentService {
 										ExhibitionResult exhibitionResult = exhibitionResultOp.get();
 										if (exhibitionResult.getScore() != null) {
 											exhibitionTeamDto.setScore(exhibitionResult.getScore());
+											exhibitionTeamDto.setAreaName(exhibitionResult.getArea().getName());
+											exhibitionTeamDto.setTime(exhibitionResult.getTime());
 										}
 									}
 
