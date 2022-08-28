@@ -1832,6 +1832,19 @@ public class TournamentServiceImpl implements TournamentService {
 			if (LocalDateTime.now().isBefore(tournament.getRegistrationPlayerDeadline())
 					&& tournament.getStage() == 0) {
 //				User user = userRepository.findByStudentId(studentId).get();
+
+				Set<ExhibitionType> exhibitionTypes = tournament.getExhibitionTypes();
+				for (ExhibitionType exhibitionType : exhibitionTypes) {
+					Set<ExhibitionTeam> exhibitionTeams = exhibitionType.getExhibitionTeams();
+					for (ExhibitionTeam exhibitionTeam : exhibitionTeams) {
+						if (teamName.toLowerCase().trim().equals(exhibitionTeam.getTeamName().toLowerCase().trim())) {
+							responseMessage
+									.setMessage("Tên đội " + teamName + " đã tồn tại, vui lòng chọn tên khác");
+							return responseMessage;
+						}
+					}
+				}
+
 				ExhibitionType exhibitionType = exhibitionTypeRepository.findById(exhibitionTypeId).get();
 
 				int countMale = 0;

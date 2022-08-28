@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.AttendanceEventDto;
-import com.fpt.macm.model.dto.AttendanceStatusDto;
 import com.fpt.macm.model.dto.EventDto;
 import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.Event;
