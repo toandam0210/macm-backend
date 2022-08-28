@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
 import com.fpt.macm.model.dto.AttendanceEventDto;
+import com.fpt.macm.model.dto.AttendanceStatusDto;
 import com.fpt.macm.model.dto.EventDto;
 import com.fpt.macm.model.entity.AttendanceEvent;
 import com.fpt.macm.model.entity.Event;
@@ -70,6 +71,15 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 						AttendanceEvent attendanceEvent = attendanceEventOp.get();
 						
 						if (attendanceEvent.getStatus() == status) {
+							AttendanceEventDto attendanceEventDto = new AttendanceEventDto();
+							attendanceEventDto.setId(attendanceEvent.getId());
+							attendanceEventDto.setEventId(event.getId());
+							attendanceEventDto.setEventName(event.getName());
+							attendanceEventDto.setDate(eventStartDate);
+							attendanceEventDto.setName(user.getName());
+							attendanceEventDto.setStudentId(user.getStudentId());
+							attendanceEventDto.setStatus(status);
+							responseMessage.setData(Arrays.asList(attendanceEventDto));
 							responseMessage.setMessage(user.getStudentId() + " - " + user.getName() + " đã được điểm danh!");
 							return responseMessage;
 						}
@@ -91,6 +101,9 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 						responseMessage.setData(Arrays.asList(attendanceEventDto));
 						responseMessage.setMessage(Constant.MSG_084);
 					} else {
+						AttendanceEventDto attendanceEventDto = new AttendanceEventDto();
+						attendanceEventDto.setStudentId(studentId);
+						attendanceEventDto.setStatus(1);
 						responseMessage.setMessage(
 								"Không có thông tin điểm danh của " + user.getName() + " - " + user.getStudentId());
 					}

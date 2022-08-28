@@ -80,6 +80,15 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 					if (attendanceStatus != null) {
 
 						if (attendanceStatus.getStatus() == status) {
+							AttendanceStatusDto attendanceStatusDto = new AttendanceStatusDto();
+							attendanceStatusDto.setId(attendanceStatus.getId());
+							attendanceStatusDto.setName(user.getName());
+							attendanceStatusDto.setStudentId(studentId);
+							attendanceStatusDto.setStatus(status);
+							attendanceStatusDto.setTrainingScheduleId(trainingSchedule.getId());
+							attendanceStatusDto.setDate(trainingSchedule.getDate());
+
+							responseMessage.setData(Arrays.asList(attendanceStatusDto));
 							responseMessage
 									.setMessage(user.getStudentId() + " - " + user.getName() + " đã được điểm danh!");
 							return responseMessage;
