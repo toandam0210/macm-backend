@@ -108,4 +108,6 @@ public interface TournamentService {
 
 	ResponseMessage editRoleTournament(int tournamentId, List<TournamentRoleDto> rolesTournamentDto);
 	
+	ResponseMessage getMyTeam(String studentId, int tournamentId);
+	
 }
