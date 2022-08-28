@@ -641,7 +641,7 @@ public class EventServiceImpl implements EventService {
 							userEventSemesterDto.setStudentId(user.getStudentId());
 
 							Optional<MemberEvent> memberEventOp = memberEventRepository
-									.findMemberEventByEventAndUser(event.getId(), user.getId());
+									.findByEventIdAndUserId(event.getId(), user.getId());
 							if (memberEventOp.isPresent()) {
 								MemberEvent memberEvent = memberEventOp.get();
 //								if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)) {
