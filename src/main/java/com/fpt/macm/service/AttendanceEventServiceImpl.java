@@ -53,7 +53,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 	EventRepository eventRepository;
 
 	@Override
-	public ResponseMessage takeAttendanceByStudentId(String studentId, int status, int eventId) {
+	public ResponseMessage takeAttendanceByStudentId(String studentId, int status, int eventId, String adminStudentId) {
 		// TODO Auto-generated method stub
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
@@ -63,12 +63,25 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 				Event event = eventSchedule.getEvent();
 				LocalDate eventStartDate = eventSchedule.getDate();
 				if (eventStartDate.isBefore(LocalDate.now()) || eventStartDate.isEqual(LocalDate.now())) {
+					User admin = userRepository.findByStudentId(adminStudentId).get();
+					Optional<AttendanceEvent> attendanceEventAdminOp = attendanceEventRepository
+							.findByEventIdAndUserId(eventId, admin.getId());
+					if (attendanceEventAdminOp.isPresent()) {
+						AttendanceEvent attendanceEventAdmin = attendanceEventAdminOp.get();
+						if (attendanceEventAdmin.getStatus() != 1) {
+							attendanceEventAdmin.setStatus(1);
+							attendanceEventAdmin.setUpdatedBy(admin.getName() + " - " + admin.getStudentId());
+							attendanceEventAdmin.setUpdatedOn(LocalDateTime.now());
+							attendanceEventRepository.save(attendanceEventAdmin);
+						}
+					}
+
 					User user = userRepository.findByStudentId(studentId).get();
 					Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
 							.findByEventIdAndUserId(event.getId(), user.getId());
 					if (attendanceEventOp.isPresent()) {
 						AttendanceEvent attendanceEvent = attendanceEventOp.get();
-						
+
 						if (attendanceEvent.getStatus() == status) {
 							AttendanceEventDto attendanceEventDto = new AttendanceEventDto();
 							attendanceEventDto.setId(attendanceEvent.getId());
@@ -79,10 +92,11 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 							attendanceEventDto.setStudentId(user.getStudentId());
 							attendanceEventDto.setStatus(status);
 							responseMessage.setData(Arrays.asList(attendanceEventDto));
-							responseMessage.setMessage(user.getStudentId() + " - " + user.getName() + " đã được điểm danh!");
+							responseMessage
+									.setMessage(user.getStudentId() + " - " + user.getName() + " đã được điểm danh!");
 							return responseMessage;
 						}
-						
+
 						attendanceEvent.setStatus(status);
 						attendanceEvent.setUpdatedBy("toandv");
 						attendanceEvent.setUpdatedOn(LocalDateTime.now());
@@ -120,7 +134,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 	}
 
 	@Override
-	public ResponseMessage checkAttendanceStatusByEventId(int eventId) {
+	public ResponseMessage checkAttendanceStatusByEventId(int eventId, int status) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<AttendanceEvent> attendancesEvent = attendanceEventRepository.findByEventId(eventId);
@@ -142,6 +156,32 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 				attendanceEventDto.setName(attendanceEvent.getUser().getName());
 				attendanceEventDto.setStudentId(attendanceEvent.getUser().getStudentId());
 				attendanceEventDto.setStatus(attendanceEvent.getStatus());
+				attendanceEventDto.setDate(startDate);
+
+				switch (status) {
+				case -1:
+					attendanceEventDtos.add(attendanceEventDto);
+					break;
+				case 0:
+					if (attendanceEvent.getStatus() == 0) {
+						attendanceEventDtos.add(attendanceEventDto);
+					}
+					break;
+				case 1:
+					if (attendanceEvent.getStatus() == 1) {
+						attendanceEventDtos.add(attendanceEventDto);
+					}
+					break;
+				case 2:
+					if (attendanceEvent.getStatus() == 2) {
+						attendanceEventDtos.add(attendanceEventDto);
+					}
+					break;
+
+				default:
+					attendanceEventDtos.add(attendanceEventDto);
+					break;
+				}
 
 				if (attendanceEvent.getStatus() == 1) {
 					attend++;
@@ -149,9 +189,6 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 				if (attendanceEvent.getStatus() == 0) {
 					absent++;
 				}
-
-				attendanceEventDto.setDate(startDate);
-				attendanceEventDtos.add(attendanceEventDto);
 			}
 
 			Collections.sort(attendanceEventDtos);

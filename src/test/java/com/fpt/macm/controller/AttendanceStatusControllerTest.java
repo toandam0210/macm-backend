@@ -82,18 +82,18 @@ public class AttendanceStatusControllerTest {
 //		.andExpect(jsonPath("$.message").value(Constant.MSG_056));
 //	}
 	
-	@Test
-	public void checkAttendanceSuccessTest() throws Exception {
-		ResponseMessage responseMessage = new ResponseMessage();
-		responseMessage.setData(Arrays.asList(attendanceStatusDto()));
-		when(attendanceStatusService.checkAttendanceStatusByTrainingSchedule(anyInt())).thenReturn(responseMessage);
-		this.mockMvc.perform(get("/api/admin/headtechnique/checkattendance/{trainingScheduleId}", 37)
-		.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(status().isOk())
-		.andExpect(content()
-				.contentType(MediaType.APPLICATION_JSON))
-		.andExpect(jsonPath("$.data.size()").value("1"));
-	}
+//	@Test
+//	public void checkAttendanceSuccessTest() throws Exception {
+//		ResponseMessage responseMessage = new ResponseMessage();
+//		responseMessage.setData(Arrays.asList(attendanceStatusDto()));
+//		when(attendanceStatusService.checkAttendanceStatusByTrainingSchedule(anyInt())).thenReturn(responseMessage);
+//		this.mockMvc.perform(get("/api/admin/headtechnique/checkattendance/{trainingScheduleId}", 37)
+//		.contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(status().isOk())
+//		.andExpect(content()
+//				.contentType(MediaType.APPLICATION_JSON))
+//		.andExpect(jsonPath("$.data.size()").value("1"));
+//	}
 	
 	@Test
 	public void attendanceReportSuccessTest() throws Exception {

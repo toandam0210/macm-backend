@@ -25,27 +25,26 @@ import com.fpt.macm.service.AttendanceStatusService;
 public class AttendanceStatusController {
 	@Autowired
 	AttendanceStatusService attendanceStatusService;
-	
+
 	@Autowired
-    private SimpMessagingTemplate simpMessagingTemplate;
-	
+	private SimpMessagingTemplate simpMessagingTemplate;
+
 	@PutMapping("/takeattendance/{studentId}/{trainingScheduleId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> takeAttendanceByStudentId(@PathVariable(name = "studentId") String studentId,
-			@PathVariable(name = "trainingScheduleId") int trainingScheduleId, @RequestParam int status) {
-		ResponseMessage response = attendanceStatusService.takeAttendanceByStudentId(studentId, status, trainingScheduleId);
-		return new ResponseEntity<ResponseMessage>(
-				response,
-				HttpStatus.OK);
+			@PathVariable(name = "trainingScheduleId") int trainingScheduleId, @RequestParam int status,
+			@RequestParam String adminStudentId) {
+		ResponseMessage response = attendanceStatusService.takeAttendanceByStudentId(studentId, status,
+				trainingScheduleId, adminStudentId);
+		return new ResponseEntity<ResponseMessage>(response, HttpStatus.OK);
 	}
 
 	@GetMapping("/checkattendance/{trainingScheduleId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> checkAttendanceByStudentId(
-			@PathVariable(name = "trainingScheduleId") int trainingScheduleId) {
-		ResponseMessage response = attendanceStatusService.checkAttendanceStatusByTrainingSchedule(trainingScheduleId);
-		return new ResponseEntity<ResponseMessage>(
-				response, HttpStatus.OK);
+			@PathVariable(name = "trainingScheduleId") int trainingScheduleId, @RequestParam(defaultValue = "-1") int status) {
+		ResponseMessage response = attendanceStatusService.checkAttendanceStatusByTrainingSchedule(trainingScheduleId, status);
+		return new ResponseEntity<ResponseMessage>(response, HttpStatus.OK);
 	}
 
 	@GetMapping("/checkattendance/report")
@@ -57,7 +56,8 @@ public class AttendanceStatusController {
 
 	@GetMapping("/getallattendancestatusbystudentidandsemester/{studentId}")
 	ResponseEntity<ResponseMessage> getAllAttendanceStatusByStudentIdAndSemester(
-			@PathVariable(name = "studentId") String studentId, @RequestParam String semester, @RequestParam int month) {
+			@PathVariable(name = "studentId") String studentId, @RequestParam String semester,
+			@RequestParam int month) {
 		return new ResponseEntity<ResponseMessage>(
 				attendanceStatusService.getAllAttendanceStatusByStudentIdAndSemester(studentId, semester, month),
 				HttpStatus.OK);
@@ -79,22 +79,24 @@ public class AttendanceStatusController {
 		return new ResponseEntity<ResponseMessage>(
 				attendanceStatusService.getAttendanceTrainingStatistic(semesterName, roleId), HttpStatus.OK);
 	}
-	
+
 	@GetMapping("/checkattendancestatusbystudentid/{studentId}")
-	ResponseEntity<ResponseMessage> checkAttendanceStatusByStudentId(@PathVariable(name = "studentId") String studentId){
-		return new ResponseEntity<ResponseMessage>(attendanceStatusService.checkAttendanceStatusByStudentId(studentId), HttpStatus.OK);
+	ResponseEntity<ResponseMessage> checkAttendanceStatusByStudentId(
+			@PathVariable(name = "studentId") String studentId) {
+		return new ResponseEntity<ResponseMessage>(attendanceStatusService.checkAttendanceStatusByStudentId(studentId),
+				HttpStatus.OK);
 	}
-	
+
 	@Scheduled(fixedDelay = 10000L)
-	 @SendTo("/chatroom/public")
-    public void sendPong() {
-		simpMessagingTemplate.convertAndSend("/chatroom/public","Pong");
-    }
-	
+	@SendTo("/chatroom/public")
+	public void sendPong() {
+		simpMessagingTemplate.convertAndSend("/chatroom/public", "Pong");
+	}
+
 	@MessageMapping("/private-message")
-    public Message recMessage(@Payload Message message){
-        simpMessagingTemplate.convertAndSendToUser(message.getReceiverName(),"/private",message);
-        System.out.println(message.toString());
-        return message;
-    }
+	public Message recMessage(@Payload Message message) {
+		simpMessagingTemplate.convertAndSendToUser(message.getReceiverName(), "/private", message);
+		System.out.println(message.toString());
+		return message;
+	}
 }
