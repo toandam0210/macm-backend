@@ -385,6 +385,20 @@ public class UserServiceImpl implements UserService {
 						attendanceStatus.setStatus(2);
 						listAttendanceStatus.add(attendanceStatus);
 					}
+					ResponseMessage response = semesterService.getCurrentSemester();
+					Semester semester = (Semester) response.getData().get(0);
+					Optional<MembershipInfo> membershipInfo = membershipShipInforRepository.findBySemester(semester.getName());
+					if (membershipInfo.isPresent()) {
+						Optional<MembershipStatus> membershipStatusResponse = membershipStatusRepository
+								.findByMemberShipInfoIdAndUserId(membershipInfo.get().getId(), newUser.getId());
+						if (!membershipStatusResponse.isPresent()) {
+							MembershipStatus membershipStatus = new MembershipStatus();
+							membershipStatus.setMembershipInfo(membershipInfo.get());
+							membershipStatus.setStatus(false);
+							membershipStatus.setUser(newUser);
+							membershipStatusRepository.save(membershipStatus);
+						}
+					}
 				}
 				
 				if (!listAttendanceStatus.isEmpty()) {
@@ -499,6 +513,20 @@ public class UserServiceImpl implements UserService {
 					}
 					if (!listAttendanceStatus.isEmpty()) {
 						attendanceStatusRepository.saveAll(listAttendanceStatus);
+					}
+					ResponseMessage response = semesterService.getCurrentSemester();
+					Semester currentsemester = (Semester) response.getData().get(0);
+					Optional<MembershipInfo> membershipInfo = membershipShipInforRepository.findBySemester(currentsemester.getName());
+					if (membershipInfo.isPresent()) {
+						Optional<MembershipStatus> membershipStatusResponse = membershipStatusRepository
+								.findByMemberShipInfoIdAndUserId(membershipInfo.get().getId(), user.getId());
+						if (!membershipStatusResponse.isPresent()) {
+							MembershipStatus membershipStatus = new MembershipStatus();
+							membershipStatus.setMembershipInfo(membershipInfo.get());
+							membershipStatus.setStatus(false);
+							membershipStatus.setUser(user);
+							membershipStatusRepository.save(membershipStatus);
+						}
 					}
 				}
 				// Xóa data điểm danh khi deactive user
@@ -655,6 +683,9 @@ public class UserServiceImpl implements UserService {
 					// Thêm data điểm danh khi user active
 					List<AttendanceStatus> listAttendanceStatus = new ArrayList<AttendanceStatus>();
 					Optional<User> newUserOp = userRepository.findByStudentIdAndEmail(userFromExcel.getStudentId(), userFromExcel.getEmail());
+					ResponseMessage response = semesterService.getCurrentSemester();
+					Semester semester = (Semester) response.getData().get(0);
+					Optional<MembershipInfo> membershipInfo = membershipShipInforRepository.findBySemester(semester.getName());
 					if (newUserOp.isPresent()) {
 						User newUser = newUserOp.get();
 						if (newUser.isActive()) {
@@ -669,6 +700,17 @@ public class UserServiceImpl implements UserService {
 							}
 							if (!listAttendanceStatus.isEmpty()) {
 								attendanceStatusRepository.saveAll(listAttendanceStatus);
+							}
+						}
+						if (membershipInfo.isPresent()) {
+							Optional<MembershipStatus> membershipStatusResponse = membershipStatusRepository
+									.findByMemberShipInfoIdAndUserId(membershipInfo.get().getId(), newUser.getId());
+							if (!membershipStatusResponse.isPresent()) {
+								MembershipStatus membershipStatus = new MembershipStatus();
+								membershipStatus.setMembershipInfo(membershipInfo.get());
+								membershipStatus.setStatus(false);
+								membershipStatus.setUser(newUser);
+								membershipStatusRepository.save(membershipStatus);
 							}
 						}
 					}
