@@ -20,7 +20,7 @@ public class ClubFundReport {
 	@Column
 	private double fundChange;
 	
-	@Column
+	@Column(columnDefinition = "TEXT")
 	private String note;
 	
 	@Column
