@@ -196,7 +196,7 @@ public class AttendanceEventServiceImpl implements AttendanceEventService {
 			responseMessage.setMessage(Constant.MSG_057);
 			responseMessage.setTotalActive(attend);
 			responseMessage.setTotalDeactive(absent);
-			responseMessage.setTotalResult(attendanceEventDtos.size());
+			responseMessage.setTotalResult(attendancesEvent.size());
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
