@@ -192,7 +192,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			responseMessage.setMessage(Constant.MSG_057);
 			responseMessage.setTotalActive(attend);
 			responseMessage.setTotalDeactive(absent);
-			responseMessage.setTotalResult(attendanceStatusDtos.size());
+			responseMessage.setTotalResult(attendancesStatus.size());
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
