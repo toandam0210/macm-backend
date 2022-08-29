@@ -13,7 +13,9 @@ public interface CompetitiveTypeRegistrationRepository extends JpaRepository<Com
 
 	Optional<CompetitiveTypeRegistration> findByCompetitiveTypeIdAndTournamentPlayerId(int competitiveTypeId,
 			int tournamentPlayerId);
-
+	
+	Optional<CompetitiveTypeRegistration> findByTournamentPlayerId(int tournamentPlayerId);
+	
 	List<CompetitiveTypeRegistration> findByCompetitiveTypeId(int competitiveTypeId);
 
 }

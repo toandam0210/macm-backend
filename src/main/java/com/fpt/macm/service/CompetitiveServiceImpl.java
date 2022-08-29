@@ -136,15 +136,8 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				List<TournamentPlayer> listPlayers = tournamentPlayerRepository
 						.getPlayerByTournamentId(tournament.getId());
 				for (TournamentPlayer tournamentPlayer : listPlayers) {
-//					Optional<CompetitivePlayer> getCompetitivePlayerOp = competitivePlayerRepository
-//							.findByTournamentPlayerId(tournamentPlayer.getId());
-//					if (getCompetitivePlayerOp.isPresent()) {
-//						User getUser = tournamentPlayer.getUser();
-//						userJoined.add(getUser);
-//					}
-
 					Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
-							.findByCompetitiveTypeIdAndTournamentPlayerId(competitiveTypeId, tournamentPlayer.getId());
+							.findByTournamentPlayerId(tournamentPlayer.getId());
 					if (competitiveTypeRegistrationOp.isPresent()) {
 						CompetitiveTypeRegistration competitiveTypeRegistration = competitiveTypeRegistrationOp.get();
 						if (competitiveTypeRegistration.getRegisterStatus().equals(Constant.REQUEST_STATUS_PENDING)
@@ -507,8 +500,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 								CompetitiveTypeRegistration competitiveTypeRegistration = new CompetitiveTypeRegistration();
 
 								Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
-										.findByCompetitiveTypeIdAndTournamentPlayerId(competitiveTypeId,
-												tournamentPlayer.getId());
+										.findByTournamentPlayerId(tournamentPlayer.getId());
 								if (competitiveTypeRegistrationOp.isPresent()) {
 									competitiveTypeRegistration = competitiveTypeRegistrationOp.get();
 								}
@@ -607,8 +599,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 				if (tournament.getStage() < 2) {
 					// Xóa đơn đăng ký của member
 					Optional<CompetitiveTypeRegistration> competitiveTypeRegistrationOp = competitiveTypeRegistrationRepository
-							.findByCompetitiveTypeIdAndTournamentPlayerId(competitiveType.getId(),
-									getCompetitivePlayer.getTournamentPlayer().getId());
+							.findByTournamentPlayerId(getCompetitivePlayer.getTournamentPlayer().getId());
 					if (competitiveTypeRegistrationOp.isPresent()) {
 						competitiveTypeRegistrationRepository.delete(competitiveTypeRegistrationOp.get());
 					}
