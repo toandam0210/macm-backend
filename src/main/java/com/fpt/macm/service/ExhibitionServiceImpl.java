@@ -402,7 +402,7 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 					if (listExhibitionByUser.size() == 0 && !getCompetitivePlayerOp.isPresent()) {
 						if (getTournamentPlayer.isPaymentStatus()) {
 							clubFundService.withdrawFromClubFund(admin.getStudentId(), getTournament.getFeePlayerPay(),
-									("Hoàn phí đăng ký tham gia giải đấu cho tuyển thủ "
+									("Hoàn phí đăng ký tham gia giải đấu " + getTournament.getName() + " cho tuyển thủ "
 											+ getTournamentPlayer.getUser().getName()) + " - "
 											+ getTournamentPlayer.getUser().getStudentId());
 
@@ -424,13 +424,11 @@ public class ExhibitionServiceImpl implements ExhibitionService {
 									.setCreatedBy(admin.getName() + " - " + admin.getStudentId());
 							tournamentPlayerPaymentStatusReport.setCreatedOn(LocalDateTime.now());
 							tournamentPlayerPaymentStatusReportRepository.save(tournamentPlayerPaymentStatusReport);
-							
-							
 
 						}
 						Set<TournamentPlayer> tournamentPlayers = getTournament.getTournamentPlayers();
 						tournamentPlayers.remove(getTournamentPlayer);
-						
+
 						getTournament.setTournamentPlayers(tournamentPlayers);
 						tournamentRepository.save(getTournament);
 //						tournamentPlayerRepository.deleteById(getTournamentPlayer.getId());

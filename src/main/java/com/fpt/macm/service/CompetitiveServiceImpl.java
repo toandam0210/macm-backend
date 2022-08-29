@@ -82,7 +82,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 
 	@Autowired
 	ClubFundRepository clubFundRepository;
-	
+
 	@Autowired
 	TournamentPlayerPaymentStatusReportRepository tournamentPlayerPaymentStatusReportRepository;
 
@@ -645,7 +645,7 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 					TournamentPlayer tournamentPlayer = getCompetitivePlayer.getTournamentPlayer();
 					if (tournamentPlayer.isPaymentStatus()) {
 						clubFundService.withdrawFromClubFund(user.getStudentId(), tournament.getFeePlayerPay(),
-								("Hoàn phí đăng ký tham gia giải đấu cho tuyển thủ "
+								("Hoàn phí đăng ký tham gia giải đấu " + tournament.getName() + " cho tuyển thủ "
 										+ tournamentPlayer.getUser().getName()) + " - "
 										+ tournamentPlayer.getUser().getStudentId());
 
@@ -667,13 +667,13 @@ public class CompetitiveServiceImpl implements CompetitiveService {
 						tournamentPlayerPaymentStatusReport.setCreatedOn(LocalDateTime.now());
 						tournamentPlayerPaymentStatusReportRepository.save(tournamentPlayerPaymentStatusReport);
 					}
-					
+
 					Set<TournamentPlayer> tournamentPlayers = tournament.getTournamentPlayers();
 					tournamentPlayers.remove(tournamentPlayer);
-					
+
 					tournament.setTournamentPlayers(tournamentPlayers);
 					tournamentRepository.save(tournament);
-					
+
 				}
 			} else {
 				responseMessage.setMessage("Không tồn tại tuyển thủ để xóa");

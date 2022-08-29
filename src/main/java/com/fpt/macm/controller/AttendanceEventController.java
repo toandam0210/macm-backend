@@ -24,15 +24,17 @@ public class AttendanceEventController {
 	@PutMapping("/takeattendanceevent/{eventId}/{studentId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
 	ResponseEntity<ResponseMessage> takeAttendanceEvent(@PathVariable(name = "eventId") int eventId,
-			@PathVariable(name = "studentId") String studentId, @RequestParam int status) {
+			@PathVariable(name = "studentId") String studentId, @RequestParam int status,
+			@RequestParam String adminStudentId) {
 		return new ResponseEntity<ResponseMessage>(
-				attendanceEventService.takeAttendanceByStudentId(studentId, status, eventId), HttpStatus.OK);
+				attendanceEventService.takeAttendanceByStudentId(studentId, status, eventId, adminStudentId),
+				HttpStatus.OK);
 	}
 
 	@GetMapping("/checkattendance/{eventId}")
 	@PreAuthorize("hasAnyRole('ROLE_HeadClub','ROLE_ViceHeadClub','ROLE_HeadCulture','ROLE_ViceHeadCulture','ROLE_HeadCommunication','ROLE_ViceHeadCommunication','ROLE_HeadTechnique','ROLE_ViceHeadTechnique','ROLE_Treasurer')")
-	ResponseEntity<ResponseMessage> checkAttendanceByEventId(@PathVariable(name = "eventId") int eventId) {
-		return new ResponseEntity<ResponseMessage>(attendanceEventService.checkAttendanceStatusByEventId(eventId),
+	ResponseEntity<ResponseMessage> checkAttendanceByEventId(@PathVariable(name = "eventId") int eventId, @RequestParam(defaultValue = "-1") int status) {
+		return new ResponseEntity<ResponseMessage>(attendanceEventService.checkAttendanceStatusByEventId(eventId, status),
 				HttpStatus.OK);
 	}
 

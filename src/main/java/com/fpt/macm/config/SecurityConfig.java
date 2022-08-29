@@ -69,7 +69,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 						"/**/*.html", "/**/*.css", "/**/*.js")
 				.permitAll().antMatchers("/auth/**", "/oauth2/**").permitAll()
 				// permit all
-				.antMatchers("/api/admin/headtechnique/checkattendancestatusbystudentid/**","/api/tournamentschedule/getalltournamentschedule","/api/admin/dashboard/getallupcomingactivities/**", "/api/contact/getallcontact",
+				.antMatchers("/api/tournament/getmyteam/**",
+						"/api/admin/headtechnique/checkattendancestatusbystudentid/**",
+						"/api/tournamentschedule/getalltournamentschedule",
+						"/api/admin/dashboard/getallupcomingactivities/**", "/api/contact/getallcontact",
 						"/api/contact/getallsocialnetwork", "/api/rule/getallrule", "/api/semester/currentsemester",
 						"/api/semester/getTop3Semesters", "/api/semester/getlistmonths", "/api/commonschedule/**",
 						"/api/event/geteventbyid/**", "/api/event/geteventsbyname", "/api/event/geteventsbydate",
@@ -108,7 +111,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 						"/api/exhibition/getlistexhibitiontype/**", "/api/exhibition/getlistexhibitionresult",
 						"/api/admin/hr/getbystudentid/**", "/api/admin/hr/getallactivememberandcollaborator",
 						"/api/admin/hr/updateuser/**", "/api/competitive/headclub/listmatchs/**",
-						"/api/tournament/gettournamentresult/**", "/api/admin/hr/updatestatusbymember", "/api/admin/hr/membersemesterinfor", "/ws/**")
+						"/api/tournament/gettournamentresult/**", "/api/admin/hr/updatestatusbymember",
+						"/api/admin/hr/membersemesterinfor", "/ws/**")
 				.permitAll()
 //                // HeadClub
 //                .antMatchers("/api/tournament/headclub/**","/api/tournamentschedule/headclub/**","/api/area/headclub/**","/api/competitive/headclub/**","/api/exhibition/headclub/**","/api/admin/dashboard/**").hasAnyRole("HeadClub")

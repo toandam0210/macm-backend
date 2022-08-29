@@ -22,8 +22,9 @@ public class RoleEventServiceImpl implements RoleEventService {
 	public ResponseMessage getAllRoleEvent() {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<RoleEvent> rolesEvent = roleEventRepository.findAll(Sort.by("id").descending());
+			List<RoleEvent> rolesEvent = roleEventRepository.findAll(Sort.by("id").ascending());
 			if (!rolesEvent.isEmpty()) {
+				rolesEvent.remove(0);
 				responseMessage.setData(rolesEvent);
 				responseMessage.setMessage("Lấy tất cả vai trò mặc định trong sự kiện thành công");
 			} else {

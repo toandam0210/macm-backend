@@ -65,7 +65,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	AttendanceEventRepository attendanceEventRepository;
 
 	@Override
-	public ResponseMessage takeAttendanceByStudentId(String studentId, int status, int trainingScheduleId) {
+	public ResponseMessage takeAttendanceByStudentId(String studentId, int status, int trainingScheduleId, String adminStudentId) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<TrainingSchedule> trainingScheduleOp = trainingScheduleRepository.findById(trainingScheduleId);
@@ -73,6 +73,16 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				TrainingSchedule trainingSchedule = trainingScheduleOp.get();
 				if (trainingSchedule.getDate().isBefore(LocalDate.now())
 						|| trainingSchedule.getDate().isEqual(LocalDate.now())) {
+					User admin = userRepository.findByStudentId(adminStudentId).get();
+					AttendanceStatus attendanceStatusAdmin = attendanceStatusRepository
+							.findByUserIdAndTrainingScheduleId(admin.getId(), trainingSchedule.getId());
+					if (attendanceStatusAdmin != null && attendanceStatusAdmin.getStatus() != 1) {
+						attendanceStatusAdmin.setStatus(1);
+						attendanceStatusAdmin.setUpdatedOn(LocalDateTime.now());
+						attendanceStatusAdmin.setUpdatedBy(admin.getName() + " - " + admin.getStudentId());
+						attendanceStatusRepository.save(attendanceStatusAdmin);
+					}
+					
 					Optional<User> userOp = userRepository.findByStudentId(studentId);
 					User user = userOp.get();
 					AttendanceStatus attendanceStatus = attendanceStatusRepository
@@ -129,7 +139,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 	}
 
 	@Override
-	public ResponseMessage checkAttendanceStatusByTrainingSchedule(int trainingScheduleId) {
+	public ResponseMessage checkAttendanceStatusByTrainingSchedule(int trainingScheduleId, int status) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			List<AttendanceStatus> attendancesStatus = attendanceStatusRepository
@@ -144,21 +154,45 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 				attendanceStatusDto.setStudentId(attendanceStatus.getUser().getStudentId());
 				attendanceStatusDto.setStatus(attendanceStatus.getStatus());
 				attendanceStatusDto.setTrainingScheduleId(trainingScheduleId);
+				attendanceStatusDto.setDate(attendanceStatus.getTrainingSchedule().getDate());
+				
+				switch (status) {
+				case -1:
+					attendanceStatusDtos.add(attendanceStatusDto);
+					break;
+				case 0:
+					if (attendanceStatus.getStatus() == 0) {
+						attendanceStatusDtos.add(attendanceStatusDto);
+					}
+					break;
+				case 1:
+					if (attendanceStatus.getStatus() == 1) {
+						attendanceStatusDtos.add(attendanceStatusDto);
+					}
+					break;
+				case 2:
+					if (attendanceStatus.getStatus() == 2) {
+						attendanceStatusDtos.add(attendanceStatusDto);
+					}
+					break;
+				default:
+					attendanceStatusDtos.add(attendanceStatusDto);
+					break;
+				}
+				
 				if (attendanceStatus.getStatus() == 1) {
 					attend++;
 				}
 				if (attendanceStatus.getStatus() == 0) {
 					absent++;
 				}
-				attendanceStatusDto.setDate(attendanceStatus.getTrainingSchedule().getDate());
-				attendanceStatusDtos.add(attendanceStatusDto);
 			}
 			Collections.sort(attendanceStatusDtos);
 			responseMessage.setData(attendanceStatusDtos);
 			responseMessage.setMessage(Constant.MSG_057);
 			responseMessage.setTotalActive(attend);
 			responseMessage.setTotalDeactive(absent);
-			responseMessage.setTotalResult(attendanceStatusDtos.size());
+			responseMessage.setTotalResult(attendancesStatus.size());
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
