@@ -742,7 +742,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 					notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
 
 					responseMessage.setData(Arrays.asList(memberEvent));
-					responseMessage.setMessage("Từ chối đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
+					responseMessage.setMessage("Chấp nhận yêu cầu đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
 							+ " - " + memberEvent.getUser().getStudentId());
 				} else {
 					responseMessage.setMessage("Yêu cầu đăng ký không hợp lệ");
