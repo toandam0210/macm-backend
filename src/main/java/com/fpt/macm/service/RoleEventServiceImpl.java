@@ -22,8 +22,9 @@ public class RoleEventServiceImpl implements RoleEventService {
 	public ResponseMessage getAllRoleEvent() {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<RoleEvent> rolesEvent = roleEventRepository.findAll(Sort.by("id").descending());
+			List<RoleEvent> rolesEvent = roleEventRepository.findAll(Sort.by("id").ascending());
 			if (!rolesEvent.isEmpty()) {
+				rolesEvent.remove(0);
 				responseMessage.setData(rolesEvent);
 				responseMessage.setMessage("Lấy tất cả vai trò mặc định trong sự kiện thành công");
 			} else {
@@ -36,9 +37,10 @@ public class RoleEventServiceImpl implements RoleEventService {
 	}
 
 	@Override
-	public ResponseMessage addNewRoleEvent(String newName) {
+	public ResponseMessage addNewRoleEvent(RoleEvent newRoleEvent) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			String newName = newRoleEvent.getName();
 			if (!newName.trim().equals("")) {
 				List<RoleEvent> rolesEvent = roleEventRepository.findAll();
 				for (RoleEvent roleEvent : rolesEvent) {
@@ -64,9 +66,10 @@ public class RoleEventServiceImpl implements RoleEventService {
 	}
 
 	@Override
-	public ResponseMessage updateRoleEventName(int roleEventId, String newName) {
+	public ResponseMessage updateRoleEventName(int roleEventId, RoleEvent newRoleEvent) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
+			String newName = newRoleEvent.getName();
 			if (!newName.trim().equals("")) {
 				List<RoleEvent> rolesEvent = roleEventRepository.findAll();
 				for (RoleEvent roleEvent : rolesEvent) {

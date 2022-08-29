@@ -172,24 +172,24 @@ public class TournamentScheduleServiceImpl implements TournamentScheduleService 
 	}
 
 	@Override
-	public ResponseMessage updateTournamentSession(int tournamentSessionId, TournamentSchedule tournamentSchedule) {
+	public ResponseMessage updateTournamentSession(int tournamentSessionId, TournamentSchedule newTournamentSchedule) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			Optional<TournamentSchedule> currentSession = tournamentScheduleRepository.findById(tournamentSessionId);
-			TournamentSchedule getTournamentSession = currentSession.get();
-			if(getTournamentSession.getDate().compareTo(LocalDate.now()) > 0) {
-				getTournamentSession.setStartTime(tournamentSchedule.getStartTime());
-				getTournamentSession.setFinishTime(tournamentSchedule.getFinishTime());
-				getTournamentSession.setUpdatedBy("LinhLHN");
-				getTournamentSession.setUpdatedOn(LocalDateTime.now());
-				tournamentScheduleRepository.save(getTournamentSession);
-				responseMessage.setData(Arrays.asList(getTournamentSession));
+			TournamentSchedule tournamentSchedule = currentSession.get();
+			if(tournamentSchedule.getDate().compareTo(LocalDate.now()) > 0) {
+				tournamentSchedule.setStartTime(newTournamentSchedule.getStartTime());
+				tournamentSchedule.setFinishTime(newTournamentSchedule.getFinishTime());
+				tournamentSchedule.setUpdatedBy("LinhLHN");
+				tournamentSchedule.setUpdatedOn(LocalDateTime.now());
+				tournamentScheduleRepository.save(tournamentSchedule);
+				responseMessage.setData(Arrays.asList(tournamentSchedule));
 				responseMessage.setMessage(Constant.MSG_107);
-				CommonSchedule commonSession = commonScheduleService.getCommonSessionByDate(getTournamentSession.getDate());
-				commonSession.setStartTime(tournamentSchedule.getStartTime());
-				commonSession.setFinishTime(tournamentSchedule.getFinishTime());
-				commonSession.setUpdatedOn(LocalDateTime.now());
-				commonScheduleRepository.save(commonSession);
+				CommonSchedule commonSchedule = commonScheduleService.getCommonSessionByDate(tournamentSchedule.getDate());
+				commonSchedule.setStartTime(newTournamentSchedule.getStartTime());
+				commonSchedule.setFinishTime(newTournamentSchedule.getFinishTime());
+				commonSchedule.setUpdatedOn(LocalDateTime.now());
+				commonScheduleRepository.save(commonSchedule);
 			}
 			else {
 				responseMessage.setMessage(Constant.MSG_108);

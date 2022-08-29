@@ -45,7 +45,7 @@ public class CommonScheduleServiceImpl implements CommonScheduleService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		List<CommonSchedule> getAllCommonSchedule = commonScheduleRepository.listAll();
 		responseMessage.setData(getAllCommonSchedule);
-		responseMessage.setMessage(Constant.MSG_105);
+		responseMessage.setMessage("Lấy lịch hoạt động chung của CLB thành công");
 		return responseMessage;
 	}
 
@@ -58,9 +58,9 @@ public class CommonScheduleServiceImpl implements CommonScheduleService {
 			Optional<CommonSchedule> getSessionOp = commonScheduleRepository.findByDate(getDate);
 			if (getSessionOp.isPresent()) {
 				responseMessage.setData(Arrays.asList(getSessionOp.get()));
-				responseMessage.setMessage(Constant.MSG_103);
+				responseMessage.setMessage("Lấy lịch hoạt động ngày " + date.toString() + " của CLB thành công");
 			} else {
-				responseMessage.setMessage(Constant.MSG_104);
+				responseMessage.setMessage("Ngày " + date + " không có hoạt động nào");
 			}
 		} catch (Exception e) {
 			// TODO: handle exception

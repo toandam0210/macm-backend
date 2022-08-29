@@ -462,7 +462,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 			List<User> listUser = (List<User>) userRepository.findAll();
 			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
 			for (User user : listUser) {
-				Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(eventId,
+				Optional<MemberEvent> memberEventOp = memberEventRepository.findByEventIdAndUserId(eventId,
 						user.getId());
 				if (memberEventOp.isPresent()) {
 					MemberEvent memberEvent = memberEventOp.get();
@@ -507,11 +507,17 @@ public class MemberEventServiceImpl implements MemberEventService {
 			for (MemberEventDto memberEventDto : listToJoin) {
 				User user = userRepository.findById(memberEventDto.getUserId()).get();
 				MemberEvent memberEvent = new MemberEvent();
-				if (memberEventDto.getRegisterStatus().equals(Constant.REQUEST_STATUS_DECLINED)) {
-					memberEvent = memberEventRepository
-							.findMemberEventByEventAndUser(eventId, memberEventDto.getUserId()).get();
-					memberEvent.setUpdatedBy("toandv");
-					memberEvent.setUpdatedOn(LocalDateTime.now());
+
+				Optional<MemberEvent> memberEventOp = memberEventRepository.findByEventIdAndUserId(event.getId(),
+						user.getId());
+				if (memberEventOp.isPresent()) {
+					memberEvent = memberEventOp.get();
+					if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_DECLINED)) {
+						memberEvent = memberEventRepository.findByEventIdAndUserId(eventId, memberEventDto.getUserId())
+								.get();
+						memberEvent.setUpdatedBy("toandv");
+						memberEvent.setUpdatedOn(LocalDateTime.now());
+					}
 				} else {
 					memberEvent.setEvent(event);
 					memberEvent.setUser(user);
@@ -520,10 +526,10 @@ public class MemberEventServiceImpl implements MemberEventService {
 					memberEvent.setCreatedBy("toandv");
 					memberEvent.setCreatedOn(LocalDateTime.now());
 				}
+
 				memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_APPROVED);
 				Optional<EventRole> eventRoleOp = eventRoleRepository
 						.findByNameAndEventId(Constant.ROLE_EVENT_MEMBER_VN, event.getId());
-				;
 				EventRole eventRole = eventRoleOp.get();
 				memberEvent.setEventRole(eventRole);
 				listJoinEvent.add(memberEvent);
@@ -578,7 +584,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 				User user = userRepository.findByStudentId(studentId).get();
 
 				MemberEvent memberEvent = new MemberEvent();
-				Optional<MemberEvent> memberEventOp = memberEventRepository.findMemberEventByEventAndUser(event.getId(),
+				Optional<MemberEvent> memberEventOp = memberEventRepository.findByEventIdAndUserId(event.getId(),
 						user.getId());
 				if (memberEventOp.isPresent()) {
 					memberEvent = memberEventOp.get();
@@ -645,7 +651,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 						MemberEvent memberEvent = new MemberEvent();
 
 						Optional<MemberEvent> memberEventOp = memberEventRepository
-								.findMemberEventByEventAndUser(event.getId(), user.getId());
+								.findByEventIdAndUserId(event.getId(), user.getId());
 						if (memberEventOp.isPresent()) {
 							memberEvent = memberEventOp.get();
 							if (memberEvent.getRegisterStatus().equals(Constant.REQUEST_STATUS_APPROVED)
@@ -736,13 +742,13 @@ public class MemberEventServiceImpl implements MemberEventService {
 					notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
 
 					responseMessage.setData(Arrays.asList(memberEvent));
-					responseMessage.setMessage("Từ chối đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
+					responseMessage.setMessage("Chấp nhận yêu cầu đăng ký tham gia sự kiện của " + memberEvent.getUser().getName()
 							+ " - " + memberEvent.getUser().getStudentId());
 				} else {
 					responseMessage.setMessage("Yêu cầu đăng ký không hợp lệ");
 				}
 			} else {
-				responseMessage.setMessage("Sai memberEventId rồi");
+				responseMessage.setMessage("Thành viên này không tồn tại");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
@@ -792,7 +798,7 @@ public class MemberEventServiceImpl implements MemberEventService {
 					responseMessage.setMessage("Yêu cầu đăng ký không hợp lệ");
 				}
 			} else {
-				responseMessage.setMessage("Sai memberEventId rồi");
+				responseMessage.setMessage("Thành viên này không tồn tại");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
@@ -807,43 +813,59 @@ public class MemberEventServiceImpl implements MemberEventService {
 			Optional<MemberEvent> memberEventOp = memberEventRepository.findById(memberEventId);
 			if (memberEventOp.isPresent()) {
 				MemberEvent memberEvent = memberEventOp.get();
-				if (memberEvent.getPaymentValue() == 0) {
-					memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
-					memberEvent.setUpdatedBy("toandv");
-					memberEvent.setUpdatedOn(LocalDateTime.now());
-					memberEventRepository.save(memberEvent);
-
-					Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
-							.findByEventIdAndUserId(memberEvent.getEvent().getId(), memberEvent.getUser().getId());
-					if (attendanceEventOp.isPresent()) {
-						AttendanceEvent attendanceEvent = attendanceEventOp.get();
-						attendanceEventRepository.delete(attendanceEvent);
-					}
-
-					Notification notification = new Notification();
-					notification.setMessage("Bạn đã bị xóa khỏi sự kiện " + memberEvent.getEvent().getName());
-					notification.setCreatedOn(LocalDateTime.now());
-					notification.setNotificationType(1);
-					notification.setNotificationTypeId(memberEvent.getEvent().getId());
-					notificationRepository.save(notification);
-
-					Iterable<Notification> notificationIterable = notificationRepository
-							.findAll(Sort.by("id").descending());
-					List<Notification> notifications = IterableUtils.toList(notificationIterable);
-					Notification newNotification = notifications.get(0);
-
-					notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
-
-					responseMessage.setData(Arrays.asList(memberEvent));
-					responseMessage.setMessage("Xóa " + memberEvent.getUser().getName() + " - "
-							+ memberEvent.getUser().getStudentId() + " khỏi sự kiện thành công");
-				} else {
-					responseMessage.setMessage(
-							"Thành viên này đã đóng phí tham gia. Vui lòng cập nhật lại trạng thái đóng tiền của "
-									+ memberEvent.getUser().getName() + " - " + memberEvent.getUser().getStudentId());
+				if (memberEvent.getPaymentValue() != 0) {
+					User user = memberEvent.getUser();
+					clubFundService.withdrawFromClubFund(user.getStudentId(), memberEvent.getPaymentValue(),
+							("Hoàn phí đăng ký tham gia sự kiện " + memberEvent.getEvent().getName()
+									+ " cho thành viên " + user.getName()) + " - " + user.getStudentId());
+					memberEvent.setPaymentValue(0);
+					memberEvent.setPaidBeforeClosing(false);
+					
+					List<ClubFund> clubFunds = clubFundRepository.findAll();
+					ClubFund clubFund = clubFunds.get(0);
+					
+					EventPaymentStatusReport eventPaymentStatusReport = new EventPaymentStatusReport();
+					eventPaymentStatusReport.setEvent(memberEvent.getEvent());
+					eventPaymentStatusReport.setUser(memberEvent.getUser());
+					eventPaymentStatusReport.setPaymentValue(memberEvent.getPaymentValue());
+					eventPaymentStatusReport.setFundChange(-memberEvent.getPaymentValue());
+					eventPaymentStatusReport.setFundBalance(clubFund.getFundAmount());
+					eventPaymentStatusReport.setCreatedBy(user.getName() + " - " + user.getStudentId());
+					eventPaymentStatusReport.setCreatedOn(LocalDateTime.now());
+					eventPaymentStatusReportRepository.save(eventPaymentStatusReport);
 				}
+
+				memberEvent.setRegisterStatus(Constant.REQUEST_STATUS_DECLINED);
+				memberEvent.setUpdatedBy("toandv");
+				memberEvent.setUpdatedOn(LocalDateTime.now());
+				memberEventRepository.save(memberEvent);
+
+				Optional<AttendanceEvent> attendanceEventOp = attendanceEventRepository
+						.findByEventIdAndUserId(memberEvent.getEvent().getId(), memberEvent.getUser().getId());
+				if (attendanceEventOp.isPresent()) {
+					AttendanceEvent attendanceEvent = attendanceEventOp.get();
+					attendanceEventRepository.delete(attendanceEvent);
+				}
+
+				Notification notification = new Notification();
+				notification.setMessage("Bạn đã bị xóa khỏi sự kiện " + memberEvent.getEvent().getName());
+				notification.setCreatedOn(LocalDateTime.now());
+				notification.setNotificationType(1);
+				notification.setNotificationTypeId(memberEvent.getEvent().getId());
+				notificationRepository.save(notification);
+
+				Iterable<Notification> notificationIterable = notificationRepository
+						.findAll(Sort.by("id").descending());
+				List<Notification> notifications = IterableUtils.toList(notificationIterable);
+				Notification newNotification = notifications.get(0);
+
+				notificationService.sendNotificationToAnUser(memberEvent.getUser(), newNotification);
+
+				responseMessage.setData(Arrays.asList(memberEvent));
+				responseMessage.setMessage("Xóa " + memberEvent.getUser().getName() + " - "
+						+ memberEvent.getUser().getStudentId() + " khỏi sự kiện thành công");
 			} else {
-				responseMessage.setMessage("Sai memberEventId rồi");
+				responseMessage.setMessage("Thành viên này không tồn tại");
 			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
@@ -877,6 +899,86 @@ public class MemberEventServiceImpl implements MemberEventService {
 						+ user.getStudentId() + " thành công");
 			}
 
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllRequestToJoinEvent(int eventId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId,
+					Constant.REQUEST_STATUS_PENDING);
+			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
+			if (!membersEvent.isEmpty()) {
+				for (MemberEvent memberEvent : membersEvent) {
+					if (memberEvent.getEventRole().getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
+						MemberEventDto memberEventDto = new MemberEventDto();
+						memberEventDto.setId(memberEvent.getId());
+						memberEventDto.setUserName(memberEvent.getUser().getName());
+						memberEventDto.setUserMail(memberEvent.getUser().getEmail());
+						memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
+						memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
+						EventRoleDto eventRoleDto = new EventRoleDto();
+						eventRoleDto.setId(memberEvent.getEventRole().getId());
+						eventRoleDto.setName(memberEvent.getEventRole().getName());
+						memberEventDto.setEventRoleDto(eventRoleDto);
+						memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
+						memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
+						memberEventDto
+								.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
+						memberEventDto.setAmountPerRegisterActual(memberEvent.getEvent().getAmountPerRegisterActual());
+						membersEventDto.add(memberEventDto);
+					}
+				}
+
+				responseMessage.setData(membersEventDto);
+				responseMessage.setMessage("Lấy danh sách thành viên đăng ký tham gia thành công");
+			} else {
+				responseMessage.setMessage("Chưa có thành viên nào đăng ký tham gia");
+			}
+		} catch (Exception e) {
+			responseMessage.setMessage(e.getMessage());
+		}
+		return responseMessage;
+	}
+
+	@Override
+	public ResponseMessage getAllRequestToJoinOrganizingCommittee(int eventId) {
+		ResponseMessage responseMessage = new ResponseMessage();
+		try {
+			List<MemberEvent> membersEvent = memberEventRepository.findByEventIdAndRegisterStatus(eventId,
+					Constant.REQUEST_STATUS_PENDING);
+			List<MemberEventDto> membersEventDto = new ArrayList<MemberEventDto>();
+			if (!membersEvent.isEmpty()) {
+				for (MemberEvent memberEvent : membersEvent) {
+					if (!memberEvent.getEventRole().getName().equals(Constant.ROLE_EVENT_MEMBER_VN)) {
+						MemberEventDto memberEventDto = new MemberEventDto();
+						memberEventDto.setId(memberEvent.getId());
+						memberEventDto.setUserName(memberEvent.getUser().getName());
+						memberEventDto.setUserMail(memberEvent.getUser().getEmail());
+						memberEventDto.setUserStudentId(memberEvent.getUser().getStudentId());
+						memberEventDto.setRegisterStatus(memberEvent.getRegisterStatus());
+						EventRoleDto eventRoleDto = new EventRoleDto();
+						eventRoleDto.setId(memberEvent.getEventRole().getId());
+						eventRoleDto.setName(memberEvent.getEventRole().getName());
+						memberEventDto.setEventRoleDto(eventRoleDto);
+						memberEventDto.setRoleInClub(Utils.convertRoleFromDbToExcel(memberEvent.getUser().getRole()));
+						memberEventDto.setPaymentValue(memberEvent.getPaymentValue());
+						memberEventDto
+								.setAmountPerRegisterEstimate(memberEvent.getEvent().getAmountPerRegisterEstimated());
+						memberEventDto.setAmountPerRegisterActual(memberEvent.getEvent().getAmountPerRegisterActual());
+						membersEventDto.add(memberEventDto);
+					}
+				}
+
+				responseMessage.setData(membersEventDto);
+				responseMessage.setMessage("Lấy danh sách thành viên đăng ký tham gia BTC thành công");
+			} else {
+				responseMessage.setMessage("Chưa có thành viên nào đăng ký tham gia BTC");
+			}
 		} catch (Exception e) {
 			responseMessage.setMessage(e.getMessage());
 		}
