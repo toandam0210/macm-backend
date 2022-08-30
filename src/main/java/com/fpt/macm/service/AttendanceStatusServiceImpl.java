@@ -348,6 +348,7 @@ public class AttendanceStatusServiceImpl implements AttendanceStatusService {
 			}
 
 			if (!oldTrainingSchedules.isEmpty()) {
+				Collections.sort(oldTrainingSchedules);
 				responseMessage.setData(oldTrainingSchedules);
 				responseMessage.setMessage("Lấy danh sách các buổi tập đã qua của kỳ " + semester.getName()
 						+ " để điểm danh lại thành công");

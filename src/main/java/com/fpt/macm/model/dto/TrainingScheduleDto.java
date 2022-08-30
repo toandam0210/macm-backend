@@ -3,7 +3,7 @@ package com.fpt.macm.model.dto;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-public class TrainingScheduleDto {
+public class TrainingScheduleDto implements Comparable<TrainingScheduleDto>{
 
 	private int id;
 	private LocalDate date;
@@ -58,6 +58,11 @@ public class TrainingScheduleDto {
 
 	public void setTotalSize(int totalSize) {
 		this.totalSize = totalSize;
+	}
+
+	@Override
+	public int compareTo(TrainingScheduleDto o) {
+		return o.getDate().compareTo(this.getDate());
 	}
 
 }
