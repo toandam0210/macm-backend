@@ -221,10 +221,10 @@ public class DashboardServiceImpl implements DashboardService {
 	public ResponseMessage statusMemberReport(String semesterName) {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
-			List<Semester> semesters = semesterRepository.findTop3Semester();
+			List<Semester> semesters = semesterRepository.findTop4Semester();
 			UserActiveReportDto userActiveReportDto = new UserActiveReportDto();
 			if (semesters.size() > 1) {
-				Semester semester = semesters.get(0);
+				Semester semester = semesters.get(1);
 				int totalActive = 0;
 				int totalUser = 0;
 				int totalActiveBefore = 0;
@@ -453,7 +453,7 @@ public class DashboardServiceImpl implements DashboardService {
 				endDateFilter = LocalDate.now().plusMonths(1);
 				break;
 			case 2:
-				Semester semester = semesterRepository.findTop3Semester().get(0);
+				Semester semester = semesterRepository.findTop4Semester().get(1);
 				endDateFilter = semester.getEndDate();
 				break;
 			default:
