@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.fpt.macm.constant.Constant;
@@ -25,6 +26,7 @@ import com.fpt.macm.repository.CommonScheduleRepository;
 import com.fpt.macm.repository.EventRepository;
 import com.fpt.macm.repository.EventScheduleRepository;
 import com.fpt.macm.repository.MemberEventRepository;
+import com.fpt.macm.repository.SemesterRepository;
 import com.fpt.macm.repository.TrainingScheduleRepository;
 import com.fpt.macm.utils.Utils;
 
@@ -60,6 +62,9 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 
 	@Autowired
 	AttendanceStatusRepository attendanceStatusRepository;
+	
+	@Autowired
+	SemesterRepository semesterRepository;
 
 	@Override
 	public ResponseMessage createPreviewEventSchedule(String eventName, String startDate, String finishDate,
@@ -80,8 +85,8 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 			} else if (startLocalDate.compareTo(LocalDate.now()) <= 0) {
 				responseMessage.setMessage(Constant.MSG_065);
 			} else {
-				Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-				if (finishLocalDate.compareTo(currentSemester.getEndDate()) > 0) {
+				Semester lastSemester = semesterRepository.findAll(Sort.by("startDate").descending()).get(0);
+				if (finishLocalDate.compareTo(lastSemester.getEndDate()) > 0) {
 					responseMessage.setMessage(Constant.MSG_080);
 				} else {
 					List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
@@ -186,8 +191,8 @@ public class EventScheduleServiceImpl implements EventScheduleService {
 			} else if (startLocalDate.compareTo(LocalDate.now()) <= 0) {
 				responseMessage.setMessage(Constant.MSG_065);
 			} else {
-				Semester currentSemester = (Semester) semesterService.getCurrentSemester().getData().get(0);
-				if (finishLocalDate.compareTo(currentSemester.getEndDate()) > 0) {
+				Semester lastSemester = semesterRepository.findAll(Sort.by("startDate").descending()).get(0);
+				if (finishLocalDate.compareTo(lastSemester.getEndDate()) > 0) {
 					responseMessage.setMessage(Constant.MSG_080);
 				} else {
 					List<ScheduleDto> listPreview = new ArrayList<ScheduleDto>();
