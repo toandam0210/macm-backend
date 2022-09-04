@@ -482,7 +482,7 @@ public class EventServiceImpl implements EventService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			if (semester == "") {
-				semester = semesterRepository.findTop3Semester().get(0).getName();
+				semester = semesterRepository.findTop4Semester().get(1).getName();
 			}
 			List<Event> events = eventRepository.findBySemesterOrderByIdAsc(semester);
 			List<EventDto> eventDtos = new ArrayList<EventDto>();
@@ -611,7 +611,7 @@ public class EventServiceImpl implements EventService {
 			User user = userRepository.findByStudentId(studentId).get();
 
 			if (semester == "") {
-				semester = semesterRepository.findTop3Semester().get(0).getName();
+				semester = semesterRepository.findTop4Semester().get(1).getName();
 			}
 			List<Event> events = eventRepository.findBySemesterOrderByIdAsc(semester);
 

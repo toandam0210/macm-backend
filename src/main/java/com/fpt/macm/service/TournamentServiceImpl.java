@@ -673,7 +673,7 @@ public class TournamentServiceImpl implements TournamentService {
 		ResponseMessage responseMessage = new ResponseMessage();
 		try {
 			if (semester == "") {
-				semester = semesterRepository.findTop3Semester().get(0).getName();
+				semester = semesterRepository.findTop4Semester().get(1).getName();
 			}
 			List<Tournament> tournaments = tournamentRepository.findBySemester(semester);
 			List<TournamentDto> tournamentDtos = new ArrayList<TournamentDto>();
@@ -2090,7 +2090,7 @@ public class TournamentServiceImpl implements TournamentService {
 			User user = userRepository.findByStudentId(studentId).get();
 
 			if (semester == "") {
-				semester = semesterRepository.findTop3Semester().get(0).getName();
+				semester = semesterRepository.findTop4Semester().get(1).getName();
 			}
 			List<Tournament> tournaments = tournamentRepository.findBySemester(semester);
 			List<UserTournamentDto> userTournamentsDto = new ArrayList<UserTournamentDto>();
